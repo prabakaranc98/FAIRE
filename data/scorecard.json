@@ -1,0 +1,19 @@
+{
+  "lastUpdated": "2026-04-06",
+  "metrics": [
+    { "id": "workshop_papers",    "icon": "📄", "label": "Workshop papers accepted",  "target": 2,   "current": 0, "category": "papers" },
+    { "id": "main_conference",    "icon": "📄", "label": "Main conference submitted",  "target": 1,   "current": 0, "category": "papers" },
+    { "id": "survey_paper",       "icon": "📄", "label": "Survey / position paper",   "target": 1,   "current": 0, "category": "papers" },
+    { "id": "github_repos",       "icon": "💻", "label": "GitHub repos (50+ ★)",      "target": 3,   "current": 0, "category": "products" },
+    { "id": "hf_model",           "icon": "🤗", "label": "HuggingFace model",         "target": 1,   "current": 0, "category": "products" },
+    { "id": "blog_posts",         "icon": "✍️", "label": "Blog posts published",      "target": 6,   "current": 0, "category": "content" },
+    { "id": "tutorials",          "icon": "📓", "label": "Tutorials with code",       "target": 2,   "current": 0, "category": "content" },
+    { "id": "portfolio",          "icon": "🌐", "label": "Portfolio website",         "target": 1,   "current": 0, "category": "visibility" },
+    { "id": "conf_presentations", "icon": "🎤", "label": "Conference presentations",  "target": 2,   "current": 0, "category": "visibility" },
+    { "id": "research_talk",      "icon": "🎙️", "label": "Research talk ready",      "target": 1,   "current": 0, "category": "visibility" },
+    { "id": "referrals",          "icon": "🤝", "label": "Warm referrals",            "target": 3,   "current": 0, "category": "network" },
+    { "id": "applications",       "icon": "📬", "label": "Applications submitted",   "target": 10,  "current": 0, "category": "applications" },
+    { "id": "kaggle",             "icon": "🏆", "label": "Kaggle competitions",       "target": 2,   "current": 0, "category": "mastery" },
+    { "id": "leetcode",           "icon": "💪", "label": "Leetcode problems",         "target": 200, "current": 0, "category": "mastery" }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "week": "2026-W14",
+  "dates": "Apr 6–12, 2026",
+  "phase": "Q2 — Foundation Sprint",
+  "sprint": "CRL theory + P3 domain decision + P1 experiments",
+  "entries": {
+    "lab": [],
+    "think_tank": [
+      "Explored CRL × RecSys landscape, identified gap",
+      "CRL vs IRM vs ICP comparison",
+      "Disentangled representation learning deep dive",
+      "Explored CRL × Biology (GenBio AI, AIDO)"
+    ],
+    "startup": [
+      "Scaffolded Applied Life pillar (6 problem spaces, key players)",
+      "Built PraCha Labs constellation (7 pillars connected)"
+    ],
+    "institute": [
+      "Created P3 Domain A: RecSys wiki page",
+      "Created Pre-Reads: AI+Biology page",
+      "Added CRL tutorials to Theoretical Foundations",
+      "Built Evidence Manifesto + OKR connections"
+    ]
+  },
+  "artifacts": "0 public (internal scaffolding phase)",
+  "key_decisions": "CRL × RecSys as primary P3 angle; Applied Life pillar established",
+  "next_week": "Begin P1 experiments; start score-based CRL implementation; portfolio site setup"
+}
