@@ -106,18 +106,28 @@ If a sprint stops feeling alive, that's information: write down why and either r
 The right problem pulls you toward it. If you're pushing, examine the problem.
 
 ### 10. Bird by bird
-When the problem feels too large, too open, or too uncertain — don't solve it.
-Find the one next concrete thing and do that.
+From Anne Lamott's *Bird by Bird* — the two things she argues make good writing also make good research.
 
+**Tell the truth on the page.**
+Write what you actually observed, not what you hoped to observe.
+Document the experiment that failed, the curve that didn't converge, the hypothesis that was wrong.
+Don't perform. Don't dress a null result in language that makes it sound like progress.
+Honest seeing — of what the model is actually doing, what the numbers actually say — is the work.
+A log entry that says "this didn't work and I don't know why yet" is more valuable than one that sounds impressive.
+
+**Take it bird by bird.**
+When a problem feels impossibly large, you don't solve it — you find the one next small piece and do that.
 Not "understand continual learning." → "Run one forgetting experiment on two tasks and plot the loss curves."
 Not "figure out how diffusion works." → "Implement the forward process for DDPM and verify the math."
 Not "build a world model." → "Can a small MLP predict the next state of a pendulum from five frames?"
 
+Start messy. A dirty first experiment is better than a perfect one that never ran.
+You refine after you've seen something real, not before.
+
+The sprint is one bird. The experiment is one bird. The honest log entry is one bird.
 You can't see the whole staircase. You only need the next step.
-The sprint is the step. The question is the step. The experiment is the step.
-*Bird by bird.*
 
 ---
 
 > The goal is not to solve everything. The goal is to know something real by the end.
-> The method: first principles, genuine curiosity, one bird at a time.
+> The method: first principles, genuine curiosity, tell the truth, one bird at a time.
