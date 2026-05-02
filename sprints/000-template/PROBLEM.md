@@ -59,7 +59,7 @@ Keep this short. You're not writing a literature review.
 
 ## Problem Space
 
-`World Models` / `Continual Learning` / `Causal Representation Learning` / `Post-Training & Alignment` / `Systems & Efficiency` / `Foundation Model Science`
+`LLMs` / `Mechanistic Interpretability` / `Diffusions & Flows` / `World Models` / `Continual Learning` / `Causal Representation Learning` / `Post-Training & Alignment` / `Systems & Efficiency` / `Foundation Model Science` / `Modern Deep Learning`
 
 ## Started
 

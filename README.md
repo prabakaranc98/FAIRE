@@ -22,12 +22,16 @@ All problems are in core Frontier AI Research and Engineering — no application
 
 | Space | Core question |
 |---|---|
+| **Large Language Models** | What determines reasoning, generalization, and capability — architecture, data, scale, or training recipe? |
+| **Mechanistic Interpretability** | What circuits, features, and structures form inside networks, and can we trace behavior back to them? |
+| **Diffusions & Flows** | How do score-based and flow-matching models learn the data manifold, and where does the geometry break? |
 | **World Models** | How do causal structure and energy landscapes make models generalize beyond training distribution? |
 | **Continual Learning** | Can we close the plasticity–stability gap without architectural overhead? |
 | **Causal Representation Learning** | Under what conditions can latent causal variables be identified from observations alone? |
 | **Post-Training & Alignment** | What do SFT, RLHF, and DPO actually do to a model's representations and capabilities? |
 | **Systems & Efficiency** | Where are the real bottlenecks — training, inference, communication — and can they be moved? |
-| **Foundation Model Science** | What can mechanistic analysis, probing, and scaling experiments tell us about what models learn? |
+| **Foundation Model Science** | What do scaling laws, probing, and ablations reveal about what models actually learn? |
+| **Modern Deep Learning** | What do the mathematical structures of deep learning — loss landscapes, optimization dynamics, generalization — actually explain? |
 
 ---
 
