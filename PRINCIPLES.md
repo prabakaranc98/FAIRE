@@ -105,7 +105,19 @@ Not because interest makes it easier — because uninspired work produces shallo
 If a sprint stops feeling alive, that's information: write down why and either reframe or abandon it.
 The right problem pulls you toward it. If you're pushing, examine the problem.
 
+### 10. Bird by bird
+When the problem feels too large, too open, or too uncertain — don't solve it.
+Find the one next concrete thing and do that.
+
+Not "understand continual learning." → "Run one forgetting experiment on two tasks and plot the loss curves."
+Not "figure out how diffusion works." → "Implement the forward process for DDPM and verify the math."
+Not "build a world model." → "Can a small MLP predict the next state of a pendulum from five frames?"
+
+You can't see the whole staircase. You only need the next step.
+The sprint is the step. The question is the step. The experiment is the step.
+*Bird by bird.*
+
 ---
 
 > The goal is not to solve everything. The goal is to know something real by the end.
-> The method is first principles: understand deeply, build honestly, follow what's actually interesting.
+> The method: first principles, genuine curiosity, one bird at a time.
