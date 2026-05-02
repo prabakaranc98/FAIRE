@@ -11,6 +11,15 @@ Write a single, concrete question. If it takes more than two sentences, it's two
 
 **Question:** ___
 
+## Objectives
+
+Which of the four does this sprint serve? Check all that apply and write one sentence per checked item on what that looks like here.
+
+- [ ] **Discovery** — what new pattern or behavior are you looking for?
+- [ ] **Evidence** — what claim are you trying to ground empirically?
+- [ ] **Inference** — what conclusion do you expect to be able to draw?
+- [ ] **Optimization** — what are you making better, and how will you measure it?
+
 ---
 
 ## Why This is at the Frontier

@@ -1,6 +1,47 @@
 # Principles
 ## Rules of engagement for FAIRE
 
+---
+
+## The Four Objectives
+
+Every sprint — every experiment, every build — serves one or more of these.
+If you can't say which one you're doing, you don't have a sprint yet.
+
+**1. Discovery**
+Find something that wasn't known before — to you, or in the field.
+A new pattern, a surprising failure mode, a connection between two ideas.
+Discovery doesn't require novelty; it requires honest observation.
+*The question: "What is here that I didn't expect?"*
+
+**2. Evidence**
+Ground a claim in something real — numbers, outputs, ablations, plots.
+Evidence is what separates a hypothesis from a belief.
+A sprint without evidence is a reading session.
+*The question: "What would make me believe or disbelieve this?"*
+
+**3. Inference**
+Draw a conclusion from what you observed.
+Not a summary — a claim. Something you're willing to be wrong about.
+The hardest step: most people stop at evidence and never say what it means.
+*The question: "Given what I saw, what do I now think is true?"*
+
+**4. Optimization**
+Make something better because of what you learned.
+Tighter code, a better loss, a faster system, a cleaner framing.
+Optimization without the first three is just tuning noise.
+*The question: "What should change, and by how much?"*
+
+---
+
+These are not sequential stages — they form a loop.
+Discovery generates hypotheses. Evidence tests them. Inference produces claims.
+Optimization acts on those claims. The next experiment begins from a higher baseline.
+
+---
+
+## Rules of engagement
+
 These exist to keep you out of rabbit holes and in contact with reality.
 The deeper aim: do research and engineering the way it's actually done — from first principles,
 driven by genuine curiosity, not by what looks good or what's already been done.
