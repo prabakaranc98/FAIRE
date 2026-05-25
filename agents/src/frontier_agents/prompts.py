@@ -236,9 +236,9 @@ STRUCTURE (follow the schema exactly)
   14. Minimum Valuable Build (if has_mvb: true) — specific, runnable recipe
   15. [After MVB] → separator → GitHub star CTA → separator
   16. Code & implementations — official repos, not tutorials
-  17. What can you build next? — arc connector section
+  17. What comes next — natural wiki links, no course/roadmap language
   18. Connected topics — [[wikilinks]] with relationship description
-  19. Further reading — arXiv/edu only
+  19. Further reading — primary sources only (arXiv/edu/distill.pub/lil'log)
 
 ═══════════════════════════════════════════════
 MATH RULES
@@ -254,11 +254,29 @@ because..." DO NOT just dump equations — every symbol must be grounded in word
 SOURCE RULES
 ═══════════════════════════════════════════════
 
-Default: arxiv.org, *.edu, huggingface.co, official library docs (pytorch.org, jax.readthedocs.io)
-"In production" section only: + engineering.linkedin.com, ai.meta.com, developer.nvidia.com/blog,
-  research.google, openai.com/research, aws.amazon.com/blogs/machine-learning, stability.ai/research
+PRIMARY SOURCES (link directly, cite freely):
+  arxiv.org, *.edu, huggingface.co, official library docs (pytorch.org, jax.readthedocs.io)
+
+SECONDARY REFERENCES (cite for attribution only — no copy-paste, paraphrase with credit):
+  lilianweng.github.io/posts — Lilian Weng's blog; high-quality technical writing.
+    Cite as: "Lilian Weng's survey on X (lil'log, YYYY)" — never copy paragraphs verbatim.
+  distill.pub — peer-reviewed interactive ML articles; cite with author + year.
+  lesswrong.com (alignment / interpretability posts by known researchers only) — cite sparingly
+    with author name. Only for original ideas, not general explanations.
+  The distinction: use these as pointers ("for an intuitive walkthrough, see..."),
+    never as the primary source for a factual claim.
+
+"IN PRODUCTION" SECTION ONLY — engineering blogs from frontier labs:
+  engineering.linkedin.com, ai.meta.com/research, developer.nvidia.com/blog,
+  research.google, openai.com/research, aws.amazon.com/blogs/machine-learning,
+  stability.ai/research, techblog.netflix.com, databricks.com/blog
+
 NEVER: medium.com, towardsdatascience.com, substack.com, youtube.com, wikipedia.org,
-       personal blogs, reddit.com, twitter.com
+       personal .github.io pages (except lilianweng.github.io), reddit.com, twitter.com
+
+DO NOT add a source-policy banner or disclaimer to the page itself.
+  The page should NOT say "sources: arXiv, .edu, HuggingFace only" anywhere in the footer
+  or page body. Source discipline is internal agent policy, not reader-facing content.
 
 ═══════════════════════════════════════════════
 MVB SECTION — THE CENTERPIECE
@@ -277,24 +295,31 @@ After stretch goals, add exactly:
 ---
 
 ═══════════════════════════════════════════════
-"WHAT CAN YOU BUILD NEXT?" — THE ARC CONNECTOR
+CONNECTED CONCEPTS — NATURAL WIKI LINKS
 ═══════════════════════════════════════════════
 
-After "Code & implementations", always add:
+After "Code & implementations", add a section that feels like natural hyperlinks — not a roadmap,
+not a course syllabus. This is a wiki: the reader is already here; they don't need selling.
 
-## What can you build next?
-> *Your arc of work continues here.*
+TONE RULES FOR THIS SECTION:
+  ✗ BAD: "This track covers X, Y, Z — continue your learning journey by..."
+  ✗ BAD: "In this arc, the next step is..."
+  ✗ BAD: "You'll want to learn X before moving on to Y"
+  ✓ GOOD: Links with one-sentence descriptions of *relationship*, not *sequence*
+  ✓ GOOD: "Score matching provides the probabilistic foundation — DDPM is the discrete
+    training procedure built on top of it."
+  ✓ GOOD: Natural cross-references, like an encyclopedia entry that points outward
 
-[1-2 sentences: what does having understood this unlock? What natural question follows?]
+FORMAT:
 
-**Go deeper on this concept:**
-→ [[related-concept]] — [one sentence on what it adds to your understanding]
+## What comes next
 
-**Build a system with this:**
-→ [[applied-topic]] — [one sentence on how this concept scales or deploys]
+[1 sentence on what this concept unlocks — stated as a fact, not a direction.
+ E.g. "Understanding score matching makes the noise schedule in DDPM precise rather than heuristic."]
 
-**The arc this page belongs to:**
-→ [Arc Name](../../arcs/arc-slug/index.md) — [one sentence on where the arc leads]
+- [[related-concept]] — [one sentence on the relationship, not the sequence]
+- [[applied-topic]] — [one sentence on how this feeds into something larger]
+- [[deeper-concept]] — [one sentence on the extension or generalization]
 
 ═══════════════════════════════════════════════
 ANTI-PATTERNS (the reviewer will flag these)
@@ -310,6 +335,10 @@ ANTI-PATTERNS (the reviewer will flag these)
   ✗ Any URL from medium.com, towardsdatascience.com, wikipedia.org
   ✗ Paper titles that look plausible but aren't real (hallucinated citations)
   ✗ "In production" without specific company + specific system + specific scale number
+  ✗ "This track covers..." or "In this arc..." — course/roadmap language has no place in a wiki
+  ✗ "Continue your learning journey" or any navigation framing that sells sequence
+  ✗ Source-policy banners on the page ("arXiv · .edu · HuggingFace sources only")
+  ✗ Copying explanations from lil'log or Distill — cite them, don't reproduce them
 
 SCHEMA (from SCHEMA.md):
 {schema}
@@ -398,19 +427,24 @@ REVIEW CHECKLIST:
    If any section is missing: passed=False, confidence<0.7
 
 2. SOURCE POLICY — all URLs from approved domains?
-   Approved (default): arxiv.org, *.edu, huggingface.co, pytorch.org, official library docs
+   Approved (default): arxiv.org, *.edu, huggingface.co, pytorch.org, official library docs,
+     lilianweng.github.io, distill.pub
+   Approved (secondary attribution, not primary source): lesswrong.com (research posts only)
    Approved (In production section only): engineering.linkedin.com, ai.meta.com, research.google,
      developer.nvidia.com/blog, openai.com/research, aws.amazon.com/blogs/machine-learning,
      stability.ai/research
    NEVER approved: medium.com, towardsdatascience.com, substack.com, wikipedia.org, youtube.com,
-     personal blogs, reddit.com
+     personal .github.io pages (except lilianweng.github.io), reddit.com
    If any unapproved URL found: passed=False
 
-3. PROSE QUALITY — no nested lists in explanatory sections?
+3. PROSE QUALITY — no nested lists, no course language, no source banners?
    Check these sections for nested lists (bullet inside bullet): What it is, Why it matters,
    What's happening now, In production. If any nested lists found: add to issues, reduce confidence.
    Check that "What it is" opens with an analogy/scenario, not a formal definition.
    If it opens with "X is a..." or "X refers to..." — flag it.
+   Check for course/roadmap language: "this track covers", "in this arc", "your learning journey",
+     "continue to the next step" — flag any instance, reduce confidence by 0.1.
+   Check the page does NOT contain a source-policy banner (e.g., "arXiv · .edu sources only").
 
 4. CITATION PLAUSIBILITY — do cited papers plausibly exist?
    Check: Do paper titles + authors + years make sense together?

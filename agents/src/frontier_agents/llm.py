@@ -73,20 +73,31 @@ def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
         "X-Title": "Frontier Wiki Agent",
     }
 
+    # Full wiki pages need 4000-8000 tokens of output — set explicitly per role
+    max_tokens_by_role = {
+        "writer":   8192,   # full schema page: ~3000-6000 tokens
+        "mvb":      4096,   # MVB section only
+        "reviewer": 2048,   # structured JSON feedback
+        "research": 4096,   # plan + summaries
+        "fallback": 8192,
+    }
+    max_tokens = max_tokens_by_role.get(role, 8192)
+
     if os.getenv("OPENROUTER_API_KEY"):
         return ChatOpenAI(
             model=model,
             openai_api_key=os.environ["OPENROUTER_API_KEY"],
             openai_api_base=OPENROUTER_BASE_URL,
             temperature=temperature,
+            max_tokens=max_tokens,
             model_kwargs={"extra_headers": extra_headers},
         )
 
     # Fallback: direct Anthropic via langchain-anthropic (when no OpenRouter key)
     from langchain_anthropic import ChatAnthropic
     return ChatAnthropic(  # type: ignore[return-value]
-        model=model.replace("anthropic/", "") or "claude-opus-4-7",
+        model=model.replace("anthropic/", "") or "claude-opus-4.7",
         anthropic_api_key=os.environ["ANTHROPIC_API_KEY"],
         temperature=temperature,
-        max_tokens=8000,
+        max_tokens=max_tokens,
     )
