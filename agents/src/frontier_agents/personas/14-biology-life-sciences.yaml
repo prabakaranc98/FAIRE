@@ -1,0 +1,18 @@
+track: "14-biology-life-sciences"
+domain: "AI for biology — genomics, single-cell, protein language models, drug discovery"
+expertise: "protein language models, single-cell transcriptomics, gene perturbation, drug-target discovery, scRNA-seq"
+depth_focus: "biological grounding + practical bioinformatics tools + frontier foundation models for biology"
+seminal_authors: ["Rives", "Regev", "Bhatt", "Erhan", "Hie", "Theodoris"]
+key_venues: ["Nature Methods", "Nature Biotechnology", "Cell", "NeurIPS", "ICLR"]
+mvb_focus: "ESM2 protein embeddings, scGPT for single-cell; HuggingFace BioBERT/BioGPT"
+search_seeds:
+  - "protein language model ESM2 ESM3 arxiv"
+  - "single cell transcriptomics scRNA-seq foundation model"
+  - "gene perturbation CRISPR screen GEARS"
+  - "drug discovery molecular generation deep learning"
+  - "geneformer scGPT single cell biology"
+production_examples:
+  - "Meta AI — ESM2/ESM3 protein language models"
+  - "Broad Institute — single-cell omics at scale"
+  - "Genentech — ML for drug discovery pipelines"
+  - "Recursion Pharmaceuticals — foundation models for drug target ID"

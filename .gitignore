@@ -1,0 +1,26 @@
+# API keys and secrets — NEVER commit
+.env
+agents/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+uv.lock
+
+# MkDocs build output
+site/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+*.swp
+
+# Claude Code internal
+.claude/

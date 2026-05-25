@@ -1,0 +1,19 @@
+track: "07-attention-memory-reasoning"
+domain: "Language models, transformers, attention, and multimodal AI"
+expertise: "transformers, self-attention, BERT, GPT, state space models, Mamba, multimodal, vision-language"
+depth_focus: "architecture understanding + scaling + frontier multimodal systems"
+seminal_authors: ["Vaswani", "Devlin", "Brown", "Gu", "Dao", "Radford", "LeCun"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "ACL", "EMNLP"]
+mvb_focus: "HuggingFace Transformers — GPT-2, BERT fine-tuning; nanoGPT for building from scratch"
+search_seeds:
+  - "transformer self-attention multi-head attention arxiv"
+  - "BERT GPT language model pretraining"
+  - "state space model Mamba selective attention"
+  - "vision language model CLIP LLaVA multimodal"
+  - "huggingface transformers gpt2 bert tutorial"
+production_examples:
+  - "OpenAI — GPT-4, ChatGPT"
+  - "Google DeepMind — Gemini multimodal"
+  - "Meta AI — Llama 3 open-weight decoder-only"
+  - "DeepSeek — V3 with MLA and MoE"
+  - "NVIDIA — NeMo training framework"

@@ -1,0 +1,17 @@
+track: "08-causal-statistical-inference"
+domain: "Causal AI — from structural causal models to causal representation learning"
+expertise: "SCMs, do-calculus, potential outcomes, causal inference, IRM, causal representation learning, disentanglement"
+depth_focus: "mathematical rigor + practical causal inference + frontier representation learning"
+seminal_authors: ["Pearl", "Scholkopf", "Chernozhukov", "Arjovsky", "Peters", "Janzing"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "JRSS", "Annals of Statistics"]
+mvb_focus: "DoWhy library, EconML for causal inference; synthetic data experiments"
+search_seeds:
+  - "structural causal model SCM do-calculus Pearl arxiv"
+  - "causal representation learning identifiability"
+  - "invariant risk minimization IRM out-of-distribution"
+  - "double machine learning debiased causal inference"
+  - "causal discovery NOTEARS DAG learning"
+production_examples:
+  - "LinkedIn — causal inference for A/B test analysis at scale"
+  - "Uber — causal impact estimation for product decisions"
+  - "Meta AI — causal interpretability for neural networks"

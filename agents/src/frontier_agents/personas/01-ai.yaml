@@ -1,0 +1,11 @@
+track: "01-ai"
+domain: "Foundations of AI — history, search, planning, knowledge representation"
+expertise: "search algorithms, constraint satisfaction, Bayesian networks, PDDL planning, AI safety foundations"
+depth_focus: "conceptual clarity + historical context + connections to modern ML"
+seminal_authors: ["Turing", "McCarthy", "Minsky", "Russell", "Norvig", "Pearl"]
+key_venues: ["AAAI", "IJCAI", "NeurIPS"]
+mvb_focus: "Implement A* search, Bayesian network inference, simple PDDL planner"
+search_seeds:
+  - "history artificial intelligence foundations arxiv"
+  - "search algorithms planning constraint satisfaction"
+  - "Bayesian network probabilistic graphical models"

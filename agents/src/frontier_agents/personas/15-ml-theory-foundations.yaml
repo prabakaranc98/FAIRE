@@ -1,0 +1,12 @@
+track: "15-ml-theory-foundations"
+domain: "ML theory — generalization, optimization theory, PAC learning, information theory"
+expertise: "PAC learning, VC dimension, Rademacher complexity, generalization bounds, NTK, loss landscape theory"
+depth_focus: "mathematical rigor + theoretical grounding for empirical observations"
+seminal_authors: ["Vapnik", "Bartlett", "Shalev-Shwartz", "Jacot", "Du", "Li"]
+key_venues: ["COLT", "NeurIPS", "ICML", "JMLR", "Foundations of Computational Mathematics"]
+mvb_focus: "Implement VC dimension estimation, empirically verify generalization bounds on small datasets"
+search_seeds:
+  - "PAC learning generalization bounds VC dimension arxiv"
+  - "neural tangent kernel NTK infinite width"
+  - "loss landscape neural networks saddle points"
+  - "double descent bias variance tradeoff deep learning"

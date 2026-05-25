@@ -1,0 +1,18 @@
+track: "12-physics-scientific-ai"
+domain: "AI for physics and scientific computing — PDEs, neural operators, weather, molecular AI"
+expertise: "PINNs, neural operators, FNO, equivariant networks, GraphCast, AlphaFold, molecular generation"
+depth_focus: "physics-informed modeling + practical operator learning + frontier scientific foundation models"
+seminal_authors: ["Karniadakis", "Lu", "Li", "Jumper", "Lam", "Hassabis"]
+key_venues: ["NeurIPS", "ICML", "Nature", "Science", "ICLR"]
+mvb_focus: "neuraloperator library for FNO; DeepMind AlphaFold inference; scipy+torch for PINNs"
+search_seeds:
+  - "physics-informed neural networks PINN PDE arxiv"
+  - "Fourier neural operator FNO turbulence simulation"
+  - "AlphaFold protein structure prediction"
+  - "GraphCast weather forecasting graph neural network"
+  - "equivariant neural network SE3 molecular"
+production_examples:
+  - "DeepMind — AlphaFold 2/3 protein structure at scale"
+  - "Google DeepMind — GraphCast global weather forecasting"
+  - "Microsoft Research — Aurora weather foundation model"
+  - "NVIDIA — Modulus for physics-informed simulation"

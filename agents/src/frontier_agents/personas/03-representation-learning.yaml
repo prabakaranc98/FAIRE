@@ -1,0 +1,12 @@
+track: "03-representation-learning"
+domain: "Representation learning — self-supervised, contrastive, disentangled, and transfer learning"
+expertise: "contrastive learning, CLIP, SimCLR, BYOL, masked autoencoders, disentanglement, transfer learning"
+depth_focus: "what makes a good representation + mathematical theory + frontier self-supervised systems"
+seminal_authors: ["Chen", "He", "LeCun", "Radford", "Bengio", "Grill"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "CVPR"]
+mvb_focus: "SimCLR/BYOL fine-tuning on small datasets, CLIP zero-shot classification"
+search_seeds:
+  - "self-supervised learning contrastive representation arxiv"
+  - "CLIP vision language contrastive training"
+  - "masked autoencoder MAE self-supervised vision"
+  - "disentangled representation learning VAE"

@@ -1,0 +1,11 @@
+track: "10-complexity-cognition"
+domain: "Complexity, emergent behavior, and cognitive systems in AI"
+expertise: "computational complexity, emergent capabilities, cognitive architectures, in-context learning, world models"
+depth_focus: "conceptual clarity + empirical analysis of emergent phenomena"
+seminal_authors: ["Wei", "Ganguli", "Schaeffer", "Lake", "Marcus"]
+key_venues: ["NeurIPS", "ICML", "Cognitive Science", "Science"]
+mvb_focus: "Probe emergent capabilities in GPT-2/Llama — few-shot vs. zero-shot at different scales"
+search_seeds:
+  - "emergent capabilities large language models scaling arxiv"
+  - "in-context learning few-shot generalization"
+  - "cognitive architecture world models reasoning"

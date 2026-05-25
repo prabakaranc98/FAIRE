@@ -1,0 +1,18 @@
+track: "06-reinforcement-learning"
+domain: "Reinforcement learning — from Bellman equations to RLHF and GRPO"
+expertise: "MDPs, policy gradient, PPO, DQN, RLHF, DPO, GRPO, RLVR, alignment, reward modeling"
+depth_focus: "theoretical foundations + practical alignment + frontier reasoning systems"
+seminal_authors: ["Sutton", "Barto", "Schulman", "Mnih", "Silver", "Rafailov", "DeepSeek"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "Nature"]
+mvb_focus: "HuggingFace TRL — DPOTrainer, PPOTrainer, GRPOTrainer; gymnasium for RL environments"
+search_seeds:
+  - "reinforcement learning policy gradient PPO arxiv"
+  - "RLHF reward model preference learning LLM"
+  - "direct preference optimization DPO alignment"
+  - "GRPO RLVR verifiable rewards DeepSeek reasoning"
+  - "huggingface TRL alignment training"
+production_examples:
+  - "OpenAI — InstructGPT, ChatGPT via RLHF"
+  - "Anthropic — Claude via Constitutional AI + RLHF"
+  - "DeepSeek — R1 via GRPO + verifiable rewards"
+  - "Meta AI — Llama 3 Instruct via DPO + RLHF"

@@ -1,0 +1,114 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+{{ super() }}
+
+<style>
+  .md-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 3rem 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+  }
+
+  .md-hero__inner {
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .md-hero__title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.02em;
+  }
+
+  .md-hero__subtitle {
+    font-size: 1.1rem;
+    color: #94a3b8;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .md-hero__cta {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .md-hero__cta a {
+    display: inline-block;
+    padding: 0.6rem 1.4rem;
+    border-radius: 0.375rem;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .md-hero__cta a.primary {
+    background: #6366f1;
+    color: white;
+  }
+
+  .md-hero__cta a.primary:hover {
+    background: #4f46e5;
+    transform: translateY(-1px);
+  }
+
+  .md-hero__cta a.secondary {
+    background: rgba(99, 102, 241, 0.1);
+    color: #a5b4fc;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+
+  .md-hero__cta a.secondary:hover {
+    background: rgba(99, 102, 241, 0.2);
+    transform: translateY(-1px);
+  }
+
+  .md-hero__tags {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .md-hero__tag {
+    background: rgba(255,255,255,0.06);
+    color: #94a3b8;
+    padding: 0.25rem 0.7rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-family: monospace;
+  }
+</style>
+
+<div class="md-hero">
+  <div class="md-hero__inner">
+    <div class="md-hero__title">Frontier Wiki</div>
+    <div class="md-hero__subtitle">
+      A 360° knowledge base — from ML fundamentals to frontier AI research.<br>
+      Structured for depth, built for exploration.
+    </div>
+    <div class="md-hero__cta">
+      <a href="curriculum/" class="primary">Explore Curriculum →</a>
+      <a href="arcs/" class="secondary">Follow a Learning Arc →</a>
+      <a href="references/seminal-papers/" class="secondary">Seminal Papers</a>
+    </div>
+    <div class="md-hero__tags">
+      <span class="md-hero__tag">15 tracks</span>
+      <span class="md-hero__tag">7 learning arcs</span>
+      <span class="md-hero__tag">arXiv · edu · HuggingFace</span>
+      <span class="md-hero__tag">editorial agents</span>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

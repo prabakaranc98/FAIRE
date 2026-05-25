@@ -1,0 +1,17 @@
+track: "04-neural-networks-dl"
+domain: "Neural networks and deep learning — architectures, optimization, and training"
+expertise: "backpropagation, optimization, CNNs, ResNets, batch normalization, dropout, scaling laws"
+depth_focus: "foundational understanding + mathematical rigor + practical training"
+seminal_authors: ["LeCun", "Bengio", "Hinton", "He", "Ioffe", "Szegedy", "Kingma", "Ba"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "CVPR"]
+mvb_focus: "PyTorch — train a ResNet on CIFAR-10, implement backprop from scratch, train a deep MLP"
+search_seeds:
+  - "deep learning optimization backpropagation arxiv"
+  - "residual networks skip connections training"
+  - "batch normalization layer normalization"
+  - "neural network scaling laws training compute"
+  - "huggingface pytorch training tutorial"
+production_examples:
+  - "NVIDIA — cuDNN, TensorRT for neural network inference"
+  - "Google — TPU training infrastructure for large models"
+  - "Meta AI — PyTorch production deployment"

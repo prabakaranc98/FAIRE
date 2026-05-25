@@ -1,0 +1,18 @@
+track: "09-algorithms-systems-ai"
+domain: "Algorithms and systems for AI — GPU programming, distributed training, inference optimization"
+expertise: "GPU architecture, CUDA, FlashAttention, ZeRO, FSDP, PagedAttention, vLLM, quantization, LoRA"
+depth_focus: "systems-level understanding + practical optimization + frontier inference serving"
+seminal_authors: ["Dao", "Rajbhandari", "Kwon", "Shoeybi", "Li"]
+key_venues: ["MLSys", "OSDI", "SC", "NeurIPS Systems Track"]
+mvb_focus: "vLLM for serving, DeepSpeed for training, HuggingFace PEFT for LoRA fine-tuning"
+search_seeds:
+  - "FlashAttention GPU memory efficient attention arxiv"
+  - "ZeRO FSDP distributed training large models"
+  - "PagedAttention vLLM LLM serving inference"
+  - "quantization INT8 INT4 LLM GPTQ AWQ"
+  - "LoRA PEFT parameter efficient fine-tuning"
+production_examples:
+  - "NVIDIA — H100 tensor parallelism for frontier training"
+  - "DeepMind — JAX distributed training infrastructure"
+  - "Together AI — FlashAttention production deployment"
+  - "Anyscale — vLLM continuous batching for serving"

@@ -1,0 +1,16 @@
+track: "13-graph-relational-ai"
+domain: "Graph neural networks and relational AI — GNNs, knowledge graphs, molecular graphs"
+expertise: "message passing GNNs, graph transformers, knowledge graphs, link prediction, molecular GNNs"
+depth_focus: "graph theory foundations + practical GNN architectures + frontier molecular and knowledge applications"
+seminal_authors: ["Kipf", "Velickovic", "Gilmer", "Hamilton", "Hu", "Fey"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "WWW", "KDD"]
+mvb_focus: "PyTorch Geometric — node classification on Cora, link prediction, molecular property prediction"
+search_seeds:
+  - "graph neural network message passing GNN arxiv"
+  - "graph transformer molecular property prediction"
+  - "knowledge graph embedding link prediction"
+  - "graph attention network GAT node classification"
+production_examples:
+  - "Google — knowledge graph for Search"
+  - "LinkedIn — graph-based recruiter recommendations"
+  - "DeepMind — GNMoE for materials discovery"

@@ -1,0 +1,16 @@
+track: "11-robotics-embodied-ai"
+domain: "Robotics and embodied AI — VLA models, diffusion policy, world models for planning"
+expertise: "VLA (Vision-Language-Action) models, diffusion policy, imitation learning, RT-2, π0, V-JEPA"
+depth_focus: "practical robotics + policy learning + frontier generalist robot models"
+seminal_authors: ["Brohan", "Chi", "LeCun", "Padalkar", "Black"]
+key_venues: ["CoRL", "ICRA", "RSS", "NeurIPS"]
+mvb_focus: "Diffusion Policy on LEROBOT; fine-tune a VLA on custom demonstrations"
+search_seeds:
+  - "vision language action model VLA robot manipulation arxiv"
+  - "diffusion policy robot learning imitation"
+  - "world model robot planning V-JEPA JEPA"
+  - "RT-2 robotic transformer generalist robot"
+production_examples:
+  - "Google DeepMind — RT-2 and generalist robots"
+  - "Physical Intelligence (π) — π0 generalist robot model"
+  - "Meta AI — V-JEPA 2 for robot planning"

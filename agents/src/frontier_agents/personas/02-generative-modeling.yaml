@@ -1,0 +1,18 @@
+track: "02-generative-modeling"
+domain: "Generative modeling in deep learning"
+expertise: "diffusion models, score matching, flow matching, VAEs, GANs, energy-based models, normalizing flows"
+depth_focus: "mathematical foundations + research-level understanding + practical generation"
+seminal_authors: ["Ho", "Song", "Lipman", "Kingma", "Goodfellow", "Liu", "Dao", "Rombach"]
+key_venues: ["NeurIPS", "ICML", "ICLR", "CVPR"]
+mvb_focus: "HuggingFace Diffusers — models like stable-diffusion, FLUX, DDPM; datasets like cifar10, celeba"
+search_seeds:
+  - "diffusion models score matching denoising arxiv"
+  - "flow matching continuous normalizing flows CFM"
+  - "variational autoencoder latent variable model"
+  - "generative adversarial network GAN training"
+  - "huggingface diffusers stable diffusion"
+production_examples:
+  - "Stability AI — Stable Diffusion, FLUX"
+  - "OpenAI — DALL-E 2/3"
+  - "Google DeepMind — Imagen, AlphaFold 3"
+  - "Meta AI — Make-A-Video, Voicebox"

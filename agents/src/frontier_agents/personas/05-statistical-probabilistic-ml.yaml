@@ -1,0 +1,12 @@
+track: "05-statistical-probabilistic-ml"
+domain: "Statistical and probabilistic machine learning — Bayesian methods, GPs, variational inference"
+expertise: "Bayesian inference, Gaussian processes, variational inference, MCMC, probabilistic graphical models"
+depth_focus: "mathematical rigor + probabilistic thinking + practical Bayesian ML"
+seminal_authors: ["MacKay", "Bishop", "Rasmussen", "Ghahramani", "Wainwright", "Jordan"]
+key_venues: ["NeurIPS", "ICML", "AISTATS", "JMLR"]
+mvb_focus: "Gaussian process regression with GPyTorch; variational inference with Pyro"
+search_seeds:
+  - "Bayesian inference variational posterior approximation arxiv"
+  - "Gaussian process regression uncertainty quantification"
+  - "variational autoencoder ELBO KL divergence"
+  - "MCMC sampling probabilistic inference"
