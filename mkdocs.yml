@@ -133,6 +133,10 @@ nav:
   - References:
     - Seminal Papers: references/seminal-papers.md
     - Glossary: references/glossary.md
+  - System:
+    - About: about.md
+    - Generation Status: system/status.md
+    - Agent Changelog: system/changelog.md
 
 extra_css:
   - stylesheets/extra.css

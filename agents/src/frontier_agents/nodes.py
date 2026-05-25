@@ -447,10 +447,20 @@ def write_file_node(state: WikiPageState) -> WikiPageState:
 def commit_node(state: WikiPageState) -> WikiPageState:
     topic = state.get("topic", "unknown")
     page_type = state.get("page_type", "core-concept")
+    confidence = state.get("review_confidence", 0.0)
+    has_mvb = state.get("mvb_decision", False)
+    revisions = state.get("revision_count", 0)
+
+    message = (
+        f"wiki: {topic} ({page_type}, conf={confidence:.2f}"
+        f"{', mvb' if has_mvb else ''}"
+        f"{f', rev={revisions}' if revisions else ''})"
+    )
     committed = git_commit(
         path=state["output_path"],
-        message=f"wiki: add {topic} ({page_type}, agent-generated)",
+        message=message,
         docs_dir=DOCS_DIR,
+        confidence=confidence,
     )
     return {**state, "committed": committed}
 
