@@ -143,10 +143,30 @@ A practical recipe: something real you can build with what's on this page.
 - Implement DDIM sampling on top of your trained model — compare 1000-step vs. 50-step quality
 - Fine-tune [stabilityai/stable-diffusion-2-1](https://huggingface.co/stabilityai/stable-diffusion-2-1) on a custom domain using LoRA via Diffusers' `train_dreambooth_lora.py`
 
+---
+
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+
+---
+
 ## Code & implementations
 
 - [huggingface/diffusers](https://huggingface.co/docs/diffusers) — production diffusion library; DDPM, DDIM, latent diffusion, DiT
 - [openai/consistency_models](https://github.com/openai/consistency_models) — official consistency model code
+
+## What can you build next?
+> *Your arc of work continues here.*
+
+Having trained a diffusion model and understood ε-prediction, you now have the intuition to ask: why 1000 steps? The answer leads directly to flow matching — straighter paths, fewer steps, same quality. That's the natural next build.
+
+**Go deeper on this concept:**
+→ [[score-matching]] — the theoretical foundation behind ε-prediction; understanding score functions unlocks a unified view of all diffusion variants
+
+**Build a system with this:**
+→ [[flow-matching]] — train a flow matching model on the same CIFAR-10 setup; observe the 4-8× inference speedup directly
+
+**The arc this page belongs to:**
+→ [Generative Stack arc](../../arcs/generative-stack/index.md) — the full journey from VAEs to FLUX.1; diffusion is the arc's turning point
 
 ## Connected topics
 

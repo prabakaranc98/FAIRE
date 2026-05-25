@@ -144,11 +144,31 @@ All frontier LLMs are decoder-only transformers with: pre-norm, RoPE, SwiGLU act
 - Add RoPE positional embeddings instead of learned absolute embeddings; see if performance changes
 - Implement Flash Attention manually for the attention block; compare throughput vs. vanilla attention
 
+---
+
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+
+---
+
 ## Code & implementations
 
 - [nanoGPT](https://github.com/karpathy/nanoGPT) — Karpathy's minimal GPT-2; best pedagogical resource
 - [The Annotated Transformer](https://nlp.seas.harvard.edu/annotated-transformer/) — harvard.edu; code-annotated walkthrough of the original paper
 - [huggingface/transformers](https://huggingface.co/docs/transformers) — production library; `GPT2Model`, `BertModel`, etc.
+
+## What can you build next?
+> *Your arc of work continues here.*
+
+You built a transformer and understand attention. The natural next question is: how do you take this architecture and turn it into a model that actually follows instructions? That requires alignment — and that's RLHF.
+
+**Go deeper on this concept:**
+→ [[flash-attention]] — the single optimization that makes transformers viable at scale; implement it and see the memory/throughput difference directly
+
+**Build a system with this:**
+→ [[rlhf]] — take your fine-tuned GPT-2 and run DPO on a preference dataset; that's the arc from "model that predicts tokens" to "model that follows instructions"
+
+**The arc this page belongs to:**
+→ [MLP → Transformer arc](../../arcs/mlp-to-transformer/index.md) — the transformer is the arc's culmination; the Language Models arc picks up here
 
 ## Connected topics
 

@@ -139,11 +139,31 @@ $$x_1 \approx x_0 + \int_0^1 v_\theta(x_t, t)\, dt$$
 - Run FLUX.1 via `diffusers` on a prompt, inspect the CFM scheduler, compare 4-step vs. 8-step quality
 - Implement OT-CFM: use `scipy.optimize.linear_sum_assignment` to couple mini-batches optimally; observe cleaner paths
 
+---
+
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+
+---
+
 ## Code & implementations
 
 - [huggingface/diffusers](https://huggingface.co/docs/diffusers) — includes `FlowMatchEulerDiscreteScheduler` (FLUX scheduler)
 - [Flow Matching Guide and Code — official repo](https://arxiv.org/abs/2412.06264) — reference implementation by the original authors
 - [black-forest-labs/flux](https://huggingface.co/black-forest-labs/FLUX.1-dev) — FLUX.1 weights and inference code
+
+## What can you build next?
+> *Your arc of work continues here.*
+
+You now understand how to transport a distribution along straight paths. The natural next question is: can you do this in continuous time, for arbitrary distributions? That's score matching — and it's the theoretical foundation that unifies diffusion and flow matching.
+
+**Go deeper on this concept:**
+→ [[score-matching]] — derive the probability flow ODE that connects score-based models to flow matching; see why they're the same framework viewed differently
+
+**Build a system with this:**
+→ [[diffusion-models]] — if you came to flow matching first, go back to diffusion; train DDPM on CIFAR-10 and directly compare training stability and inference steps to your flow matching model
+
+**The arc this page belongs to:**
+→ [Generative Stack arc](../../arcs/generative-stack/index.md) — flow matching is the arc's current frontier; you're at the edge of what's deployed in production
 
 ## Connected topics
 

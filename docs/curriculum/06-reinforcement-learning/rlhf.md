@@ -142,11 +142,31 @@ The frontier has moved to **RLVR** for reasoning tasks: DeepSeek-R1 (2025) uses 
 - Run GRPO on math problems: use a simple math dataset (GSM8K), use `sympy` to verify answers, use group-relative advantage — no reward model needed
 - Compare DPO (β=0.1 vs. β=0.5) — see how the KL weight affects output diversity
 
+---
+
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+
+---
+
 ## Code & implementations
 
 - [huggingface/trl](https://huggingface.co/docs/trl) — `DPOTrainer`, `PPOTrainer`, `GRPOTrainer`; production RLHF library
 - [OpenRLHF](https://github.com/OpenRLHF/OpenRLHF) — scalable PPO RLHF training for 70B+ models with Ray
 - [DeepSpeed-Chat](https://github.com/microsoft/DeepSpeed) — Microsoft's three-stage RLHF pipeline at scale
+
+## What can you build next?
+> *Your arc of work continues here.*
+
+You've aligned a small model with DPO. The natural next question is: can you do this without any human labels at all — using a verifiable reward signal? That's GRPO, and it's how DeepSeek-R1 achieves reasoning without human annotation.
+
+**Go deeper on this concept:**
+→ [[grpo]] — Group-Relative Policy Optimization; implement it on a math dataset using symbolic verification; no reward model needed
+
+**Build a system with this:**
+→ [[constitutional-ai]] — replace human preferences with AI-generated feedback; build a fully automated alignment pipeline on top of your DPO-trained model
+
+**The arc this page belongs to:**
+→ [Reinforcement Learning arc](../../arcs/reinforcement-learning/index.md) — RLHF is the arc's applied peak; GRPO and process reward models are the current frontier
 
 ## Connected topics
 

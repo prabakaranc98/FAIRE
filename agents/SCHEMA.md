@@ -98,29 +98,51 @@ Include one research frontier, one engineering/systems frontier.]
 ## Minimum Valuable Build
 > *[Only on pivotal pages — omit if `has_mvb: false` in frontmatter]*
 
-A practical recipe: something real you can build with what's on this page. Not a toy — something
-with a genuine use case, built with tools that actually exist.
+The one real thing a reader can build after this page. Not a verification that the algorithm runs —
+something that changes what the reader can do or make. Honest about compute, honest about difficulty.
 
-**What you're building:** [one sentence — specific, concrete project]
+**What you're building:** [one sentence — specific output, real use case]
 
-**Why this is valuable:** [to the learner / to a user / to the industry — make it honest]
+**Why this is valuable:** [honest — to the learner's trajectory AND to a real user or problem]
 
 **Stack:**
-- **Model:** [HuggingFace model card](huggingface.co link) or describe the architecture
-- **Dataset:** [HuggingFace dataset](huggingface.co/datasets link) or describe the data
-- **Framework:** PyTorch / JAX / Diffusers / Transformers / etc.
+- **Model:** [HuggingFace model ID](https://huggingface.co/...) — downloads count, real model card
+- **Dataset:** [HuggingFace dataset ID](https://huggingface.co/datasets/...) — well-known, documented
+- **Framework:** [specific library + key dependency]
+- **Compute:** [GPU VRAM needed / free Colab tier / estimated time]
 
 **The recipe:**
-1. [Step 1 — specific, one actionable sentence]
-2. [Step 2]
-3. [Step 3 — produces the valuable output]
-4. [Step 4 — optional stretch]
+1. [Install + load — exact packages, one command]
+2. [Data — specific preprocessing with why]
+3. [Train/fine-tune — key hyperparameters, expected loss curve behavior]
+4. [Evaluate — specific metric, expected ballpark number]
+5. [What you now have — the artifact]
 
-**Expected outcome:** [what you have at the end — something you can show, deploy, or build on]
+**Expected outcome:** [a model, a demo, a result table — something you can show or deploy]
 
 **Stretch goals:**
-- [How to push beyond minimum — something publishable, deployable, or shareable]
-- [Alternative application of the same technique]
+- [One step toward publishable or production-deployable]
+- [One alternative application of the same technique]
+
+---
+
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+
+---
+
+## What can you build next?
+> *Your arc of work continues here.*
+
+[1-2 sentences: what does building this unlock? What's the natural next question or build?]
+
+**Go deeper on this concept:**
+→ [[related-concept]] — [one sentence: what it adds to your understanding]
+
+**Build a system with this:**
+→ [[systems-or-applied-topic]] — [one sentence: how this scales or deploys]
+
+**The arc this page belongs to:**
+→ [Arc Name](../../arcs/arc-slug/index.md) — [one sentence on where this leads in the arc]
 
 ## Code & implementations
 - [repo or huggingface link](URL) — what it implements and why it's worth reading
@@ -135,20 +157,54 @@ with a genuine use case, built with tools that actually exist.
 
 ---
 
+## The philosophy this schema encodes
+
+**FAIRE wiki is a wiki that nudges people toward building arc of work.**
+
+Not a textbook. Not a reading list. A mentor who says: here's what's real, here's what you can build,
+here's where this leads. Every page exists to answer one question for the reader: *what can I do with
+this understanding?*
+
+The **Minimum Valuable Build** is the cornerstone — not an optional section. It is the reason the
+page exists. If the MVB is weak, the page has failed. If someone reads the page, builds the thing,
+and it works — that page has succeeded.
+
+The **"What can you build next?"** section closes the arc. No one should finish a page wondering where
+to go. They should know: here's the next build, here's the arc you're in, here's where it leads.
+
+The **GitHub star** is the only reward signal we collect. We ask for it once, after the MVB, without
+pressure. If someone found the recipe and built something real — a star means "this worked." Nothing
+else is asked.
+
+**FAIRE = Frontier AI Research Encyclopedia.** It covers the 360° of contemporary AI from fundamentals
+to frontier. Not "run a notebook" — a structured atlas that builds understanding arc by arc.
+
+---
+
 ## Multi-audience writing guidelines (for agents)
 
 Pages must serve four reader types simultaneously. Use this checklist before approving a draft:
 
-1. **Applied reader** (MS Data Science, industry practitioner): Can they understand the Key algorithms section without reading the math? Does the MVB section give them something to run today?
-2. **Foundational reader** (curious generalist): Does "What it is" explain the *why* before the *what*? Is there a concrete analogy or mental model?
-3. **Theoretical reader** (math/CS graduate): Is the mathematical notation clean and annotated? Are the core concepts defined precisely before use?
-4. **Frontier reader** (researcher, PhD): Does "Current SotA" name specific papers with dates? Does "What's happening now" identify open problems precisely — not vaguely?
+1. **Applied reader** (MS Data Science, industry practitioner): Can they find the MVB in under 30 seconds? Does the recipe give them something runnable on a consumer GPU or free Colab?
+2. **Foundational reader** (curious generalist): Does "What it is" explain the *why* before the *what*? Is there a concrete mental model before any math?
+3. **Theoretical reader** (math/CS graduate): Is every LaTeX variable annotated? Are core concepts defined precisely before use? Is the derivation sketch honest about what it skips?
+4. **Frontier reader** (researcher, PhD): Does "Current SotA" name specific papers with dates and metrics? Does "What's happening now" name specific open problems, not "more research is needed"?
+
+**Writing with empathy — what this means in practice:**
+- Meet the reader where they are: assume ML basics, assume no familiarity with *this specific topic*
+- The first paragraph of "What it is" must be readable by a curious non-expert
+- Every analogy should be grounded: don't say "like a filter" — say "like a high-pass filter on audio, removing low-frequency structure"
+- Be honest about what's hard: "this is technically simple but took years to get right in practice because..."
+- Be honest about limitations: "this works well for X but breaks on Y because..."
+- The tone is confident but not authoritative: "here's what the evidence says" not "this is how it works"
 
 **Anti-patterns to avoid:**
 - Defining a term by restating its name ("diffusion models are models that use diffusion")
 - Math without annotation (equations where no variable is explained)
 - SotA that's vague ("recent work has shown...") without naming the work
-- MVB that's just "follow the tutorial" — it must synthesize understanding into a build
+- MVB that just says "follow the tutorial" — it must produce a real artifact
+- "Further reading" that is just a bibliography dump — every item needs one honest line on what it adds
+- "Connected topics" with no relationship description — "related" means nothing; explain how
 
 ---
 
