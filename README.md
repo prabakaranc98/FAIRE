@@ -1,60 +1,100 @@
 # Frontier Wiki
-### A 360° knowledge base — from fundamentals to frontier AI research
 
-Built as a living reference: structured, navigable, and progressively deepened by an editorial agent system.
+A 360° AI/ML knowledge base — from fundamentals to frontier research, built around one question:
+*what can you actually build with this?*
 
----
-
-## What this is
-
-A personal wiki covering the full landscape of AI/ML — not a tutorial series, not a course,
-but a **structured knowledge substrate** you can enter at any depth.
-
-Every topic has three layers:
-- **Applied** — what it is, what it does, how to use it
-- **Foundations** — the math, theory, and core intuitions
-- **Research** — frontier papers, open problems, and what's unsettled
+Not a tutorial series. Not a reading list. A structured knowledge substrate where every page
+is the first step in someone's arc of work.
 
 ---
 
-## How it's organized
+## What is an Arc of Work?
 
-**[Curriculum](docs/curriculum/index.md)** — 15 tracks covering the entire field.
-Each track is a domain (Generative Modeling, Reinforcement Learning, Systems, etc.)
-with individual topic pages inside.
+An arc of work is a deliberate sequence of concepts, builds, and insights that takes you from
+"I've heard of this" to "I understand how it works and I've built something real with it."
 
-**[Arcs](docs/arcs/index.md)** — Themed learning paths that cut across tracks.
-An arc is a logical sequence: start here, go there, end up understanding this whole idea.
+The wiki is organized around arcs. Each arc has ~20-28 ordered concept nodes. Each node is
+a page that answers: what is this, why does it matter at the frontier, and what can you build
+with it? Three to five nodes per arc have a **Minimum Valuable Build** — a concrete,
+runnable project that produces something real, not just a verification exercise.
 
-**[References](docs/references/seminal-papers.md)** — Seminal papers by area.
-Only arXiv, university, and HuggingFace links.
+The MVB on the Generative Stack arc's VAE node lets you train a latent-space model from scratch.
+The MVB on the Diffusion node lets you train a conditional image generator. The MVB on the Latent
+Diffusion node lets you fine-tune Stable Diffusion on a custom domain. Each build unlocks a new
+class of artifact you couldn't make before.
 
 ---
 
-## Editorial agents
+## How to enter the wiki
 
-Wiki pages are generated and maintained by a local LangGraph agent system in `agents/`.
-Agents use the Claude API + Exa search (filtered to arXiv, *.edu, huggingface.co).
-Run locally, commit to repo, auto-deploy to GitHub Pages.
+**[Curriculum](docs/curriculum/index.md)** — breadth first. Fifteen tracks covering the entire
+field: Generative Modeling, Reinforcement Learning, Representation Learning, Causal Inference,
+Systems, and more. Enter at any topic. See how it connects. Find your footing.
+
+**[Arcs](docs/arcs/index.md)** — depth first. Focused, sequential journeys with a clear purpose.
+The arc tells you why this sequence, what you're building toward, and what you know at each step.
+Read the arc page before diving into topic pages — it's the map.
+
+---
+
+## The agent system
+
+Wiki pages are generated and maintained by a local LangGraph editorial agent system in `agents/`.
+Agents run on your machine only — never deployed, never automated without your approval.
+
+The pipeline: research (Exa + HuggingFace) → deliberate planning → write → review → log.
+Every run is tracked in `agents/runs/runs.jsonl`. Check coverage with `uv run python generate.py status`.
 
 ```bash
-cd agents && uv sync
-uv run python generate.py --topic diffusion-models --track 02-generative-modeling --depth foundations
-```
+# Setup
+cd agents && uv sync && cp .env.example .env  # fill in your keys
 
-See [agents/README.md](agents/README.md) for setup and usage.
+# Generate a single page
+uv run python generate.py generate \
+  --topic diffusion-models \
+  --track 02-generative-modeling \
+  --page-type arc-entry \
+  --depth-emphasis applied
+
+# Arc-aware generation (tells agent where this page sits in the sequence)
+uv run python generate.py generate \
+  --topic score-matching \
+  --track 02-generative-modeling \
+  --page-type core-concept \
+  --depth-emphasis theoretical \
+  --arc generative-stack \
+  --arc-position 4 \
+  --prev-node ddpm \
+  --next-node flow-matching
+
+# Check coverage
+uv run python generate.py status
+```
 
 ---
 
-## Source policy
+## Source discipline
 
-Every link in this wiki must be one of:
+Every link in this wiki comes from one of:
 - `arxiv.org` — papers
 - `*.edu` — university course pages, lecture notes
 - `huggingface.co` — model cards, datasets, spaces
-- Official library documentation
+- Official library documentation (PyTorch, JAX, etc.)
 
-No blog posts. No Medium. No Towards Data Science.
+"In production" sections also allow official engineering blogs from top labs
+(ai.meta.com/research, research.google, developer.nvidia.com/blog, etc.).
+
+No Medium. No Towards Data Science. No personal blogs. No Substack. No Wikipedia.
+
+---
+
+## Quality signal
+
+The reviewer agent scores every page 0.0–1.0 for: schema compliance, source policy,
+prose quality (no nested lists, narrative flow), technical accuracy, and MVB executability.
+Pages below 0.8 confidence are flagged for human review before writing to disk.
+
+The GitHub star is the only engagement metric we collect.
 
 ---
 

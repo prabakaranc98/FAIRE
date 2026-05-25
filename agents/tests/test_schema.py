@@ -138,6 +138,81 @@ class TestHasMvbPages:
         )
 
 
+class TestProseQuality:
+    """Enforce narrative prose rules — no nested lists, explanatory sections must flow."""
+
+    def _get_section(self, content: str, heading: str) -> str:
+        """Extract content between `heading` and the next ## section."""
+        start = content.find(heading)
+        if start == -1:
+            return ""
+        next_section = content.find("\n## ", start + 1)
+        return content[start:next_section] if next_section != -1 else content[start:]
+
+    @pytest.mark.parametrize("page_path", FULL_PAGES, ids=[p.name for p in FULL_PAGES])
+    def test_no_nested_lists(self, page_path):
+        """No bullet point should be immediately followed by an indented bullet."""
+        content = _read_page(page_path)
+        lines = content.split("\n")
+        for i, line in enumerate(lines[:-1]):
+            stripped = line.lstrip()
+            if stripped.startswith("- ") or stripped.startswith("* "):
+                next_stripped = lines[i + 1].lstrip()
+                indent_next = len(lines[i + 1]) - len(lines[i + 1].lstrip())
+                indent_curr = len(line) - len(line.lstrip())
+                if (
+                    (next_stripped.startswith("- ") or next_stripped.startswith("* "))
+                    and indent_next > indent_curr
+                ):
+                    pytest.fail(
+                        f"{page_path.name}: Nested bullet list found at line {i + 1}:\n"
+                        f"  {line!r}\n  {lines[i + 1]!r}"
+                    )
+
+    @pytest.mark.parametrize("page_path", FULL_PAGES, ids=[p.name for p in FULL_PAGES])
+    def test_what_it_is_is_prose(self, page_path):
+        """The 'What it is' section must contain at least 2 prose paragraphs."""
+        content = _read_page(page_path)
+        section = self._get_section(content, "## What it is")
+        if not section:
+            pytest.skip(f"{page_path.name}: No 'What it is' section found")
+
+        # Count non-empty, non-heading, non-bullet lines as prose
+        prose_paragraphs = [
+            p for p in section.split("\n\n")
+            if p.strip()
+            and not p.strip().startswith("#")
+            and not p.strip().startswith("- ")
+            and not p.strip().startswith("* ")
+            and not p.strip().startswith("|")
+            and len(p.strip()) > 60
+        ]
+        assert len(prose_paragraphs) >= 2, (
+            f"{page_path.name}: 'What it is' section has fewer than 2 prose paragraphs "
+            f"(found {len(prose_paragraphs)}). Must be narrative, not a bullet dump."
+        )
+
+    @pytest.mark.parametrize("page_path", FULL_PAGES, ids=[p.name for p in FULL_PAGES])
+    def test_why_it_matters_no_bullets(self, page_path):
+        """The 'Why it matters' section must not be a bullet list."""
+        content = _read_page(page_path)
+        section = self._get_section(content, "## Why it matters")
+        if not section:
+            pytest.skip(f"{page_path.name}: No 'Why it matters' section found")
+
+        lines = [l.strip() for l in section.split("\n") if l.strip()]
+        bullet_lines = [l for l in lines if l.startswith("- ") or l.startswith("* ")]
+        prose_lines = [
+            l for l in lines
+            if not l.startswith("#") and not l.startswith("-") and not l.startswith("*")
+            and not l.startswith("|") and len(l) > 40
+        ]
+        assert len(prose_lines) >= 1, (
+            f"{page_path.name}: 'Why it matters' section is all bullet points, no prose. "
+            f"Must be narrative."
+        )
+
+
 class TestAllStubPages:
     """Every page in docs/curriculum must have valid frontmatter — even stubs."""
 

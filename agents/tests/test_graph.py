@@ -37,9 +37,10 @@ class TestGraphCompilation:
         assert "mvb_recipe" not in graph_nodes
         assert "merge_mvb" not in graph_nodes
 
-    def test_mvb_graph_does_not_include_research(self):
+    def test_mvb_graph_does_not_include_write_draft_or_plan(self):
+        """MVB graph generates via mvb_recipe + merge_mvb, not the full draft pipeline."""
         g = build_mvb_graph()
         compiled = g.compile()
         graph_nodes = set(compiled.get_graph().nodes.keys())
-        assert "research" not in graph_nodes
         assert "write_draft" not in graph_nodes
+        assert "plan" not in graph_nodes

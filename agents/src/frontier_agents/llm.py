@@ -3,15 +3,11 @@
 All LLMs route through OpenRouter using LangChain's ChatOpenAI interface.
 This gives access to any model on OpenRouter without changing any node code.
 
-Model selection philosophy:
-- WRITER (Editorial, MVB):   Maximum intelligence — Opus 4.7 for rich prose and accurate citations
-- REVIEWER (Schema checks):  Gemini 2.5 Pro — strong reasoning, catches errors, not a weak model
-- FALLBACK:                  Claude Sonnet — still high quality, used when Opus is overkill
-
-OpenRouter model IDs (update in .env to override):
-  anthropic/claude-opus-4-7    — best writer; richest output; most nuanced pedagogy
-  google/gemini-2.5-pro        — strong reviewer; great at structured analysis
-  anthropic/claude-sonnet-4-6  — fallback; fast, capable, cost-effective
+Model selection philosophy (verified on OpenRouter 2026-05-25):
+- WRITER (Editorial, MVB):   anthropic/claude-opus-4-7 — $5/M, 1M ctx — maximum prose intelligence
+- REVIEWER (Schema checks):  google/gemini-3.1-pro-preview — $2/M, 1M ctx — best structured reasoning
+- RESEARCH (fast search):    google/gemini-3.5-flash — $1.50/M, 1M ctx — high-quality, low latency
+- FALLBACK:                  anthropic/claude-sonnet-4.6 — $3/M, 1M ctx — still high quality
 """
 
 from __future__ import annotations
@@ -25,10 +21,11 @@ OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Default model IDs — override via .env
 _DEFAULTS = {
-    "WRITER_MODEL":   "anthropic/claude-opus-4-7",
-    "MVB_MODEL":      "anthropic/claude-opus-4-7",
-    "REVIEWER_MODEL": "google/gemini-2.5-pro",
-    "FALLBACK_MODEL": "anthropic/claude-sonnet-4-6",
+    "WRITER_MODEL":   "anthropic/claude-opus-4.7",
+    "MVB_MODEL":      "anthropic/claude-opus-4.7",
+    "REVIEWER_MODEL": "google/gemini-3.1-pro-preview",
+    "RESEARCH_MODEL": "google/gemini-3.5-flash",
+    "FALLBACK_MODEL": "anthropic/claude-sonnet-4.6",
 }
 
 
@@ -64,6 +61,7 @@ def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
         "writer":   "WRITER_MODEL",
         "reviewer": "REVIEWER_MODEL",
         "mvb":      "MVB_MODEL",
+        "research": "RESEARCH_MODEL",
         "fallback": "FALLBACK_MODEL",
     }.get(role, "WRITER_MODEL")
 

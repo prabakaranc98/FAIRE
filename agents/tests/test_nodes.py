@@ -66,16 +66,23 @@ class TestReadStubNode:
 
 class TestResearchNode:
     def test_handles_exa_failure_gracefully(self, base_state):
-        with patch("frontier_agents.nodes.exa_search", side_effect=Exception("no key")):
-            with patch("frontier_agents.nodes.hf_search_models", return_value=[]):
-                result = research_node(base_state)
+        with patch("frontier_agents.nodes.exa_search_papers", side_effect=Exception("no key")):
+            with patch("frontier_agents.nodes.exa_search_sota", return_value=[]):
+                with patch("frontier_agents.nodes.exa_search_production", return_value=[]):
+                    with patch("frontier_agents.nodes.hf_search_models", return_value=[]):
+                        with patch("frontier_agents.nodes.hf_search_datasets", return_value=[]):
+                            result = research_node(base_state)
         assert "research_results" in result
         assert isinstance(result["research_results"], list)
 
     def test_deduplicates_by_url(self, base_state):
-        dup = {"url": "https://arxiv.org/abs/123", "title": "T", "text": "t"}
-        with patch("frontier_agents.nodes.exa_search", return_value=[dup, dup]):
-            result = research_node(base_state)
+        dup = {"url": "https://arxiv.org/abs/123", "title": "T", "text": "t", "source_type": "paper"}
+        with patch("frontier_agents.nodes.exa_search_papers", return_value=[dup, dup]):
+            with patch("frontier_agents.nodes.exa_search_sota", return_value=[]):
+                with patch("frontier_agents.nodes.exa_search_production", return_value=[]):
+                    with patch("frontier_agents.nodes.hf_search_models", return_value=[]):
+                        with patch("frontier_agents.nodes.hf_search_datasets", return_value=[]):
+                            result = research_node(base_state)
         urls = [r["url"] for r in result["research_results"]]
         assert len(urls) == len(set(urls))
 

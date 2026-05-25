@@ -18,8 +18,8 @@ REQUIRED_KEYS = [
     "WIKI_DOCS_DIR",
 ]
 OPENROUTER_MODELS = [
-    "anthropic/claude-opus-4-7",
-    "google/gemini-2.5-flash-preview",
+    "anthropic/claude-opus-4.7",
+    "google/gemini-3.1-pro-preview",
     "meta-llama/llama-3.3-70b-instruct",
 ]
 
@@ -90,7 +90,7 @@ class TestLlmFactory:
 
     def test_default_models_are_set(self):
         from frontier_agents.llm import _DEFAULTS
-        assert _DEFAULTS["WRITER_MODEL"] == "anthropic/claude-opus-4-7"
+        assert _DEFAULTS["WRITER_MODEL"] == "anthropic/claude-opus-4.7"
         assert "gemini" in _DEFAULTS["REVIEWER_MODEL"].lower()
 
     def test_all_roles_resolve(self):
