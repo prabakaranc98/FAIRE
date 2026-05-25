@@ -38,6 +38,98 @@ markdown_extensions:
   - attr_list
   - md_in_html
 
+nav:
+  - Home: index.md
+  - Curriculum:
+    - Overview: curriculum/index.md
+    - "01 · AI Foundations":
+      - Overview: curriculum/01-ai/index.md
+      - Agent Architectures: curriculum/01-ai/agent-architectures.md
+      - Classical Planning: curriculum/01-ai/classical-planning.md
+      - Search Algorithms: curriculum/01-ai/search-algorithms.md
+    - "02 · Generative Modeling":
+      - Overview: curriculum/02-generative-modeling/index.md
+      - Diffusion Models: curriculum/02-generative-modeling/diffusion-models.md
+      - Flow Matching: curriculum/02-generative-modeling/flow-matching.md
+      - Variational Autoencoders: curriculum/02-generative-modeling/variational-autoencoders.md
+    - "03 · Representation Learning":
+      - Overview: curriculum/03-representation-learning/index.md
+      - Contrastive Learning: curriculum/03-representation-learning/contrastive-learning.md
+      - JEPA: curriculum/03-representation-learning/jepa.md
+      - Self-Supervised Learning: curriculum/03-representation-learning/self-supervised-learning.md
+    - "04 · Neural Networks & Deep Learning":
+      - Overview: curriculum/04-neural-networks-dl/index.md
+      - Backpropagation: curriculum/04-neural-networks-dl/backpropagation.md
+      - Optimization: curriculum/04-neural-networks-dl/optimization.md
+      - Scaling Laws: curriculum/04-neural-networks-dl/scaling-laws.md
+    - "05 · Statistical & Probabilistic ML":
+      - Overview: curriculum/05-statistical-probabilistic-ml/index.md
+      - Bayesian Inference: curriculum/05-statistical-probabilistic-ml/bayesian-inference.md
+      - Gaussian Processes: curriculum/05-statistical-probabilistic-ml/gaussian-processes.md
+      - Variational Inference: curriculum/05-statistical-probabilistic-ml/variational-inference.md
+    - "06 · Reinforcement Learning":
+      - Overview: curriculum/06-reinforcement-learning/index.md
+      - MDPs: curriculum/06-reinforcement-learning/mdp.md
+      - PPO: curriculum/06-reinforcement-learning/ppo.md
+      - RLHF: curriculum/06-reinforcement-learning/rlhf.md
+    - "07 · Transformers & Language Models":
+      - Overview: curriculum/07-attention-memory-reasoning/index.md
+      - Transformer: curriculum/07-attention-memory-reasoning/transformer.md
+      - State Space Models: curriculum/07-attention-memory-reasoning/state-space-models.md
+      - Vision-Language Models: curriculum/07-attention-memory-reasoning/vision-language-models.md
+    - "08 · Causal & Statistical Inference":
+      - Overview: curriculum/08-causal-statistical-inference/index.md
+      - Structural Causal Models: curriculum/08-causal-statistical-inference/scm.md
+      - Do-Calculus: curriculum/08-causal-statistical-inference/do-calculus.md
+      - Counterfactuals: curriculum/08-causal-statistical-inference/counterfactuals.md
+    - "09 · Algorithms & Systems for AI":
+      - Overview: curriculum/09-algorithms-systems-ai/index.md
+      - Data Parallelism: curriculum/09-algorithms-systems-ai/data-parallelism.md
+      - KV Cache: curriculum/09-algorithms-systems-ai/kv-cache.md
+      - Quantization: curriculum/09-algorithms-systems-ai/quantization.md
+    - "10 · Complexity & Cognition":
+      - Overview: curriculum/10-complexity-cognition/index.md
+      - Complexity Classes: curriculum/10-complexity-cognition/complexity-classes.md
+      - Emergent Capabilities: curriculum/10-complexity-cognition/emergent-capabilities.md
+      - Cognitive Architectures: curriculum/10-complexity-cognition/cognitive-architectures.md
+    - "11 · Robotics & Embodied AI":
+      - Overview: curriculum/11-robotics-embodied-ai/index.md
+      - Foundation Models for Robotics: curriculum/11-robotics-embodied-ai/foundation-models-robotics.md
+      - Imitation Learning: curriculum/11-robotics-embodied-ai/imitation-learning.md
+      - Sim-to-Real: curriculum/11-robotics-embodied-ai/sim-to-real.md
+    - "12 · Physics & Scientific AI":
+      - Overview: curriculum/12-physics-scientific-ai/index.md
+      - PINNs: curriculum/12-physics-scientific-ai/pinn.md
+      - Fourier Neural Operators: curriculum/12-physics-scientific-ai/fno.md
+      - Equivariant Networks: curriculum/12-physics-scientific-ai/equivariant-networks.md
+    - "13 · Graph & Relational AI":
+      - Overview: curriculum/13-graph-relational-ai/index.md
+      - Message Passing: curriculum/13-graph-relational-ai/message-passing.md
+      - GNN Expressivity: curriculum/13-graph-relational-ai/gnn-expressivity.md
+      - Equivariant GNNs: curriculum/13-graph-relational-ai/equivariant-gnn.md
+    - "14 · Biology & Life Sciences":
+      - Overview: curriculum/14-biology-life-sciences/index.md
+      - Protein Structure: curriculum/14-biology-life-sciences/protein-structure.md
+      - Protein Language Models: curriculum/14-biology-life-sciences/protein-lm.md
+      - Single-Cell AI: curriculum/14-biology-life-sciences/single-cell.md
+    - "15 · ML Theory & Foundations":
+      - Overview: curriculum/15-ml-theory-foundations/index.md
+      - PAC Learning: curriculum/15-ml-theory-foundations/pac-learning.md
+      - Double Descent: curriculum/15-ml-theory-foundations/double-descent.md
+      - Neural Tangent Kernel: curriculum/15-ml-theory-foundations/ntk.md
+  - Learning Arcs:
+    - Overview: arcs/index.md
+    - MLP to Transformer: arcs/mlp-to-transformer/index.md
+    - Generative Stack: arcs/generative-stack/index.md
+    - Language Models: arcs/language-models/index.md
+    - Causal AI: arcs/causal-ai/index.md
+    - Reinforcement Learning: arcs/reinforcement-learning/index.md
+    - Systems for Scale: arcs/systems-for-scale/index.md
+    - Scientific AI: arcs/scientific-ai/index.md
+  - References:
+    - Seminal Papers: references/seminal-papers.md
+    - Glossary: references/glossary.md
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
