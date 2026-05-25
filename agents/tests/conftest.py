@@ -8,10 +8,13 @@ from unittest.mock import MagicMock
 import pytest
 from dotenv import load_dotenv
 
-# Load .env from agents/ directory so real API keys are available for integration tests
-_ENV_PATH = Path(__file__).parent.parent / ".env"
-if _ENV_PATH.exists():
-    load_dotenv(_ENV_PATH)
+# Load .env — try agents/.env first, then root FAIRE/.env
+_AGENTS_ENV = Path(__file__).parent.parent / ".env"        # agents/.env
+_ROOT_ENV   = Path(__file__).parent.parent.parent / ".env" # FAIRE/.env (root)
+for _env_path in (_AGENTS_ENV, _ROOT_ENV):
+    if _env_path.exists():
+        load_dotenv(_env_path, override=False)
+        break
 
 from frontier_agents.state import WikiPageState
 

@@ -182,8 +182,8 @@ class TestPipelineIntegration:
             "committed": False,
         }
 
-        with os.environ.copy() as _:
-            os.environ["GIT_AUTO_COMMIT"] = "false"  # don't commit during test
+        from unittest.mock import patch
+        with patch.dict(os.environ, {"GIT_AUTO_COMMIT": "false"}):
             graph = compile_wiki_graph()
             result = graph.invoke(initial_state)
 
@@ -220,8 +220,8 @@ class TestPipelineIntegration:
             "committed": False,
         }
 
-        with os.environ.copy() as _:
-            os.environ["GIT_AUTO_COMMIT"] = "false"
+        from unittest.mock import patch
+        with patch.dict(os.environ, {"GIT_AUTO_COMMIT": "false"}):
             graph = compile_mvb_graph()
             result = graph.invoke(initial_state)
 

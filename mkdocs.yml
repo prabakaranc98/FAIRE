@@ -1,5 +1,5 @@
 site_name: Frontier Wiki
-site_description: A 360° knowledge base — from fundamentals to frontier AI research
+site_description: A wiki that nudges you toward getting things done — from ML foundations to frontier AI
 site_url: https://prabakaranc98.github.io/FAIRE
 repo_url: https://github.com/prabakaranc98/FAIRE
 docs_dir: docs
@@ -8,13 +8,17 @@ theme:
   name: material
   custom_dir: docs/overrides
   palette:
-    - scheme: slate
-      primary: indigo
-      accent: cyan
+    - scheme: default
+      primary: custom
+      accent: custom
+  font:
+    text: Inter
+    code: JetBrains Mono
   features:
     - navigation.tabs
     - navigation.sections
     - navigation.top
+    - navigation.instant
     - toc.integrate
     - search.suggest
     - search.highlight
@@ -130,7 +134,18 @@ nav:
     - Seminal Papers: references/seminal-papers.md
     - Glossary: references/glossary.md
 
+extra_css:
+  - stylesheets/extra.css
+
 extra_javascript:
   - javascripts/mathjax.js
   - https://polyfill.io/v3/polyfill.min.js?features=es6
   - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+    - icon: fontawesome/solid/house
+      link: https://pracha.me
+      name: pracha.me
+    - icon: fontawesome/brands/github
+      link: https://github.com/prabakaranc98/FAIRE

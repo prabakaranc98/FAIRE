@@ -1,0 +1,115 @@
+/* Frontier Wiki — custom theme overrides
+   Palette: white + tomato red (#E8452A) */
+
+:root {
+  --md-primary-fg-color:        #E8452A;
+  --md-primary-fg-color--light: #FF6347;
+  --md-primary-fg-color--dark:  #C63818;
+  --md-primary-bg-color:        #FFFFFF;
+  --md-accent-fg-color:         #E8452A;
+  --md-accent-fg-color--transparent: rgba(232, 69, 42, 0.1);
+}
+
+/* Navigation header — white with red accents */
+.md-header {
+  background-color: #FFFFFF;
+  border-bottom: 2px solid #E8452A;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.md-header__title {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+/* Navigation tabs */
+.md-tabs {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.md-tabs__link {
+  color: #374151;
+}
+
+.md-tabs__link--active,
+.md-tabs__link:hover {
+  color: #E8452A;
+}
+
+/* Sidebar navigation */
+.md-nav__link--active {
+  color: #E8452A;
+  font-weight: 600;
+}
+
+.md-nav__link:hover {
+  color: #E8452A;
+}
+
+/* Links */
+.md-content a {
+  color: #E8452A;
+}
+
+.md-content a:hover {
+  color: #C63818;
+}
+
+/* Search highlight */
+.md-search-result mark {
+  color: #E8452A;
+  background-color: rgba(232, 69, 42, 0.12);
+}
+
+/* Code blocks — clean, readable */
+.highlight pre {
+  border-left: 3px solid #E8452A;
+}
+
+/* Tables */
+.md-typeset table:not([class]) th {
+  background-color: #fff5f3;
+  color: #1a1a1a;
+  border-bottom: 2px solid #E8452A;
+}
+
+/* Admonitions — tip/note in red accent */
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #E8452A;
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(232, 69, 42, 0.08);
+  border-left-color: #E8452A;
+}
+
+/* Cards */
+.md-typeset .grid.cards > ul > li {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  border-color: #E8452A;
+  box-shadow: 0 2px 12px rgba(232, 69, 42, 0.12);
+}
+
+/* Footer */
+.md-footer {
+  background-color: #1a1a1a;
+}
+
+/* TOC active item */
+.md-nav--secondary .md-nav__link--active {
+  color: #E8452A;
+}
+
+/* Back to top button */
+.md-top {
+  background-color: #E8452A;
+  color: white;
+}

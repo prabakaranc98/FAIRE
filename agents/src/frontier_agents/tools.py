@@ -64,25 +64,26 @@ def exa_search(
     if not api_key:
         raise ValueError("EXA_API_KEY not set in environment. See .env.example")
 
+    from exa_py.api import ContentsOptions
+
     exa = Exa(api_key=api_key)
 
     include_domains = list(APPROVED_DOMAINS)
     if section == "in_production":
         include_domains.extend(APPROVED_ENGINEERING_BLOGS)
 
-    results = exa.search_and_contents(
+    results = exa.search(
         query=query,
         num_results=num_results,
         include_domains=include_domains,
-        use_autoprompt=True,
-        text={"max_characters": 2000},
+        contents=ContentsOptions(text={"max_characters": 2000}),
     )
 
     return [
         {
             "url": r.url,
             "title": r.title,
-            "text": r.text,
+            "text": getattr(r, "text", "") or "",
             "domain": _extract_domain(r.url),
             "published_date": getattr(r, "published_date", None),
         }

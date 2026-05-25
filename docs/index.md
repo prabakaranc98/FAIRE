@@ -3,44 +3,57 @@ title: Frontier Wiki
 template: home.html
 ---
 
-# Frontier Wiki
+## What is an Arc of Work?
 
-A navigable knowledge base for the full landscape of AI/ML — built to be entered at any depth, by any background.
+An arc of work is a focused, sequenced journey through a domain — not a reading list, but a path with a destination. Each arc takes you from entry intuition to frontier capability, with a clear build at each stage. You finish an arc knowing *what you can do*, not just *what you've read*.
 
----
-
-## The field in one breath
-
-Artificial intelligence went from hand-coded rules (1950s) to statistical learning (1980s–2000s) to deep learning (2012 onwards). The 2017 transformer changed everything — scaling it gave us large language models, multimodal AI, and frontier systems like GPT-4, Claude, and Gemini. Today the field moves fast: diffusion models generate images and proteins, reinforcement learning from human feedback aligns AI behavior, and interpretability researchers try to understand what these systems actually compute.
-
-This wiki covers that entire landscape — from the mathematical foundations to the current state of the art.
-
----
-
-## How to use this wiki
-
-**Not sure where to start?** Pick the question that fits you:
-
-| I want to... | Start here |
-|---|---|
-| Understand what AI/ML actually is | [Track 01 · Artificial Intelligence](curriculum/01-ai/index.md) or [Track 04 · Neural Networks](curriculum/04-neural-networks-dl/index.md) |
-| Learn how large language models work | [Track 07 · Language Models, Transformers & Multimodal AI](curriculum/07-attention-memory-reasoning/index.md) |
-| Understand generative AI (images, video, audio) | [Track 02 · Generative Modeling](curriculum/02-generative-modeling/index.md) |
-| Follow a structured learning path | [Learning Arcs →](arcs/index.md) |
-| Look up a specific topic | Use the search bar (top right) |
-| See key papers by area | [References →](references/seminal-papers.md) |
+The wiki is organized around arcs — and every curriculum page feeds into one.
 
 ---
 
 ## Two ways in
 
-### [Curriculum](curriculum/index.md) — breadth across the field
+### [Learning Arcs](arcs/index.md) — follow a path to capability
 
-15 tracks organized by domain. Each track covers a full area — from foundational concepts to frontier research. Enter at any track, any topic. Use the curriculum when you want to:
+Focused sequences, 20–28 topics each. Every arc starts with the foundational question and ends at the current frontier — with a build at each stage.
 
-- Understand what a domain contains and how it's organized
-- Look up a specific concept you've encountered
-- Survey an area before going deep
+<div class="grid cards" markdown>
+
+- **[MLP → Transformer](arcs/mlp-to-transformer/index.md)**
+
+    Architecture lineage: from perceptrons to attention. Understand *why* each step happened.
+
+- **[Generative Stack](arcs/generative-stack/index.md)**
+
+    VAEs → GANs → Diffusion → Flow Matching. Every generation paradigm, in the order they emerged.
+
+- **[Language Models](arcs/language-models/index.md)**
+
+    Pretraining → RLHF → alignment → frontier LLMs. The full arc from n-grams to GPT-4.
+
+- **[Reinforcement Learning](arcs/reinforcement-learning/index.md)**
+
+    Bandits → PPO → RLHF → GRPO → DeepSeek-R1. Decision-making from tabular to frontier.
+
+- **[Causal AI](arcs/causal-ai/index.md)**
+
+    SCMs → do-calculus → causal representation learning. From correlation to intervention.
+
+- **[Systems for Scale](arcs/systems-for-scale/index.md)**
+
+    FlashAttention → ZeRO → vLLM → speculative decoding. The engineering behind frontier models.
+
+- **[Scientific AI](arcs/scientific-ai/index.md)**
+
+    PINNs → FNO → AlphaFold 3 → V-JEPA. AI as a scientific instrument.
+
+</div>
+
+---
+
+### [Curriculum](curriculum/index.md) — the full landscape by domain
+
+15 tracks covering every major area of AI/ML. Enter at any topic, any depth. Use the curriculum when you want to understand how a domain is organized or look up a specific concept.
 
 <div class="grid cards" markdown>
 
@@ -58,66 +71,39 @@ This wiki covers that entire landscape — from the mathematical foundations to 
 
 - **D · Perception & Action**
 
-    [Language Models, Transformers & Multimodal AI](curriculum/07-attention-memory-reasoning/index.md) · [Robotics & Embodied AI](curriculum/11-robotics-embodied-ai/index.md) · [Graph & Relational AI](curriculum/13-graph-relational-ai/index.md)
+    [Language Models & Transformers](curriculum/07-attention-memory-reasoning/index.md) · [Robotics & Embodied AI](curriculum/11-robotics-embodied-ai/index.md) · [Graph & Relational AI](curriculum/13-graph-relational-ai/index.md)
 
 - **E · AI for Science**
 
-    [Physics & Scientific AI](curriculum/12-physics-scientific-ai/index.md) · [Biology & Life Sciences](curriculum/14-biology-life-sciences/index.md) · [AI Fundamentals](curriculum/01-ai/index.md)
+    [Physics & Scientific AI](curriculum/12-physics-scientific-ai/index.md) · [Biology & Life Sciences](curriculum/14-biology-life-sciences/index.md) · [AI Foundations](curriculum/01-ai/index.md)
 
 </div>
 
 ---
 
-### [Learning Arcs](arcs/index.md) — depth along a path
+## What every page gives you
 
-7 focused learning paths that take you from entry point to frontier understanding. Each arc is a sequence: follow it in order, or jump in at the right depth.
+Every topic page is built for **four reader types** — and always answers the same question: *what can I do with this?*
 
-Use arcs when you want to:
+| Reader | Gets | Outcome |
+|---|---|---|
+| **Applied practitioner** | Key algorithms + MVB recipe | Something built today |
+| **Curious generalist** | Clear intuition, no jargon | Genuine understanding |
+| **Theory student** | Annotated LaTeX, derivations | Rigorous mental model |
+| **Frontier researcher** | Named papers, open problems | Where to push next |
 
-- Build a deep, coherent understanding of one area
-- Follow a path from basics to frontier research
-- Know what to read next
-
-<div class="grid cards" markdown>
-
-- **[MLP → Transformer](arcs/mlp-to-transformer/index.md)** — Architecture lineage from perceptrons to modern transformers
-
-- **[Generative Stack](arcs/generative-stack/index.md)** — VAEs → GANs → Diffusion → Flow Matching
-
-- **[Language Models](arcs/language-models/index.md)** — Pretraining → alignment → frontier LLMs
-
-- **[Reinforcement Learning](arcs/reinforcement-learning/index.md)** — Bandits → PPO → RLHF → GRPO → DeepSeek-R1
-
-- **[Causal AI](arcs/causal-ai/index.md)** — From correlation to causation: SCMs, do-calculus, causal representation learning
-
-- **[Systems for Scale](arcs/systems-for-scale/index.md)** — FlashAttention → ZeRO → vLLM → inference at scale
-
-- **[Scientific AI](arcs/scientific-ai/index.md)** — PINNs → FNO → AlphaFold → V-JEPA → frontier models
-
-</div>
+Pivotal pages include a **Minimum Valuable Build** — a concrete, runnable recipe with real HuggingFace model and dataset IDs, designed for a consumer GPU or free Colab tier.
 
 ---
 
-## Each page is built for four types of readers
+## Source discipline
 
-Every topic page in this wiki is structured to be useful whether you're new or expert:
-
-- **Applied** — what it is, what it does, how to use it in practice
-- **Foundational** — the core concepts and mathematical intuition
-- **Theoretical** — rigorous formulations, proofs, deeper connections
-- **Frontier** — current state of the art, open problems, latest results
-
-Start anywhere. Go as deep as you need.
-
----
-
-## Source policy
-
-Every link in this wiki is one of:
+Every link traces back to a primary source:
 
 - `arxiv.org` — papers and preprints
-- `*.edu` — university course pages, lecture notes
-- `huggingface.co` — model cards, datasets, documentation
-- Official library documentation
+- `*.edu` — university lecture notes, course pages
+- `huggingface.co` — model cards, datasets
+- Official library docs (PyTorch, JAX, Diffusers...)
+- *"In production" sections only:* official engineering blogs from frontier labs
 
-No blogs, no Medium, no Towards Data Science. Every claim traces back to a primary source.
+No Medium. No Towards Data Science. No Wikipedia as a citation.
