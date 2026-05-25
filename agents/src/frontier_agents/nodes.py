@@ -4,7 +4,7 @@ All LLM calls go through LangChain (ChatOpenAI via OpenRouter or ChatAnthropic d
 The reviewer uses structured output (Pydantic) for reliable PASS/FAIL + confidence.
 
 Graph flow:
-  START → load_persona → read_stub → research → plan
+  START → load_persona → read_stub → research → plan → scratch
         → [full] write_draft → review
         → [mvb-only] mvb_recipe → merge_mvb → review
         → [approved] write_file → commit → log_run → END
@@ -23,7 +23,16 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from .llm import get_llm
-from .prompts import MVB_SYSTEM, PLAN_SYSTEM, REVIEWER_SYSTEM, WRITER_SYSTEM
+from .prompts import (
+    CHUNK1_INSTRUCTIONS,
+    CHUNK2_INSTRUCTIONS,
+    CHUNK3_INSTRUCTIONS,
+    MVB_SYSTEM,
+    PLAN_SYSTEM,
+    REVIEWER_SYSTEM,
+    SCRATCH_SYSTEM,
+    WRITER_SYSTEM,
+)
 from .state import WikiPageState
 from .tools import (
     exa_search_papers,
@@ -201,99 +210,179 @@ Production deployments found:
     return {**state, "writing_plan": response.content}
 
 
+def scratch_node(state: WikiPageState) -> WikiPageState:
+    """Compile raw research into a structured working-memory fact sheet.
+
+    Uses the fast RESEARCH_MODEL — this is synthesis/extraction, not prose.
+    The scratch_pad replaces raw research results in all subsequent writing calls:
+    the writer never sees unprocessed search results, only the compiled facts.
+    """
+    compiler = get_llm("research", temperature=0.1)
+    topic = state["topic"].replace("-", " ")
+    writing_plan = state.get("writing_plan", "")
+
+    def _fmt_papers(results: list[dict], max_items: int = 8) -> str:
+        return "\n".join(
+            f"- [{r.get('title', 'Untitled')}]({r.get('url', '')}) — "
+            f"{r.get('text', '')[:300].strip()}"
+            for r in results[:max_items]
+        )
+
+    def _fmt_sota(results: list[dict], max_items: int = 5) -> str:
+        return "\n".join(
+            f"- [{r.get('title', 'Untitled')}]({r.get('url', '')}) — "
+            f"{'; '.join((r.get('highlights') or [])[:2])}"
+            for r in results[:max_items]
+        )
+
+    def _fmt_prod(results: list[dict], max_items: int = 4) -> str:
+        return "\n".join(
+            f"- [{r.get('title', 'Untitled')}]({r.get('url', '')}) — "
+            f"{str(r.get('summary', ''))[:200]}"
+            for r in results[:max_items]
+        )
+
+    hf_models = state.get("hf_models", [])
+    hf_datasets = state.get("hf_datasets", [])
+    hf_block = (
+        "Models: " + " | ".join(
+            f"{m['model_id']} ({m['downloads']:,} dl)" for m in hf_models[:5]
+        ) + "\nDatasets: " + " | ".join(
+            f"{d['dataset_id']} ({d['downloads']:,} dl)" for d in hf_datasets[:5]
+        )
+    ) if hf_models or hf_datasets else "No HuggingFace results found."
+
+    user = f"""Compile a working-memory fact sheet for the Frontier Wiki page on: **{topic}**
+
+Writing plan (use this to guide what's essential):
+{writing_plan}
+
+Raw research results — extract, verify, organise:
+
+FOUNDATIONAL PAPERS:
+{_fmt_papers(state.get("research_results", [])) or "None found."}
+
+SOTA (2024+):
+{_fmt_sota(state.get("sota_results", [])) or "None found."}
+
+PRODUCTION DEPLOYMENTS:
+{_fmt_prod(state.get("production_results", [])) or "None found."}
+
+HUGGINGFACE (for MVB):
+{hf_block}
+
+{SCRATCH_SYSTEM}
+"""
+    response = compiler.invoke([HumanMessage(content=user)])
+    return {**state, "scratch_pad": response.content}
+
+
 def write_draft_node(state: WikiPageState) -> WikiPageState:
-    """Write a full wiki page — guided by the writing plan from plan_node."""
+    """Write the full wiki page in three sequential chunks.
+
+    Each chunk is a separate LLM call. Every call receives:
+      - The WRITER_SYSTEM persona + rules
+      - The writing plan (strategy)
+      - The scratch pad (verified facts, equations, citations, MVB stack)
+      - All previously written chunks (for coherence)
+
+    This avoids token-limit truncation and ensures each section can reference
+    what came before — the same way a human writer works draft by draft.
+
+    Chunks:
+      1 — Foundation: frontmatter + TL;DR + reader table + What it is + Why it matters
+      2 — Depth:      Core concepts + Math + Algorithms + Reading + SotA + In production
+      3 — Action:     MVB + Code + What comes next + Connected topics + Further reading
+    """
     writer = get_llm("writer", temperature=0.3)
     schema = _load_schema()
     persona = state.get("persona", {})
-    existing = state.get("existing_stub", "")
     writing_plan = state.get("writing_plan", "")
+    scratch_pad = state.get("scratch_pad", "")
     page_type = state.get("page_type", "core-concept")
     depth_emphasis = state.get("depth_emphasis", ["applied"])
+    topic = state["topic"]
+    track = state["track"]
 
-    # Compile research into a source block for the writer
-    def _fmt_papers(results: list[dict], max_items: int = 8) -> str:
-        return "\n\n".join(
-            f"PAPER: {r['url']}\nTITLE: {r['title']}\n{r.get('text', '')[:600]}"
-            for r in results[:max_items]
-        )
-
-    def _fmt_sota(results: list[dict], max_items: int = 4) -> str:
-        return "\n\n".join(
-            f"SOTA: {r['url']}\nTITLE: {r['title']}\nHIGHLIGHTS: {'; '.join(r.get('highlights', [])[:2])}"
-            for r in results[:max_items]
-        )
-
-    def _fmt_prod(results: list[dict], max_items: int = 3) -> str:
-        return "\n\n".join(
-            f"PRODUCTION: {r['url']}\nTITLE: {r['title']}\nSUMMARY: {r.get('summary', '')[:300]}"
-            for r in results[:max_items]
-        )
-
-    research_block = "\n\n".join(filter(None, [
-        "=== FOUNDATIONAL PAPERS ===",
-        _fmt_papers(state.get("research_results", [])),
-        "=== CURRENT SotA (2024+) ===",
-        _fmt_sota(state.get("sota_results", [])),
-        "=== PRODUCTION DEPLOYMENTS ===",
-        _fmt_prod(state.get("production_results", [])),
-    ]))
-
-    hf_models = state.get("hf_models", [])
-    hf_block = "\n".join(
-        f"- {m['model_id']} ({m['downloads']:,} downloads)"
-        for m in hf_models[:5]
-    ) or "Search huggingface.co/models for this topic"
-
-    # Build system prompt — use .replace() to avoid KeyError from LaTeX {braces}
     system = (
         WRITER_SYSTEM
         .replace("{domain}", persona.get("domain", "AI/ML"))
-        .replace("{schema}", schema[:3000])
-    )
-
-    improve_block = (
-        "IMPROVE THIS EXISTING CONTENT — keep what works, rewrite what doesn't:\n" + existing[:3000]
-        if existing.strip() and "🚧" not in existing
-        else "Write from scratch — there is no existing content to preserve."
+        .replace("{schema}", schema[:2000])
     )
 
     depth_note = (
-        "DEPTH EMPHASIS for this page: " + ", ".join(depth_emphasis) + "\n"
-        + ("Lean into the applied/engineering angle — more MVB detail, real code patterns, "
-           "production framing.\n" if "applied" in depth_emphasis else "")
-        + ("Lean into the theoretical angle — derivation steps, formal definitions, "
-           "proof intuitions.\n" if "theoretical" in depth_emphasis else "")
-        + ("Lean into the frontier angle — specific benchmark numbers, named 2024-2025 "
-           "papers, open problems as precise questions.\n" if "frontier" in depth_emphasis else "")
+        "Depth emphasis: " + ", ".join(depth_emphasis) + ". "
+        + ("Lean applied: longer MVB, code patterns, production framing. "
+           if "applied" in depth_emphasis else "")
+        + ("Lean theoretical: derivation steps, formal definitions, proof intuitions. "
+           if "theoretical" in depth_emphasis else "")
+        + ("Lean frontier: benchmark numbers, named 2024–2025 papers, open problems as questions. "
+           if "frontier" in depth_emphasis else "")
     )
 
-    user = f"""Write a complete Frontier Wiki page for: **{state['topic']}**
-Track: {state['track']} | Page type: {page_type}
-
+    # Shared context block — passed to every chunk call
+    context_header = f"""Topic: **{topic}** | Track: {track} | Page type: {page_type}
 {depth_note}
 
-WRITING PLAN (from planning agent — follow this):
+════════════════════════════════════
+WRITING PLAN
+════════════════════════════════════
 {writing_plan}
 
-{improve_block}
-
-RESEARCH SOURCES (verify URLs before citing — use only approved domains):
-{research_block}
-
-HuggingFace models available for MVB (use exact IDs):
-{hf_block}
-
-Produce the complete page with ALL schema sections. Requirements:
-- Every "What it is" / "Why it matters" paragraph must be prose — NO nested lists
-- Every LaTeX variable must be annotated on the following line
-- "In production": name specific companies + systems + scale numbers + official source links
-- MVB: use exact HuggingFace model/dataset IDs from the list above
-- End with the GitHub star CTA and "What can you build next?" arc connector
+════════════════════════════════════
+WORKING MEMORY (verified facts — use ONLY these citations, equations, examples)
+════════════════════════════════════
+{scratch_pad}
 """
 
-    response = writer.invoke([SystemMessage(content=system), HumanMessage(content=user)])
-    return {**state, "draft": response.content}
+    existing = state.get("existing_stub", "")
+    improve_note = (
+        "\n⚠ IMPROVE MODE — existing content below. Keep what's good, rewrite what's weak:\n"
+        + existing[:2000]
+        if existing.strip() and "🚧" not in existing else ""
+    )
+
+    chunks: list[str] = []
+
+    # ── Chunk 1: Foundation ──────────────────────────────────────────────────
+    r1 = writer.invoke([
+        SystemMessage(content=system),
+        HumanMessage(content=f"""{context_header}{improve_note}
+
+{CHUNK1_INSTRUCTIONS}
+"""),
+    ])
+    chunks.append(r1.content.strip())
+
+    # ── Chunk 2: Depth + Reference ───────────────────────────────────────────
+    r2 = writer.invoke([
+        SystemMessage(content=system),
+        HumanMessage(content=f"""{context_header}
+
+Already written (CHUNK 1 — do not repeat these sections):
+{chunks[0]}
+
+{CHUNK2_INSTRUCTIONS}
+"""),
+    ])
+    chunks.append(r2.content.strip())
+
+    # ── Chunk 3: Build + Connections ─────────────────────────────────────────
+    r3 = writer.invoke([
+        SystemMessage(content=system),
+        HumanMessage(content=f"""{context_header}
+
+Already written (CHUNKS 1 & 2 — do not repeat these sections):
+{chunks[0][-1000:]}   ← end of chunk 1
+{chunks[1][-1500:]}   ← end of chunk 2
+
+{CHUNK3_INSTRUCTIONS}
+"""),
+    ])
+    chunks.append(r3.content.strip())
+
+    draft = "\n\n".join(chunks)
+    return {**state, "draft": draft}
 
 
 def mvb_recipe_node(state: WikiPageState) -> WikiPageState:
@@ -382,7 +471,7 @@ def review_node(state: WikiPageState) -> WikiPageState:
 
 ---
 PAGE TO REVIEW:
-{draft[:6000]}
+{draft[:15000]}
 """
 
     try:
@@ -413,27 +502,37 @@ PAGE TO REVIEW:
 
 
 def revise_draft_node(state: WikiPageState) -> WikiPageState:
-    """Writer LLM revises the draft based on reviewer feedback."""
+    """Writer LLM revises the draft based on reviewer feedback.
+
+    Includes the full WRITER_SYSTEM + scratch_pad context so the reviser
+    has the same verified facts and prose rules as the original writer.
+    """
     writer = get_llm("writer", temperature=0.2)
+    schema = _load_schema()
+    persona = state.get("persona", {})
+    scratch_pad = state.get("scratch_pad", "")
 
-    prompt = f"""Revise this Frontier Wiki page based on the reviewer's feedback.
+    system = (
+        WRITER_SYSTEM
+        .replace("{domain}", persona.get("domain", "AI/ML"))
+        .replace("{schema}", schema[:2000])
+    )
 
-REVIEWER FEEDBACK:
+    prompt = f"""You are revising a Frontier Wiki page. The reviewer flagged specific issues. Fix them.
+
+REVIEWER FEEDBACK (fix every issue listed):
 {state.get('review_feedback', '')}
 
-CURRENT DRAFT:
+WORKING MEMORY (verified facts — use ONLY these citations when adding new content):
+{scratch_pad[:3000]}
+
+CURRENT DRAFT TO REVISE:
 {state.get('draft', '')}
 
-Fix all issues listed. Pay special attention to:
-- Convert any nested lists in explanatory sections to flowing prose
-- Ensure LaTeX variables are annotated
-- Replace vague "large companies" with specific named companies + scale numbers
-- Verify all source URLs are from approved domains
-
-Return the complete revised page.
+Return the complete revised page. Maintain all sections. Fix the flagged issues without breaking what's already good.
 """
 
-    response = writer.invoke([HumanMessage(content=prompt)])
+    response = writer.invoke([SystemMessage(content=system), HumanMessage(content=prompt)])
     count = state.get("revision_count", 0) + 1
     return {**state, "draft": response.content, "revision_count": count}
 

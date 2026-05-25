@@ -39,9 +39,11 @@ class WikiPageState(TypedDict, total=False):
     hf_models: list[dict]               # HuggingFace model search results (for MVB)
     hf_datasets: list[dict]             # HuggingFace dataset search results (for MVB)
 
-    # ── Planning phase (new) ───────────────────────────────────────────────────
-    writing_plan: str                   # 200-300 word plan from plan_node before writing
-    # Contains: key analogy, whether MVB is warranted, 3 essential papers, specific open problem
+    # ── Planning phase ────────────────────────────────────────────────────────
+    writing_plan: str                   # 200-300 word plan from plan_node
+    scratch_pad: str                    # compiled fact sheet from scratch_node:
+                                        # verified citations, equations, prod examples,
+                                        # MVB stack, opening scenario, open problem
 
     # ── Writing phase ──────────────────────────────────────────────────────────
     draft: str                          # full markdown page draft

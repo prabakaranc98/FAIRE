@@ -5,7 +5,7 @@ description: Live coverage and quality metrics for every wiki page
 
 # Generation Status
 
-> Last updated: **2026-05-25 23:23 UTC** · 1 total runs
+> Last updated: **2026-05-25 23:30 UTC** · 2 total runs
 
 ## Summary
 
@@ -14,14 +14,14 @@ description: Live coverage and quality metrics for every wiki page
 | Pages generated | **1** |
 | Approved (conf ≥ 0.8) | **0** (0%) |
 | With MVB | **0** |
-| Avg reviewer confidence | **0.20** |
+| Avg reviewer confidence | **0.30** |
 | Committed to git | **0** |
 
 ## Pages
 
 | Track | Topic | Type | Status | Conf | MVB | Rev | Committed |
 |---|---|---|---|---|---|---|---|
-| 02-generative-modeling | score-matching | core-concept | ⚠️ flagged | 0.20 | — | 2 | — |
+| 02-generative-modeling | score-matching | core-concept | ⚠️ flagged | 0.30 | — | 2 | — |
 
 ---
 

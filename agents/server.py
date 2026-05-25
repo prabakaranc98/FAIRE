@@ -146,6 +146,36 @@ def sprint_queue():
     return parse_sprint_backlog()
 
 
+@app.post("/supervise")
+def supervise(background_tasks: BackgroundTasks, dry_run: bool = False):
+    """Run the supervising agent: assess health, prioritise work, update sprint.
+
+    Returns immediately; runs in background. Check /supervisor for the report.
+    """
+    background_tasks.add_task(_run_supervisor_background, dry_run)
+    return {"queued": True, "message": "Supervisor running in background — check /supervisor when done"}
+
+
+@app.get("/supervisor", response_class=PlainTextResponse)
+def get_supervisor_report():
+    """Return the latest supervisor report (docs/system/supervisor.md)."""
+    docs_dir = Path(__file__).parent.parent / "docs"
+    report_path = docs_dir / "system" / "supervisor.md"
+    if not report_path.exists():
+        return "No supervisor report yet — POST /supervise to generate one."
+    return report_path.read_text(encoding="utf-8")
+
+
+def _run_supervisor_background(dry_run: bool = False):
+    """Run supervisor in background thread."""
+    try:
+        from frontier_agents.supervisor import run_supervisor
+        docs_dir = str(Path(__file__).parent.parent / "docs")
+        run_supervisor(docs_dir=docs_dir, dry_run=dry_run)
+    except Exception as e:
+        print(f"[supervisor] Error: {e}")
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 @click.command()

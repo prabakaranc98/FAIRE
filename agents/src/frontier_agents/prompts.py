@@ -14,6 +14,136 @@ Prompt design principles:
 from __future__ import annotations
 
 
+# ── Scratch / working memory compiler ────────────────────────────────────────
+
+SCRATCH_SYSTEM = """You are the working-memory compiler for the Frontier Wiki editorial agent.
+
+The writer will NOT see the raw research results — only your output. Your job is to
+extract, verify, and organise the raw search results into a clean fact sheet that the
+writer can consult section by section while drafting. Be surgical and precise.
+
+Produce the following sections in order. If a section has no good data, say "None found
+in search results" — do not invent facts.
+
+────────────────────────────────────────────
+## Verified citations
+────────────────────────────────────────────
+List 4–6 papers that actually appeared in the search results with real arXiv URLs.
+For each:
+  CITATION: Author et al. (YEAR) — "Exact Title" — [arXiv URL]
+  CONTRIBUTION: one sentence — what this paper established and why it matters here.
+  ESSENTIALITY: foundational | sota | survey
+
+Exclude any paper whose arXiv URL looks malformed or whose title seems dubious.
+
+────────────────────────────────────────────
+## Key equations
+────────────────────────────────────────────
+3–5 equations that are central to understanding this topic. For each:
+  EQUATION: [LaTeX — use $$ ... $$ block format]
+  ANNOTATION: where $x$ is ..., $y$ is ... (annotate EVERY symbol)
+  ROLE: what this equation computes and why it matters
+
+────────────────────────────────────────────
+## Production examples
+────────────────────────────────────────────
+2–4 real deployments from the production search results. For each:
+  COMPANY: [name]
+  SYSTEM: [what they built]
+  SCALE: [real number — users, throughput, parameters, cost reduction, etc.]
+  SOURCE: [URL from engineering blog — only approved domains]
+
+If no verified production examples were found, state that clearly.
+
+────────────────────────────────────────────
+## HuggingFace MVB stack
+────────────────────────────────────────────
+If the writing plan says this page earns an MVB, select:
+  MODEL: [exact HuggingFace model ID] — [download count] — [why this one]
+  DATASET: [exact HuggingFace dataset ID] — [why this one]
+  COMPUTE: [GPU spec — must be consumer GPU ≤16GB or Colab T4]
+  ESTIMATE: [training time estimate]
+  BUILD_GOAL: [one sentence — what the reader will have when done]
+
+If no MVB, write: "No MVB for this page — feeds into [[parent-page]]."
+
+────────────────────────────────────────────
+## Opening scenario
+────────────────────────────────────────────
+Write 3–4 sentences — the concrete scenario the writer will use to open "What it is".
+This must NOT start with a definition. It must start with the human problem or a
+surprising fact that makes the reader immediately understand WHY this concept exists.
+Draw on the writing plan's opening move. Make it vivid and specific.
+
+────────────────────────────────────────────
+## The open problem
+────────────────────────────────────────────
+One specific unsolved question. Stated as a research question, not a direction.
+Must be specific enough that a researcher could write a paper to answer it.
+Draw from the most recent SotA results and the writing plan.
+"""
+
+
+# ── Writing chunk instructions ─────────────────────────────────────────────────
+
+CHUNK1_INSTRUCTIONS = """Write CHUNK 1 of the page — the foundation.
+
+Sections to write (in order):
+1. Frontmatter block (---yaml---): title, track, tags, depth, prereqs, updated, has_mvb
+2. # Page Title
+3. > **TL;DR:** one sentence — what this is and why it matters at the frontier
+4. ## For your reader type  (4-row table routing to sections)
+5. ## What it is  (2–3 paragraphs of prose — open with the scenario from scratch pad)
+6. ## Why it matters at the frontier  (2 paragraphs — connect to open problems + lab priorities)
+
+Rules for this chunk:
+- "What it is" MUST open with the opening scenario from the scratch pad, NOT a definition
+- Both prose sections must be narrative paragraphs, zero nested lists
+- The reader-type table should route to specific section anchors
+- End at the closing of "Why it matters" — do not start the next section
+"""
+
+CHUNK2_INSTRUCTIONS = """Write CHUNK 2 of the page — the technical depth and reference material.
+
+Sections to write (in order):
+7. ## Core concepts  (flat bullet list — 5–8 key ideas, each defined precisely in one sentence)
+8. ## Mathematical foundations  (LaTeX equations from scratch pad — annotate EVERY variable)
+9. ## Key algorithms / techniques  (flat list — named methods, 1–2 sentences each)
+10. ## Essential reading  (table — 2–4 papers from scratch pad verified citations only)
+11. ## Seminal papers & test-of-time  (table — papers that moved the field)
+12. ## Current SotA  (2–3 sentences — named systems + specific benchmark numbers)
+13. ## What's happening now  (3 prose paragraphs: Research / Engineering & Systems / Open problems)
+14. ## In production  (production examples from scratch pad — company + system + scale + URL)
+
+Rules for this chunk:
+- Use ONLY the citations listed in the scratch pad — do not invent paper titles
+- Every equation must use the exact annotation format from the scratch pad
+- "What's happening now" must be prose paragraphs, not bullets
+- "In production" must have specific scale numbers — not "large companies use this"
+- End at the closing of "In production" — do not start MVB
+"""
+
+CHUNK3_INSTRUCTIONS = """Write CHUNK 3 of the page — the build and connections.
+
+Sections to write (in order):
+15. ## Minimum Valuable Build  (if has_mvb=true — use exact stack from scratch pad)
+    OR  (if has_mvb=false) — skip this section; add a one-line pointer to the parent page's MVB
+16. GitHub star CTA (exactly: > *If this build worked for you — a ⭐ on [GitHub](...) is the only signal we collect.*)
+    [only if MVB was written]
+17. ## Code & implementations  (official repos + HuggingFace links — no tutorials)
+18. ## What comes next  (natural wiki links — one sentence each on the relationship, not sequence)
+19. ## Connected topics  ([[wikilink]] — relationship description, not navigation framing)
+20. ## Further reading  (arXiv/edu/distill.pub/lil'log — one sentence per item on what it adds)
+
+Rules for this chunk:
+- If MVB: use the exact model ID, dataset ID, compute spec from the scratch pad
+- MVB recipe steps must be specific enough to follow without googling
+- "What comes next" and "Connected topics" must feel like encyclopedia links, not a roadmap
+- No "this track covers / in this arc / your learning journey" language anywhere
+- No source-policy banner ("arXiv · .edu only") in the footer
+"""
+
+
 # ── Planning agent ────────────────────────────────────────────────────────────
 
 PLAN_SYSTEM = """You are the planning stage of the Frontier Wiki editorial agent.
@@ -470,8 +600,8 @@ REVIEW CHECKLIST:
    - Are sources from approved engineering blog domains?
    - Are scale numbers present (users, throughput, parameter count)?
 
-8. ARC CONNECTOR — "What can you build next?" section present?
-   This section is required. If missing: add to issues.
+8. CONNECTIONS — "What comes next" section present?
+   Check for ## What comes next section. If missing: add to issues.
 
 CONFIDENCE SCORING:
   0.9–1.0: Excellent — all sections, good prose, specific examples, verified sources → auto-commit

@@ -382,6 +382,90 @@ def serve(host, port, interval, dry_run, run_now):
     uvicorn.run(server_mod.app, host=host, port=port, log_level="info")
 
 
+@cli.command()
+@click.option("--dry-run", is_flag=True, help="Analyse and report without updating sprint or writing files")
+@click.option("--verbose", is_flag=True, help="Show detailed progress")
+@click.option("--docs-dir", default=None, help="Path to docs/ (default: ../docs from agents/)")
+def supervise(dry_run, verbose, docs_dir):
+    """Run the supervising agent: assess wiki health, prioritise work, update sprint queue.
+
+    Reads current wiki state, identifies quality gaps and content holes,
+    ranks work by impact, and updates agents/sprints/current.md.
+    Writes a health report to docs/system/supervisor.md.
+    """
+    from .supervisor import run_supervisor
+
+    resolved_docs = docs_dir or str(Path(__file__).parent.parent.parent.parent / "docs")
+
+    console.print(Panel(
+        "[bold]Frontier Wiki — Supervising Agent[/bold]\n"
+        "Assessing wiki health · identifying gaps · prioritising sprint queue",
+        border_style="blue",
+    ))
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Analysing wiki state...", total=None)
+        report = run_supervisor(
+            docs_dir=resolved_docs,
+            dry_run=dry_run,
+            verbose=verbose,
+        )
+        progress.update(task, description="Analysis complete.")
+
+    h = report.health
+    console.print(Panel(
+        f"[bold]Wiki Health[/bold]\n"
+        f"Pages: [cyan]{h.total_pages}[/cyan] total "
+        f"([yellow]{h.stub_pages}[/yellow] stubs, "
+        f"[green]{h.generated_pages}[/green] generated)\n"
+        f"Approved: [green]{h.approved_pages}[/green] | "
+        f"Flagged: [yellow]{h.flagged_pages}[/yellow] | "
+        f"Avg confidence: [cyan]{h.avg_confidence:.2f}[/cyan]\n"
+        f"Tracks covered: [cyan]{h.tracks_covered}[/cyan] / {h.tracks_total}",
+        border_style="green",
+    ))
+
+    if report.llm_analysis:
+        console.print("\n[bold]Editorial Analysis:[/bold]")
+        console.print(report.llm_analysis)
+
+    if report.actions:
+        table = Table(show_header=True, header_style="bold", title="Prioritised Work Queue")
+        table.add_column("#", width=3)
+        table.add_column("Priority")
+        table.add_column("Action")
+        table.add_column("Topic")
+        table.add_column("Track")
+        table.add_column("Reason", overflow="fold")
+
+        for i, a in enumerate(report.actions[:15], 1):
+            pri_colors = {1: "red", 2: "yellow", 3: "cyan", 4: "dim"}
+            pri_labels = {1: "critical", 2: "high", 3: "medium", 4: "low"}
+            color = pri_colors.get(a.priority, "white")
+            label = pri_labels.get(a.priority, "?")
+            table.add_row(
+                str(i),
+                f"[{color}]{label}[/{color}]",
+                a.action,
+                a.topic,
+                a.track,
+                a.reason[:60],
+            )
+        console.print(table)
+
+    if not dry_run:
+        sprint_path = Path(__file__).parent.parent.parent / "sprints" / "current.md"
+        supervisor_path = Path(resolved_docs) / "system" / "supervisor.md"
+        console.print(f"\n[green]✓ Sprint updated:[/green] {sprint_path}")
+        console.print(f"[green]✓ Report written:[/green] {supervisor_path}")
+    else:
+        console.print("\n[yellow]Dry run — sprint not updated, report not written[/yellow]")
+
+
 def _generate_all_stubs(
     track: str,
     depth: str,

@@ -28,6 +28,7 @@ from .nodes import (
     review_node,
     revise_draft_node,
     route_after_review,
+    scratch_node,
     write_draft_node,
     write_file_node,
 )
@@ -42,8 +43,9 @@ def build_wiki_graph() -> StateGraph:
           → load_persona
           → read_stub
           → research
-          → plan             ← NEW: deliberate planning before writing
-          → write_draft
+          → plan             ← deliberate planning before writing
+          → scratch          ← compile working-memory fact sheet from research
+          → write_draft      ← chunked: 3 sequential LLM calls with scratch_pad context
           → review ─────────────── [approved] ──→ write_file → commit → log_run → END
                     └── [revise, count<2] ──→ revise_draft → review
                     └── [revise, count≥2] ──→ flag_human_review → log_run → END
@@ -55,6 +57,7 @@ def build_wiki_graph() -> StateGraph:
     graph.add_node("read_stub", read_stub_node)
     graph.add_node("research", research_node)
     graph.add_node("plan", plan_node)
+    graph.add_node("scratch", scratch_node)
     graph.add_node("write_draft", write_draft_node)
     graph.add_node("review", review_node)
     graph.add_node("revise_draft", revise_draft_node)
@@ -68,7 +71,8 @@ def build_wiki_graph() -> StateGraph:
     graph.add_edge("load_persona", "read_stub")
     graph.add_edge("read_stub", "research")
     graph.add_edge("research", "plan")
-    graph.add_edge("plan", "write_draft")
+    graph.add_edge("plan", "scratch")
+    graph.add_edge("scratch", "write_draft")
     graph.add_edge("write_draft", "review")
 
     graph.add_conditional_edges(

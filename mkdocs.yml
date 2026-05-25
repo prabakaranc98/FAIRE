@@ -137,6 +137,7 @@ nav:
     - About: about.md
     - Generation Status: system/status.md
     - Agent Changelog: system/changelog.md
+    - Supervisor Report: system/supervisor.md
 
 extra_css:
   - stylesheets/extra.css

@@ -271,7 +271,35 @@ def sprint_job(dry_run: bool = False) -> list[dict]:
 
 
 def full_cycle_job(dry_run: bool = False) -> dict:
-    """Run the full 48-hour cycle: audit → sprint → changelog."""
+    """Run the full 48-hour cycle: supervise → audit → sprint → changelog.
+
+    Cycle order:
+      1. Supervisor — assess wiki health, update sprint with priorities
+      2. Audit      — structural quality check on all pages
+      3. Sprint     — execute queued work items
+      4. Changelog  — log quality delta per touched page
+    """
+    # Step 0: Supervisor updates the sprint with latest priorities
+    supervisor_summary = {}
+    try:
+        from .supervisor import run_supervisor
+        report = run_supervisor(
+            docs_dir=str(DOCS_DIR),
+            runs_dir="runs",
+            sprints_dir=str(SPRINTS_DIR),
+            dry_run=dry_run,
+            verbose=False,
+        )
+        supervisor_summary = {
+            "total_pages": report.health.total_pages,
+            "approved": report.health.approved_pages,
+            "flagged": report.health.flagged_pages,
+            "avg_confidence": round(report.health.avg_confidence, 2),
+            "actions_queued": len(report.actions),
+        }
+    except Exception as e:
+        supervisor_summary = {"error": str(e)}
+
     sprint_tasks = parse_sprint_backlog()
     topics = [t["topic"] for t in sprint_tasks]
     confidence_before = _read_confidence_before(topics)
@@ -281,6 +309,7 @@ def full_cycle_job(dry_run: bool = False) -> dict:
     write_changelog_entry(sprint_tasks, confidence_before, run_results)
 
     return {
+        "supervisor": supervisor_summary,
         "audit": audit_summary,
         "runs": run_results,
         "changelog_updated": True,

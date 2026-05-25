@@ -1,10 +1,10 @@
 # Frontier Wiki
 
-A 360° AI/ML knowledge base — from fundamentals to frontier research, built around one question:
-*what can you actually build with this?*
+A 360° AI/ML knowledge base built around one question: *what can you actually build with this?*
 
 Not a tutorial series. Not a reading list. A structured knowledge substrate where every page
-is the first step in someone's arc of work.
+is the first step in someone's arc of work — from the intuition, through the math, to a
+concrete artifact.
 
 ---
 
@@ -13,89 +13,156 @@ is the first step in someone's arc of work.
 An arc of work is a deliberate sequence of concepts, builds, and insights that takes you from
 "I've heard of this" to "I understand how it works and I've built something real with it."
 
-The wiki is organized around arcs. Each arc has ~20-28 ordered concept nodes. Each node is
-a page that answers: what is this, why does it matter at the frontier, and what can you build
-with it? Three to five nodes per arc have a **Minimum Valuable Build** — a concrete,
-runnable project that produces something real, not just a verification exercise.
-
-The MVB on the Generative Stack arc's VAE node lets you train a latent-space model from scratch.
-The MVB on the Diffusion node lets you train a conditional image generator. The MVB on the Latent
-Diffusion node lets you fine-tune Stable Diffusion on a custom domain. Each build unlocks a new
-class of artifact you couldn't make before.
+Each arc has ~20–28 ordered concept nodes. Each node is a page. Three to five nodes per arc
+have a **Minimum Valuable Build** — a concrete, runnable project that produces a real artifact.
+The MVB on the VAE node lets you train a latent-space model from scratch. The MVB on the
+Diffusion node lets you train a conditional image generator. Each build unlocks a new class
+of artifact you couldn't make before. Sub-concept pages (UNet, DDPM sampler) don't get their
+own MVB — they feed the build at the parent page.
 
 ---
 
 ## How to enter the wiki
 
 **[Curriculum](docs/curriculum/index.md)** — breadth first. Fifteen tracks covering the entire
-field: Generative Modeling, Reinforcement Learning, Representation Learning, Causal Inference,
-Systems, and more. Enter at any topic. See how it connects. Find your footing.
+field. Enter at any topic. See how it connects. Find your footing.
 
-**[Arcs](docs/arcs/index.md)** — depth first. Focused, sequential journeys with a clear purpose.
-The arc tells you why this sequence, what you're building toward, and what you know at each step.
-Read the arc page before diving into topic pages — it's the map.
+**[Arcs](docs/arcs/index.md)** — depth first. Focused, sequential journeys with a clear
+purpose. Read the arc page first — it's the map.
+
+**[System](docs/system/status.md)** — live generation status: which pages are agent-generated,
+reviewer confidence scores, changelog.
 
 ---
 
-## The agent system
+## How the system is built
 
-Wiki pages are generated and maintained by a local LangGraph editorial agent system in `agents/`.
-Agents run on your machine only — never deployed, never automated without your approval.
+### Agent pipeline
 
-The pipeline: research (Exa + HuggingFace) → deliberate planning → write → review → log.
-Every run is tracked in `agents/runs/runs.jsonl`. Check coverage with `uv run python generate.py status`.
+Every page is generated and maintained by a local LangGraph editorial agent. The pipeline runs
+on your machine — never deployed, never automated without your approval.
+
+```
+START
+  → load_persona       per-track expert persona (YAML)
+  → read_stub          existing content if the page already exists
+  → research           Exa: foundational papers + 2024+ SotA + production deployments
+                       HuggingFace: relevant models + datasets
+  → plan               deliberate planning pass (RESEARCH_MODEL — fast):
+                         core insight · opening analogy · MVB yes/no ·
+                         3 essential papers · specific open problem
+  → scratch            working-memory compiler (RESEARCH_MODEL):
+                         verified citations · key equations · production examples ·
+                         MVB stack · opening scenario · the open problem
+                         (writer never sees raw search results — only this fact sheet)
+  → write_draft        3 sequential WRITER_MODEL calls:
+                         chunk 1 — frontmatter + TL;DR + What it is + Why it matters
+                         chunk 2 — Core concepts + Math + Algorithms + Reading + SotA + In production
+                         chunk 3 — MVB + Code + What comes next + Connected topics
+                         each chunk reads plan + scratch_pad + previous chunks
+  → review             REVIEWER_MODEL: schema · source policy · prose quality ·
+                         technical accuracy · MVB executability → confidence 0–1
+  → [conf ≥ 0.8]  → write_file → commit → log_run → END
+  → [conf < 0.8, rev<2] → revise_draft → review
+  → [conf < 0.8, rev≥2] → flag_human_review → log_run → END
+```
+
+### Why this architecture
+
+**Plan before you write.** The planning step forces the agent to answer five specific questions
+before prose generation begins: what's the core insight, what analogy opens it, does this page
+earn an MVB, which three papers are essential, what is the specific open problem. Agents that
+skip this produce vague, generic output.
+
+**Scratch pad as working memory.** Raw search results (8 papers × 600 chars + SotA highlights
++ production summaries) would flood the writer context. The scratch node compiles this into a
+clean fact sheet: verified citations only, typed-out equations with annotations, production
+examples with scale numbers, the exact HuggingFace model/dataset IDs for the MVB. The writer
+reads the fact sheet, not the raw data.
+
+**Chunked writing for coherence.** A full wiki page (~5000 tokens of markdown) in one LLM call
+truncates and loses coherence across sections. Three chunks of ~1500 tokens each, each reading
+the previous chunks, produces a page where the prose in "Why it matters" references the analogy
+set up in "What it is," and the MVB uses the exact model IDs established in the scratch pad.
+
+**Confidence-gated commit.** The reviewer scores 0–1. Pages commit to git automatically when
+confidence ≥ 0.8 (configurable). If `GIT_AUTO_PUSH=true`, the commit is also pushed —
+meaning a full run ends with the page live on GitHub Pages.
+
+### Self-improving loop (48h cycle)
+
+```
+uv run python server.py          # start — 48h cycle
+uv run python server.py --run-now  # run one cycle immediately, then schedule
+```
+
+Each cycle: **audit** (scan all pages for quality regressions) → **sprint** (run pipeline on
+items in `agents/sprints/current.md`) → **changelog** (confidence delta per touched page).
+
+API at `http://localhost:8765`: `GET /status` · `POST /trigger` · `GET /changelog`
+
+---
+
+## Setup checklist
 
 ```bash
-# Setup
-cd agents && uv sync && cp .env.example .env  # fill in your keys
+# 1. Clone and navigate
+git clone https://github.com/prabakaranc98/FAIRE.git && cd FAIRE
 
-# Generate a single page
-uv run python generate.py generate \
-  --topic diffusion-models \
-  --track 02-generative-modeling \
-  --page-type arc-entry \
-  --depth-emphasis applied
+# 2. Install agent dependencies
+cd agents && uv sync
 
-# Arc-aware generation (tells agent where this page sits in the sequence)
+# 3. Configure environment
+cp .env.example .env
+# Fill in: OPENROUTER_API_KEY, EXA_API_KEY
+# Models are pre-configured: claude-opus-4.7 writer, gemini-3.1-pro-preview reviewer
+
+# 4. Generate a page
 uv run python generate.py generate \
   --topic score-matching \
   --track 02-generative-modeling \
   --page-type core-concept \
-  --depth-emphasis theoretical \
-  --arc generative-stack \
-  --arc-position 4 \
-  --prev-node ddpm \
-  --next-node flow-matching
+  --depth-emphasis theoretical
 
-# Check coverage
+# 5. Check coverage
 uv run python generate.py status
+
+# 6. Start the self-improving server (optional)
+uv run python server.py --run-now
+
+# 7. Preview the wiki locally
+cd .. && mkdocs serve
 ```
 
 ---
 
-## Source discipline
+## Source policy
 
-Every link in this wiki comes from one of:
-- `arxiv.org` — papers
-- `*.edu` — university course pages, lecture notes
+Every link in this wiki comes from:
+- `arxiv.org` · `*.edu` — papers and lecture notes
 - `huggingface.co` — model cards, datasets, spaces
-- Official library documentation (PyTorch, JAX, etc.)
+- Official library docs (pytorch.org, jax.readthedocs.io, etc.)
+- `distill.pub` · `lilianweng.github.io` — cited for attribution, never reproduced verbatim
 
-"In production" sections also allow official engineering blogs from top labs
-(ai.meta.com/research, research.google, developer.nvidia.com/blog, etc.).
-
-No Medium. No Towards Data Science. No personal blogs. No Substack. No Wikipedia.
-
----
-
-## Quality signal
-
-The reviewer agent scores every page 0.0–1.0 for: schema compliance, source policy,
-prose quality (no nested lists, narrative flow), technical accuracy, and MVB executability.
-Pages below 0.8 confidence are flagged for human review before writing to disk.
-
-The GitHub star is the only engagement metric we collect.
+"In production" sections also allow official engineering blogs from top labs.
+No Medium. No Towards Data Science. No personal blogs. No Wikipedia.
+The reviewer enforces this on every run.
 
 ---
 
-See [PRINCIPLES.md](PRINCIPLES.md) for the operating philosophy behind this.
+## Models
+
+| Role | Model | Context |
+|---|---|---|
+| Writer | `anthropic/claude-opus-4.7` | 1M |
+| Reviewer | `google/gemini-3.1-pro-preview` | 1M |
+| Research / Planning / Scratch | `google/gemini-3.5-flash` | 1M |
+| Fallback | `anthropic/claude-sonnet-4.6` | 1M |
+
+All model calls route through OpenRouter. The wiki is generated via local API calls —
+no cloud agent infrastructure, no external orchestration.
+
+---
+
+See [PRINCIPLES.md](PRINCIPLES.md) for the operating philosophy.
+See [docs/about.md](docs/about.md) for the full architecture walkthrough.

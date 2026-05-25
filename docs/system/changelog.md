@@ -24,3 +24,14 @@ No runs recorded yet. Run the agent to populate this log.
 - **Writer model:** anthropic/claude-opus-4.7
 
 ---
+
+### 2026-05-25 23:30 UTC — score-matching
+
+⚠️ **flagged** · conf=0.30
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** anthropic/claude-opus-4.7
+
+---
