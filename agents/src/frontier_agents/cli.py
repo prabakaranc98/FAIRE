@@ -383,6 +383,66 @@ def serve(host, port, interval, dry_run, run_now):
 
 
 @cli.command()
+@click.option(
+    "--depth-emphasis",
+    multiple=True,
+    type=click.Choice(DEPTH_EMPHASES),
+    default=["applied"],
+    help="Depth lens for all pages. Repeat for multiple.",
+)
+@click.option("--dry-run", is_flag=True, help="Generate but don't write to disk or commit")
+def rebuild(depth_emphasis, dry_run):
+    """Rebuild all existing (non-stub) pages with the updated agent pipeline.
+
+    Use this when the prompts, writer system, or pipeline have changed and
+    you need to refresh all existing content. Score-matching (just generated)
+    is skipped; only pages from before the last major pipeline update are rebuilt.
+    """
+    docs_dir = Path(os.getenv("WIKI_DOCS_DIR", "../docs"))
+
+    # Find all non-stub, non-index pages
+    pages = []
+    for page in docs_dir.rglob("*.md"):
+        if page.name == "index.md":
+            continue
+        if page.parts[-3] != "curriculum":
+            continue
+        content = page.read_text(encoding="utf-8", errors="ignore")
+        if "🚧" in content or "Agent-generated content pending" in content:
+            continue
+        track = page.parent.name
+        topic = page.stem
+        pages.append((topic, track))
+
+    if not pages:
+        console.print("[yellow]No fully-generated pages found to rebuild.[/yellow]")
+        return
+
+    console.print(Panel(
+        f"[bold]Rebuild mode[/bold] — {len(pages)} pages to rewrite\n"
+        + "\n".join(f"  [cyan]{topic}[/cyan] ({track})" for topic, track in pages),
+        border_style="yellow",
+    ))
+
+    if dry_run:
+        os.environ["GIT_AUTO_COMMIT"] = "false"
+        console.print("[yellow]Dry run — not writing to disk[/yellow]")
+
+    for i, (topic, track) in enumerate(pages, 1):
+        console.print(f"\n[bold][{i}/{len(pages)}] Rebuilding: {topic} ({track})[/bold]")
+        _run_pipeline(
+            topic=topic,
+            track=track,
+            depth="all",
+            mode="full",
+            page_type="core-concept",
+            depth_emphasis=list(depth_emphasis),
+            arc_context={},
+            dry_run=dry_run,
+        )
+
+
+@cli.command()
 @click.option("--dry-run", is_flag=True, help="Analyse and report without updating sprint or writing files")
 @click.option("--verbose", is_flag=True, help="Show detailed progress")
 @click.option("--docs-dir", default=None, help="Path to docs/ (default: ../docs from agents/)")

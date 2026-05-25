@@ -488,16 +488,28 @@ PAGE TO REVIEW:
         }
     except Exception:
         fallback = reviewer.invoke([
-            HumanMessage(content=prompt + "\n\nRespond: PASS or FAIL, then confidence 0.0-1.0, then issues.")
+            HumanMessage(content=prompt + (
+                "\n\nRespond in this exact format:\n"
+                "VERDICT: PASS or FAIL\n"
+                "CONFIDENCE: 0.0-1.0\n"
+                "ISSUES: bullet list of issues\n"
+            ))
         ])
         text = fallback.content
-        passed = "PASS" in text.upper()
+
+        import re as _re
+        passed = "PASS" in text.upper() and "FAIL" not in text.upper().split("PASS")[0]
+        # Parse confidence from text — look for decimal like "0.82" or "0.9"
+        conf_match = _re.search(r"\b(0\.\d+|1\.0)\b", text)
+        fallback_conf = float(conf_match.group(1)) if conf_match else 0.7
+        threshold = float(os.getenv("GIT_COMMIT_THRESHOLD", "0.8"))
+
         return {
             **state,
             "review_feedback": text,
             "review_pass": passed,
-            "review_confidence": 0.75,
-            "approved": passed,
+            "review_confidence": fallback_conf,
+            "approved": passed and fallback_conf >= threshold,
         }
 
 
