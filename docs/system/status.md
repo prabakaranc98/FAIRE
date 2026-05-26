@@ -5,17 +5,17 @@ description: Live coverage and quality metrics for every wiki page
 
 # Generation Status
 
-> Last updated: **2026-05-26 10:51 UTC** · 104 total runs
+> Last updated: **2026-05-26 12:59 UTC** · 118 total runs
 
 ## Summary
 
 | Metric | Value |
 |---|---|
-| Pages generated | **81** |
-| Approved (conf ≥ 0.8) | **24** (29%) |
+| Pages generated | **87** |
+| Approved (conf ≥ 0.8) | **28** (32%) |
 | With MVB | **0** |
-| Avg reviewer confidence | **0.72** |
-| Committed to git | **24** |
+| Avg reviewer confidence | **0.71** |
+| Committed to git | **28** |
 
 ## Pages
 
@@ -26,8 +26,9 @@ description: Live coverage and quality metrics for every wiki page
 | 01-ai | constraint-satisfaction | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 02-generative-modeling | consistency-models | core-concept | ❌ error | 0.77 | — | 2 | — |
 | 02-generative-modeling | diffusion-models | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 02-generative-modeling | energy-based-models | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
+| 02-generative-modeling | energy-based-models | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
 | 02-generative-modeling | flow-matching | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
+| 02-generative-modeling | generative-adversarial-networks | core-concept | ✅ approved | 0.85 | — | 0 | ✓ |
 | 03-representation-learning | bootstrapping-methods | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
 | 03-representation-learning | contrastive-learning | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
 | 04-neural-networks-dl | backpropagation | core-concept | ✅ approved | 0.84 | — | 2 | ✓ |
@@ -74,6 +75,7 @@ description: Live coverage and quality metrics for every wiki page
 | 09-algorithms-systems-ai | classical-algorithms | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 09-algorithms-systems-ai | custom-kernels | core-concept | ❌ error | 0.76 | — | 2 | — |
 | 09-algorithms-systems-ai | data-parallelism | core-concept | ❌ error | 0.85 | — | 2 | — |
+| 09-algorithms-systems-ai | gpu-architecture | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
 | 09-algorithms-systems-ai | kv-cache-impl | arc-step | ❌ error | 0.70 | — | 2 | — |
 | 09-algorithms-systems-ai | paged-attention-lm | arc-step | ❌ error | 0.70 | — | 2 | — |
 | 09-algorithms-systems-ai | speculative-decoding-lm | arc-step | ❌ error | 0.70 | — | 2 | — |
@@ -90,18 +92,22 @@ description: Live coverage and quality metrics for every wiki page
 | 12-physics-scientific-ai | deeponet | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 12-physics-scientific-ai | equivariant-networks | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
 | 12-physics-scientific-ai | fno | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
+| 12-physics-scientific-ai | geometric-dl | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
 | 13-graph-relational-ai | combinatorial-opt | core-concept | ❌ error | 0.71 | — | 2 | — |
-| 13-graph-relational-ai | equivariant-gnn | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
+| 13-graph-relational-ai | equivariant-gnn | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
+| 13-graph-relational-ai | geometric-unification | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
 | 14-biology-life-sciences | admet | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 14-biology-life-sciences | cell-simulation | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
 | 14-biology-life-sciences | dna-sequence-models | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 14-biology-life-sciences | drug-target | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 14-biology-life-sciences | epigenomics | core-concept | ✅ approved | 0.82 | — | 0 | ✓ |
+| 14-biology-life-sciences | gene-networks | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
 | 15-ml-theory-foundations | bias-variance | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
 | 15-ml-theory-foundations | concentration | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
 | 15-ml-theory-foundations | convex-optimization | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
 | 15-ml-theory-foundations | double-descent | core-concept | ❌ error | 0.70 | — | 2 | — |
 | 15-ml-theory-foundations | entropy | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
+| 15-ml-theory-foundations | generalization-deep | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
 
 ---
 

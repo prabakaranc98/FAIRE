@@ -2092,3 +2092,157 @@ No runs recorded yet. Run the agent to populate this log.
 - **Writer model:** google/gemini-3.1-flash-lite
 
 ---
+
+### 2026-05-26 10:51 UTC — gene-networks
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 14-biology-life-sciences
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:51 UTC — flow-matching
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:51 UTC — gaussian-processes
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 11:05 UTC — generative-adversarial-networks
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 11:05 UTC — generative-adversarial-networks
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 11:31 UTC — gene-networks
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 14-biology-life-sciences
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 11:31 UTC — generalization-deep
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 11:32 UTC — generalization-deep
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 12:58 UTC — geometric-unification
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 13-graph-relational-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 12:58 UTC — estimation
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 12:58 UTC — energy-based-models
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 12:58 UTC — geometric-dl
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 12-physics-scientific-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 12:58 UTC — equivariant-gnn
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 13-graph-relational-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 12:59 UTC — gpu-architecture
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 09-algorithms-systems-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
