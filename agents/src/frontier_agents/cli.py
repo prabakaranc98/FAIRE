@@ -679,6 +679,64 @@ def spin_arc(arc_id, steps, dry_run, docs_dir):
         console.print(f"[yellow]Arc-index line already present in sprint queue.[/yellow]")
 
 
+@cli.command(name="persona-review")
+@click.option("--last-n", type=int, default=20, help="Number of recent runs per track to analyze")
+@click.option("--threshold", type=float, default=0.70, help="Weakness threshold (default 0.70)")
+@click.option("--docs-dir", default=None, help="Path to docs/ (default: ../docs)")
+def persona_review(last_n, threshold, docs_dir):
+    """Scan recent critic_panel patterns and propose persona YAML updates.
+
+    For each track, aggregates the per-critic scores across the last N runs.
+    Tracks where the weakest critic dimension scores below `threshold` get a
+    persona-update proposal written to docs/system/persona-proposals.md.
+
+    Closes the long-horizon voice loop: critic feedback over many runs feeds
+    back into the writer's persona for the next cycle. The human reviews and
+    applies the diff manually — no auto-apply.
+    """
+    from .supervisor import propose_persona_updates
+
+    resolved_docs = Path(docs_dir or str(Path(__file__).parent.parent.parent.parent / "docs"))
+    runs_path = Path(__file__).parent.parent.parent / "runs" / "runs.jsonl"
+    personas_dir = Path(__file__).parent / "personas"
+
+    console.print(Panel(
+        f"[bold]Persona update review[/bold]\n"
+        f"Window: last {last_n} runs per track · threshold: {threshold:.2f}\n"
+        f"Writes proposals to docs/system/persona-proposals.md (no auto-apply).",
+        border_style="cyan",
+    ))
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Aggregating critic patterns...", total=None)
+        summary = propose_persona_updates(
+            runs_path=runs_path,
+            personas_dir=personas_dir,
+            docs_path=resolved_docs,
+            weakness_threshold=threshold,
+            last_n=last_n,
+            verbose=True,
+        )
+        progress.update(task, description="Review complete.")
+
+    flagged = summary.get("flagged_tracks", [])
+    if not flagged:
+        console.print(f"\n[green]✓ No tracks below threshold.[/green] Reason: {summary.get('reason')}")
+        return
+
+    console.print(f"\n[yellow]Flagged tracks ({len(flagged)}):[/yellow]")
+    for t in flagged:
+        p = summary["patterns"][t]
+        console.print(f"  {t}: weakest=[red]{p['weakest']}[/red] ({p['weakest_score']:.2f}) — {p['n_runs']} runs")
+
+    console.print(f"\n[green]✓ Proposals written:[/green] {summary['wrote_to']}")
+    console.print("Review each proposed diff against the live persona YAML, then apply by hand.")
+
+
 def _generate_all_stubs(
     track: str,
     depth: str,

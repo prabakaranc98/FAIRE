@@ -496,7 +496,24 @@ SECTION ORDER (use EXACTLY these heading names):
     "Step 1's encoder becomes the input to Step 4's latent diffusion. Step 4's checkpoint
     is what Steps 5 and 6 load — no retraining." Make the compounding explicit.
 
-7.  `## Chapter [K] — [Chapter Title]`
+7.  ## Build menu
+    Table with one row per step, showing the build series at a glance so the reader can
+    see WHICH builds they'll actually do (and which one matches their persona) before
+    committing to the arc.
+
+    Format:
+    | Step | mvb_persona | Named artifact | Compute target | Success metric |
+    |---|---|---|---|---|
+    | 1 | ml-tinkerer | trained 4M-param UNet DDPM checkpoint on MNIST 32×32 | RTX 4070 16GB | FID ≤ 20 |
+    | 2 | ml-tinkerer | β-VAE with disentangled latent dims | RTX 4070 16GB | latent-traversal yields semantically distinct dims |
+    | 3 | applied-researcher | CFG scale ablation comparison table | A100 40GB | guidance-vs-FID monotonicity verified |
+    ...
+
+    The persona walk must be visible from this table — the reader should see at a glance
+    "steps 1-4 are CS-student lane, step 5 is applied-researcher, step 6 is frontier-researcher."
+    See `arc-anatomy.md` for the persona walk pattern.
+
+8.  `## Chapter [K] — [Chapter Title]`
     Repeat this block for each chapter. Each block contains:
 
     **One paragraph overview**: what this chapter covers, what problem it solves that
@@ -513,23 +530,24 @@ SECTION ORDER (use EXACTLY these heading names):
     **Steps in this chapter** (flat list):
     `- [Step N — What You're Building](./step-NN-{topic}.md) — one sentence on the claim it tests`
 
-8.  ## The reading order
+9.  ## The reading order
     One paragraph, opinionated. How to use this arc: read the chapter overview, do the curated
     readings in order, then do the builds. State which readings can be skipped by applied-only
     readers and which are required for everyone. No wishy-washy "feel free to skip."
 
-9.  ## Key figures
+10. ## Key figures
     Flat list: 3–5 researchers. Each: `- **Name** (Affiliation) — specific contribution to this arc`
 
-10. ## Where this arc leads
+11. ## Where this arc leads
     2–3 sentences. What other arcs become accessible after this one. Be specific about the
     dependency: "The generative stack arc is the prerequisite for the Scientific AI arc's
     protein structure generation chapter, which uses latent diffusion over 3D coordinates."
 
 HARD RULES (violations cause the reviewer to reject):
-- has_mvb: false — arc index pages have no builds
+- has_mvb: false — arc index pages have no builds themselves; the BUILD MENU lists step MVBs
 - Every chapter must have curated readings (no empty chapter)
 - The compounding trajectory table must have non-empty "Artifact produced" for every row
+- The Build menu table must have one row per step with a non-empty mvb_persona, artifact, compute, metric
 - Step links must be real relative paths (./step-NN-topic.md format)
 - Only approved URLs in curated readings: arxiv.org, *.edu, distill.pub,
   lilianweng.github.io, ai.meta.com, research.google, openai.com/research
@@ -620,6 +638,26 @@ DOMAIN POLICY — enforced at search time:
 WRITER_SYSTEM = """You are the Frontier Wiki editorial agent — an expert in {domain}.
 
 You have received a writing plan from the planning agent. Follow it.
+
+═══════════════════════════════════════════════
+PLAN-THEN-WRITE (read this first)
+═══════════════════════════════════════════════
+
+Before writing the full page, internally compose a 5-line outline. This is for
+your own reasoning — do NOT include it in the page output. The outline forces
+deliberate thinking before prose.
+
+The 5 lines (think them through in your head):
+  1. The one question this page answers (the reader's question — not yours).
+  2. Three load-bearing claims the page must establish.
+  3. The citation backbone: which 3 papers (with verified URLs) anchor the page.
+  4. MVB persona spread: which personas this page serves with build variants.
+     (Skip for arc-step pages — they have one MVB per the declared mvb_persona.)
+  5. Self-check: what would make critic-cohesion score this page below 0.6?
+     Name the risk in one sentence, then write the page to avoid that risk.
+
+Only after the outline is settled in your mind, produce the page. This is the
+reasoning-scaffolding skill applied to writing — see `reasoning-scaffolding.md`.
 
 ═══════════════════════════════════════════════
 THE PHILOSOPHY YOU MUST EMBODY

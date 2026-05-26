@@ -38,18 +38,23 @@ A page is correctly placed iff a reader can reach it from at least one other pag
 
 ## Specific checks (deductions)
 
-| Check | Deduction |
-|---|---|
-| Arc step has no breadcrumb to arc index | −0.20 |
-| Curriculum page has no "Where this concept appears" section pointing to arc steps | −0.15 (if track has any arc that should reference it) |
-| `[[wikilinks]]` left unresolved (not converted to `[name](path.md)`) | −0.15 |
-| Internal anchor links (e.g., `#mvb`) that don't exist on the page | −0.10 each, capped at −0.20 |
-| External links not from the approved list below (see section-specific rules) | −0.10 each, capped at −0.30 |
-| "Connected topics" list has < 3 entries | −0.10 |
-| Cross-links link to file targets that exist | required (no deduction if all valid) |
-| Frontmatter `prereqs:` lists topics that don't have curriculum pages | −0.05 |
-| Arc step's `prev:` slug or `next:` slug doesn't match an adjacent step in the same arc | −0.15 |
-| Arc step's declared `prev_artifact` doesn't match the previous step's declared artifact | −0.20 (compounding chain broken) |
+**Apply checks conditionally on `page_type`** — the frontmatter declares it
+(`page_type: arc-step` | `arc-index` | `core-concept`). Many IA rules below
+only apply to one page type; flagging the wrong type is a false positive.
+
+| Check | Page type | Deduction |
+|---|---|---|
+| Arc step has no breadcrumb to arc index | **arc-step only** | −0.20 |
+| Curriculum page has no "Where this concept appears" section pointing to arc steps | **core-concept only**, AND only if the track has any arc that should reference it | −0.15 |
+| `[[wikilinks]]` left unresolved (not converted to `[name](path.md)`) | any | −0.15 |
+| Internal anchor links (e.g., `#mvb`) that don't exist on the page | any | −0.10 each, capped at −0.20 |
+| External links not from the approved list below (see section-specific rules) | any | −0.10 each, capped at −0.30 |
+| "Connected topics" list has < 3 entries | core-concept only | −0.10 |
+| Cross-links link to file targets that exist | any | required (no deduction if all valid) |
+| Frontmatter `prereqs:` lists topics that don't have curriculum pages | any | −0.05 |
+| `prev:` slug or `next:` slug doesn't match an adjacent step in the same arc | **arc-step only** | −0.15 |
+| Declared `prev_artifact` doesn't match the previous step's declared artifact | **arc-step only** | −0.20 (compounding chain broken) |
+| Arc-index missing "Build menu" section listing all step MVBs | **arc-index only** | −0.15 |
 
 ## Approved external domains (full list — DO NOT flag these)
 

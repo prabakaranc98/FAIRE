@@ -11,6 +11,17 @@ You are scoring **one dimension only**: does this page hold together as one cohe
 
 A page can pass every other critic (structure, sources, voice, IA, builds) and still fail this one. This critic is the editorial sense — "is this *worth reading start to finish*?"
 
+## How to score (step-by-step, do NOT one-shot it)
+
+See `reasoning-scaffolding.md` for the audit pattern. For cohesion specifically:
+
+1. **Read the opening 200 words.** Identify the page's *through-line claim* — the single argument the page is building. Write it down (internally) in one sentence.
+2. **Walk each section in order.** For each, ask: does this section advance the through-line, or does it stand alone? Sections that stand alone deduct.
+3. **Check notation consistency.** Does `x_t` mean the same thing in "Mathematical foundations" and in "Key algorithms" and in the MVB? Inconsistency deducts.
+4. **Find the synthesis paragraph.** Is there at least one paragraph that *interprets* the literature rather than restating it? If not, deduct.
+5. **The "so what" test.** After reading, do you have a position on the topic, or just an inventory of facts? No position → deduct.
+6. **Compose** the final score + the specific issue strings (name the section that breaks the through-line, name the inconsistent notation).
+
 ## What cohesion looks like
 
 A cohesive page has a **through-line**: the sections build on each other rather than restate the same information from different angles. Reading top-to-bottom should feel like one argument unfolding, not like 9 mini-pages stapled together.

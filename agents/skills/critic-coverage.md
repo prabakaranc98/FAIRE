@@ -13,6 +13,16 @@ Two failure modes:
 - **Under-scoped** — page is a stub-sized treatment of a major concept.
 - **Over-scoped** — page tries to teach the entire field; should have been split into multiple pages or moved to an arc.
 
+## How to score (step-by-step, do NOT one-shot it)
+
+See `reasoning-scaffolding.md` for the audit pattern. For coverage specifically:
+
+1. **Locate the layer** — check frontmatter `page_type` (`core-concept` / `arc-step` / `arc-index`). Apply the corresponding standard from the table below.
+2. **Count words rendered** — strip frontmatter and code blocks, count remaining words. Compare to the layer's expected range.
+3. **Walk required sections** — go down the layer's required-section list in order, marking each present / thin / missing.
+4. **Tally deductions** — apply each deduction from the "Specific deductions" section literally; don't paraphrase.
+5. **Compose** — score = 1.0 minus tallied deductions, clamped to [0, 1]. Issues list names the specific gaps; fix_suggestions lists the section additions.
+
 ## Layer-specific standards
 
 ### Curriculum page (`page_type: core-concept`)

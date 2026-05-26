@@ -755,6 +755,35 @@ slots_open: {summary['slots_open']}
 [If approve:] **Approval note:** [one paragraph on why this arc is worth materializing]
 
 ## 2. ...
+
+## Deferred branches (not proposed this cycle)
+
+[Optional. If the explorer surveyed branches that did NOT make the cut,
+list them here as bullets — NOT numbered as proposals. One line per
+branch with the reason it was dropped (insufficient prereqs / vertical
+shape / persona span too narrow). This is documentation, not a proposal.]
+
+OUTPUT RULES
+- Output raw markdown starting with `---` frontmatter. Do NOT wrap the response
+  in a code fence (no ```markdown, no ```yaml, no opening ``` of any kind).
+- Numbered `## 1.`, `## 2.` sections are ONLY for actual arc proposals.
+- Use `## Deferred branches` (no number) for branches you considered but did
+  not propose.
+
+SELF-CRITIQUE BEFORE EMITTING (see reasoning-scaffolding.md)
+After you draft each candidate, invoke the critic-editor lens against your
+own proposal. Specifically, for each arc you're about to label `approve`:
+  - Would the critic-editor veto it for seed-readiness? (Are ≥ 50% of prereqs
+    solid curriculum pages, not stubs?)
+  - Does the compounding chain hold? (Step N's prev_artifact = step N-1's
+    artifact, verbatim, for every step?)
+  - Is the persona span ≥ 3? (Otherwise the arc is too narrow.)
+  - Does the diagonal shape hold? (Col-1 ≠ col-4 of the diagonal pattern.)
+
+If any answer is "no," downgrade the verdict from `approve` to `reshape` (or
+`veto`) yourself and put the reason in the section. Don't emit `approve` for
+arcs you can't defend against these objections — surface the issue so the
+human sees it.
 """
         llm = get_llm("research", temperature=0.2)
         try:
@@ -763,6 +792,10 @@ slots_open: {summary['slots_open']}
         except Exception as exc:
             summary["reason"] = f"LLM call failed: {exc}"
             return summary
+
+        # Strip leading/trailing code fences if the model wraps its output anyway.
+        from .nodes import _sanitize_draft
+        proposal_md = _sanitize_draft(proposal_md)
 
         (docs_path / "system" / "arc-proposals.md").write_text(
             proposal_md, encoding="utf-8"
@@ -775,3 +808,166 @@ slots_open: {summary['slots_open']}
         summary["reason"] = f"proposal failed: {exc}"
 
     return summary
+
+
+# ── Persona-update loop (closes the long-horizon voice loop) ──────────────────
+
+def analyze_critic_patterns(
+    runs_path: Path,
+    last_n: int = 20,
+) -> dict[str, dict]:
+    """Aggregate critic_panel scores per track over the last N runs.
+
+    For each track that has any critic_panel data, computes:
+      - per-critic average score
+      - the critic dimension that scored lowest
+      - the most common issue strings across runs (top 3)
+
+    Returns: {track: {dimension_means: {...}, weakest: str, top_issues: [str]}}
+    """
+    if not runs_path.exists():
+        return {}
+
+    runs: list[dict] = []
+    with runs_path.open(encoding="utf-8") as f:
+        for line in f:
+            if line.strip():
+                try:
+                    runs.append(json.loads(line))
+                except json.JSONDecodeError:
+                    pass
+    runs = runs[-last_n * 5:]  # take a wider window then filter
+
+    by_track: dict[str, list[dict]] = {}
+    for r in runs:
+        if not r.get("critic_panel"):
+            continue
+        t = r.get("track", "")
+        if t:
+            by_track.setdefault(t, []).append(r)
+
+    results: dict[str, dict] = {}
+    for track, rs in by_track.items():
+        rs = rs[-last_n:]
+        # Aggregate per-critic mean score across runs
+        dim_scores: dict[str, list[float]] = {}
+        dim_issues: dict[str, list[str]] = {}
+        for r in rs:
+            panel = r.get("critic_panel", {})
+            for name, entry in panel.items():
+                if not isinstance(entry, dict):
+                    continue
+                score = entry.get("score", 0.7)
+                dim_scores.setdefault(name, []).append(float(score))
+                for iss in entry.get("issues", []):
+                    dim_issues.setdefault(name, []).append(str(iss))
+
+        if not dim_scores:
+            continue
+
+        means = {n: sum(v) / len(v) for n, v in dim_scores.items()}
+        weakest = min(means.items(), key=lambda kv: kv[1])
+        from collections import Counter
+        top = Counter(dim_issues.get(weakest[0], []))
+        top_issues = [s for s, _ in top.most_common(3)]
+
+        results[track] = {
+            "n_runs": len(rs),
+            "dimension_means": {n: round(m, 3) for n, m in means.items()},
+            "weakest": weakest[0],
+            "weakest_score": round(weakest[1], 3),
+            "top_issues": top_issues,
+        }
+    return results
+
+
+def propose_persona_updates(
+    runs_path: Path,
+    personas_dir: Path,
+    docs_path: Path,
+    weakness_threshold: float = 0.70,
+    last_n: int = 20,
+    verbose: bool = False,
+) -> dict:
+    """Generate persona-update proposals for tracks whose critic patterns fall below threshold.
+
+    Writes one consolidated report to docs/system/persona-proposals.md. Does NOT
+    auto-edit any persona YAML — the human reviews and applies.
+    """
+    patterns = analyze_critic_patterns(runs_path, last_n=last_n)
+    if not patterns:
+        return {"flagged_tracks": [], "reason": "no critic_panel data yet"}
+
+    flagged = [(t, p) for t, p in patterns.items() if p["weakest_score"] < weakness_threshold]
+    if not flagged:
+        return {"flagged_tracks": [], "reason": "all tracks above weakness threshold"}
+
+    proposals: list[str] = [
+        "---",
+        "title: Persona update proposals",
+        f"description: Critic patterns suggesting persona tweaks (last {last_n} runs per track). Human reviews; no auto-apply.",
+        "---",
+        "",
+        "# Persona update proposals",
+        "",
+        f"Each section below is one track whose worst-scoring critic dimension fell below "
+        f"the threshold ({weakness_threshold:.2f}). The proposed YAML diff is a suggestion — "
+        "review against `agents/src/frontier_agents/personas/{track}.yaml` and apply only "
+        "if it matches your editorial intent.",
+        "",
+    ]
+
+    llm = get_llm("research", temperature=0.1)
+    for track, p in flagged:
+        persona_path = personas_dir / f"{track}.yaml"
+        current_yaml = persona_path.read_text(encoding="utf-8") if persona_path.exists() else "(no persona file)"
+
+        prompt = f"""You are reviewing failure patterns in the wiki's writer agent for one track and proposing a YAML update to its persona file.
+
+TRACK: {track}
+RUNS ANALYZED: {p['n_runs']}
+WEAKEST CRITIC DIMENSION: {p['weakest']} (avg score {p['weakest_score']})
+TOP ISSUES ON THAT DIMENSION:
+{chr(10).join(f'  - {iss}' for iss in p['top_issues']) if p['top_issues'] else '  (no issue strings recorded)'}
+
+CURRENT PERSONA YAML:
+```yaml
+{current_yaml}
+```
+
+YOUR JOB
+Propose ONE concrete persona YAML diff that addresses the recurring weakness.
+Keep the diff small — 1-3 added or modified keys. Concrete additions only;
+don't reword existing fields unless they're actively misleading.
+
+Examples of good diffs (illustrative — don't copy these literally):
+- If critic-wiki-voice keeps flagging marketing language: add
+  `voice_guard: "avoid marketing adjectives — strip 'powerful', 'revolutionary', 'state-of-the-art'"`
+- If critic-coverage keeps flagging missing mathematical foundations: bump
+  `depth_focus` to mention "include derivations for every named theorem"
+- If critic-build-nudge keeps flagging phantom HF IDs: tighten `mvb_focus`
+  with 3-5 specific verified model IDs the writer should reach for first
+
+Output format: just a markdown section starting with `## {track}` then
+showing the proposed diff in a yaml code block + one paragraph explanation
+of what pattern this addresses.
+"""
+        try:
+            response = llm.invoke([HumanMessage(content=prompt)])
+            proposals.append(response.content.strip())
+            proposals.append("")
+            proposals.append("---")
+            proposals.append("")
+        except Exception as exc:
+            if verbose:
+                print(f"[supervisor] persona-update LLM failed for {track}: {exc}")
+            proposals.append(f"## {track}\n\n_LLM call failed: {exc}_\n\n---\n")
+
+    out_path = docs_path / "system" / "persona-proposals.md"
+    out_path.write_text("\n".join(proposals), encoding="utf-8")
+
+    return {
+        "flagged_tracks": [t for t, _ in flagged],
+        "wrote_to": str(out_path),
+        "patterns": {t: p for t, p in flagged},
+    }
