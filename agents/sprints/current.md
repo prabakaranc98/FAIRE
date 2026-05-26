@@ -5,55 +5,65 @@
 > Checked items are archived automatically on the next scheduler run.
 
 ## Critical Fixes
-- [x] agent-architectures | 01-ai | core-concept | applied  <!-- Reviewer flagged (conf=0.50) — needs targeted revision -->
-- [x] ai-hardware | 09-algorithms-systems-ai | core-concept | applied  <!-- Reviewer flagged (conf=0.35) — needs targeted revision -->
-- [x] backpropagation | 04-neural-networks-dl | core-concept | applied  <!-- Reviewer flagged (conf=0.45) — needs targeted revision -->
-- [x] bayesian-inference | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Reviewer flagged (conf=0.35) — needs targeted revision -->
-- [x] bayesian-nn | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Reviewer flagged (conf=0.35) — needs targeted revision -->
-- [x] bootstrapping-methods | 03-representation-learning | core-concept | applied  <!-- Reviewer flagged (conf=0.55) — needs targeted revision -->
-- [x] cell-simulation | 14-biology-life-sciences | core-concept | applied  <!-- Reviewer flagged (conf=0.25) — needs targeted revision -->
-- [x] chain-of-thought | 07-attention-memory-reasoning | core-concept | applied  <!-- Reviewer flagged (conf=0.65) — needs targeted revision -->
-- [x] circuit-complexity | 10-complexity-cognition | core-concept | applied  <!-- Reviewer flagged (conf=0.40) — needs targeted revision -->
-- [x] classical-algorithms | 09-algorithms-systems-ai | core-concept | applied  <!-- Reviewer flagged (conf=0.40) — needs targeted revision -->
+- [x] convex-optimization | 15-ml-theory-foundations | core-concept | applied  <!-- Reviewer flagged (conf=0.66) — needs targeted revision -->
 
 ## New Content
-- [x] bias-variance | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
-- [x] classical-planning | 01-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] climate-ai | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] cnn | 04-neural-networks-dl | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] cognitive-architectures | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] combinatorial-opt | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] complex-systems | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] complexity-classes | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] concentration | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] consistency-models | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] constraint-satisfaction | 01-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] contrastive-learning | 03-representation-learning | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] control-theory | 11-robotics-embodied-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] convex-optimization | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] counterfactuals | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] custom-kernels | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] data-parallelism | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] deeponet | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] diffusion-models | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] directed-graphical-models | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] disentanglement | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] distribution-shift | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] distributional-rl | 06-reinforcement-learning | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] dna-sequence-models | 14-biology-life-sciences | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] do-calculus | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] double-descent | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] dqn | 06-reinforcement-learning | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] drug-target | 14-biology-life-sciences | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] dynamic-programming | 06-reinforcement-learning | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] efficient-attention | 07-attention-memory-reasoning | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] em | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] emergent-capabilities | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] energy-based-models | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] entropy | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] epigenomics | 14-biology-life-sciences | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] equivariant-gnn | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] equivariant-networks | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] estimation | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] flow-matching | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] fno | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] energy-based-models | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] equivariant-gnn | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] estimation | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] flow-matching | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] fno | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] foundation-models-robotics | 11-robotics-embodied-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] gaussian-processes | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] gene-networks | 14-biology-life-sciences | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] generalization-deep | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] generative-adversarial-networks | 02-generative-modeling | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] geometric-dl | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] geometric-unification | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] geometry | 03-representation-learning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] gnn-expressivity | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] gpu-architecture | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] gradient-checkpointing | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] graph-transformers | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] hamiltonian-networks | 12-physics-scientific-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] hardness-of-learning | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] hidden-markov-models | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] high-dimensional | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] hyperparameter-tuning | 04-neural-networks-dl | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] hypothesis-testing | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] imitation-learning | 11-robotics-embodied-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] implicit-bias | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] inference-serving | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] information-dynamics | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] information-theory | 08-causal-statistical-inference | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] instruction-tuning | 07-attention-memory-reasoning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] jepa | 03-representation-learning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] kinematics | 11-robotics-embodied-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] knowledge-graphs | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] knowledge-representation | 01-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] kv-cache | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] lm-pretraining | 07-attention-memory-reasoning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] locomotion | 11-robotics-embodied-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] logic | 01-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] manipulation | 11-robotics-embodied-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] masked-autoencoders | 03-representation-learning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] mcmc | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] mdl | 15-ml-theory-foundations | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] mdp | 06-reinforcement-learning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] memory-architectures | 07-attention-memory-reasoning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] memory-systems | 10-complexity-cognition | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] message-passing | 13-graph-relational-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] mixed-precision | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] mlp | 04-neural-networks-dl | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] model-based-rl | 06-reinforcement-learning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] model-parallelism | 09-algorithms-systems-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+
+## Arc spin-up — GRPO-based Reasoning Alignment
+- [ ] grpo-arc-index | 06-reinforcement-learning | arc-index | frontier | arc:grpo-reasoning dest:"Implement Group Relative Policy Optimization to align a base model on chain-of-thought reasoning tasks" total:7
+- [ ] cot-baseline | 06-reinforcement-learning | arc-step | applied | arc:grpo-reasoning pos:1 ch:1 ch_title:"Chain-of-thought baseline" prev:none next:reward-signal prev_artifact:"none" artifact:"CoT prompting baseline on GSM8K with named accuracy number" total:7
+- [ ] reward-signal | 06-reinforcement-learning | arc-step | applied | arc:grpo-reasoning pos:2 ch:1 ch_title:"Chain-of-thought baseline" prev:cot-baseline next:group-generation prev_artifact:"CoT baseline accuracy on GSM8K" artifact:"PPO-style reward signal definition for reasoning correctness" total:7
+- [ ] group-generation | 06-reinforcement-learning | arc-step | applied | arc:grpo-reasoning pos:3 ch:2 ch_title:"Group generation pipeline" prev:reward-signal next:relative-advantage prev_artifact:"PPO reward signal" artifact:"group generation pipeline producing N candidate completions per prompt" total:7
+- [ ] relative-advantage | 06-reinforcement-learning | arc-step | applied | arc:grpo-reasoning pos:4 ch:2 ch_title:"Group generation pipeline" prev:group-generation next:policy-update prev_artifact:"group generation pipeline" artifact:"relative advantage computation across the group" total:7
+- [ ] policy-update | 06-reinforcement-learning | arc-step | theoretical applied | arc:grpo-reasoning pos:5 ch:3 ch_title:"Policy update" prev:relative-advantage next:length-ablation prev_artifact:"relative advantage tensor" artifact:"GRPO policy update with KL-penalty applied" total:7
+- [ ] length-ablation | 06-reinforcement-learning | arc-step | applied frontier | arc:grpo-reasoning pos:6 ch:3 ch_title:"Policy update" prev:policy-update next:final-eval prev_artifact:"GRPO-aligned policy" artifact:"reasoning trace length ablation comparison table" total:7
+- [ ] final-eval | 06-reinforcement-learning | arc-step | frontier | arc:grpo-reasoning pos:7 ch:4 ch_title:"Final evaluation" prev:length-ablation next:none prev_artifact:"GRPO-aligned policy with optimal trace length" artifact:"final evaluation on MATH and GSM8K with named accuracy numbers" total:7

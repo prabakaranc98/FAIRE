@@ -1,38 +1,33 @@
-```markdown
 ---
 title: Arc proposals
-generated_at: 2024-05-26 14:00 UTC
-remaining_budget: $3.44
+generated_at: 2026-05-26 15:30 UTC
+remaining_budget: $30.65
 slots_open: 2
 ---
 
 # Arc proposals
 
-This cycle proposes one arc focused on JEPA world models, aiming to build a predictive model for action. The survey revealed promising directions in Gaussian Splatting, JEPA, and Diffusion-based world models. After careful evaluation, the JEPA arc was selected due to its strong compounding trajectory and alignment with existing curriculum. The other branches were either not diagonal or had insufficient curriculum support.
+I have surveyed the "post-training and RL" seed within the 06-reinforcement-learning track. I propose one high-impact arc: **GRPO-based Reasoning Alignment**. This arc satisfies the diagonal pattern by bridging standard RLHF (specialized tool) with reasoning-chain verification (frontier intersection). A second potential branch (DPO-based alignment) was deferred due to insufficient curriculum depth in the underlying preference-modeling track.
 
-## 1. JEPA World Model for Action — EV/$ = 4.5 — verdict: approve
-**Destination:** Build a JEPA-style world model and use it to predict future states conditioned on actions.
-**Steps:** 6 · **Cost:** $1.60 · **Impact:** 8/10
-**Prereqs in curriculum:** transformer architecture ✓(07-attention-memory-reasoning), representation learning ✓(03-representation-learning), optimization ✓(04-neural-networks-dl), causal inference ✗ (queue first)
-**Persona span:** 3 (curious-learner, applied-researcher, frontier-researcher)
-**Seminal anchors:** LeCun 2022 · V-JEPA 2024 ·  Schrittwieser et al. 2020
-**Outline:**
-1.  **Build:** Implement a simple autoencoder (representation learning)
-    *   `mvb_persona`: curious-learner
-2.  **Build:** Implement a Transformer-based predictor (transformer architecture)
-    *   `mvb_persona`: curious-learner
-3.  **Build:** Train the predictor to predict future frames (representation learning, optimization)
-    *   `mvb_persona`: applied-researcher
-4.  **Build:** Add action conditioning to the predictor (transformer architecture)
-    *   `mvb_persona`: applied-researcher
-5.  **Build:** Evaluate the model's ability to predict future states given actions.
-    *   `mvb_persona`: applied-researcher
-6.  **Build:** Explore the model's latent space for planning and control.
-    *   `mvb_persona`: frontier-researcher
+## 1. GRPO-based Reasoning Alignment — EV/$ = 4.8 — verdict: approve
+**Destination:** Implement Group Relative Policy Optimization (GRPO) to align a base model on chain-of-thought reasoning tasks without a separate reward model.
+**Steps:** 7 · **Cost:** $1.60 · **Impact:** 12/14
+**Prereqs in curriculum:** [policy-gradient: solid, ppo-basics: solid, chain-of-thought-prompting: adequate, reward-modeling: stub]
+**Persona span:** 4 (ml-tinkerer, applied-engineer, applied-researcher, frontier-researcher)
+**Seminal anchors:** Shao et al. 2024 (DeepSeek-R1), Schulman et al. 2017 (PPO), Wei et al. 2022 (CoT)
+**Outline:** 
+1. CoT prompting baseline (ml-tinkerer)
+2. PPO-style reward signal definition (ml-tinkerer)
+3. Group generation pipeline (applied-engineer)
+4. Relative advantage calculation (applied-engineer)
+5. Policy update with KL-penalty (applied-researcher)
+6. Reasoning trace length ablation (applied-researcher)
+7. Final evaluation on MATH/GSM8K (frontier-researcher)
 **Editor verdict:** approve
-**Approval note:** This arc provides a solid foundation for understanding and building JEPA-style world models, a promising direction for future AI systems. The compounding trajectory is clear, and the persona walk is well-structured.
+**Approval note:** This arc is highly timely and follows a perfect diagonal: it starts with familiar CoT prompting, moves to the broader frame of RL-based alignment, synthesizes a GRPO capability, and lands at the frontier of reasoning-model training. The compounding chain is tight, as each step builds the specific components of the GRPO loop.
 
-## 2. Exploration deferred — seed "world models"
+## Deferred branches (not proposed this cycle)
 
-The survey returned 3 distinct branching directions. The Gaussian Splatting and Diffusion-based world model branches were considered, but were not selected due to the lack of a clear diagonal shape, or insufficient curriculum support.
-```
+* **DPO-based Preference Alignment:** Deferred. The curriculum for `06-reinforcement-learning` currently lacks a solid `preference-modeling` page, which is a required prereq for DPO.
+* **Online RLHF with Rejection Sampling:** Deferred. The survey indicated this branch is currently too similar to existing PPO implementations; it lacks a distinct "frontier intersection" compared to the GRPO reasoning path.
+* **Multi-Objective RL for Safety:** Deferred. The diagonal shape is currently vertical (RL → RL → RL), failing the requirement to cross into a broader research community.

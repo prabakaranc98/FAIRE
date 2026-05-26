@@ -80,8 +80,9 @@ def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
         "writer":   16000,  # full schema page: ~4000-8000 tokens; 16K gives headroom for longer pages
         "mvb":      4096,   # MVB section only
         "reviewer": 8192,   # one structured rubric call per page; reasoning model.
-        "critic":   4096,   # one call per critic skill, 8 in parallel; non-reasoning model,
-                            # all tokens visible, 4K covers structured JSON + small reasoning.
+        "critic":   8192,   # one call per critic skill, 8 in parallel. 8K to absorb full
+                            # page draft (~3-6K input) + structured JSON output without
+                            # LengthFinishReasonError, even on gemini-3.1-flash-lite.
         "research": 4096,   # plan + summaries
         "fallback": 16000,
     }

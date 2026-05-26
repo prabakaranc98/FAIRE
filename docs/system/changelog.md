@@ -1531,3 +1531,542 @@ No runs recorded yet. Run the agent to populate this log.
 - **Writer model:** google/gemini-3.1-flash-lite
 
 ---
+
+### 2026-05-26 09:55 UTC — climate-ai
+
+❌ **error** · conf=0.70
+
+- **Track:** 12-physics-scientific-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 09:56 UTC — cnn
+
+✅ **approved** · conf=0.84 · git committed
+
+- **Track:** 04-neural-networks-dl
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 09:57 UTC — cognitive-architectures
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 10-complexity-cognition
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 09:58 UTC — combinatorial-opt
+
+❌ **error** · conf=0.71
+
+- **Track:** 13-graph-relational-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 09:58 UTC — complex-systems
+
+❌ **error** · conf=0.83
+
+- **Track:** 10-complexity-cognition
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 09:59 UTC — complexity-classes
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 10-complexity-cognition
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 09:59 UTC — concentration
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:00 UTC — consistency-models
+
+❌ **error** · conf=0.77
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:01 UTC — constraint-satisfaction
+
+❌ **error** · conf=0.70
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:03 UTC — contrastive-learning
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:03 UTC — control-theory
+
+❌ **error** · conf=0.70
+
+- **Track:** 11-robotics-embodied-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:04 UTC — convex-optimization
+
+⚠️ **flagged** · conf=0.66
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:05 UTC — counterfactuals
+
+⚠️ **flagged** · conf=0.59
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:06 UTC — custom-kernels
+
+❌ **error** · conf=0.76
+
+- **Track:** 09-algorithms-systems-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:07 UTC — data-parallelism
+
+❌ **error** · conf=0.85
+
+- **Track:** 09-algorithms-systems-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:08 UTC — deeponet
+
+❌ **error** · conf=0.70
+
+- **Track:** 12-physics-scientific-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:08 UTC — diffusion-models
+
+❌ **error** · conf=0.70
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:10 UTC — directed-graphical-models
+
+❌ **error** · conf=0.70
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:10 UTC — disentanglement
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:11 UTC — distribution-shift
+
+❌ **error** · conf=0.70
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:12 UTC — distributional-rl
+
+❌ **error** · conf=0.82
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:13 UTC — dna-sequence-models
+
+❌ **error** · conf=0.70
+
+- **Track:** 14-biology-life-sciences
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:14 UTC — do-calculus
+
+⚠️ **flagged** · conf=0.66
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:14 UTC — double-descent
+
+❌ **error** · conf=0.70
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:16 UTC — dqn
+
+❌ **error** · conf=0.71
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:17 UTC — drug-target
+
+❌ **error** · conf=0.70
+
+- **Track:** 14-biology-life-sciences
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:17 UTC — dynamic-programming
+
+❌ **error** · conf=0.85
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:18 UTC — efficient-attention
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 07-attention-memory-reasoning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:19 UTC — em
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:20 UTC — entropy
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:38 UTC — cnn
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 04-neural-networks-dl
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:40 UTC — counterfactuals
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:41 UTC — counterfactuals
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:41 UTC — emergent-capabilities
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 10-complexity-cognition
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:42 UTC — epigenomics
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 14-biology-life-sciences
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:44 UTC — do-calculus
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:45 UTC — equivariant-networks
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 12-physics-scientific-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:46 UTC — energy-based-models
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:46 UTC — equivariant-gnn
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 13-graph-relational-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:46 UTC — convex-optimization
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:47 UTC — estimation
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:48 UTC — convex-optimization
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 15-ml-theory-foundations
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:48 UTC — estimation
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:48 UTC — energy-based-models
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:48 UTC — flow-matching
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:48 UTC — equivariant-gnn
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 13-graph-relational-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:49 UTC — foundation-models-robotics
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 11-robotics-embodied-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:49 UTC — fno
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 12-physics-scientific-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:50 UTC — gaussian-processes
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
