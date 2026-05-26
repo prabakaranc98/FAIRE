@@ -455,6 +455,22 @@
       "10-complexity-cognition/circuit-complexity",
       "03-representation-learning/contrastive-learning",
       "08-causal-statistical-inference/disentanglement"
+    ],
+    "02-generative-modeling/generative-adversarial-networks": [
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "08-causal-statistical-inference/disentanglement",
+      "15-ml-theory-foundations/entropy",
+      "15-ml-theory-foundations/bias-variance",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "12-physics-scientific-ai/geometric-dl": [
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/cnn",
+      "03-representation-learning/contrastive-learning",
+      "14-biology-life-sciences/cell-simulation",
+      "08-causal-statistical-inference/disentanglement",
+      "15-ml-theory-foundations/entropy"
     ]
   },
   "reverse": {
@@ -601,7 +617,8 @@
       "02-generative-modeling/energy-based-models",
       "13-graph-relational-ai/equivariant-gnn",
       "12-physics-scientific-ai/equivariant-networks",
-      "14-biology-life-sciences/gene-networks"
+      "14-biology-life-sciences/gene-networks",
+      "02-generative-modeling/generative-adversarial-networks"
     ],
     "09-algorithms-systems-ai/ai-hardware": [
       "10-complexity-cognition/circuit-complexity",
@@ -694,7 +711,8 @@
       "02-generative-modeling/flow-matching",
       "12-physics-scientific-ai/fno",
       "05-statistical-probabilistic-ml/gaussian-processes",
-      "15-ml-theory-foundations/generalization-deep"
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks"
     ],
     "14-biology-life-sciences/cell-simulation": [
       "10-complexity-cognition/complex-systems",
@@ -703,7 +721,8 @@
       "13-graph-relational-ai/equivariant-gnn",
       "12-physics-scientific-ai/equivariant-networks",
       "12-physics-scientific-ai/fno",
-      "14-biology-life-sciences/gene-networks"
+      "14-biology-life-sciences/gene-networks",
+      "12-physics-scientific-ai/geometric-dl"
     ],
     "10-complexity-cognition/cognitive-architectures": [
       "10-complexity-cognition/complexity-classes",
@@ -730,7 +749,9 @@
       "10-complexity-cognition/emergent-capabilities",
       "13-graph-relational-ai/equivariant-gnn",
       "12-physics-scientific-ai/equivariant-networks",
-      "12-physics-scientific-ai/fno"
+      "12-physics-scientific-ai/fno",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
     ],
     "15-ml-theory-foundations/concentration": [
       "15-ml-theory-foundations/convex-optimization",
@@ -757,7 +778,9 @@
       "12-physics-scientific-ai/equivariant-networks",
       "02-generative-modeling/flow-matching",
       "11-robotics-embodied-ai/foundation-models-robotics",
-      "15-ml-theory-foundations/generalization-deep"
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
     ],
     "08-causal-statistical-inference/disentanglement": [
       "08-causal-statistical-inference/do-calculus",
@@ -769,7 +792,9 @@
       "13-graph-relational-ai/equivariant-gnn",
       "12-physics-scientific-ai/equivariant-networks",
       "02-generative-modeling/flow-matching",
-      "15-ml-theory-foundations/generalization-deep"
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
     ],
     "10-complexity-cognition/complexity-classes": [
       "06-reinforcement-learning/dynamic-programming",
@@ -793,7 +818,9 @@
       "12-physics-scientific-ai/equivariant-networks",
       "02-generative-modeling/flow-matching",
       "05-statistical-probabilistic-ml/gaussian-processes",
-      "15-ml-theory-foundations/generalization-deep"
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
     ],
     "07-attention-memory-reasoning/efficient-attention": [
       "10-complexity-cognition/emergent-capabilities"
@@ -807,7 +834,8 @@
       "13-graph-relational-ai/equivariant-gnn",
       "02-generative-modeling/flow-matching",
       "12-physics-scientific-ai/fno",
-      "11-robotics-embodied-ai/foundation-models-robotics"
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "12-physics-scientific-ai/geometric-dl"
     ],
     "08-causal-statistical-inference/do-calculus": [
       "08-causal-statistical-inference/estimation",

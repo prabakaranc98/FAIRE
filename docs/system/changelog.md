@@ -2070,3 +2070,25 @@ No runs recorded yet. Run the agent to populate this log.
 - **Writer model:** google/gemini-3.1-flash-lite
 
 ---
+
+### 2026-05-26 10:51 UTC — fno
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 12-physics-scientific-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---
+
+### 2026-05-26 10:51 UTC — foundation-models-robotics
+
+⚠️ **flagged** · conf=0.50
+
+- **Track:** 11-robotics-embodied-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** google/gemini-3.1-flash-lite
+
+---

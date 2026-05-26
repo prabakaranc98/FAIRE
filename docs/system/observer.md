@@ -5,7 +5,7 @@ description: Closed-loop control system — real-time wiki quality signals
 
 # Observer Dashboard
 
-> Last observed: **2026-05-26 10:50 UTC** · [Source: `agents/runs/metrics.json`]
+> Last observed: **2026-05-26 10:51 UTC** · [Source: `agents/runs/metrics.json`]
 
 ## Control State
 
@@ -15,7 +15,7 @@ description: Closed-loop control system — real-time wiki quality signals
 | Quality | 0.85 | 0.72 | 0.13 deficit | 🔴 |
 | Stale pages | 0 | 25 | 25 pages | 🔴 |
 | Flagged pages | 0 | 8 | 8 pages | 🔴 |
-| Budget | >$1 remaining | $30.13 | full mode | 🟢 |
+| Budget | >$1 remaining | $29.82 | full mode | 🟢 |
 
 ## Coverage
 
@@ -43,17 +43,17 @@ description: Closed-loop control system — real-time wiki quality signals
 
 ## Quality Trend
 
-Last **10** runs · avg confidence **0.52** · first-pass approval **10%** · avg revisions **1.8** · trend **↓ declining** (-0.040)
+Last **10** runs · avg confidence **0.50** · first-pass approval **0%** · avg revisions **2.0** · trend **→ stable** (+0.000)
 
 ## Budget
 
-$46.8707 used of $77.00 limit · $30.13 remaining · **full mode**
+$47.1799 used of $77.00 limit · $29.82 remaining · **full mode**
 
 | Action | Est. Cost | Actions in Budget |
 |---|---|---|
-| generate | $0.20 | ~150 pages |
-| improve | $0.15 | ~200 pages |
-| mvb-only | $0.07 | ~430 pages |
+| generate | $0.20 | ~149 pages |
+| improve | $0.15 | ~198 pages |
+| mvb-only | $0.07 | ~426 pages |
 
 ---
 

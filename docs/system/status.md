@@ -5,7 +5,7 @@ description: Live coverage and quality metrics for every wiki page
 
 # Generation Status
 
-> Last updated: **2026-05-26 10:50 UTC** · 102 total runs
+> Last updated: **2026-05-26 10:51 UTC** · 104 total runs
 
 ## Summary
 
