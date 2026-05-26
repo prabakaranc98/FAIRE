@@ -45,11 +45,12 @@
   }
 
   .fw-hero__subtitle {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     color: #4B5563;
     margin: 1rem auto 2rem;
-    line-height: 1.7;
-    max-width: 600px;
+    line-height: 1.75;
+    max-width: 620px;
+    font-weight: 400;
   }
 
   .fw-hero__cta {
@@ -62,10 +63,10 @@
 
   .fw-hero__cta a {
     display: inline-block;
-    padding: 0.65rem 1.5rem;
+    padding: 0.65rem 1.4rem;
     border-radius: 6px;
     font-weight: 600;
-    font-size: 0.95rem;
+    font-size: 0.92rem;
     text-decoration: none !important;
     transition: all 0.18s ease;
     letter-spacing: -0.01em;
@@ -74,13 +75,13 @@
   .fw-hero__cta a.cta-primary {
     background: #E8452A;
     color: #FFFFFF !important;
-    box-shadow: 0 2px 8px rgba(232, 69, 42, 0.35);
+    box-shadow: 0 2px 8px rgba(232, 69, 42, 0.3);
   }
 
   .fw-hero__cta a.cta-primary:hover {
     background: #C63818;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(232, 69, 42, 0.4);
+    box-shadow: 0 4px 12px rgba(232, 69, 42, 0.38);
   }
 
   .fw-hero__cta a.cta-secondary {
@@ -90,8 +91,8 @@
   }
 
   .fw-hero__cta a.cta-secondary:hover {
-    border-color: #E8452A;
-    color: #E8452A !important;
+    border-color: #9CA3AF;
+    color: #1a1a1a !important;
     transform: translateY(-1px);
   }
 
@@ -143,18 +144,20 @@
 
 <div class="fw-hero">
   <div class="fw-hero__inner">
-    <div class="fw-hero__eyebrow">AI · ML · Frontier Research</div>
+    <div class="fw-hero__eyebrow">Machine Learning · Frontier Research · Open Reference</div>
     <h1 class="fw-hero__title">
-      A wiki that nudges you<br>toward <span>getting things done.</span>
+      Frontier Wiki
     </h1>
     <p class="fw-hero__subtitle">
-      Not another reading list. A structured atlas of AI/ML — built so every page
-      gives you intuition, a build recipe, and a clear next step. From foundations
-      to frontier, always with a question: <em>what can you do with this today?</em>
+      A reference on machine learning covering mathematical foundations,
+      model architectures, training methods, and current research.
+      Each topic includes core concepts, key algorithms, state-of-the-art results,
+      and a minimal working implementation.
+      Sources: arXiv, peer-reviewed venues, and official documentation.
     </p>
     <div class="fw-hero__cta">
-      <a href="arcs/" class="cta-primary">Start an Arc of Work →</a>
-      <a href="curriculum/" class="cta-secondary">Browse the Curriculum</a>
+      <a href="curriculum/" class="cta-primary">Browse Curriculum</a>
+      <a href="arcs/" class="cta-secondary">Learning Arcs</a>
       <a href="references/seminal-papers/" class="cta-secondary">Seminal Papers</a>
     </div>
     <div class="fw-hero__stats">
@@ -164,24 +167,24 @@
       </div>
       <div class="fw-hero__stat">
         <span class="fw-hero__stat-num">7</span>
-        <span class="fw-hero__stat-label">Learning arcs</span>
+        <span class="fw-hero__stat-label">Structured arcs</span>
       </div>
       <div class="fw-hero__stat">
         <span class="fw-hero__stat-num">4</span>
-        <span class="fw-hero__stat-label">Reader types per page</span>
+        <span class="fw-hero__stat-label">Reader perspectives per page</span>
       </div>
       <div class="fw-hero__stat">
         <span class="fw-hero__stat-num">MVB</span>
-        <span class="fw-hero__stat-label">Build recipe on every pivotal page</span>
+        <span class="fw-hero__stat-label">Working implementation on key pages</span>
       </div>
     </div>
   </div>
 </div>
 
 <div class="fw-byline">
-  Built by <a href="https://pracha.me" target="_blank">Prabakaran Chandran</a> ·
-  Agent-generated · arXiv · .edu · HuggingFace sources only ·
-  <a href="https://github.com/prabakaranc98/FAIRE" target="_blank">Open source</a>
+  Maintained by <a href="https://pracha.me" target="_blank">Prabakaran Chandran</a> ·
+  Sources: arXiv · .edu · HuggingFace ·
+  <a href="https://github.com/prabakaranc98/FAIRE" target="_blank">GitHub</a>
 </div>
 
 {% endblock %}
