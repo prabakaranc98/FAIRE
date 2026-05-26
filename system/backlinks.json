@@ -1,0 +1,252 @@
+{
+  "forward": {
+    "07-attention-memory-reasoning/transformer-block": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "07-attention-memory-reasoning/positional-encoding": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "07-attention-memory-reasoning/scaled-transformer": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "04-neural-networks-dl/bpe-tokenizer": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "04-neural-networks-dl/gpt2-pretrain": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "04-neural-networks-dl/scaling-laws": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "07-attention-memory-reasoning/sft-instruction": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "07-attention-memory-reasoning/rlhf-reward-ppo": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "07-attention-memory-reasoning/dpo-alternative": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/kv-cache-impl": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/speculative-decoding-lm": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/paged-attention-lm": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/scm-equations": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/dag-dsep": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/do-calculus-query": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/backdoor-adjustment": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/counterfactual-twin": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/causal-discovery": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "01-ai/agent-architectures": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/ai-hardware": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/attention-profiler": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/flash-attention-triton": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/int8-ptq": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "09-algorithms-systems-ai/gptq-4bit": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "10-complexity-cognition/animal-intelligence": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "10-complexity-cognition/attention-cognition": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "04-neural-networks-dl/backpropagation": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-inference": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-nn": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "15-ml-theory-foundations/bias-variance": [
+      "03-representation-learning/bootstrapping-methods",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "03-representation-learning/bootstrapping-methods": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "05-statistical-probabilistic-ml/bayesian-inference"
+    ],
+    "07-attention-memory-reasoning/chain-of-thought": [
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "10-complexity-cognition/circuit-complexity": [
+      "04-neural-networks-dl/backpropagation",
+      "09-algorithms-systems-ai/ai-hardware",
+      "07-attention-memory-reasoning/single-head-attention",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "05-statistical-probabilistic-ml/bayesian-inference"
+    ],
+    "09-algorithms-systems-ai/classical-algorithms": [
+      "09-algorithms-systems-ai/ai-hardware",
+      "10-complexity-cognition/circuit-complexity",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "01-ai/classical-planning": [
+      "09-algorithms-systems-ai/ai-hardware",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "07-attention-memory-reasoning/single-head-attention",
+      "10-complexity-cognition/circuit-complexity"
+    ],
+    "12-physics-scientific-ai/climate-ai": [
+      "09-algorithms-systems-ai/ai-hardware",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "03-representation-learning/bootstrapping-methods"
+    ],
+    "04-neural-networks-dl/cnn": [
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "09-algorithms-systems-ai/ai-hardware",
+      "07-attention-memory-reasoning/single-head-attention",
+      "03-representation-learning/bootstrapping-methods"
+    ],
+    "13-graph-relational-ai/combinatorial-opt": [
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "10-complexity-cognition/cognitive-architectures": [
+      "10-complexity-cognition/circuit-complexity",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "07-attention-memory-reasoning/single-head-attention",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "04-neural-networks-dl/backpropagation"
+    ]
+  },
+  "reverse": {
+    "07-attention-memory-reasoning/single-head-attention": [
+      "07-attention-memory-reasoning/transformer-block",
+      "07-attention-memory-reasoning/positional-encoding",
+      "07-attention-memory-reasoning/scaled-transformer",
+      "04-neural-networks-dl/bpe-tokenizer",
+      "04-neural-networks-dl/gpt2-pretrain",
+      "04-neural-networks-dl/scaling-laws",
+      "07-attention-memory-reasoning/sft-instruction",
+      "07-attention-memory-reasoning/rlhf-reward-ppo",
+      "07-attention-memory-reasoning/dpo-alternative",
+      "09-algorithms-systems-ai/kv-cache-impl",
+      "09-algorithms-systems-ai/speculative-decoding-lm",
+      "09-algorithms-systems-ai/paged-attention-lm",
+      "08-causal-statistical-inference/scm-equations",
+      "08-causal-statistical-inference/dag-dsep",
+      "08-causal-statistical-inference/do-calculus-query",
+      "08-causal-statistical-inference/backdoor-adjustment",
+      "08-causal-statistical-inference/counterfactual-twin",
+      "08-causal-statistical-inference/causal-discovery",
+      "01-ai/agent-architectures",
+      "09-algorithms-systems-ai/ai-hardware",
+      "09-algorithms-systems-ai/attention-profiler",
+      "09-algorithms-systems-ai/flash-attention-triton",
+      "09-algorithms-systems-ai/int8-ptq",
+      "09-algorithms-systems-ai/gptq-4bit",
+      "10-complexity-cognition/animal-intelligence",
+      "10-complexity-cognition/attention-cognition",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "15-ml-theory-foundations/bias-variance",
+      "03-representation-learning/bootstrapping-methods",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "10-complexity-cognition/circuit-complexity",
+      "09-algorithms-systems-ai/classical-algorithms",
+      "01-ai/classical-planning",
+      "12-physics-scientific-ai/climate-ai",
+      "04-neural-networks-dl/cnn",
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-inference": [
+      "03-representation-learning/bootstrapping-methods",
+      "10-complexity-cognition/circuit-complexity",
+      "09-algorithms-systems-ai/classical-algorithms",
+      "15-ml-theory-foundations/bias-variance",
+      "01-ai/classical-planning",
+      "12-physics-scientific-ai/climate-ai",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-nn": [
+      "03-representation-learning/bootstrapping-methods",
+      "10-complexity-cognition/circuit-complexity",
+      "09-algorithms-systems-ai/classical-algorithms",
+      "15-ml-theory-foundations/bias-variance",
+      "01-ai/classical-planning",
+      "12-physics-scientific-ai/climate-ai",
+      "04-neural-networks-dl/cnn",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "04-neural-networks-dl/backpropagation": [
+      "10-complexity-cognition/circuit-complexity",
+      "09-algorithms-systems-ai/classical-algorithms",
+      "15-ml-theory-foundations/bias-variance",
+      "01-ai/classical-planning",
+      "12-physics-scientific-ai/climate-ai",
+      "04-neural-networks-dl/cnn",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "09-algorithms-systems-ai/ai-hardware": [
+      "10-complexity-cognition/circuit-complexity",
+      "09-algorithms-systems-ai/classical-algorithms",
+      "01-ai/classical-planning",
+      "12-physics-scientific-ai/climate-ai",
+      "04-neural-networks-dl/cnn"
+    ],
+    "10-complexity-cognition/circuit-complexity": [
+      "09-algorithms-systems-ai/classical-algorithms",
+      "01-ai/classical-planning",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "03-representation-learning/bootstrapping-methods": [
+      "15-ml-theory-foundations/bias-variance",
+      "12-physics-scientific-ai/climate-ai",
+      "04-neural-networks-dl/cnn"
+    ],
+    "07-attention-memory-reasoning/chain-of-thought": [
+      "12-physics-scientific-ai/climate-ai",
+      "10-complexity-cognition/cognitive-architectures"
+    ]
+  }
+}

@@ -178,3 +178,69 @@
   background-color: #E8452A;
   color: white;
 }
+
+/* ── Persona admonition callout boxes ────────────────────────────────────────── */
+
+/* researcher: deep blue */
+.md-typeset .admonition.researcher,
+.md-typeset details.researcher { border-color: #1e40af; }
+.md-typeset .researcher > .admonition-title,
+.md-typeset .researcher > summary {
+  background-color: rgba(30, 64, 175, 0.08);
+  color: #1e40af;
+  font-weight: 600;
+}
+.md-typeset .researcher > .admonition-title::before,
+.md-typeset .researcher > summary::before {
+  background-color: #1e40af;
+  -webkit-mask-image: var(--md-admonition-icon--question);
+          mask-image: var(--md-admonition-icon--question);
+}
+
+/* engineer: forest green */
+.md-typeset .admonition.engineer,
+.md-typeset details.engineer { border-color: #166534; }
+.md-typeset .engineer > .admonition-title,
+.md-typeset .engineer > summary {
+  background-color: rgba(22, 101, 52, 0.08);
+  color: #166534;
+  font-weight: 600;
+}
+.md-typeset .engineer > .admonition-title::before,
+.md-typeset .engineer > summary::before {
+  background-color: #166534;
+  -webkit-mask-image: var(--md-admonition-icon--example);
+          mask-image: var(--md-admonition-icon--example);
+}
+
+/* build: orange-red */
+.md-typeset .admonition.build,
+.md-typeset details.build { border-color: #c2410c; }
+.md-typeset .build > .admonition-title,
+.md-typeset .build > summary {
+  background-color: rgba(194, 65, 12, 0.08);
+  color: #c2410c;
+  font-weight: 600;
+}
+.md-typeset .build > .admonition-title::before,
+.md-typeset .build > summary::before {
+  background-color: #c2410c;
+  -webkit-mask-image: var(--md-admonition-icon--info);
+          mask-image: var(--md-admonition-icon--info);
+}
+
+/* open: purple */
+.md-typeset .admonition.open,
+.md-typeset details.open { border-color: #7e22ce; }
+.md-typeset .open > .admonition-title,
+.md-typeset .open > summary {
+  background-color: rgba(126, 34, 206, 0.08);
+  color: #7e22ce;
+  font-weight: 600;
+}
+.md-typeset .open > .admonition-title::before,
+.md-typeset .open > summary::before {
+  background-color: #7e22ce;
+  -webkit-mask-image: var(--md-admonition-icon--question);
+          mask-image: var(--md-admonition-icon--question);
+}

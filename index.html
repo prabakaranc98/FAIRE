@@ -455,39 +455,132 @@
 
 <div class="fw-hero">
   <div class="fw-hero__inner">
-    <div class="fw-hero__eyebrow">Machine Learning · Frontier Research · Open Reference</div>
+    <div class="fw-hero__eyebrow">Range · Depth · Build</div>
     <h1 class="fw-hero__title">
-      Frontier Wiki
+      A wiki that nudges you toward<br>
+      <span>getting valuable builds done.</span>
     </h1>
     <p class="fw-hero__subtitle">
-      A reference on machine learning covering mathematical foundations,
-      model architectures, training methods, and current research.
-      Each topic includes core concepts, key algorithms, state-of-the-art results,
-      and a minimal working implementation.
-      Sources: arXiv, peer-reviewed venues, and official documentation.
+      Frontier AI/ML reference — curated, primary-source only, and explicitly directed at the next thing you can build.
+      Not a tutorial chase. Not a bookmark stack. Not a pile of links to get lost in.
+      Every pivotal page closes with six builds — one per persona — so the curious learner, the CS student, the production engineer,
+      the applied researcher, the theory student, and the frontier researcher each find a recipe shaped for their day.
     </p>
     <div class="fw-hero__cta">
-      <a href="curriculum/" class="cta-primary">Browse Curriculum</a>
-      <a href="arcs/" class="cta-secondary">Learning Arcs</a>
-      <a href="references/seminal-papers/" class="cta-secondary">Seminal Papers</a>
+      <a href="curriculum/" class="cta-primary">Get range — Curriculum</a>
+      <a href="arcs/" class="cta-secondary">Get depth — Arcs</a>
+      <a href="system/sense/" class="cta-secondary">What this is</a>
     </div>
     <div class="fw-hero__stats">
       <div class="fw-hero__stat">
         <span class="fw-hero__stat-num">15</span>
-        <span class="fw-hero__stat-label">Curriculum tracks</span>
+        <span class="fw-hero__stat-label">Curriculum tracks (range)</span>
+      </div>
+      <div class="fw-hero__stat">
+        <span class="fw-hero__stat-num">Arcs</span>
+        <span class="fw-hero__stat-label">Compounding builds (depth)</span>
       </div>
       <div class="fw-hero__stat">
         <span class="fw-hero__stat-num">7</span>
-        <span class="fw-hero__stat-label">Structured arcs</span>
+        <span class="fw-hero__stat-label">Reader personas served per page</span>
       </div>
       <div class="fw-hero__stat">
-        <span class="fw-hero__stat-num">4</span>
-        <span class="fw-hero__stat-label">Reader perspectives per page</span>
+        <span class="fw-hero__stat-num">MVBs</span>
+        <span class="fw-hero__stat-label">Persona-tagged, the milestone in every arc</span>
       </div>
-      <div class="fw-hero__stat">
-        <span class="fw-hero__stat-num">MVB</span>
-        <span class="fw-hero__stat-label">Working implementation on key pages</span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .fw-journey {
+    background: #FAFAFA;
+    border-top: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E7EB;
+    padding: 3rem 1.5rem;
+  }
+  .fw-journey__inner { max-width: 1000px; margin: 0 auto; }
+  .fw-journey__eyebrow {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+    color: #E8452A; text-transform: uppercase; text-align: center;
+    margin-bottom: 0.4rem;
+  }
+  .fw-journey__title {
+    font-size: 1.7rem; font-weight: 800; color: #111827;
+    text-align: center; margin-bottom: 0.4rem; letter-spacing: -0.02em;
+  }
+  .fw-journey__lede {
+    font-size: 1rem; color: #4B5563; text-align: center;
+    max-width: 720px; margin: 0 auto 2.2rem;
+  }
+  .fw-journey__grid {
+    display: grid; grid-template-columns: 1fr 40px 1fr 40px 1fr; gap: 0;
+    align-items: stretch;
+  }
+  .fw-journey__step {
+    background: white; border: 1px solid #E5E7EB; border-radius: 12px;
+    padding: 1.4rem 1.2rem; text-align: left;
+  }
+  .fw-journey__step h3 {
+    font-size: 1rem; font-weight: 800; color: #111827; margin: 0 0 0.2rem;
+    letter-spacing: -0.01em;
+  }
+  .fw-journey__step .tag {
+    font-size: 0.72rem; font-weight: 700; color: #E8452A;
+    letter-spacing: 0.1em; text-transform: uppercase; display: block;
+    margin-bottom: 0.6rem;
+  }
+  .fw-journey__step p {
+    font-size: 0.88rem; color: #4B5563; line-height: 1.55; margin: 0;
+  }
+  .fw-journey__arrow {
+    display: flex; align-items: center; justify-content: center;
+    color: #E8452A; font-size: 1.6rem; font-weight: 700;
+  }
+  .fw-journey__foot {
+    margin-top: 1.6rem; padding: 1rem 1.2rem;
+    background: rgba(232, 69, 42, 0.06);
+    border-left: 3px solid #E8452A;
+    border-radius: 4px;
+    font-size: 0.92rem; color: #374151;
+  }
+  @media (max-width: 720px) {
+    .fw-journey__grid { grid-template-columns: 1fr; gap: 0.6rem; }
+    .fw-journey__arrow { transform: rotate(90deg); padding: 0.4rem 0; }
+  }
+</style>
+
+<div class="fw-journey">
+  <div class="fw-journey__inner">
+    <div class="fw-journey__eyebrow">The compounding journey</div>
+    <h2 class="fw-journey__title">Curriculum → Arcs → MVBs</h2>
+    <p class="fw-journey__lede">
+      Wikipedia gives knowledge but no journey. roadmap.sh gives a path but no compounding.
+      paperswithcode gives implementations but no pedagogy. This wiki is built around the one thing none of them offer:
+      <strong>learning that actually compounds</strong>.
+    </p>
+    <div class="fw-journey__grid">
+      <div class="fw-journey__step">
+        <span class="tag">1 · Range</span>
+        <h3>Curriculum</h3>
+        <p>One page per concept across 15 tracks. Context that carries forward — by page 3 the reader doesn't re-read what they already know. Reference voice, primary sources only.</p>
       </div>
+      <div class="fw-journey__arrow">→</div>
+      <div class="fw-journey__step">
+        <span class="tag">2 · Depth</span>
+        <h3>Arcs</h3>
+        <p>Opinionated paths from a starting concept to a frontier capability. Curated readings + a compounding-trajectory table. Each step has a named artifact that the next step actually loads.</p>
+      </div>
+      <div class="fw-journey__arrow">→</div>
+      <div class="fw-journey__step">
+        <span class="tag">3 · Proof</span>
+        <h3>MVBs</h3>
+        <p>One build per arc step. Persona-tagged — a CS student, a production engineer, and a researcher get different recipes from the same concept. The final artifact is the capstone you can show.</p>
+      </div>
+    </div>
+    <div class="fw-journey__foot">
+      <strong>The bet:</strong> not tutorial-chasing, not bookmark-stacking, not getting lost in piles of information.
+      A wiki that closes every page with a directed nudge — what to build next, for the persona you are.
     </div>
   </div>
 </div>
@@ -863,6 +956,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -891,6 +991,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -918,6 +1025,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -1035,6 +1149,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1063,6 +1184,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1090,6 +1218,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -1207,6 +1342,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1235,6 +1377,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1262,6 +1411,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -1407,6 +1563,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1434,6 +1597,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -1579,6 +1749,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1606,6 +1783,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -1723,6 +1907,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1751,6 +1942,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1778,6 +1976,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -1895,6 +2100,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1923,6 +2135,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -1950,6 +2169,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -2067,6 +2293,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2095,6 +2328,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2122,6 +2362,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -2239,6 +2486,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2267,6 +2521,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2294,6 +2555,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -2411,6 +2679,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2439,6 +2714,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2466,6 +2748,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -2583,6 +2872,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2611,6 +2907,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2638,6 +2941,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -2755,6 +3065,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2783,6 +3100,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2810,6 +3134,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -2927,6 +3258,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2955,6 +3293,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -2982,6 +3327,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -3099,6 +3451,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -3127,6 +3486,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -3154,6 +3520,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -3271,6 +3644,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -3299,6 +3679,13 @@
   </span>
   
   
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
+  
 
       </a>
     </li>
@@ -3326,6 +3713,13 @@
     
   </span>
   
+  
+    
+  
+  
+    <span class="md-status md-status--stub"></span>
+  
+
   
 
       </a>
@@ -3436,7 +3830,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/mlp-to-transformer/" class="md-nav__link">
+      <a href="arcs/mlp-to-transformer/index.md" class="md-nav__link">
         
   
   
@@ -3464,7 +3858,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/generative-stack/" class="md-nav__link">
+      <a href="arcs/generative-stack/index.md" class="md-nav__link">
         
   
   
@@ -3492,7 +3886,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/language-models/" class="md-nav__link">
+      <a href="arcs/language-models/index.md" class="md-nav__link">
         
   
   
@@ -3520,7 +3914,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/causal-ai/" class="md-nav__link">
+      <a href="arcs/causal-ai/index.md" class="md-nav__link">
         
   
   
@@ -3548,7 +3942,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/reinforcement-learning/" class="md-nav__link">
+      <a href="arcs/reinforcement-learning/index.md" class="md-nav__link">
         
   
   
@@ -3576,7 +3970,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/systems-for-scale/" class="md-nav__link">
+      <a href="arcs/systems-for-scale/index.md" class="md-nav__link">
         
   
   
@@ -3604,7 +3998,7 @@
   
   
     <li class="md-nav__item">
-      <a href="arcs/scientific-ai/" class="md-nav__link">
+      <a href="arcs/scientific-ai/index.md" class="md-nav__link">
         
   
   
@@ -3834,6 +4228,62 @@
   
   
     <li class="md-nav__item">
+      <a href="system/sense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What FAIRE is (Sense)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="system/status/" class="md-nav__link">
         
   
@@ -3918,7 +4368,7 @@
   
   
     <li class="md-nav__item">
-      <a href="system/supervisor.md" class="md-nav__link">
+      <a href="system/supervisor/" class="md-nav__link">
         
   
   
@@ -3957,6 +4407,14 @@
           
             <div class="md-content" data-md-component="content">
               
+                
+
+
+
+  
+
+
+              
               <article class="md-content__inner md-typeset">
                 
                   
@@ -3978,31 +4436,31 @@
 <div class="grid cards">
 <ul>
 <li>
-<p><strong><a href="arcs/mlp-to-transformer/">MLP → Transformer</a></strong></p>
+<p><strong><a href="arcs/mlp-to-transformer/index.md">MLP → Transformer</a></strong></p>
 <p>Architecture lineage: from perceptrons to attention. Understand <em>why</em> each step happened.</p>
 </li>
 <li>
-<p><strong><a href="arcs/generative-stack/">Generative Stack</a></strong></p>
+<p><strong><a href="arcs/generative-stack/index.md">Generative Stack</a></strong></p>
 <p>VAEs → GANs → Diffusion → Flow Matching. Every generation paradigm, in the order they emerged.</p>
 </li>
 <li>
-<p><strong><a href="arcs/language-models/">Language Models</a></strong></p>
+<p><strong><a href="arcs/language-models/index.md">Language Models</a></strong></p>
 <p>Pretraining → RLHF → alignment → frontier LLMs. The full arc from n-grams to GPT-4.</p>
 </li>
 <li>
-<p><strong><a href="arcs/reinforcement-learning/">Reinforcement Learning</a></strong></p>
+<p><strong><a href="arcs/reinforcement-learning/index.md">Reinforcement Learning</a></strong></p>
 <p>Bandits → PPO → RLHF → GRPO → DeepSeek-R1. Decision-making from tabular to frontier.</p>
 </li>
 <li>
-<p><strong><a href="arcs/causal-ai/">Causal AI</a></strong></p>
+<p><strong><a href="arcs/causal-ai/index.md">Causal AI</a></strong></p>
 <p>SCMs → do-calculus → causal representation learning. From correlation to intervention.</p>
 </li>
 <li>
-<p><strong><a href="arcs/systems-for-scale/">Systems for Scale</a></strong></p>
+<p><strong><a href="arcs/systems-for-scale/index.md">Systems for Scale</a></strong></p>
 <p>FlashAttention → ZeRO → vLLM → speculative decoding. The engineering behind frontier models.</p>
 </li>
 <li>
-<p><strong><a href="arcs/scientific-ai/">Scientific AI</a></strong></p>
+<p><strong><a href="arcs/scientific-ai/index.md">Scientific AI</a></strong></p>
 <p>PINNs → FNO → AlphaFold 3 → V-JEPA. AI as a scientific instrument.</p>
 </li>
 </ul>
@@ -4164,14 +4622,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
       <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
       
         <script src="javascripts/mathjax.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

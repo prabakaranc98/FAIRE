@@ -13,34 +13,6 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/causal-ai/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/generative-stack/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/language-models/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/mlp-to-transformer/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/reinforcement-learning/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/scientific-ai/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
-         <loc>https://prabakaranc98.github.io/FAIRE/arcs/systems-for-scale/</loc>
-         <lastmod>2026-05-26</lastmod>
-    </url>
-    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -57,6 +29,22 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/01-ai/constraint-satisfaction/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/01-ai/knowledge-representation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/01-ai/logic/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/01-ai/multi-agent-systems/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/01-ai/search-algorithms/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -65,11 +53,27 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/consistency-models/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/diffusion-models/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/energy-based-models/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/flow-matching/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/generative-adversarial-networks/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/normalizing-flows/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -93,7 +97,23 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/geometry/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/jepa/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/masked-autoencoders/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/probing/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/redundancy-reduction/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -109,11 +129,43 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/cnn/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/hyperparameter-tuning/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/mlp/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/normalization/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/optimization/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/regularization/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/residual-networks/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/rnn/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/scaling-laws/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/04-neural-networks-dl/transfer-learning/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -129,7 +181,35 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/directed-graphical-models/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/distribution-shift/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/em/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/gaussian-processes/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/hidden-markov-models/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/mcmc/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/uncertainty-quantification/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/undirected-graphical-models/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -141,7 +221,43 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/actor-critic/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/distributional-rl/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/dqn/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/dynamic-programming/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/mdp/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/model-based-rl/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/multi-agent-rl/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/muzero/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/offline-rl/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/policy-gradient/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -153,6 +269,10 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/06-reinforcement-learning/td-learning/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -161,11 +281,51 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/efficient-attention/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/instruction-tuning/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/lm-pretraining/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/memory-architectures/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/multimodal-generation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/multimodal-reasoning/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/positional-encodings/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/scaling-laws-llm/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/self-attention/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/single-head-attention/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/state-space-models/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/tool-use/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -181,11 +341,47 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/causal-discovery/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/counterfactuals/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/disentanglement/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/do-calculus/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/estimation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/hypothesis-testing/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/information-theory/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/observational-studies/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/ood-generalization/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/propensity-scores/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/randomized-experiments/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -201,7 +397,27 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/classical-algorithms/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/custom-kernels/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/data-parallelism/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/gpu-architecture/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/gradient-checkpointing/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/inference-serving/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -209,11 +425,39 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/mixed-precision/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/model-parallelism/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/numerical-methods/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/peft/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/quantization/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/09-algorithms-systems-ai/speculative-decoding/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/animal-intelligence/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/attention-cognition/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -225,6 +469,10 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/complex-systems/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/complexity-classes/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
@@ -233,7 +481,27 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/hardness-of-learning/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/information-dynamics/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/memory-systems/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/neuroscience-ai/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/control-theory/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -245,11 +513,51 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/kinematics/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/locomotion/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/manipulation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/rl-robotics/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/sim-to-real/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/slam/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/tactile-sensing/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/visual-perception/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/11-robotics-embodied-ai/world-models-robotics/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/climate-ai/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/deeponet/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -261,7 +569,31 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/geometric-dl/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/hamiltonian-networks/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/molecular-simulation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/neural-odes/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/operator-learning/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/pinn/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/12-physics-scientific-ai/simulation-acceleration/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -269,7 +601,15 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/combinatorial-opt/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/equivariant-gnn/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/geometric-unification/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -277,7 +617,35 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/graph-transformers/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/knowledge-graphs/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/message-passing/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/molecular-property/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/recommendation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/relational-biases/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/scene-graphs/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/13-graph-relational-ai/spectral-graph/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -285,7 +653,35 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/admet/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/cell-simulation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/dna-sequence-models/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/drug-target/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/epigenomics/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/gene-networks/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/molecular-generation/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/14-biology-life-sciences/protein-design/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -309,7 +705,39 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/concentration/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/convex-optimization/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/double-descent/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/entropy/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/generalization-deep/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/high-dimensional/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/implicit-bias/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/mdl/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/nonconvex-optimization/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -321,11 +749,31 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/rademacher-complexity/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/rate-distortion/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/vc-dimension/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/references/glossary/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/references/seminal-papers/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/system/arc-proposals/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/system/architecture/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
@@ -337,7 +785,15 @@
          <lastmod>2026-05-26</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/system/sense/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/system/status/</loc>
+         <lastmod>2026-05-26</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/system/supervisor/</loc>
          <lastmod>2026-05-26</lastmod>
     </url>
 </urlset>
