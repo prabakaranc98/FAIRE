@@ -1164,21 +1164,35 @@
       
       
       
-        <span class="md-tag">diffusion</span>
+        <span class="md-tag">denoising</span>
       
     
       
       
       
       
-        <span class="md-tag">generative</span>
+        <span class="md-tag">latent-space</span>
       
     
       
       
       
       
-        <span class="md-tag">sde</span>
+        <span class="md-tag">noise-schedule</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">production</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">score-based</span>
       
     
   </nav>
@@ -1189,7 +1203,78 @@
 
 
 <h1 id="diffusion-models">Diffusion Models<a class="headerlink" href="#diffusion-models" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">02 · Generative Modeling</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>Imagine you could take a masterwork, cover it with sand until the outlines disappear, and then teach a neural network to reverse that abrasion grain by grain—restoring the brushstroke, the shading, the intent. Diffusion models are the algorithmic version of that sculpting fantasy: they degrade data into utter randomness through a known process, then learn to undo each tiny step. The trick is that you never ask the network to paint a masterpiece from scratch; instead it learns how to subtract the accumulated “sand” one kick at a time. By the end of this page you will understand why this multi-step choreography lets diffusion outmaneuver adversarial training instabilities, how it is scaled into modern production systems, and what minimal DDPM you can build to see the denoising dance live on MNIST digits.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Generative modeling has always balanced two conflicting needs: define a probability distribution broad enough to cover complex natural data, and make sampling from that distribution tractable. Early GANs attacked the first part with a kicker-discriminator pair but buckled on the second, because discriminators were brittle and gradients frequently vanished. Diffusion models answer the same question from the opposite side of the table. Instead of learning to draw samples directly, they define a forward noising process that gradually destroys structure in a series of T small, fixed steps. The resulting chain is a Markov process that leads every data point toward a simple Gaussian, which means the network only ever has to learn how to reverse small, local corruptions. This is why diffusion techniques are often called “score-based” or “denoising” models: the network learns the gradient of the log-density (the score) at each noise level by predicting what noise was added. Because these steps are handcrafted and easy to simulate, diffusion models inherit stability from the forward process while still matching or beating GANs in sample quality. The mechanism is best understood by starting from how the forward corruption is defined and how the network learns to invert it, one timestep at a time.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="the-forward-corruption-chain">The forward (corruption) chain<a class="headerlink" href="#the-forward-corruption-chain" title="Permanent link">&para;</a></h3>
+<p>The forward process <span class="arithmatex">\(q(x_t \mid x_{t-1})\)</span> is a fixed Gaussian Markov chain that blurs the data sample <span class="arithmatex">\(x_0\)</span> with incremental noise, turning structure into entropy. Mathematically,
+[
+q(x_t \mid x_{t-1}) = \mathcal{N}!\left(x_t; \sqrt{1 - \beta_t} x_{t-1}, \beta_t I\right),
+]
+where <span class="arithmatex">\(x_{t-1}\)</span> is the image at timestep <span class="arithmatex">\(t-1\)</span>, <span class="arithmatex">\(\beta_t \in (0,1)\)</span> is the variance schedule for step <span class="arithmatex">\(t\)</span>, and <span class="arithmatex">\(I\)</span> is the identity covariance. Each <span class="arithmatex">\(\beta_t\)</span> controls how much of the signal is replaced by noise at that step, and by choosing a small <span class="arithmatex">\(\beta_t\)</span> we ensure the chain never jumps too far. Repeated composition yields a closed-form marginal for any <span class="arithmatex">\(t\)</span>:
+[
+q(x_t \mid x_0) = \mathcal{N}!\left(x_t; \sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t)I\right),
+]
+where <span class="arithmatex">\(\alpha_t = 1 - \beta_t\)</span> and <span class="arithmatex">\(\bar{\alpha}_t = \prod_{s=1}^t \alpha_s\)</span>. The remarkable property is that <span class="arithmatex">\(x_t\)</span> is a linear interpolation between the original image and Gaussian noise, so sampling <span class="arithmatex">\(x_t\)</span> requires just one draw: <span class="arithmatex">\(x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon\)</span> with <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, I)\)</span>. Sohl-Dickstein et al. (2015) <a href="https://arxiv.org/abs/1503.03585">arxiv:1503.03585</a> introduced this nonequilibrium thermodynamic view, showing that the forward chain is computationally cheap and that it provides a tractable distribution from which to build the inverse.</p>
+<h3 id="the-reverse-process-and-noise-prediction">The reverse process and noise prediction<a class="headerlink" href="#the-reverse-process-and-noise-prediction" title="Permanent link">&para;</a></h3>
+<p>Given the forward chain, we now need a reverse chain <span class="arithmatex">\(p_\theta(x_{t-1} \mid x_t)\)</span> that recovers images step by step. Because the forward chain is Gaussian, its reverse can also be modeled as Gaussian:
+[
+p_\theta(x_{t-1} \mid x_t) = \mathcal{N}!\left(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t)\right),
+]
+where <span class="arithmatex">\(\mu_\theta\)</span> and <span class="arithmatex">\(\Sigma_\theta\)</span> are learned functions. Ho et al. (2020) <a href="https://arxiv.org/abs/2006.11239">arxiv:2006.11239</a> observed that directly predicting <span class="arithmatex">\(\mu_\theta\)</span> is unnecessary if the network instead predicts the noise <span class="arithmatex">\(\epsilon\)</span> that was added at each step; the mean can then be computed analytically. The parameterization becomes
+[
+\mu_\theta(x_t, t) = \frac{1}{\sqrt{\alpha_t}} \left(x_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}<em>t}} \epsilon</em>\theta(x_t, t)\right),
+]
+where <span class="arithmatex">\(\epsilon_\theta\)</span> is the network output and <span class="arithmatex">\(\alpha_t\)</span>, <span class="arithmatex">\(\bar{\alpha}_t\)</span> are defined as above. This is the key insight that transforms the reverse distribution estimation into a regression problem. The training loss is
+[
+L(\theta) = \mathbb{E}<em>{x_0, t, \epsilon} \left[\left|\epsilon - \epsilon</em>\theta\left(\sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, t\right)\right|^2\right],
+]
+where <span class="arithmatex">\(x_0 \sim p_{\text{data}}\)</span>, <span class="arithmatex">\(t\)</span> is drawn uniformly from <span class="arithmatex">\(\{1,\dots,T\}\)</span>, and <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, I)\)</span>. The left-hand side of the loss penalizes differences between the true noise and the model prediction; the right-hand side ensures each timestep gets equal attention. By predicting noise, the network avoids learning the scale of <span class="arithmatex">\(x_0\)</span> and focuses on the direction back toward structure—this is why it is described as a denoiser.</p>
+<p>Because the variance <span class="arithmatex">\(\Sigma_\theta\)</span> can be fixed (e.g., set to <span class="arithmatex">\(\beta_t I\)</span>) or even learned slowly, the training objective remains simple and the gradient flow is stable. The loss can also be reweighted to prioritize earlier or later steps, giving a handle on fidelity vs. diversity. Importantly, sampling from the trained reverse chain starts from <span class="arithmatex">\(x_T \sim \mathcal{N}(0, I)\)</span> and iteratively applies <span class="arithmatex">\(p_\theta(x_{t-1} \mid x_t)\)</span> for <span class="arithmatex">\(t = T, \dots, 1\)</span> to reach <span class="arithmatex">\(x_0\)</span>. Because each step is just a single forward pass through <span class="arithmatex">\(\epsilon_\theta\)</span>, the process is embarrassingly parallelizable and can be run with as few as a dozen timesteps in practice, albeit with a quality trade-off.</p>
+<h3 id="the-u-net-denoiser-architecture">The U-Net denoiser architecture<a class="headerlink" href="#the-u-net-denoiser-architecture" title="Permanent link">&para;</a></h3>
+<p>The architecture of <span class="arithmatex">\(\epsilon_\theta\)</span> mirrors U-Nets that work well on segmentation tasks: a contracting path aggregates context while an expanding path reconstructs noise predictions at the original resolution. The network absorbs the timestep <span class="arithmatex">\(t\)</span> by embedding it with sinusoidal features (as used in Transformers) and projecting them into each convolutional block. Each block consists of a pair of convolutions, normalization, and Swish activations, with residual additions to stabilize gradients. Skip connections between contracting and expanding paths preserve spatial detail that would otherwise vanish under the repeated smoothing of the forward chain. The resulting architecture is lean enough to train on 4–8 GB GPUs but expressive enough to capture the multi-scale structure needed for photorealistic samples.</p>
+<h3 id="latent-diffusion-and-scaling-to-high-resolution">Latent diffusion and scaling to high resolution<a class="headerlink" href="#latent-diffusion-and-scaling-to-high-resolution" title="Permanent link">&para;</a></h3>
+<p>Pixel-space diffusion at <span class="arithmatex">\(512^2\)</span> or higher is costly because each convolutional pass must handle large tensors. Rombach et al. (2022) <a href="https://arxiv.org/abs/2112.10752">arxiv:2112.10752</a> introduced Latent Diffusion Models (LDMs) to shift most of the computation into a compact latent space. An autoencoder <span class="arithmatex">\(E\)</span> maps <span class="arithmatex">\(x_0\)</span> into latents <span class="arithmatex">\(z_0 = E(x_0)\)</span> with a modest downsampling factor (typically <span class="arithmatex">\(4\times\)</span> or <span class="arithmatex">\(8\times\)</span>), and the decoder <span class="arithmatex">\(D\)</span> reconstructs the image from latents. The diffusion process now operates on <span class="arithmatex">\(z_t\)</span> rather than <span class="arithmatex">\(x_t\)</span>, with noise added in the latent space:
+[
+q(z_t \mid z_{t-1}) = \mathcal{N}!\left(z_t; \sqrt{1 - \beta_t} z_{t-1}, \beta_t I \right).
+]
+Because the latents have lower dimensionality, the UNet denoiser has fewer layers and fewer channels, reducing memory bandwidth and enabling training on a single V100 or A5000 with <span class="arithmatex">\(\sim 16\)</span> GB VRAM. The decoder then projects the denoised <span class="arithmatex">\(z_0\)</span> back to the pixel domain: <span class="arithmatex">\(x_0 = D(z_0)\)</span>. This latent shift is what allowed diffusion models to scale from <span class="arithmatex">\(32 \times 32\)</span> research toys to industrial-grade <span class="arithmatex">\(1024 \times 1024\)</span> systems while still preserving the fundamental denoising training objective.</p>
+<h3 id="failure-modes-and-practical-notes">Failure modes and practical notes<a class="headerlink" href="#failure-modes-and-practical-notes" title="Permanent link">&para;</a></h3>
+<p>Diffusion models trade sampling speed for stability. Running the reverse chain for <span class="arithmatex">\(T=1000\)</span> steps yields high-quality samples but incurs a latency cost linear in <span class="arithmatex">\(T\)</span>. Accelerations such as DDIM or stochastic sampling heuristics exist, but they often require tuning the noise schedule <span class="arithmatex">\(\beta_t\)</span> to maintain quality. A poorly chosen schedule causes the forward chain to either collapse (if <span class="arithmatex">\(\beta_t\)</span> grows too fast, eliminating signal prematurely) or stagnate (if <span class="arithmatex">\(\beta_t\)</span> is too small, making reverse steps ambiguous). Another practical challenge is classifier-free guidance: during sampling we can bias <span class="arithmatex">\(\epsilon_\theta\)</span> toward a conditional prompt by interpolating guided and unguided noise predictions, but the strength of this guidance must be calibrated to avoid mode collapse. Finally, when diffusion is applied autoregressively over time (e.g., for videos), errors accumulate across frames; incorrectly handled drift can break temporal coherence unless corrective mechanisms appear in the sampling loop. Addressing drift without backpropagation through long rollouts is an active frontier.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>DDPM (Ho et al. 2020) <a href="https://arxiv.org/abs/2006.11239">arxiv:2006.11239</a> showed that the simple squared-error noise prediction objective could match GAN-level fidelity on <span class="arithmatex">\(32 \times 32\)</span> benchmarks, which was the first evidence that diffusion’s multi-step reversal strategy is competitive. Latent Diffusion (Rombach et al. 2022) <a href="https://arxiv.org/abs/2112.10752">arxiv:2112.10752</a> then demonstrated that the same framework, when shifted to a compressed latent via a pre-trained autoencoder, supports <span class="arithmatex">\(1024 \times 1024\)</span> image synthesis with inference costs similar to GANs while keeping the denoising training objective intact. The latest research frontier for denoising models is temporal data: Video Diffusion Models (Ho et al. 2022) <a href="https://arxiv.org/abs/2204.02891">arxiv:2204.02891</a> embed diffusion in an autoregressive framework that enforces consistency across frames, achieving lower FVD (Fréchet Video Distance) than previous GAN-based video generators for 64-frame clips.</p>
+<p>Engineering-wise, Latent Diffusion powers Stability AI’s Stable Diffusion 2.1 and its downstream services, where the latent-space denoiser runs on billions of API calls per month while consuming under 8 GB of VRAM per inference, according to Stability AI’s engineering blog <a href="https://stability.ai/blog/stable-diffusion-2-1">stability.ai/blog/stable-diffusion-2-1</a>. The same production stack leverages distilled UNets, 8-bit quantization, and scheduler caching to deliver prompt-to-image latencies around 2 seconds on A100-class hardware. This combination of algorithmic stability (research frontier) and lean inference (engineering frontier) is why diffusion models now appear in creative tools, robotics simulators, and even medical imaging suites.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we remove the dependence on a long reverse chain by learning a single-step denoiser whose predictions correct the residual discovered after running a vanilla DDPM sampler for <span class="arithmatex">\(k\)</span> steps? If such a correction exists, it would replace expensive sampler distillation while still maintaining fidelity. What is the minimal augmentation to the noise schedule that makes timestep-wise guidance calibration generalize across domains so that guidance strengths tuned on one dataset do not fail catastrophically on another? The most immediate open question raised earlier is this: how can autoregressive video diffusion models detect and correct their own accumulated drift errors during inference without the computationally prohibitive cost of backpropagating gradients through long, sequential multi-step rollouts? A solution that treats drift correction as an online filtering or learned controller would unlock generative video that remains coherent for thousands of frames. Each of these questions points to a different weakness of the current denoising pipeline—nonlinear correction, schedule generalization, temporal stabilization—and solving any one would move diffusion modeling from strong offline synthesis toward robust, closed-loop generation.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation, → [[score-matching]] exposes the score estimation view that DDPM compiles down to; the engineering counterpart for making these UNets efficient is → [[flash-attention]], which explains how attention-heavy decoders run on commodity GPUs; for operating on compressed latents, → [[latent-diffusion]] walks through the encoder-decoder pair that lets diffusion handle high resolutions; and the next paradigm beyond diffusion is → [[flow-matching]], which replaces the discrete timesteps with continuous paths that can be solved with single backward passes.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>A minimal DDPM trains the denoiser on MNIST digits so you can see the erosion-reversal loop turn random noise into recognizable handwriting in under ten minutes. This build proves the core insight that learning to subtract incremental Gaussian noise, rather than directly predicting pixels, makes sampling stable even on commodity hardware.</p>
+<p><strong>What you're building:</strong> A DDPM trained from scratch with a tiny U-Net denoiser that generates <span class="arithmatex">\(28 \times 28\)</span> MNIST digits from random Gaussian noise on a 10-minute Colab T4 run.</p>
+<p><strong>Why this is valuable:</strong> It forces you to implement the forward noising schedule, the noise-predicting loss, and the reverse sampling loop, which together encode the mathematical core that differentiates diffusion from GAN-style generation.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>google/ddpm-cifar10-32</code> [https://huggingface.co/google/ddpm-cifar10-32] — &gt;4.5K downloads; use its <code>UNet2DModel</code> config as the blueprint for your MNIST denoiser.
+- <strong>Dataset:</strong> <code>mnist</code> [https://huggingface.co/datasets/mnist] — 60K grayscale <span class="arithmatex">\(28 \times 28\)</span> digits, already normalized.
+- <strong>Framework:</strong> PyTorch 2.1 + <code>diffusers</code> 0.30 (for the scheduler and UNet boilerplate).
+- <strong>Compute:</strong> Colab T4 (16 GB VRAM) — entire training finishes in ~8 minutes with 1000 steps; sampling another 15 seconds per checkpoint.</p>
+<p><strong>The recipe:</strong>
+1. Install + load: <code>pip install torch torchvision diffusers accelerate datasets</code> and import <code>UNet2DModel</code>, <code>DDPMScheduler</code>, and <code>MNIST</code> from the Hugging Face ecosystem; set <code>torch.backends.cudnn.benchmark = True</code>.
+2. Data: normalize MNIST to <span class="arithmatex">\([-1,1]\)</span>, stack into batches of 128, and use random horizontal flips only as augmentation to keep the digits centered; the scheduler expects tensors shaped <code>[B, 1, 28, 28]</code>.
+3. Train/fine-tune: instantiate a <code>DDPMScheduler</code> with <span class="arithmatex">\(T=1000\)</span> steps and <span class="arithmatex">\(\beta_t\)</span> linearly spaced from 0.0001 to 0.02; run 5 epochs with AdamW at lr=1e-4, weight decay 0.01, gradient norm clipping 1.0, and the loss <span class="arithmatex">\( \|\epsilon - \epsilon_\theta(x_t, t)\|^2 \)</span>. Expect the training loss to drop below 0.5 after ~3 epochs on the T4.
+4. Evaluate: sample 8 batches of 64 images by starting from <span class="arithmatex">\(\mathcal{N}(0, I)\)</span> at <span class="arithmatex">\(t=1000\)</span> and reversing with the learned scheduler; the FID against the MNIST test set should stabilize around 7.5 (it is easy to compute with <code>torchmetrics</code>). Save a grid of generated digits.
+5. What you now have: a checkpointed denoiser and sampling notebook that turn Gaussian noise into digits, along with visual proof (saved grids) that the reverse chain mirrors the forward erosion.</p>
+<p><strong>Expected outcome:</strong> A training checkpoint plus a visualization notebook showing MNIST digits emerging step-by-step from noise, ready for further experiments or export to other datasets.</p>
+<ul>
+<li><strong>CS student:</strong> Use a free Colab T4 and reduce <span class="arithmatex">\(T\)</span> to 500 steps; lower batch size to 64, and log the per-step reconstruction loss so you understand the stability of the noise-prediction objective.</li>
+<li><strong>Applied engineer:</strong> Export the trained UNet to ONNX, quantize it to 8-bit with Hugging Face Optimum, and serve it through a <code>diffusers</code> pipeline behind a vLLM-style HTTP endpoint targeting &lt;250 ms inference on an A10.</li>
+<li><strong>Applied researcher:</strong> Hypothesize that a cosine <span class="arithmatex">\(\beta_t\)</span> schedule improves fast sampling; train with both linear and cosine schedules, hold all else constant, and compare FID after 250 sampling steps to test the hypothesis.</li>
+<li><strong>Frontier researcher:</strong> Probe the open question about autoregressive video drift by fine-tuning this MNIST DDPM to denoise short MNIST-video clips and measure how per-frame drift accumulates when you skip gradient updates through the sequence, aiming to falsify the idea that independent timestep correction suffices.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
