@@ -88,6 +88,12 @@ Draw from the most recent SotA results and the writing plan.
 
 WRITE_INSTRUCTIONS = """Write the complete wiki page in a single pass.
 
+CRITICAL: You MUST write every section listed below. Do NOT stop after the MVB
+section or after any code block. Keep writing until you have completed section 20
+(## Further reading). The last line of your output must be in ## Further reading.
+If you find yourself finishing a code block or a recipe section, continue immediately
+to the next section — never stop mid-page.
+
 Write ALL sections in order. The model has full context — do not hold back or
 abbreviate. Every section must be substantive. Do not truncate.
 
@@ -141,7 +147,10 @@ SECTION ORDER (use EXACTLY these heading names):
 
 13. ## What's happening now
     3 prose paragraphs (one each): Research frontiers / Engineering & Systems / Open problems.
-    State open problems as specific research questions, not vague directions.
+    EVERY frontier claim MUST name a specific paper inline: "Author et al. (YEAR) showed that
+    [CLAIM] ([arXiv URL])". Vague language ("recent work suggests", "may depend on", "in certain
+    settings", "some approaches") is a reviewer violation — name the paper or cut the claim.
+    Open problems must be specific research questions a researcher would write a paper to answer.
 
 14. ## In production
     3–5 bullet points. Each: Company — System — Scale number — Source URL.
@@ -175,7 +184,10 @@ SECTION ORDER (use EXACTLY these heading names):
 19. ## Connected topics
     ← USE EXACTLY THIS HEADING — the reviewer checks this name literally
     3–5 cross-track connections. Real relative paths to pages that exist.
-    One sentence per link: shared structure or concept, not "also related to".
+    For each link write ONE sentence explaining the mechanistic relationship — the specific
+    concept, equation, or structure they share. NOT "also related to" or "see also".
+    Example: "[Attention](../transformers/attention.md) uses the same query-key-value
+    decomposition as memory networks, replacing the fixed memory with a learned context window."
 
 20. ## Further reading
     4–6 items: arXiv, *.edu, distill.pub, or lilianweng.github.io only.
@@ -189,6 +201,10 @@ HARD RULES (violations cause the reviewer to reject):
 - No nested lists anywhere (bullet inside bullet = fail)
 - No roadmap language: "step 1", "next you'll", "your learning journey", "continue to"
 - No source-policy footer banner
+- Academic voice: write for a researcher who reads papers, not a student who needs encouragement.
+  State facts, cite papers, explain mechanism. NEVER use motivational language ("you'll learn",
+  "let's explore", "your journey", "feel free to", "don't worry").
+- Every claim in ## What's happening now must name an author, year, and URL. No anonymous "work".
 """
 
 
@@ -587,75 +603,100 @@ source policy, factual plausibility, and multi-audience quality before a page is
 
 You must return structured output with: passed (bool), confidence (float 0-1), issues (list), suggestions (list).
 
-REVIEW CHECKLIST:
+RUBRIC — score each dimension independently (0.0–1.0), then set overall confidence.
 
-1. SCHEMA COMPLIANCE — all required sections present?
-   Required sections (exact markdown headings):
-   - ## What it is
-   - ## Why it matters at the frontier
-   - ## Core concepts
-   - ## Mathematical foundations
-   - ## Key algorithms / techniques
-   - ## Essential reading
-   - ## Seminal papers & test-of-time
-   - ## Current SotA
-   - ## What's happening now
-   - ## In production
-   - ## Connected topics
-   If any section is missing: passed=False, confidence<0.7
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 1 — SCHEMA (schema_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Required headings (exact names):
+  ## What it is
+  ## Why it matters at the frontier
+  ## Core concepts
+  ## Mathematical foundations
+  ## Key algorithms / techniques
+  ## Essential reading
+  ## Seminal papers & test-of-time
+  ## Current SotA
+  ## What's happening now
+  ## In production
+  ## What comes next
+  ## Connected topics
 
-2. SOURCE POLICY — all URLs from approved domains?
-   Approved (default): arxiv.org, *.edu, huggingface.co, pytorch.org, official library docs,
-     lilianweng.github.io, distill.pub
-   Approved (secondary attribution, not primary source): lesswrong.com (research posts only)
-   Approved (In production section only): engineering.linkedin.com, ai.meta.com, research.google,
-     developer.nvidia.com/blog, openai.com/research, aws.amazon.com/blogs/machine-learning,
-     stability.ai/research
-   NEVER approved: medium.com, towardsdatascience.com, substack.com, wikipedia.org, youtube.com,
-     personal .github.io pages (except lilianweng.github.io), reddit.com
-   If any unapproved URL found: passed=False
+Scoring:
+  1.0 — all 12 headings present, all well-populated (>2 sentences each)
+  0.8 — 11/12 present, or 1 heading is very thin (1 sentence)
+  0.6 — 10/12 present, or 2 are thin
+  <0.6 — 3+ missing headings or page cuts off before ## Connected topics
+  0.0 — page is entirely missing (stub only)
 
-3. PROSE QUALITY — no nested lists, no course language, no source banners?
-   Check these sections for nested lists (bullet inside bullet): What it is, Why it matters,
-   What's happening now, In production. If any nested lists found: add to issues, reduce confidence.
-   Check that "What it is" opens with an analogy/scenario, not a formal definition.
-   If it opens with "X is a..." or "X refers to..." — flag it.
-   Check for course/roadmap language: "this track covers", "in this arc", "your learning journey",
-     "continue to the next step" — flag any instance, reduce confidence by 0.1.
-   Check the page does NOT contain a source-policy banner (e.g., "arXiv · .edu sources only").
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 2 — SOURCE POLICY (source_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Approved everywhere: arxiv.org, *.edu, huggingface.co, pytorch.org, jax.readthedocs.io,
+  lilianweng.github.io, distill.pub
+Approved in ## In production only: engineering.linkedin.com, ai.meta.com, research.google,
+  developer.nvidia.com/blog, openai.com/research, aws.amazon.com/blogs/machine-learning,
+  stability.ai/research, github.com (official repos only)
+NEVER approved: medium.com, towardsdatascience.com, substack.com, wikipedia.org,
+  youtube.com, reddit.com, nature.com, personal .github.io (except lilianweng)
 
-4. CITATION PLAUSIBILITY — do cited papers plausibly exist?
-   Check: Do paper titles + authors + years make sense together?
-   Red flags: Author names that don't match the paper's known authors, years that seem wrong,
-   arXiv IDs that look malformed (should be YYYY.NNNNN format)
-   If suspected hallucination: add to issues list, reduce confidence by 0.15
+Scoring:
+  1.0 — all URLs approved; citations look real (title + author + year plausible)
+  0.8 — 1 non-critical URL from a soft-banned domain (e.g., nature.com for a real paper)
+  0.5 — 1 clearly banned URL (medium.com, wikipedia.org)
+  0.0 — multiple banned URLs OR likely hallucinated arXiv IDs (format not YYYY.NNNNN)
 
-5. MULTI-AUDIENCE QUALITY
-   - Applied: Is there a Key algorithms section? Is the MVB specific and runnable?
-   - Generalist: Does "What it is" open with intuition before math?
-   - Theory: Is every LaTeX variable annotated on the line following the equation?
-   - Frontier: Are open problems stated as specific questions (not vague directions)?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 3 — PROSE QUALITY (prose_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Check: ## What it is, ## Why it matters, ## What's happening now
 
-6. MVB QUALITY (if present)
-   - Are model/dataset IDs specific (not placeholder)?
-   - Is the compute realistic (consumer GPU or Colab)?
-   - Are recipe steps actionable without googling?
-   - Is the outcome a real artifact?
-   - Is the GitHub star CTA present after stretch goals?
+  1.0 — opens with scenario/analogy (not "X is a..."), no nested lists, no roadmap language,
+         LaTeX variables annotated on line immediately after each equation
+  0.8 — minor issues: 1 nested list, or 1 equation missing annotation
+  0.6 — "What it is" opens with definition; OR 2+ nested lists; OR roadmap language present
+  <0.4 — the page is mostly bullet dumps with no prose connecting them
 
-7. IN PRODUCTION (if present)
-   - Are company names specific (not "large companies")?
-   - Are sources from approved engineering blog domains?
-   - Are scale numbers present (users, throughput, parameter count)?
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 4 — MVB QUALITY (mvb_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+If has_mvb: true in frontmatter:
+  1.0 — specific HuggingFace model ID, dataset ID, realistic compute (Colab/≤16GB),
+         numbered recipe steps, expected outcome artifact, GitHub star CTA present
+  0.8 — model ID present but dataset vague; OR CTA missing
+  0.6 — recipe exists but steps require googling; OR compute unrealistic
+  0.0 — no MVB section despite has_mvb: true in frontmatter
 
-8. CONNECTIONS — "What comes next" section present?
-   Check for ## What comes next section. If missing: add to issues.
+If has_mvb: false or no frontmatter:
+  Set mvb_score = 1.0 (not applicable)
 
-CONFIDENCE SCORING:
-  0.9–1.0: Excellent — all sections, good prose, specific examples, verified sources → auto-commit
-  0.8–0.9: Good — minor issues (vague production example, 1 missing annotation) → commit with notes
-  0.6–0.8: Needs revision — describe each issue specifically so the writer can fix it
-  <0.6: Major problems — missing core sections OR unapproved sources OR likely hallucination
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 5 — FRONTIER CITATION QUALITY (frontier_citation_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Check ## What's happening now and ## Current SotA for citation discipline.
+
+  1.0 — every empirical claim names a paper: "Author et al. (YEAR) showed X (arXiv URL)"
+  0.8 — most claims cited; 1-2 minor vague phrases but no sweeping uncited assertions
+  0.5 — several claims use anonymous hedging ("recent work suggests", "some approaches",
+         "it has been shown") without naming any paper
+  0.2 — the entire What's happening now section makes claims with zero named papers
+  0.0 — frontier sections are entirely vague or copy generic descriptions with no citations
+
+Flag specific vague phrases as issues: quote the phrase and note it needs a paper citation.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+OVERALL CONFIDENCE AND PASSED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+confidence = weighted average: 0.30×schema + 0.20×source + 0.20×prose + 0.15×mvb + 0.15×frontier_citation
+
+passed = True only if:
+  - schema_score >= 0.8 (all main sections present)
+  - source_score >= 0.8 (no clearly banned URLs)
+  Otherwise passed = False regardless of overall confidence.
+
+IMPORTANT: A page with good content but one heading typo should score schema≥0.8.
+Do NOT penalize schema for minor prose issues — keep the dimensions independent.
+Return issues as specific, actionable strings that the writer can fix in one pass.
 """
 
 

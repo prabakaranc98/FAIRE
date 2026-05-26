@@ -65,11 +65,37 @@ def _load_schema() -> str:
 # ---------------------------------------------------------------------------
 
 class ReviewResult(BaseModel):
-    """Structured review output — eliminates fragile text parsing."""
+    """Structured review output with rubric-based dimensions.
+
+    Approval uses a rubric: each dimension is scored independently.
+    A page approves when ALL blocker dimensions pass and prose ≥ 0.6.
+    This prevents a single minor issue from tanking an otherwise excellent page.
+    """
     passed: bool = Field(description="True if the page passes schema + source policy checks")
-    confidence: float = Field(ge=0.0, le=1.0, description="Quality confidence score")
+    confidence: float = Field(ge=0.0, le=1.0, description="Overall quality confidence score")
     issues: list[str] = Field(description="Specific actionable issues to fix")
     suggestions: list[str] = Field(description="Optional improvement suggestions")
+    # Rubric dimensions (each 0.0–1.0)
+    schema_score: float = Field(
+        default=1.0, ge=0.0, le=1.0,
+        description="Schema compliance: all required sections present and named correctly (0=major missing, 1=complete)"
+    )
+    source_score: float = Field(
+        default=1.0, ge=0.0, le=1.0,
+        description="Source policy: only approved domains, no hallucinated citations (0=violations, 1=clean)"
+    )
+    prose_score: float = Field(
+        default=0.7, ge=0.0, le=1.0,
+        description="Prose quality: no nested lists, no course language, opens with scenario not definition (0=bad, 1=excellent)"
+    )
+    mvb_score: float = Field(
+        default=0.8, ge=0.0, le=1.0,
+        description="MVB quality: specific model IDs, realistic compute, actionable recipe, CTA present (0=missing/vague, 1=complete)"
+    )
+    frontier_citation_score: float = Field(
+        default=0.8, ge=0.0, le=1.0,
+        description="Frontier sections cite papers with author/year/URL inline; vague claims like 'recent work suggests' score 0 (0=uncited vague claims, 1=every frontier claim has author-year-URL)"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -94,50 +120,53 @@ def read_stub_node(state: WikiPageState) -> WikiPageState:
 
 def research_node(state: WikiPageState) -> WikiPageState:
     """Three-phase Exa search: foundational papers, SotA (2024+), production deployments."""
+    from concurrent.futures import ThreadPoolExecutor as _TPE, as_completed as _asc
+    import os as _os
+
     topic = state["topic"].replace("-", " ")
     persona = state.get("persona", {})
     domain = persona.get("domain", "")
     seeds = (persona.get("search_seeds") or [])[:2]
 
-    # Phase 1: foundational papers
+    def _safe(fn, *args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except Exception:
+            return []
+
+    # Build parallel search tasks: (bucket, fn, args, kwargs)
+    search_tasks = [
+        ("paper", exa_search_papers, (f"{topic} foundational paper",), {"foundational": True}),
+        ("paper", exa_search_papers, (f"{topic} {domain} original contribution",), {"foundational": True}),
+        ("sota",  exa_search_sota,   (f"{topic} state of the art 2024 2025 benchmark",), {}),
+        ("sota",  exa_search_sota,   (f"{topic} best result arxiv 2025",), {}),
+        ("prod",  exa_search_production, (f"{topic} production deployment engineering at scale",), {}),
+        ("hf_m",  hf_search_models,  (topic,), {}),
+        ("hf_d",  hf_search_datasets,(topic,), {}),
+    ]
+    for seed in seeds:
+        search_tasks.append(("paper", exa_search_papers, (seed,), {"foundational": True}))
+
     paper_results: list[dict] = []
-    for q in [
-        f"{topic} foundational paper",
-        f"{topic} {domain} original contribution",
-        *seeds,
-    ]:
-        try:
-            paper_results.extend(exa_search_papers(q, foundational=True))
-        except Exception:
-            pass
-
-    # Phase 2: SotA (2024+ papers with highlights)
-    sota_results: list[dict] = []
-    for q in [
-        f"{topic} state of the art 2024 2025 benchmark",
-        f"{topic} best result arxiv 2025",
-    ]:
-        try:
-            sota_results.extend(exa_search_sota(q))
-        except Exception:
-            pass
-
-    # Phase 3: production deployments (engineering blogs only)
+    sota_results:  list[dict] = []
     production_results: list[dict] = []
-    try:
-        production_results = exa_search_production(
-            f"{topic} production deployment engineering at scale"
-        )
-    except Exception:
-        pass
+    hf_models: list[dict] = []
+    hf_datasets: list[dict] = []
 
-    # HuggingFace models/datasets for MVB research
-    hf_models, hf_datasets = [], []
-    try:
-        hf_models = hf_search_models(topic)
-        hf_datasets = hf_search_datasets(topic)
-    except Exception:
-        pass
+    max_workers = int(_os.getenv("RESEARCH_WORKERS", "7"))
+    with _TPE(max_workers=max_workers, thread_name_prefix="research") as pool:
+        futs = {
+            pool.submit(_safe, fn, *args, **kwargs): bucket
+            for bucket, fn, args, kwargs in search_tasks
+        }
+        for fut in _asc(futs):
+            bucket = futs[fut]
+            val = fut.result()
+            if   bucket == "paper": paper_results.extend(val)
+            elif bucket == "sota":  sota_results.extend(val)
+            elif bucket == "prod":  production_results = val or production_results
+            elif bucket == "hf_m":  hf_models = val or hf_models
+            elif bucket == "hf_d":  hf_datasets = val or hf_datasets
 
     # Dedup paper results by URL
     seen: set[str] = set()
@@ -157,19 +186,14 @@ def research_node(state: WikiPageState) -> WikiPageState:
     }
 
 
-def plan_node(state: WikiPageState) -> WikiPageState:
-    """Deliberate planning step before writing — forces the agent to think first.
-
-    Uses RESEARCH_MODEL (fast, capable) since this is a reasoning/synthesis task,
-    not prose generation. Output becomes writing_plan in state.
-    """
+def _do_plan(state: WikiPageState) -> str:
+    """Return the writing plan string (extracted from plan_node for parallel use)."""
     planner = get_llm("research", temperature=0.2)
     topic = state["topic"].replace("-", " ")
     page_type = state.get("page_type", "core-concept")
     depth_emphasis = state.get("depth_emphasis", ["applied"])
     arc_context = state.get("arc_context", {})
 
-    # Summarize research for the planner (keep it tight)
     papers_summary = "\n".join(
         f"- {r.get('title', 'Untitled')} ({r.get('url', '')})"
         for r in (state.get("research_results", []))[:8]
@@ -209,18 +233,11 @@ Production deployments found:
 
 {PLAN_SYSTEM}
 """
-
-    response = planner.invoke([HumanMessage(content=user)])
-    return {**state, "writing_plan": response.content}
+    return planner.invoke([HumanMessage(content=user)]).content
 
 
-def scratch_node(state: WikiPageState) -> WikiPageState:
-    """Compile raw research into a structured working-memory fact sheet.
-
-    Uses the fast RESEARCH_MODEL — this is synthesis/extraction, not prose.
-    The scratch_pad replaces raw research results in all subsequent writing calls:
-    the writer never sees unprocessed search results, only the compiled facts.
-    """
+def _do_scratch(state: WikiPageState) -> str:
+    """Return the scratch pad string (extracted from scratch_node for parallel use)."""
     compiler = get_llm("research", temperature=0.1)
     topic = state["topic"].replace("-", " ")
     writing_plan = state.get("writing_plan", "")
@@ -280,8 +297,15 @@ HUGGINGFACE (for MVB):
 
 {SCRATCH_SYSTEM}{skills_block}
 """
-    response = compiler.invoke([HumanMessage(content=user)])
-    return {**state, "scratch_pad": response.content}
+    return compiler.invoke([HumanMessage(content=user)]).content
+
+
+def plan_and_scratch_node(state: WikiPageState) -> WikiPageState:
+    """Run plan first, then pass it to scratch so the fact-sheet is plan-guided."""
+    writing_plan = _do_plan(state)
+    state_with_plan = {**state, "writing_plan": writing_plan}
+    scratch_pad = _do_scratch(state_with_plan)
+    return {**state, "writing_plan": writing_plan, "scratch_pad": scratch_pad}
 
 
 def write_draft_node(state: WikiPageState) -> WikiPageState:
@@ -427,8 +451,35 @@ updated: 2026-05-25
     return {**state, "draft": draft}
 
 
+def _rubric_approve(result: ReviewResult) -> bool:
+    """Rubric-based approval gate — replaces raw confidence threshold.
+
+    A page approves when:
+      - schema_score >= 0.8  (all required sections present)
+      - source_score >= 0.8  (no banned URLs, no hallucinated citations)
+      - prose_score  >= 0.6  (readable, no nested lists, no roadmap language)
+      - mvb_score    >= 0.6  (if MVB expected — specific IDs, runnable recipe)
+      - confidence   >= 0.65 (overall quality floor)
+
+    This prevents one bad dimension from tanking an otherwise complete page,
+    while blocking pages with genuine structural or source-policy violations.
+    """
+    return (
+        result.schema_score >= 0.8
+        and result.source_score >= 0.8
+        and result.prose_score >= 0.6
+        and result.mvb_score >= 0.6
+        and result.frontier_citation_score >= 0.65
+        and result.confidence >= 0.65
+    )
+
+
 def review_node(state: WikiPageState) -> WikiPageState:
-    """Structured review using Gemini 3.1 Pro Preview via OpenRouter."""
+    """Structured review using Gemini 3.1 Pro Preview via OpenRouter.
+
+    Approval is rubric-based: schema, sources, prose, and MVB are scored
+    independently. All dimensions must pass their thresholds.
+    """
     reviewer = get_llm("reviewer", temperature=0.0)
     draft = state.get("draft", "")
 
@@ -443,18 +494,27 @@ PAGE TO REVIEW:
 
     try:
         result: ReviewResult = structured_reviewer.invoke([HumanMessage(content=prompt)])
+        approved = _rubric_approve(result)
         return {
             **state,
             "review_feedback": (
-                f"PASS: {result.passed}\nConfidence: {result.confidence}\n"
+                f"PASS: {result.passed}\nConfidence: {result.confidence:.2f}\n"
+                f"Schema: {result.schema_score:.2f}  Source: {result.source_score:.2f}  "
+                f"Prose: {result.prose_score:.2f}  MVB: {result.mvb_score:.2f}  "
+                f"Citations: {result.frontier_citation_score:.2f}\n"
                 f"Issues: {result.issues}\nSuggestions: {result.suggestions}"
             ),
             "review_issues": result.issues,
             "review_pass": result.passed,
             "review_confidence": result.confidence,
-            "approved": result.passed and result.confidence >= float(
-                os.getenv("GIT_COMMIT_THRESHOLD", "0.8")
-            ),
+            "review_rubric": {
+                "schema": result.schema_score,
+                "source": result.source_score,
+                "prose": result.prose_score,
+                "mvb": result.mvb_score,
+                "frontier_citations": result.frontier_citation_score,
+            },
+            "approved": approved,
         }
     except Exception:
         fallback = reviewer.invoke([
@@ -469,17 +529,15 @@ PAGE TO REVIEW:
 
         import re as _re
         passed = "PASS" in text.upper() and "FAIL" not in text.upper().split("PASS")[0]
-        # Parse confidence from text — look for decimal like "0.82" or "0.9"
         conf_match = _re.search(r"\b(0\.\d+|1\.0)\b", text)
         fallback_conf = float(conf_match.group(1)) if conf_match else 0.7
-        threshold = float(os.getenv("GIT_COMMIT_THRESHOLD", "0.8"))
 
         return {
             **state,
             "review_feedback": text,
             "review_pass": passed,
             "review_confidence": fallback_conf,
-            "approved": passed and fallback_conf >= threshold,
+            "approved": passed and fallback_conf >= 0.65,
         }
 
 
@@ -500,18 +558,43 @@ def revise_draft_node(state: WikiPageState) -> WikiPageState:
         .replace("{schema}", schema[:2000])
     )
 
-    prompt = f"""You are revising a Frontier Wiki page. The reviewer flagged specific issues. Fix them.
+    draft = state.get("draft", "")
+    feedback = state.get("review_feedback", "")
+    issues = state.get("review_issues", [])
+
+    # Detect if the page was truncated (missing terminal sections)
+    missing_nav = "## What comes next" not in draft or "## Connected topics" not in draft
+    truncation_note = ""
+    if missing_nav:
+        truncation_note = """
+⚠ TRUNCATION DETECTED — the draft is incomplete. The following sections are MISSING
+and must be written NOW (do not skip, do not summarize):
+
+  ## Code & implementations
+  ## What comes next
+  ## Connected topics
+  ## Further reading
+
+After fixing other reviewer issues, append these sections immediately.
+The last line of your output MUST be inside ## Further reading.
+"""
+
+    prompt = f"""You are revising a Frontier Wiki page. The reviewer flagged specific issues. Fix all of them.
 
 REVIEWER FEEDBACK (fix every issue listed):
-{state.get('review_feedback', '')}
+{feedback}
 
+SPECIFIC ISSUES TO ADDRESS:
+{chr(10).join(f"  - {i}" for i in issues) if issues else "(see feedback above)"}
+{truncation_note}
 WORKING MEMORY (verified facts — use ONLY these citations when adding new content):
 {scratch_pad[:3000]}
 
 CURRENT DRAFT TO REVISE:
-{state.get('draft', '')}
+{draft}
 
-Return the complete revised page. Maintain all sections. Fix the flagged issues without breaking what's already good.
+Return the COMPLETE revised page. Include ALL sections from frontmatter through
+## Further reading. Do not omit any section, even ones that don't need changes.
 """
 
     response = writer.invoke([SystemMessage(content=system), HumanMessage(content=prompt)])
@@ -521,6 +604,21 @@ Return the complete revised page. Maintain all sections. Fix the flagged issues 
 
 def write_file_node(state: WikiPageState) -> WikiPageState:
     final = state.get("draft", "")
+
+    # Inject arc breadcrumb immediately after frontmatter closing ---
+    arc_context = state.get("arc_context", {})
+    if arc_context and arc_context.get("arc_id"):
+        arc_id = arc_context["arc_id"]
+        position = arc_context.get("position", "?")
+        arc_title = arc_context.get("arc_title", arc_id.replace("-", " ").title())
+        arc_path = f"../../arcs/{arc_id}.md"
+        total_str = f" of {arc_context['total']}" if arc_context.get("total") else ""
+        breadcrumb = f"\n> **Arc:** [{arc_title}]({arc_path}) — Step {position}{total_str}\n"
+        fm_start = final.find("---\n")
+        fm_end = final.find("\n---\n", fm_start + 1)
+        if fm_start != -1 and fm_end != -1:
+            final = final[:fm_end + 4] + breadcrumb + final[fm_end + 4:]
+
     write_file(state["output_path"], final)
     return {**state, "final_content": final}
 
