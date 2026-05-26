@@ -55,7 +55,7 @@ class WikiPageState(TypedDict, total=False):
     # ── Loaded at runtime ──────────────────────────────────────────────────────
     persona: dict                       # from personas/[track].yaml
     existing_stub: str                  # current file content if exists (may be empty)
-    output_path: str                    # e.g., docs/curriculum/02-generative-modeling/diffusion-models.md
+    output_path: str                    # e.g., docs/curriculum/core/02-generative-modeling/concepts/diffusion-models.md
 
     # ── Research phase ─────────────────────────────────────────────────────────
     research_results: list[dict]        # Exa paper search results; [{url, title, text, domain}]

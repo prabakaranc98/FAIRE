@@ -1,49 +1,38 @@
 ---
 title: Curriculum
+description: The 10 canonical tracks per pracha.me/curriculum. Each subject has concepts, authors, arcs, builds.
+state: active
+updated: 2026-05-26
 ---
 
 # Curriculum
 
-15 tracks covering the full landscape of AI/ML. Each track is a domain with individual topic pages inside, organized by depth: applied → foundations → research.
+The 10 canonical tracks from [pracha.me/curriculum](https://pracha.me/curriculum). Every subject has the same shape: `concepts/`, `authors/`, `arcs/`, `builds/`. See the [structure spec](../system/structure-v2.md) for the v2 design contract.
 
----
+## The 10 tracks
 
-## Core ML & Theory
+| # | Track | Overview |
+|---|---|---|
+| 01 | AI | [Overview](core/01-ai/index.md) |
+| 02 | Generative Modeling | [Overview](core/02-generative-modeling/index.md) |
+| 03 | Representation Learning | [Overview](core/03-representation-learning/index.md) |
+| 04 | Neural Networks & Deep Learning | [Overview](core/04-neural-networks-deep-learning/index.md) |
+| 05 | Statistical & Probabilistic ML | [Overview](core/05-statistical-probabilistic-ml/index.md) |
+| 06 | Reinforcement Learning | [Overview](core/06-reinforcement-learning/index.md) |
+| 07 | Attention, Memory, Reasoning, Continual | [Overview](core/07-attention-memory-reasoning-continual/index.md) |
+| 08 | Causal & Statistical Inference | [Overview](core/08-causal-statistical-inference/index.md) |
+| 09 | Algorithms & Systems for AI | [Overview](core/09-algorithms-systems-for-ai/index.md) |
+| 10 | Complexity, Cognition & Natural Intelligence | [Overview](core/10-complexity-cognition-natural-intelligence/index.md) |
 
-| Track | Domain |
-|---|---|
-| [01 · Artificial Intelligence](01-ai/index.md) | Foundations of AI, search, planning, knowledge representation |
-| [04 · Neural Networks & Deep Learning](04-neural-networks-dl/index.md) | Architectures, training, optimization, scaling |
-| [05 · Statistical & Probabilistic ML](05-statistical-probabilistic-ml/index.md) | Bayesian methods, graphical models, inference |
-| [15 · ML Theory & Foundations](15-ml-theory-foundations/index.md) | Generalization, PAC learning, information theory, optimization theory |
+Each row links to a subject overview where you'll find the concepts, authors, arcs, and builds for that track.
 
-## Frontier Research Areas
+## The four artifact types
 
-| Track | Domain |
-|---|---|
-| [02 · Generative Modeling](02-generative-modeling/index.md) | Diffusion, flow matching, VAEs, GANs, energy-based models |
-| [03 · Representation Learning](03-representation-learning/index.md) | Self-supervised learning, contrastive methods, embeddings |
-| [07 · Language Models, Transformers & Multimodal AI](07-attention-memory-reasoning/index.md) | Transformers, LLMs, multimodal systems, reasoning, memory architectures |
-| [08 · Causal & Statistical Inference](08-causal-statistical-inference/index.md) | Causality, interventions, counterfactuals, do-calculus |
+| Type | What it is | Where it lives |
+|---|---|---|
+| **Concept** | Self-contained Olah/Distill-grade explainer | `core/<track>/concepts/` |
+| **Author** | Person-anchored reading guide (Pearl, Karpathy, Olah…) | `core/<track>/authors/` |
+| **Arc** | Learning path through N concepts in order | `core/<track>/arcs/` |
+| **Build** | MVB recipe — runnable, persona-tagged | `core/<track>/builds/` |
 
-## Systems & Applications
-
-| Track | Domain |
-|---|---|
-| [06 · Reinforcement Learning](06-reinforcement-learning/index.md) | Policy optimization, model-based RL, RLHF, multi-agent |
-| [09 · Algorithms & Systems for AI](09-algorithms-systems-ai/index.md) | Distributed training, inference systems, hardware-aware ML |
-
-## Cognition & Complexity
-
-| Track | Domain |
-|---|---|
-| [10 · Complexity & Cognition](10-complexity-cognition/index.md) | Computational complexity, cognitive science, emergent behavior |
-
-## Emerging Domains
-
-| Track | Domain |
-|---|---|
-| [11 · Robotics & Embodied AI](11-robotics-embodied-ai/index.md) | Manipulation, locomotion, perception-action loops, world models |
-| [12 · Physics & Scientific AI](12-physics-scientific-ai/index.md) | Physics-informed networks, neural operators, scientific simulation |
-| [13 · Graph & Relational AI](13-graph-relational-ai/index.md) | Graph neural networks, relational reasoning, geometric deep learning |
-| [14 · Biology & Life Sciences](14-biology-life-sciences/index.md) | Protein structure, genomics, drug discovery, biological sequences |
+Pages converge: a concept lives inside an arc, links to its key authors, and ends with a build you can ship.

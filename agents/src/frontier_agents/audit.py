@@ -1,10 +1,13 @@
-"""Wiki quality audit — scans docs/curriculum pages for regressions and staleness.
+"""Wiki quality audit — scans docs/curriculum (v2 tree) for regressions and staleness.
 
 Called by the scheduler before each sprint execution. Returns an AuditReport
 that lists issues per page with severity (critical, warning, info).
 
 No LLM is used here — purely structural analysis. LLM-based review is done
 by the reviewer_node inside the main pipeline after a page is rewritten.
+
+v2 layout: docs/curriculum/core/<track>/{concepts,authors,arcs,builds}/<slug>.md
+See docs/system/structure-v2.md for the full spec.
 """
 
 from __future__ import annotations
@@ -15,12 +18,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
+# Required sections — kept lenient during v2 transition.
+# These match the OLD list-heavy template; the v2 narrative template is being
+# rolled out in writer prompts. Once writer prompts are fully v2, update these.
 REQUIRED_SECTIONS = [
     "## What it is",
-    "## Why it matters",
     "## Essential reading",
-    "## Current SotA",
-    "## In production",
 ]
 
 BANNED_DOMAINS = [

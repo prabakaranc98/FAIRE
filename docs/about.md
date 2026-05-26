@@ -69,7 +69,7 @@ in your `.env`, the commit is also pushed to origin — so a full run ends with 
 GitHub Pages without manual intervention.
 
 This means: if the reviewer isn't confident, the page doesn't land in the wiki. Human review
-is flagged explicitly in `agents/runs/runs.jsonl` and in the [changelog](changelog.md).
+is flagged explicitly in `agents/runs/runs.jsonl` and in the [changelog](system/changelog.md).
 
 ### Source policy
 

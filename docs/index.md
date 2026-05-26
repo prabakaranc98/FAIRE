@@ -3,81 +3,40 @@ title: Frontier Wiki
 template: home.html
 ---
 
-## What is an Arc of Work?
+## The 10 canonical tracks
 
-An arc of work is a focused, sequenced journey through a domain — not a reading list, but a path with a destination. Each arc takes you from entry intuition to frontier capability, with a clear build at each stage. You finish an arc knowing *what you can do*, not just *what you've read*.
-
-The wiki is organized around arcs — and every curriculum page feeds into one.
-
----
-
-## Two ways in
-
-### [Learning Arcs](arcs/index.md) — follow a path to capability
-
-Focused sequences, 20–28 topics each. Every arc starts with the foundational question and ends at the current frontier — with a build at each stage.
+FAIRE is organized around the 10 parallel learning tracks from [pracha.me/curriculum](https://pracha.me/curriculum). Each subject has its own arcs, concepts, key authors, and builds — slot in at any depth.
 
 <div class="grid cards" markdown>
 
-- **[MLP → Transformer](arcs/mlp-to-transformer/index.md)**
+- **A · Foundations & Theory**
 
-    Architecture lineage: from perceptrons to attention. Understand *why* each step happened.
-
-- **[Generative Stack](arcs/generative-stack/index.md)**
-
-    VAEs → GANs → Diffusion → Flow Matching. Every generation paradigm, in the order they emerged.
-
-- **[Language Models](arcs/language-models/index.md)**
-
-    Pretraining → RLHF → alignment → frontier LLMs. The full arc from n-grams to GPT-4.
-
-- **[Reinforcement Learning](arcs/reinforcement-learning/index.md)**
-
-    Bandits → PPO → RLHF → GRPO → DeepSeek-R1. Decision-making from tabular to frontier.
-
-- **[Causal AI](arcs/causal-ai/index.md)**
-
-    SCMs → do-calculus → causal representation learning. From correlation to intervention.
-
-- **[Systems for Scale](arcs/systems-for-scale/index.md)**
-
-    FlashAttention → ZeRO → vLLM → speculative decoding. The engineering behind frontier models.
-
-- **[Scientific AI](arcs/scientific-ai/index.md)**
-
-    PINNs → FNO → AlphaFold 3 → V-JEPA. AI as a scientific instrument.
-
-</div>
-
----
-
-### [Curriculum](curriculum/index.md) — the full landscape by domain
-
-15 tracks covering every major area of AI/ML. Enter at any topic, any depth. Use the curriculum when you want to understand how a domain is organized or look up a specific concept.
-
-<div class="grid cards" markdown>
-
-- **A · Foundations**
-
-    [Algorithms & Systems](curriculum/09-algorithms-systems-ai/index.md) · [Complexity & Cognition](curriculum/10-complexity-cognition/index.md) · [ML Theory](curriculum/15-ml-theory-foundations/index.md)
+    [AI](curriculum/core/01-ai/index.md) · [NN & Deep Learning](curriculum/core/04-neural-networks-deep-learning/index.md) · [Statistical & Probabilistic ML](curriculum/core/05-statistical-probabilistic-ml/index.md)
 
 - **B · Modeling**
 
-    [Generative Modeling](curriculum/02-generative-modeling/index.md) · [Neural Networks & DL](curriculum/04-neural-networks-dl/index.md) · [Representation Learning](curriculum/03-representation-learning/index.md) · [Statistical ML](curriculum/05-statistical-probabilistic-ml/index.md) · [Causal AI](curriculum/08-causal-statistical-inference/index.md)
+    [Generative Modeling](curriculum/core/02-generative-modeling/index.md) · [Representation Learning](curriculum/core/03-representation-learning/index.md) · [Causal & Statistical Inference](curriculum/core/08-causal-statistical-inference/index.md)
 
-- **C · Decision**
+- **C · Decision & Reasoning**
 
-    [Reinforcement Learning](curriculum/06-reinforcement-learning/index.md)
+    [Reinforcement Learning](curriculum/core/06-reinforcement-learning/index.md) · [Attention, Memory, Reasoning, Continual](curriculum/core/07-attention-memory-reasoning-continual/index.md)
 
-- **D · Perception & Action**
+- **D · Systems & Cognition**
 
-    [Language Models & Transformers](curriculum/07-attention-memory-reasoning/index.md) · [Robotics & Embodied AI](curriculum/11-robotics-embodied-ai/index.md) · [Graph & Relational AI](curriculum/13-graph-relational-ai/index.md)
-
-- **E · AI for Science**
-
-    [Physics & Scientific AI](curriculum/12-physics-scientific-ai/index.md) · [Biology & Life Sciences](curriculum/14-biology-life-sciences/index.md) · [AI Foundations](curriculum/01-ai/index.md)
+    [Algorithms & Systems for AI](curriculum/core/09-algorithms-systems-for-ai/index.md) · [Complexity, Cognition & Natural Intelligence](curriculum/core/10-complexity-cognition-natural-intelligence/index.md)
 
 </div>
+
+---
+
+## What every page gives you
+
+Every subject is built around four artifact types — **concepts**, **authors**, **arcs**, and **builds** — designed to converge into a coherent reading you can act on.
+
+- **Concepts** are encyclopedic, self-contained walk-throughs (Olah/Distill grade), not bullet-point summaries.
+- **Authors** anchor the field to the people whose work shaped it.
+- **Arcs** are roadmaps.sh-style learning paths through the concepts.
+- **Builds** are Minimum Valuable Build recipes — runnable, persona-tagged, real artifact at the end.
 
 ---
 

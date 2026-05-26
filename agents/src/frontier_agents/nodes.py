@@ -125,23 +125,32 @@ def load_persona_node(state: WikiPageState) -> WikiPageState:
 
 
 def _resolve_output_path(state: WikiPageState) -> str:
-    """Route output to the correct tree based on mode/page_type.
+    """Route output to the v2 curriculum tree based on mode/page_type.
 
-    - mode == "arc-step"   → docs/arcs/{arc_id}/step-{pos:02d}-{slug}.md
-    - mode == "arc-index"  → docs/arcs/{arc_id}/index.md
-    - everything else      → docs/curriculum/{track}/{slug}.md
+    v2 layout (see docs/system/structure-v2.md):
+    - mode == "arc-step"   → docs/curriculum/core/{track}/arcs/{arc_id}/step-{pos:02d}-{slug}.md
+    - mode == "arc-index"  → docs/curriculum/core/{track}/arcs/{arc_id}/index.md
+    - page_type == "author" → docs/curriculum/core/{track}/authors/{slug}.md
+    - page_type == "build"  → docs/curriculum/core/{track}/builds/{slug}.md
+    - everything else (concept) → docs/curriculum/core/{track}/concepts/{slug}.md
     """
     mode = state.get("mode", "full")
     arc_ctx = state.get("arc_context") or {}
     arc_id = arc_ctx.get("arc_id", "")
+    page_type = state.get("page_type", "concept")
     topic = state["topic"]
+    track = state["track"]
 
     if mode == "arc-step" and arc_id:
         pos = int(arc_ctx.get("position") or 0)
-        return f"{DOCS_DIR}/arcs/{arc_id}/step-{pos:02d}-{topic}.md"
+        return f"{DOCS_DIR}/curriculum/core/{track}/arcs/{arc_id}/step-{pos:02d}-{topic}.md"
     if mode == "arc-index" and arc_id:
-        return f"{DOCS_DIR}/arcs/{arc_id}/index.md"
-    return f"{DOCS_DIR}/curriculum/{state['track']}/{topic}.md"
+        return f"{DOCS_DIR}/curriculum/core/{track}/arcs/{arc_id}/index.md"
+    if page_type == "author":
+        return f"{DOCS_DIR}/curriculum/core/{track}/authors/{topic}.md"
+    if page_type == "build":
+        return f"{DOCS_DIR}/curriculum/core/{track}/builds/{topic}.md"
+    return f"{DOCS_DIR}/curriculum/core/{track}/concepts/{topic}.md"
 
 
 def read_stub_node(state: WikiPageState) -> WikiPageState:
