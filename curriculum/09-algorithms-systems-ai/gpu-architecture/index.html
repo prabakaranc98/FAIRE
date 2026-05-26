@@ -3964,13 +3964,265 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">compute-bound</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gpu</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">hardware</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">memory-bound</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">memory-hierarchy</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="gpu-architecture">GPU Architecture<a class="headerlink" href="#gpu-architecture" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. Queued for the editorial pipeline.</p>
+<blockquote>
+<p><strong>TL;DR:</strong> Modern GPU architecture is a software-defined memory orchestration layer where performance is governed by data movement efficiency rather than raw floating-point throughput.</p>
+</blockquote>
+<hr />
+<h2 id="who-this-page-is-for">Who this page is for<a class="headerlink" href="#who-this-page-is-for" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>What you get</th>
+<th>Jump to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Curious learner</td>
+<td>Intuition on the "Memory Wall" paradox</td>
+<td><a href="#what-it-is">§What it is</a></td>
+</tr>
+<tr>
+<td>CS student / tinkerer</td>
+<td>Laptop-GPU build with a target metric</td>
+<td><a href="#mvb-cs-student">§MVB — CS student</a></td>
+</tr>
+<tr>
+<td>Applied engineer</td>
+<td>Production framing + latency-shaped build</td>
+<td><a href="#in-production">§In production</a>, <a href="#mvb-applied-engineer">§MVB — Applied engineer</a></td>
+</tr>
+<tr>
+<td>Applied researcher</td>
+<td>Hypothesis + ablation build</td>
+<td><a href="#whats-happening-now">§What's happening now</a>, <a href="#mvb-applied-researcher">§MVB — Applied researcher</a></td>
+</tr>
+<tr>
+<td>Theory student</td>
+<td>Derivations + numerical verification</td>
+<td><a href="#mathematical-foundations">§Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Frontier researcher</td>
+<td>Open problems + falsifiers</td>
+<td><a href="#open-questions">§Open questions</a>, <a href="#mvb-frontier-researcher">§MVB — Frontier researcher</a></td>
+</tr>
+<tr>
+<td>PM / decision-maker</td>
+<td>Why it matters + SotA synthesis</td>
+<td><a href="#why-it-matters">§Why it matters</a>, <a href="#current-sota">§Current SotA</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Modern GPUs are victims of their own success: an H100 can perform trillions of operations per second, yet it spends the vast majority of its time idling while waiting for data to arrive from memory. This "Memory Wall" paradox means that raw TFLOPS are increasingly irrelevant compared to the efficiency of the interconnects and cache management systems. To master modern GPU architecture, you must stop thinking of the GPU as a compute engine and start treating it as a software-defined memory orchestration layer.</p>
+<p>This shift is a direct consequence of the widening gap between compute capability and memory bandwidth. As ALUs have scaled in density, the physical limits of HBM (High Bandwidth Memory) and the latency of data movement across the chip have become the primary constraints on throughput. Consequently, modern architecture is defined less by the raw number of cores and more by the sophistication of the memory hierarchy, including L1/L2 cache management and the interconnects that bridge the gap between compute units.</p>
+<p>The consequence is that software performance is now dominated by IO-awareness. Algorithms that minimize data movement—by keeping tensors in fast SRAM as long as possible—consistently outperform those that rely on raw compute power. This insight has transformed the GPU from a static box of parallel processors into a dynamic system where the most successful models are those that treat the memory hierarchy as the primary compute resource.</p>
+<h2 id="why-it-matters">Why it matters<a class="headerlink" href="#why-it-matters" title="Permanent link">&para;</a></h2>
+<p>The transition to memory-centric architecture is the defining challenge for AI systems at the frontier. As models grow in parameter count and sequence length, the bottleneck shifts from the arithmetic logic units to the memory bus, making traditional compute-bound optimizations insufficient. This is why labs are increasingly prioritizing hardware-software co-design, where the memory access patterns of a specific model are baked into the kernel design itself.</p>
+<p>This shift has unlocked new paradigms in inference, such as disaggregated hardware and specialized prefill/decode chips. Understanding these architectural constraints is no longer optional for researchers; it is the prerequisite for designing systems that can scale beyond the current limits of monolithic GPU clusters.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>SIMT (Single Instruction, Multiple Threads)</strong> — A parallel execution model where a single instruction is executed across multiple threads, each operating on different data.</li>
+<li><strong>Memory Wall</strong> — The performance bottleneck where the speed of the processor exceeds the speed of the memory system, causing the GPU to stall while waiting for data.</li>
+<li><strong>Arithmetic Intensity</strong> — The ratio of floating-point operations to memory access operations, determining whether a kernel is compute-bound or memory-bound.</li>
+<li><strong>HBM (High Bandwidth Memory)</strong> — A high-performance RAM interface for 3D-stacked DRAM, providing the massive bandwidth required for modern AI workloads.</li>
+<li><strong>IO-Awareness</strong> — The design principle of optimizing algorithms to minimize data movement between slow HBM and fast on-chip SRAM.</li>
+<li><strong>SRAM (Static RAM)</strong> — The fast, on-chip memory (cache) that acts as a buffer between the ALUs and the slower HBM.</li>
+</ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>[
+\text{Arithmetic Intensity} = \frac{\text{FLOPs}}{\text{Bytes}}
+]
+where <span class="arithmatex">\(\text{FLOPs}\)</span> is the total number of floating-point operations performed, and <span class="arithmatex">\(\text{Bytes}\)</span> is the total amount of data moved from HBM. This equation defines the boundary between compute-bound and memory-bound regimes; if the ratio is lower than the hardware's compute-to-bandwidth ratio, the GPU is memory-bound.</p>
+<p>[
+T_{\text{total}} = \max(T_{\text{compute}}, T_{\text{memory}})
+]
+where <span class="arithmatex">\(T_{\text{compute}}\)</span> is the time spent on ALU operations and <span class="arithmatex">\(T_{\text{memory}}\)</span> is the time spent waiting for data transfer. This models the "Memory Wall" paradox, showing that the slowest component dictates the total execution time.</p>
+<p>[
+\text{Throughput} = \frac{N \times \text{Ops}}{\text{Latency}<em _text_compute="\text{compute">{\text{memory}} + \text{Latency}</em>
+]
+where }}<span class="arithmatex">\(N\)</span> is the number of parallel threads, <span class="arithmatex">\(\text{Ops}\)</span> is the operations per thread, and <span class="arithmatex">\(\text{Latency}\)</span> represents the respective stall times. This quantifies the impact of memory latency on overall GPU throughput.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>FlashAttention (2022)</strong> — An IO-aware attention algorithm that tiles the attention matrix to keep data in SRAM, significantly reducing HBM access.</li>
+<li><strong>Kernel Fusion</strong> — The process of combining multiple operations into a single GPU kernel to minimize the overhead of reading and writing intermediate results to HBM.</li>
+<li><strong>Quantization</strong> — Reducing the precision of weights and activations to decrease the memory footprint and bandwidth requirements of model execution.</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NVIDIA Tesla: A Unified Graphics and Computing Architecture</td>
+<td>2008</td>
+<td>Lindholm et al.</td>
+<td>Established the SIMT model and unified shader architecture.</td>
+</tr>
+<tr>
+<td>FlashAttention: Fast and Memory-Efficient Exact Attention</td>
+<td>2022</td>
+<td>Dao et al.</td>
+<td>Blueprint for IO-aware kernel design and memory-centric optimization.</td>
+</tr>
+<tr>
+<td>SPAD: Specialized Prefill and Decode Hardware</td>
+<td>2025</td>
+<td>SPAD Research</td>
+<td>Proposes disaggregated hardware for distinct inference phases.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NVIDIA Tesla: A Unified Graphics and Computing Architecture</td>
+<td>2008</td>
+<td>Transitioned GPUs from fixed-function to general-purpose parallel processors.</td>
+</tr>
+<tr>
+<td>FlashAttention: Fast and Memory-Efficient Exact Attention</td>
+<td>2022</td>
+<td>Proved that memory access patterns are the primary determinant of performance.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>The NVIDIA Blackwell Ultra (GB300 NVL) platform achieves extreme performance through co-design, utilizing Quantum-X800 InfiniBand to minimize interconnect bottlenecks (2024). Huawei Cloud's CloudMatrix384 (Ascend 910C) achieves 1,943 tokens/s per NPU in decode throughput using a Unified Bus network (2025).</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p>Research is currently focused on "IO-aware" kernel design, where the memory hierarchy is treated as a first-class citizen in the compiler stack. Dao et al. (2022) demonstrated that exact attention can be computed with linear memory complexity by tiling, a technique now standard in all high-performance LLM kernels. Lin et al. (2024) have extended these IO-aware techniques to diverse hardware targets, including NPUs, proving that memory-centric design is portable across different silicon architectures.</p>
+<p>Engineering efforts are shifting toward disaggregated hardware. The SPAD (2025) architecture separates compute-heavy prefill chips from memory-bandwidth-heavy decode chips, directly addressing the underutilization paradox where a single GPU cannot be optimized for both phases simultaneously. This disaggregation allows for more granular scaling of memory bandwidth versus compute power.</p>
+<p>Open problems remain in the area of dynamic resource allocation. Current systems rely on static memory layouts, but researchers are investigating whether hardware can autonomously reconfigure its HBM cache hierarchy at runtime. This would allow the GPU to adapt to the specific sparsity patterns of an incoming request, potentially unlocking a new tier of inference efficiency.</p>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>NVIDIA</strong> — Blackwell Ultra — Optimized for extreme co-design, utilizing Quantum-X800 InfiniBand to minimize interconnect bottlenecks — <a href="https://developer.nvidia.com/blog/nvidia-platform-delivers-lowest-token-cost-enabled-by-extreme-co-design/">NVIDIA Blog</a></li>
+<li><strong>Huawei Cloud</strong> — CloudMatrix384 (Ascend 910C) — 384 NPUs interconnected via a Unified Bus (UB) network, achieving 1,943 tokens/s per NPU — <a href="https://arxiv.org/abs/2506.12708v1">arXiv:2506.12708</a></li>
+</ul>
+<h2 id="minimum-valuable-builds-by-persona">Minimum Valuable Builds — by persona<a class="headerlink" href="#minimum-valuable-builds-by-persona" title="Permanent link">&para;</a></h2>
+<h3 id="1-for-the-curious-learner-30-min-free-tier">1. For the curious learner (30 min · free tier)<a class="headerlink" href="#1-for-the-curious-learner-30-min-free-tier" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Visualize the difference between compute-bound and memory-bound operations.
+<strong>Artifact:</strong> A Colab notebook comparing matrix multiplication (compute-bound) vs. a large-scale gather operation (memory-bound).
+<strong>Success:</strong> Observing that the gather operation hits a performance ceiling significantly lower than the theoretical TFLOPS.
+<strong>Stack:</strong> PyTorch on Google Colab T4.</p>
+<h3 id="2-for-the-cs-student-tinkerer-1-day-rtx-4070-m-series">2. For the CS student / tinkerer (1 day · RTX 4070 / M-series)<a class="headerlink" href="#2-for-the-cs-student-tinkerer-1-day-rtx-4070-m-series" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Profile the arithmetic intensity of a custom CUDA kernel.
+<strong>Artifact:</strong> A plot showing throughput vs. arithmetic intensity for varying matrix sizes.
+<strong>Success:</strong> Identifying the "knee" in the curve where the kernel transitions from compute-bound to memory-bound.
+<strong>Stack:</strong> PyTorch, <code>torch.profiler</code>, RTX 4070.</p>
+<h3 id="3-for-the-applied-production-engineer-1-week-a10-l4-cloud">3. For the applied / production engineer (1 week · A10 / L4 / cloud)<a class="headerlink" href="#3-for-the-applied-production-engineer-1-week-a10-l4-cloud" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Deploy a vLLM endpoint and profile the memory bandwidth utilization.
+<strong>Artifact:</strong> A latency report for Llama-3.1-8B-Instruct showing p50/p99 latency under varying batch sizes.
+<strong>Success:</strong> Achieving p50 latency &lt; 1.5s on A10 hardware.
+<strong>Stack:</strong> <code>nvidia/Llama-3.1-8B-Instruct</code>, vLLM, A10 GPU.</p>
+<h3 id="4-for-the-applied-researcher-3-days-a100">4. For the applied researcher (3 days · A100)<a class="headerlink" href="#4-for-the-applied-researcher-3-days-a100" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Ablate the impact of tile size on FlashAttention throughput.
+<strong>Artifact:</strong> A comparison table showing throughput vs. tile size for different sequence lengths.
+<strong>Success:</strong> Evidence that the optimal tile size is hardware-dependent and memory-bound.
+<strong>Stack:</strong> <code>flash-attn</code> library, A100 GPU.</p>
+<h3 id="5-for-the-theory-student-1-day-cpu">5. For the theory student (1 day · CPU)<a class="headerlink" href="#5-for-the-theory-student-1-day-cpu" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Derive the theoretical memory bandwidth limit for a matrix-vector multiplication.
+<strong>Artifact:</strong> A plot comparing the theoretical bandwidth limit to a numerical simulation.
+<strong>Success:</strong> Residual error below 5% between theory and simulation.
+<strong>Stack:</strong> Python, NumPy.</p>
+<h3 id="6-for-the-frontier-researcher-1-week-a100-cluster">6. For the frontier researcher (1 week+ · A100 cluster)<a class="headerlink" href="#6-for-the-frontier-researcher-1-week-a100-cluster" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Probe the "dynamic precision-aware memory allocation" hypothesis.
+<strong>Artifact:</strong> Evidence that reconfiguring cache hierarchy based on sparsity improves decode throughput.
+<strong>Success:</strong> A falsification criterion: if throughput does not increase by &gt;10%, the hypothesis is rejected.
+<strong>Stack:</strong> A100 cluster, custom CUDA kernels.</p>
+<h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<div class="admonition researcher">
+<p class="admonition-title">For researchers</p>
+<p>Can we design a hardware-software co-design that enables "dynamic precision-aware memory allocation," where the GPU architecture autonomously reconfigures its HBM cache hierarchy at runtime based on the specific sparsity patterns of an incoming LLM request?</p>
+</div>
+<div class="admonition engineer">
+<p class="admonition-title">For engineers</p>
+<p>How does the memory-bandwidth ceiling change when using 4-bit vs 8-bit quantization on a consumer GPU? Design an experiment to measure the throughput gain as a function of bandwidth reduction.</p>
+</div>
+<div class="admonition open">
+<p class="admonition-title">Think about this</p>
+<p>If memory bandwidth is the primary bottleneck, why do we continue to prioritize TFLOPS in GPU marketing? What would a "Bandwidth-per-Dollar" metric reveal about current hardware utility?</p>
+</div>
+<h2 id="this-concept-appears-in">This concept appears in<a class="headerlink" href="#this-concept-appears-in" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Arc step pages for this concept are being generated.</li>
+</ul>
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../ai-hardware/">AI Hardware</a> — GPU architecture is a primary implementation of specialized AI hardware for machine learning.</li>
+<li><a href="../../04-neural-networks-dl/backpropagation/">Backpropagation</a> — Backpropagation is the core algorithm accelerated by efficient GPU architecture during model training.</li>
+<li><a href="../../04-neural-networks-dl/cnn/">Convolutional Neural Networks</a> — CNNs rely heavily on GPU architecture for parallelizing high-dimensional matrix convolution operations.</li>
+<li><a href="../../07-attention-memory-reasoning/efficient-attention/">Efficient Attention</a> — Efficient attention mechanisms are designed to optimize memory access patterns on GPU architectures.</li>
+<li><a href="../../10-complexity-cognition/circuit-complexity/">Circuit Complexity</a> — Circuit complexity provides the theoretical framework for analyzing hardware-level GPU computational limits.</li>
+<li><a href="../../07-attention-memory-reasoning/single-head-attention/">Single-Head Attention</a> — Single-head attention operations are mapped to GPU kernels to maximize parallel throughput.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://www.cs.cmu.edu/afs/cs/academic/class/15869-f11/www/readings/lindholm08_tesla.pdf">NVIDIA Tesla Architecture (2008)</a> — The foundational paper on unified shader architecture.</li>
+<li><a href="https://arxiv.org/pdf/2205.14135">FlashAttention (2022)</a> — The definitive guide to IO-aware kernel design.</li>
+<li><a href="https://lilianweng.github.io/posts/2023-01-10-inference/">Lilian Weng's Blog on LLM Inference</a> — An excellent overview of the bottlenecks in modern LLM systems.</li>
+</ul>
 
 
 
