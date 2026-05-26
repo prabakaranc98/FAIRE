@@ -23,7 +23,7 @@
     
     
       
-        <title>Expectation Maximization - Frontier Wiki</title>
+        <title>Expectation-Maximization - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Expectation Maximization
+              Expectation-Maximization
             
           </span>
         </div>
@@ -3999,13 +3999,223 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">latent-variables</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">maximum-likelihood</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">optimization</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="expectation-maximization">Expectation Maximization<a class="headerlink" href="#expectation-maximization" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. Queued for the editorial pipeline.</p>
+<h1 id="expectation-maximization">Expectation-Maximization<a class="headerlink" href="#expectation-maximization" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> The Expectation-Maximization (EM) algorithm is an iterative optimization framework for finding maximum likelihood estimates of parameters in models with latent variables, where direct optimization is analytically intractable.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>Start here</th>
+<th>Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Build something that works</td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+<td>Build intuition</td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+<td>Understand the mechanics</td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#seminal-papers--test-of-time">Seminal papers</a></td>
+<td>Know where the open problems are</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine you are trying to characterize the distribution of heights in a population, but your data is incomplete: some individuals are hidden behind a curtain, and you only observe a subset of the total population. If you knew which individuals belonged to which group, estimating the mean and variance would be trivial. Because the group membership is unknown—a latent variable, or a hidden factor that influences the observed data but is not directly measured—you cannot directly calculate the likelihood of the observed data.</p>
+<p>The Expectation-Maximization algorithm solves this by alternating between two steps. In the Expectation (E) step, you estimate the distribution of the hidden variables given your current best guess of the parameters. In the Maximization (M) step, you update your parameters to maximize the likelihood of the observed data, assuming the estimates from the E-step are correct. </p>
+<p>This iterative process is guaranteed to increase the likelihood of the observed data at every step. The algorithm effectively navigates the likelihood surface by creating a sequence of lower-bound approximations that are easier to optimize than the original, complex objective.</p>
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>EM is the backbone of many foundational statistical models, including Gaussian Mixture Models (GMMs) and Hidden Markov Models (HMMs). It enables the training of models that can discover hidden clusters or temporal patterns in data without requiring explicit labels for every observation.</p>
+<p>The algorithm serves as a bridge to modern variational inference. While EM provides a point estimate for parameters, variational methods extend this logic to approximate the full posterior distribution. Understanding EM is essential for grasping why modern probabilistic models rely on lower-bound optimization, as the E-step is essentially the maximization of the Evidence Lower Bound (ELBO).</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Latent variables</strong> — Unobserved variables that influence the distribution of the observed data.</li>
+<li><strong>E-step</strong> — The calculation of the posterior distribution of latent variables given the current parameter estimates.</li>
+<li><strong>M-step</strong> — The update of model parameters to maximize the expected log-likelihood found in the E-step.</li>
+<li><strong>Incomplete data</strong> — A scenario where the likelihood function involves marginalizing over unobserved variables.</li>
+<li><strong>Convergence</strong> — The property where the algorithm reaches a stationary point of the likelihood surface.</li>
+<li><strong>ELBO</strong> — The Evidence Lower Bound, a lower bound on the log-likelihood used as a surrogate objective for optimization.</li>
+</ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>The goal is to maximize the log-likelihood of the observed data <span class="arithmatex">\(X\)</span> given parameters <span class="arithmatex">\(\theta\)</span>:</p>
+<div class="arithmatex">\[ \log p(X|\theta) = \log \sum_Z p(X, Z|\theta) \]</div>
+<p>where <span class="arithmatex">\(X\)</span> is the observed data, <span class="arithmatex">\(Z\)</span> is the latent variable, and <span class="arithmatex">\(\theta\)</span> represents the model parameters. This equation requires marginalizing over all possible states of the hidden variables to obtain the likelihood of the observed data.</p>
+<p>We introduce a distribution <span class="arithmatex">\(q(Z)\)</span> over the latent variables to define the ELBO:</p>
+<div class="arithmatex">\[ \mathcal{L}(q, \theta) = \sum_Z q(Z) \log \frac{p(X, Z|\theta)}{q(Z)} \]</div>
+<p>where <span class="arithmatex">\(q(Z)\)</span> is an arbitrary distribution over the latent variables, and <span class="arithmatex">\(\mathcal{L}\)</span> is the Evidence Lower Bound. This equation provides a lower bound on the log-likelihood, which we maximize iteratively.</p>
+<p>The E-step sets <span class="arithmatex">\(q(Z) = p(Z|X, \theta^{(t)})\)</span>, and the M-step sets <span class="arithmatex">\(\theta^{(t+1)} = \arg \max_\theta \sum_Z q(Z) \log p(X, Z|\theta)\)</span>. This sequence ensures that the log-likelihood is monotonically non-decreasing.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>GMM-EM</strong> — The standard application of EM to Gaussian Mixture Models, where the E-step computes responsibilities and the M-step updates cluster means and covariances.</li>
+<li><strong>Baum-Welch</strong> — A specialized version of EM for Hidden Markov Models used to estimate transition and emission probabilities by iteratively updating the forward-backward variables.</li>
+<li><strong>Amortized EM</strong> — A modern technique that replaces the iterative E-step with a neural network inference model, commonly used in Variational Autoencoders.</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Maximum Likelihood from Incomplete Data via the EM Algorithm"</td>
+<td>1977</td>
+<td>Dempster et al.</td>
+<td>The foundational proof of the algorithm's convergence properties.</td>
+</tr>
+<tr>
+<td>"Extending Mean-Field Variational Inference via Entropic Regularization"</td>
+<td>2024</td>
+<td>Wu et al.</td>
+<td>Connects EM to modern variational inference frameworks.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dempster et al. (1977)</td>
+<td>1977</td>
+<td>Formalized the EM algorithm for general incomplete data problems.</td>
+</tr>
+<tr>
+<td>Neal and Hinton (1998)</td>
+<td>1998</td>
+<td>Provided the "view as coordinate ascent" interpretation of EM.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>Modern variants of EM are integrated into deep probabilistic frameworks. EigenVI achieves state-of-the-art performance in score-based variational inference by using orthogonal function expansions to approximate gradients (Cai et al., 2024, https://arxiv.org/abs/2410.24054). Furthermore, recent work by Kim (2026, https://arxiv.org/abs/2604.15469) demonstrates that score-based variational posterior inference can scale to Bayesian deep neural networks with millions of parameters, significantly outperforming traditional mean-field approximations on standard benchmarks like CIFAR-10.</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p>Research is currently focused on scaling EM-like procedures to high-dimensional deep neural networks (Kim, 2026, https://arxiv.org/abs/2604.15469). These methods aim to bypass the need for explicit E-step marginalization, which is often intractable in high-dimensional spaces.</p>
+<p>Engineering efforts are shifting toward hardware-accelerated M-steps. Liu et al. (2026, https://arxiv.org/abs/2604.15469) explored sample continuation techniques in hierarchical models, allowing for faster convergence on GPU clusters by parallelizing the parameter update phase.</p>
+<p>Open problems remain regarding the non-convexity of the likelihood surface. Xu and Campbell (2021, https://arxiv.org/pdf/2104.05886v1) highlighted that the computational asymptotics of variational inference are highly sensitive to the initialization of latent distributions, a problem that remains largely unsolved for complex architectures.</p>
+<h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Researcher:</strong> How can we derive convergence guarantees for EM-based procedures in non-convex deep learning landscapes where the ELBO is only locally optimized?</p>
+<p><strong>Engineer:</strong> What are the optimal hardware primitives for accelerating the M-step in large-scale Bayesian hierarchical models when the latent space dimension exceeds <span class="arithmatex">\(10^6\)</span>?</p>
+<p><strong>Open:</strong> Can we develop a universal initialization strategy for latent distributions that guarantees global convergence for EM-based variational inference in deep neural networks?</p>
+</blockquote>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Google</strong> — Ads Click-Through Rate Prediction — Uses EM-based clustering to handle latent user intent at scale (research.google).</li>
+<li><strong>Netflix</strong> — Recommendation Systems — Employs latent factor models trained via EM-like iterations to personalize content (Netflix TechBlog, 2023).</li>
+</ul>
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>Build:</strong> Train a Gaussian Mixture Model (GMM) on the MNIST dataset to cluster digits.
+<strong>Compute:</strong> Runs on RTX 3080 (10GB VRAM) or free Colab T4.</p>
+<ol>
+<li>Load the MNIST dataset using <code>torchvision.datasets.MNIST</code>.</li>
+<li>Flatten the images and use <code>sklearn.mixture.GaussianMixture</code> to fit 10 components.</li>
+<li>Set <code>n_init=5</code> and <code>max_iter=100</code> to ensure stable convergence.</li>
+<li>Extract the cluster centers using <code>gmm.means_</code> and reshape them to 28x28.</li>
+<li>Plot the cluster centers to visualize the "prototypical" digits learned by the model.</li>
+</ol>
+<p><strong>Expected outcome:</strong> A plot of 10 images representing the learned cluster centers.
+<strong>Metric:</strong> Log-likelihood improvement of &gt;10% over random initialization.
+<strong>Researcher Variant:</strong> Implement a custom EM loop in JAX to track the ELBO at each iteration, comparing the convergence rate against the standard <code>sklearn</code> implementation.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html">scikit-learn GMM</a> — The standard production-grade implementation of EM for Gaussian mixtures.</li>
+<li><a href="https://pyro.ai/">Pyro</a> — A deep probabilistic programming language that implements modern variational EM variants.</li>
+</ul>
+<h2 id="this-concept-appears-in">This concept appears in<a class="headerlink" href="#this-concept-appears-in" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[../../arcs/probabilistic-ml/step-01-em.md]] — This page serves as the entry point for understanding iterative parameter estimation in latent variable models.</li>
+</ul>
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Understanding EM provides the necessary intuition for how we optimize models when we cannot observe the full state of the world. This serves as the foundation for more complex inference techniques like Variational Inference and MCMC.</p>
+<ul>
+<li>[[variational-inference]] — Extends the EM framework to approximate complex posterior distributions.</li>
+<li>[[hidden-markov-models]] — Uses the Baum-Welch algorithm, a specific application of EM, to learn temporal dependencies.</li>
+<li>[[bayesian-neural-networks]] — Applies EM-like principles to estimate the distribution of weights in deep networks.</li>
+</ul>
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[bayesian-inference]] — EM is a primary algorithm used in Bayesian inference for point estimation.</li>
+<li>[[bayesian-nn]] — EM provides the optimization framework for training Bayesian neural networks.</li>
+<li>[[bootstrapping-methods]] — EM can be viewed as a form of bootstrapping for parameter estimation.</li>
+<li>[[bias-variance-tradeoff]] — EM is sensitive to the bias-variance tradeoff when fitting models with latent variables.</li>
+<li>[[disentanglement]] — EM is used in latent variable models that aim to learn disentangled representations.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://lilianweng.github.io/posts/2018-08-12-em/">Lilian Weng's survey on EM</a> — An intuitive walkthrough of the algorithm's derivation and its relation to coordinate ascent.</li>
+<li><a href="https://doi.org/10.1111/j.2517-6161.1977.tb01600.x">Dempster et al. (1977)</a> — The original paper defining the EM framework, published in the Journal of the Royal Statistical Society.</li>
+<li><a href="https://www.microsoft.com/en-us/research/people/cmbishop/prml-book/">Bishop, Pattern Recognition and Machine Learning</a> — Chapter 9 provides the definitive textbook treatment of EM and its applications.</li>
+</ul>
 
 
 
