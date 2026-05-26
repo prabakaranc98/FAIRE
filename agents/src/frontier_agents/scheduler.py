@@ -47,12 +47,13 @@ def parse_sprint_backlog(sprint_path: Path | None = None) -> list[dict]:
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
 
-        if line.startswith("## New pages"):
+        # Handle both legacy headers and supervisor-generated headers
+        if line.startswith("## New pages") or line.startswith("## New Content"):
             current_section = "generate"
-        elif line.startswith("## Improvements"):
-            current_section = "improve"
         elif line.startswith("## MVB-only"):
             current_section = "mvb-only"
+        elif line.startswith("## Critical") or line.startswith("## High") or line.startswith("## Improvements"):
+            current_section = "improve"
         elif line.startswith("- [ ]"):
             item = line[5:].strip()
             task = _parse_sprint_item(item, current_section)
@@ -217,12 +218,40 @@ def audit_job(docs_dir: str = str(DOCS_DIR)) -> dict:
 
 
 def sprint_job(dry_run: bool = False) -> list[dict]:
-    """Job 2: run unchecked sprint items through the editorial pipeline."""
+    """Job 2: run unchecked sprint items through the editorial pipeline.
+
+    Checks budget before running. If budget is "paused", skips generation entirely.
+    If "reduced", overrides WRITER_MODEL to FALLBACK_MODEL (cheaper).
+    """
     from .graph import compile_wiki_graph, compile_mvb_graph
+    import os as _os
 
     tasks = parse_sprint_backlog()
     if not tasks:
         return []
+
+    # Budget gate — check before spending any tokens
+    budget_mode = "full"
+    try:
+        from .observer import check_budget
+        b = check_budget()
+        budget_mode = b.mode
+    except Exception:
+        pass  # if budget check fails, proceed in full mode
+
+    if budget_mode == "paused":
+        print("[sprint] Budget exhausted — skipping all generation. Replenish OpenRouter credits.")
+        return [{"topic": t["topic"], "track": t["track"], "approved": False,
+                 "status": "skipped", "confidence": 0.0, "error": "budget_paused"}
+                for t in tasks]
+
+    # Reduced mode: override writer model to cheaper fallback
+    _original_writer = None
+    if budget_mode == "reduced":
+        fallback = _os.getenv("FALLBACK_MODEL", "anthropic/claude-sonnet-4.6")
+        _original_writer = _os.environ.get("WRITER_MODEL")
+        _os.environ["WRITER_MODEL"] = fallback
+        print(f"[sprint] Reduced budget mode — using {fallback} for all writes")
 
     results = []
     wiki_graph = compile_wiki_graph()
@@ -266,6 +295,12 @@ def sprint_job(dry_run: bool = False) -> list[dict]:
 
     if not dry_run:
         archive_sprint()
+
+    # Restore original writer model if we overrode it
+    if _original_writer is not None:
+        _os.environ["WRITER_MODEL"] = _original_writer
+    elif budget_mode == "reduced" and "WRITER_MODEL" in _os.environ:
+        del _os.environ["WRITER_MODEL"]
 
     return results
 

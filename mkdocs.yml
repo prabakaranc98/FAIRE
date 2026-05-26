@@ -136,6 +136,7 @@ nav:
   - System:
     - About: about.md
     - Generation Status: system/status.md
+    - Observer Dashboard: system/observer.md
     - Agent Changelog: system/changelog.md
     - Supervisor Report: system/supervisor.md
 

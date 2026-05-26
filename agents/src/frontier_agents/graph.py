@@ -18,6 +18,7 @@ from langgraph.graph import END, START, StateGraph
 from .nodes import (
     commit_node,
     flag_human_review_node,
+    link_node,
     load_persona_node,
     log_run_node,
     merge_mvb_node,
@@ -59,6 +60,7 @@ def build_wiki_graph() -> StateGraph:
     graph.add_node("plan", plan_node)
     graph.add_node("scratch", scratch_node)
     graph.add_node("write_draft", write_draft_node)
+    graph.add_node("link", link_node)
     graph.add_node("review", review_node)
     graph.add_node("revise_draft", revise_draft_node)
     graph.add_node("write_file", write_file_node)
@@ -73,7 +75,8 @@ def build_wiki_graph() -> StateGraph:
     graph.add_edge("research", "plan")
     graph.add_edge("plan", "scratch")
     graph.add_edge("scratch", "write_draft")
-    graph.add_edge("write_draft", "review")
+    graph.add_edge("write_draft", "link")
+    graph.add_edge("link", "review")
 
     graph.add_conditional_edges(
         "review",
@@ -115,6 +118,7 @@ def build_mvb_graph() -> StateGraph:
     graph.add_node("research", research_node)
     graph.add_node("mvb_recipe", mvb_recipe_node)
     graph.add_node("merge_mvb", merge_mvb_node)
+    graph.add_node("link", link_node)
     graph.add_node("review", review_node)
     graph.add_node("revise_draft", revise_draft_node)
     graph.add_node("write_file", write_file_node)
@@ -127,7 +131,8 @@ def build_mvb_graph() -> StateGraph:
     graph.add_edge("read_stub", "research")
     graph.add_edge("research", "mvb_recipe")
     graph.add_edge("mvb_recipe", "merge_mvb")
-    graph.add_edge("merge_mvb", "review")
+    graph.add_edge("merge_mvb", "link")
+    graph.add_edge("link", "review")
 
     graph.add_conditional_edges(
         "review",

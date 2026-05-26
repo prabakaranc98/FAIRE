@@ -14,7 +14,9 @@ Graph flow:
 
 from __future__ import annotations
 
+import json as _json
 import os
+import re
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
@@ -484,7 +486,9 @@ PAGE TO REVIEW:
             ),
             "review_pass": result.passed,
             "review_confidence": result.confidence,
-            "approved": result.passed and result.confidence >= 0.8,
+            "approved": result.passed and result.confidence >= float(
+                os.getenv("GIT_COMMIT_THRESHOLD", "0.8")
+            ),
         }
     except Exception:
         fallback = reviewer.invoke([
@@ -583,6 +587,233 @@ def log_run_node(state: WikiPageState) -> WikiPageState:
     except Exception:
         pass  # logging failure should never break the pipeline
     return state
+
+
+def link_node(state: WikiPageState) -> WikiPageState:
+    """Inject real internal links into the draft based on existing wiki pages.
+
+    Runs after write_draft, before review. Scans the filesystem for pages that
+    actually exist, uses RESEARCH_MODEL to find semantically related ones, and
+    replaces placeholder [[wikilinks]] with real relative markdown links.
+
+    Never creates broken links — only links to files that exist on disk.
+    Also updates docs/system/backlinks.json for reverse navigation.
+    """
+    draft = state.get("draft", "")
+    if not draft:
+        return state
+
+    try:
+        docs_dir = Path(DOCS_DIR)
+        existing_pages = _index_existing_pages(docs_dir)
+
+        if not existing_pages:
+            return state
+
+        # Remove current page from candidates (no self-links)
+        current_slug = f"{state['track']}/{state['topic']}"
+        existing_pages.pop(current_slug, None)
+
+        linked_draft = _inject_links(
+            draft,
+            existing_pages,
+            state["track"],
+            state["topic"],
+            docs_dir,
+        )
+        return {**state, "draft": linked_draft}
+    except Exception:
+        return state  # link injection failure must never block publishing
+
+
+def _index_existing_pages(docs_dir: Path) -> dict[str, dict]:
+    """Scan curriculum pages and return {track/slug: {title, track, slug, concepts_snippet}}.
+
+    Skips stub pages (no real content to link to).
+    Pure filesystem scan — no LLM needed.
+    """
+    curriculum = docs_dir / "curriculum"
+    pages: dict[str, dict] = {}
+
+    if not curriculum.exists():
+        return pages
+
+    for page_file in curriculum.rglob("*.md"):
+        if page_file.name == "index.md":
+            continue
+
+        track = page_file.parent.name
+        slug = page_file.stem
+        full_slug = f"{track}/{slug}"
+
+        try:
+            content = page_file.read_text(encoding="utf-8", errors="ignore")
+        except Exception:
+            continue
+
+        if "🚧" in content or "Agent-generated content pending" in content:
+            continue
+
+        title = slug.replace("-", " ").title()
+        fm_title = re.search(r"^title:\s*(.+)$", content, re.MULTILINE)
+        if fm_title:
+            title = fm_title.group(1).strip().strip("\"'")
+
+        concepts_snippet = ""
+        core_match = re.search(
+            r"## Core concepts?\s*\n+(.*?)(?:\n\n|\n#)", content, re.DOTALL
+        )
+        if core_match:
+            for line in core_match.group(1).split("\n"):
+                line = line.strip().lstrip("*-").strip()
+                if line and not line.startswith("**") and len(line) > 20:
+                    concepts_snippet = line[:200]
+                    break
+
+        pages[full_slug] = {
+            "title": title,
+            "track": track,
+            "slug": slug,
+            "concepts_snippet": concepts_snippet,
+        }
+
+    return pages
+
+
+def _inject_links(
+    draft: str,
+    existing_pages: dict[str, dict],
+    current_track: str,
+    current_topic: str,
+    docs_dir: Path,
+) -> str:
+    """Use RESEARCH_MODEL to find related existing pages and inject real links.
+
+    Returns the draft unchanged on any error — link injection is best-effort.
+    """
+    if not existing_pages:
+        return draft
+
+    linker = get_llm("research", temperature=0.0)
+
+    catalog_lines = [
+        f"- `{slug}` | {meta['title']}"
+        + (f" — {meta['concepts_snippet'][:80]}" if meta["concepts_snippet"] else "")
+        for slug, meta in list(existing_pages.items())[:60]
+    ]
+    catalog = "\n".join(catalog_lines)
+
+    prompt = f"""You are a knowledge graph linker for a machine learning wiki.
+
+Current page: **{current_topic}** (track: {current_track})
+
+Existing wiki pages (slug | title — snippet):
+{catalog}
+
+Task: Identify up to 6 existing pages most directly related to "{current_topic}".
+For each, write one sentence explaining the relationship (max 15 words).
+
+Return ONLY a JSON array — no explanation, no markdown fences:
+[
+  {{"slug": "track/page-slug", "title": "Page Title", "relationship": "one sentence"}},
+  ...
+]
+
+Only use slugs from the catalog above. Never invent slugs."""
+
+    try:
+        response = linker.invoke([HumanMessage(content=prompt)])
+        raw = response.content.strip()
+        json_match = re.search(r"\[.*?\]", raw, re.DOTALL)
+        if not json_match:
+            return draft
+        links_data = _json.loads(json_match.group(0))
+    except Exception:
+        return draft
+
+    if not links_data:
+        return draft
+
+    link_entries = []
+    backlink_targets = []
+
+    for item in links_data:
+        slug = item.get("slug", "")
+        if slug not in existing_pages:
+            continue  # never create links to pages that don't exist
+
+        meta = existing_pages[slug]
+        title = meta["title"]
+        target_track = meta["track"]
+        target_slug = meta["slug"]
+        relationship = item.get("relationship", "")
+
+        rel_path = (
+            f"./{target_slug}.md"
+            if target_track == current_track
+            else f"../{target_track}/{target_slug}.md"
+        )
+
+        link_entries.append(f"- [{title}]({rel_path}) — {relationship}")
+        backlink_targets.append(slug)
+
+    if not link_entries:
+        return draft
+
+    links_block = "\n".join(link_entries)
+
+    # Replace content of ## Connected topics section if it exists
+    connected_pattern = r"(## Connected topics?\s*\n)(.*?)(?=\n## |\Z)"
+    if re.search(connected_pattern, draft, re.DOTALL):
+        draft = re.sub(
+            connected_pattern,
+            lambda m: m.group(1) + links_block + "\n\n",
+            draft,
+            flags=re.DOTALL,
+        )
+    elif "## Further reading" in draft:
+        draft = draft.replace(
+            "## Further reading",
+            f"## Connected topics\n\n{links_block}\n\n## Further reading",
+            1,
+        )
+    else:
+        draft += f"\n\n## Connected topics\n\n{links_block}\n"
+
+    _update_backlinks(docs_dir, current_track, current_topic, backlink_targets)
+    return draft
+
+
+def _update_backlinks(
+    docs_dir: Path,
+    current_track: str,
+    current_topic: str,
+    targets: list[str],
+) -> None:
+    """Persist forward + reverse link index to docs/system/backlinks.json."""
+    system_dir = docs_dir / "system"
+    system_dir.mkdir(parents=True, exist_ok=True)
+    backlinks_path = system_dir / "backlinks.json"
+
+    try:
+        backlinks: dict = {}
+        if backlinks_path.exists():
+            backlinks = _json.loads(backlinks_path.read_text(encoding="utf-8"))
+
+        source_slug = f"{current_track}/{current_topic}"
+        backlinks.setdefault("forward", {})[source_slug] = targets
+
+        for target in targets:
+            refs = backlinks.setdefault("reverse", {}).setdefault(target, [])
+            if source_slug not in refs:
+                refs.append(source_slug)
+
+        backlinks_path.write_text(
+            _json.dumps(backlinks, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except Exception:
+        pass
 
 
 def flag_human_review_node(state: WikiPageState) -> WikiPageState:

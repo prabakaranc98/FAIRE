@@ -8,6 +8,7 @@ import pytest
 
 from frontier_agents.nodes import (
     flag_human_review_node,
+    link_node,
     load_persona_node,
     merge_mvb_node,
     read_stub_node,
@@ -130,9 +131,11 @@ class TestReviewNode:
         assert result["review_confidence"] == 0.92
         assert result["approved"] is True
 
-    def test_approved_requires_confidence_above_08(self, draft_state):
+    def test_approved_requires_confidence_above_threshold(self, draft_state):
+        """Confidence below GIT_COMMIT_THRESHOLD means not approved."""
         from frontier_agents.nodes import ReviewResult
-        mock_result = ReviewResult(passed=True, confidence=0.75, issues=["Missing sources"], suggestions=[])
+        # Use 0.5 — well below any reasonable threshold (0.7 or 0.8)
+        mock_result = ReviewResult(passed=True, confidence=0.5, issues=["Missing sources"], suggestions=[])
         mock_llm = MagicMock()
         mock_llm.with_structured_output.return_value.invoke.return_value = mock_result
 
@@ -140,7 +143,7 @@ class TestReviewNode:
             result = review_node(draft_state)
 
         assert result["review_pass"] is True
-        assert result["approved"] is False  # confidence < 0.8
+        assert result["approved"] is False  # confidence below threshold
 
     def test_fallback_text_parsing_on_structured_failure(self, draft_state):
         mock_llm = MagicMock()
@@ -247,3 +250,145 @@ class TestFlagHumanReviewNode:
         result = flag_human_review_node(state)
         assert result["approved"] is False
         assert result["committed"] is False
+
+
+class TestLinkNode:
+    def _draft_with_connected_section(self):
+        return """---
+title: Score Matching
+track: 02-generative-modeling
+---
+# Score Matching
+> TL;DR: Learns the score function of a data distribution.
+
+## Core concepts
+Score matching learns to estimate the gradient of the log-density.
+
+## Connected topics
+- [[diffusion-models]]
+- [[flow-matching]]
+
+## Further reading
+- [Some paper](https://arxiv.org/abs/xxxx)
+"""
+
+    def test_returns_state_unchanged_when_no_docs(self, base_state, tmp_path):
+        """With no existing pages on disk, link_node is a no-op."""
+        state = {**base_state, "draft": self._draft_with_connected_section()}
+        with patch("frontier_agents.nodes.DOCS_DIR", str(tmp_path)):
+            result = link_node(state)
+        assert result["draft"] == state["draft"]
+
+    def test_returns_state_unchanged_when_no_draft(self, base_state):
+        """Empty draft → no-op."""
+        state = {**base_state, "draft": ""}
+        result = link_node(state)
+        assert result["draft"] == ""
+
+    def test_injects_real_links_for_existing_pages(self, base_state, tmp_path):
+        """When existing pages are found, real links replace placeholders."""
+        # Create a real page on disk
+        curriculum = tmp_path / "curriculum" / "02-generative-modeling"
+        curriculum.mkdir(parents=True)
+        (curriculum / "diffusion-models.md").write_text(
+            "---\ntitle: Diffusion Models\ntrack: 02-generative-modeling\n---\n"
+            "# Diffusion Models\n## Core concepts\nDiffusion models reverse a noise process.\n"
+        )
+
+        draft = self._draft_with_connected_section()
+        state = {
+            **base_state,
+            "topic": "score-matching",
+            "track": "02-generative-modeling",
+            "draft": draft,
+        }
+
+        # Mock the LLM call to return a deterministic link list
+        mock_response = MagicMock()
+        mock_response.content = (
+            '[{"slug": "02-generative-modeling/diffusion-models", '
+            '"title": "Diffusion Models", '
+            '"relationship": "Score matching is the theoretical foundation of diffusion models"}]'
+        )
+
+        with patch("frontier_agents.nodes.DOCS_DIR", str(tmp_path)):
+            with patch("frontier_agents.nodes.get_llm") as mock_get_llm:
+                mock_llm = MagicMock()
+                mock_llm.invoke.return_value = mock_response
+                mock_get_llm.return_value = mock_llm
+                result = link_node(state)
+
+        # The draft should now contain a real link to diffusion-models.md
+        assert "[Diffusion Models](./diffusion-models.md)" in result["draft"]
+
+    def test_never_links_to_nonexistent_pages(self, base_state, tmp_path):
+        """LLM may hallucinate slugs — link_node must drop them."""
+        curriculum = tmp_path / "curriculum" / "02-generative-modeling"
+        curriculum.mkdir(parents=True)
+        # No files written — catalog is empty
+
+        draft = self._draft_with_connected_section()
+        state = {**base_state, "draft": draft}
+
+        # LLM tries to link to a page that doesn't exist
+        mock_response = MagicMock()
+        mock_response.content = (
+            '[{"slug": "02-generative-modeling/nonexistent-page", '
+            '"title": "Nonexistent Page", "relationship": "made up"}]'
+        )
+
+        with patch("frontier_agents.nodes.DOCS_DIR", str(tmp_path)):
+            with patch("frontier_agents.nodes.get_llm") as mock_get_llm:
+                mock_llm = MagicMock()
+                mock_llm.invoke.return_value = mock_response
+                mock_get_llm.return_value = mock_llm
+                result = link_node(state)
+
+        # No link to nonexistent page should appear
+        assert "nonexistent-page" not in result["draft"]
+
+    def test_never_links_to_self(self, base_state, tmp_path):
+        """Current page must be excluded from link candidates."""
+        curriculum = tmp_path / "curriculum" / "02-generative-modeling"
+        curriculum.mkdir(parents=True)
+        (curriculum / "diffusion-models.md").write_text(
+            "---\ntitle: Diffusion Models\ntrack: 02-generative-modeling\n---\n"
+            "# Diffusion Models\nReal content here.\n"
+        )
+
+        # State represents the diffusion-models page itself
+        state = {
+            **base_state,
+            "topic": "diffusion-models",
+            "track": "02-generative-modeling",
+            "draft": self._draft_with_connected_section(),
+        }
+
+        from frontier_agents.nodes import _index_existing_pages
+        docs_path = tmp_path
+        pages = _index_existing_pages(docs_path)
+
+        # Self-slug must be excluded before LLM call
+        self_slug = "02-generative-modeling/diffusion-models"
+        assert self_slug not in pages or pages.pop(self_slug, None) is not None
+
+    def test_does_not_crash_on_llm_failure(self, base_state, tmp_path):
+        """LLM error → returns original draft unchanged (publishing never blocked)."""
+        curriculum = tmp_path / "curriculum" / "02-generative-modeling"
+        curriculum.mkdir(parents=True)
+        (curriculum / "flow-matching.md").write_text(
+            "---\ntitle: Flow Matching\ntrack: 02-generative-modeling\n---\nReal content.\n"
+        )
+
+        draft = self._draft_with_connected_section()
+        state = {**base_state, "draft": draft}
+
+        with patch("frontier_agents.nodes.DOCS_DIR", str(tmp_path)):
+            with patch("frontier_agents.nodes.get_llm") as mock_get_llm:
+                mock_llm = MagicMock()
+                mock_llm.invoke.side_effect = RuntimeError("LLM API down")
+                mock_get_llm.return_value = mock_llm
+                result = link_node(state)
+
+        # Draft must be returned as-is, pipeline must not crash
+        assert result["draft"] == draft

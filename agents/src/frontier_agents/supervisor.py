@@ -141,7 +141,7 @@ def run_supervisor(
     dry_run: bool = False,
     verbose: bool = False,
 ) -> SupervisorReport:
-    """Full supervisor cycle: assess → diagnose → prioritise → queue → report."""
+    """Full supervisor cycle: observe → assess → diagnose → prioritise → queue → report."""
     now = datetime.now(timezone.utc)
     docs_path = Path(docs_dir)
     runs_path = Path(__file__).parent.parent.parent / runs_dir
@@ -150,17 +150,52 @@ def run_supervisor(
     if verbose:
         print(f"[supervisor] Starting assessment — {now.strftime('%Y-%m-%d %H:%M UTC')}")
 
-    # 1. ASSESS — gather current state
-    health = _assess_wiki(docs_path, runs_path)
+    # 1. OBSERVE — unified sensor layer (also updates metrics.json + observer.md)
+    obs = None
+    try:
+        from .observer import observe, write_metrics_json, write_observer_page
+        obs = observe(docs_dir=str(docs_path), runs_dir=str(runs_path))
+        if not dry_run:
+            write_metrics_json(obs, runs_path)
+            write_observer_page(obs, docs_path)
+    except Exception as e:
+        if verbose:
+            print(f"[supervisor] Observer failed (continuing without it): {e}")
+
+    # 2. ASSESS — derive WikiHealth (from obs if available, else direct scan)
+    if obs is not None:
+        health = WikiHealth(
+            total_pages=obs.total_pages,
+            stub_pages=obs.stub_pages,
+            generated_pages=obs.generated_pages,
+            approved_pages=obs.approved_pages,
+            flagged_pages=sum(tm.flagged for tm in obs.track_metrics.values()),
+            avg_confidence=obs.avg_confidence,
+            tracks_covered=obs.tracks_covered,
+            tracks_total=obs.tracks_total,
+            pages_with_mvb=obs.pages_with_mvb,
+        )
+    else:
+        health = _assess_wiki(docs_path, runs_path)
+
     audit = audit_wiki(docs_path)
+    health.critical_issues = len(audit.critical)
+    health.warnings = len(audit.warnings)
 
     if verbose:
-        print(f"[supervisor] Health: {health.generated_pages} generated, "
-              f"{health.stub_pages} stubs, avg conf={health.avg_confidence:.2f}")
+        budget_str = (
+            f", budget={obs.budget.mode} (${obs.budget.remaining_usd:.2f} left)"
+            if obs and obs.budget.remaining_usd is not None
+            else ""
+        )
+        print(
+            f"[supervisor] Health: {health.generated_pages} generated, "
+            f"{health.stub_pages} stubs, avg conf={health.avg_confidence:.2f}{budget_str}"
+        )
 
-    # 2. DIAGNOSE + PRIORITISE via LLM reasoning
-    actions = _build_action_list(health, audit, runs_path, docs_path)
-    llm_analysis = _llm_editorial_analysis(health, audit, actions, verbose)
+    # 3. DIAGNOSE + PRIORITISE via LLM reasoning
+    actions = _build_action_list(health, audit, runs_path, docs_path, obs=obs)
+    llm_analysis = _llm_editorial_analysis(health, audit, actions, obs=obs, verbose=verbose)
 
     report = SupervisorReport(
         generated_at=now.strftime("%Y-%m-%d %H:%M UTC"),
@@ -170,13 +205,13 @@ def run_supervisor(
         llm_analysis=llm_analysis,
     )
 
-    # 3. QUEUE — write sprint if not dry run
+    # 4. QUEUE — write sprint if not dry run
     if not dry_run and actions:
         _update_sprint(actions[:15], sprints_path, now)
         if verbose:
             print(f"[supervisor] Updated sprint with {min(len(actions), 15)} items")
 
-    # 4. REPORT — write to docs/system/supervisor.md
+    # 5. REPORT — write to docs/system/supervisor.md
     _write_report(report, docs_path)
     if verbose:
         print(f"[supervisor] Report written to docs/system/supervisor.md")
@@ -246,8 +281,22 @@ def _build_action_list(
     audit: AuditReport,
     runs_path: Path,
     docs_path: Path,
+    obs=None,
 ) -> list[SupervisorAction]:
-    """Rule-based prioritisation: critical fixes first, then gaps, then improvements."""
+    """Rule-based prioritisation weighted by observer error signals.
+
+    Budget modes:
+      full    → all action types allowed
+      reduced → generate actions use cheaper models (flag in reason); no low-priority
+      paused  → no generation actions; only improve/fix for already-generated pages
+    """
+    from .observer import WikiObservation
+    budget_mode = obs.budget.mode if obs is not None else "full"
+
+    # Coverage deficit boosts priority of generate actions (0 → no boost, 0.5 → drop 1 level)
+    coverage_deficit = obs.error_signals.get("coverage_deficit", 0.5) if obs else 0.5
+    quality_deficit = obs.error_signals.get("quality_deficit", 0.1) if obs else 0.1
+
     actions: list[SupervisorAction] = []
 
     # Load latest runs for context
@@ -299,48 +348,55 @@ def _build_action_list(
             ))
 
     # Priority 3: Stub pages that haven't been attempted (new content gaps)
-    attempted_topics = set(latest_runs.keys())
-    curriculum = docs_path / "curriculum"
-    if curriculum.exists():
-        for page in curriculum.rglob("*.md"):
-            if page.name == "index.md":
-                continue
-            content = page.read_text(encoding="utf-8", errors="ignore")
-            if "🚧" in content or "Agent-generated content pending" in content:
-                topic_slug = page.stem
-                track = page.parent.name
-                if topic_slug not in attempted_topics:
-                    actions.append(SupervisorAction(
-                        priority=3,
-                        action="generate",
-                        topic=topic_slug,
-                        track=track,
-                        page_type="core-concept",
-                        depth_emphasis=["applied"],
-                        reason="Stub page — not yet generated",
-                    ))
+    # Skipped entirely when budget is "paused"
+    if budget_mode != "paused":
+        attempted_topics = set(latest_runs.keys())
+        curriculum = docs_path / "curriculum"
+        if curriculum.exists():
+            for page in curriculum.rglob("*.md"):
+                if page.name == "index.md":
+                    continue
+                content = page.read_text(encoding="utf-8", errors="ignore")
+                if "🚧" in content or "Agent-generated content pending" in content:
+                    topic_slug = page.stem
+                    track = page.parent.name
+                    if topic_slug not in attempted_topics:
+                        reason = "Stub page — not yet generated"
+                        if budget_mode == "reduced":
+                            reason += " [reduced budget: cheaper model]"
+                        actions.append(SupervisorAction(
+                            priority=3,
+                            action="generate",
+                            topic=topic_slug,
+                            track=track,
+                            page_type="core-concept",
+                            depth_emphasis=["applied"],
+                            reason=reason,
+                        ))
 
     # Priority 4: Pages approved but old (SotA may be stale)
-    for topic, r in latest_runs.items():
-        if r.get("status") != "approved":
-            continue
-        finished_at = r.get("finished_at", "")
-        if finished_at:
-            try:
-                run_dt = datetime.fromisoformat(finished_at)
-                age_days = (datetime.now(timezone.utc) - run_dt).days
-                if age_days > 90:
-                    actions.append(SupervisorAction(
-                        priority=4,
-                        action="improve",
-                        topic=topic,
-                        track=r.get("track", ""),
-                        page_type=r.get("page_type", "core-concept"),
-                        depth_emphasis=r.get("depth_emphasis", ["applied"]),
-                        reason=f"Approved {age_days}d ago — SotA may be stale",
-                    ))
-            except (ValueError, TypeError):
-                pass
+    # Skip in reduced/paused mode to conserve budget
+    if budget_mode == "full":
+        for topic, r in latest_runs.items():
+            if r.get("status") != "approved":
+                continue
+            finished_at = r.get("finished_at", "")
+            if finished_at:
+                try:
+                    run_dt = datetime.fromisoformat(finished_at)
+                    age_days = (datetime.now(timezone.utc) - run_dt).days
+                    if age_days > 90:
+                        actions.append(SupervisorAction(
+                            priority=4,
+                            action="improve",
+                            topic=topic,
+                            track=r.get("track", ""),
+                            page_type=r.get("page_type", "core-concept"),
+                            depth_emphasis=r.get("depth_emphasis", ["applied"]),
+                            reason=f"Approved {age_days}d ago — SotA may be stale",
+                        ))
+                except (ValueError, TypeError):
+                    pass
 
     # Sort by priority, then alphabetically within same priority
     actions.sort(key=lambda a: (a.priority, a.topic))
@@ -351,6 +407,7 @@ def _llm_editorial_analysis(
     health: WikiHealth,
     audit: AuditReport,
     actions: list[SupervisorAction],
+    obs=None,
     verbose: bool = False,
 ) -> str:
     """Use RESEARCH_MODEL to write a 200-word editorial analysis of wiki state."""
@@ -362,26 +419,42 @@ def _llm_editorial_analysis(
             for i, a in enumerate(actions[:10])
         )
 
+        # Add observer error signals if available
+        observer_block = ""
+        if obs is not None:
+            e = obs.error_signals
+            b = obs.budget
+            remaining = f"${b.remaining_usd:.2f}" if b.remaining_usd is not None else "unlimited"
+            observer_block = f"""
+Control system signals:
+- Coverage deficit: {e.get('coverage_deficit', 0):.1%} ({obs.coverage_pct:.1%} generated)
+- Quality deficit: {e.get('quality_deficit', 0):.2f} (avg confidence {obs.avg_confidence:.2f})
+- Flagged pages: {e.get('flagged_pages', 0):.0f}
+- Budget: {remaining} remaining, mode={b.mode}
+- Quality trend (last 10): avg conf {obs.quality_trend.avg_confidence:.2f}, "
+  first-pass approval {obs.quality_trend.approval_rate:.0%}, "
+  delta {obs.quality_trend.confidence_delta:+.3f}"""
+
         prompt = f"""You are the editorial supervisor of the Frontier Wiki — an AI/ML knowledge base.
 
 Current wiki state:
 - Total pages: {health.total_pages} ({health.stub_pages} stubs, {health.generated_pages} generated)
-- Approved (conf ≥ 0.8): {health.approved_pages}/{health.generated_pages}
-- Flagged (conf < 0.8): {health.flagged_pages}
+- Approved (conf ≥ threshold): {health.approved_pages}/{health.generated_pages}
+- Flagged: {health.flagged_pages}
 - Avg reviewer confidence: {health.avg_confidence:.2f}
 - Tracks with content: {health.tracks_covered}/{health.tracks_total}
 - Pages with MVB: {health.pages_with_mvb}
 - Critical audit issues: {len(audit.critical)}
-- Warnings: {len(audit.warnings)}
+- Warnings: {len(audit.warnings)}{observer_block}
 
 Top prioritised actions:
 {top_actions or "  No actions needed."}
 
 Write a concise editorial assessment (150-200 words) as the supervising editor:
 - What is the current state of the wiki?
-- What are the most important gaps?
+- What are the most important gaps or error signals?
 - What should the team focus on in the next sprint?
-- Are there any systemic issues (e.g., reviewer too strict, prose quality drift)?
+- Are there any systemic issues (e.g., reviewer too strict, prose quality drift, budget constraint)?
 
 Write as an editor, not as a system report. One flowing paragraph, no headers.
 """

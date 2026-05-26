@@ -415,7 +415,9 @@ def log_run(state: dict, runs_dir: str = "runs") -> None:
         "started_at": state.get("started_at", ""),
         "finished_at": now.isoformat(),
         "status": "approved" if state.get("approved") else (
-            "flagged" if state.get("review_confidence", 1.0) < 0.8 else "error"
+            "flagged" if state.get("review_confidence", 1.0) < float(
+                os.getenv("GIT_COMMIT_THRESHOLD", "0.8")
+            ) else "error"
         ),
         "confidence": state.get("review_confidence", 0.0),
         "revision_count": state.get("revision_count", 0),
@@ -436,6 +438,16 @@ def log_run(state: dict, runs_dir: str = "runs") -> None:
 
     _rebuild_status_page(runs_path, docs_system)
     _append_changelog_entry(record, now, docs_system)
+
+    # Close the feedback loop — update metrics.json + observer.md after every run
+    try:
+        from .observer import observe, write_metrics_json, write_observer_page
+        docs_dir = str(Path(__file__).parent.parent.parent.parent / "docs")
+        obs = observe(docs_dir=docs_dir, runs_dir=str(runs_path))
+        write_metrics_json(obs, runs_path)
+        write_observer_page(obs, docs_dir)
+    except Exception:
+        pass  # observer update must never break the pipeline
 
 
 def _load_all_runs(runs_path: Path) -> list[dict]:
