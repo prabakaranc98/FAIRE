@@ -31,9 +31,14 @@ APPROVED_RESEARCH_DOMAINS = [
     ".edu",
     "pytorch.org",
     "jax.readthedocs.io",
+    "tensorflow.org",
+    "scikit-learn.org",
+    "pyro.ai",
+    "numpy.org",
     "openai.com/research",
     "anthropic.com",
     "deepmind.google",
+    "microsoft.com/en-us/research",  # Microsoft Research papers + tech reports
 ]
 
 APPROVED_ENGINEERING_BLOGS = [
@@ -661,11 +666,21 @@ def verify_source_trust(url: str, section: str = "default") -> dict:
             _save_trust_cache(cache)
             return result
 
-    # +0.40 — in research allow-list (basic positive)
-    research_match = any(
-        domain_canon == d.lstrip(".") or domain_canon.endswith("." + d.lstrip("."))
-        for d in APPROVED_RESEARCH_DOMAINS
-    )
+    # +0.40 — in research allow-list. Entries can be a bare domain
+    #         ("arxiv.org") or a domain/path-prefix ("microsoft.com/en-us/research"),
+    #         or a domain-suffix (".edu"). Match accordingly:
+    url_canon_research = _re.sub(r"^https?://(www\.)?", "", url)
+    research_match = False
+    for d in APPROVED_RESEARCH_DOMAINS:
+        dd = d.lstrip(".")
+        if "/" in dd:
+            if url_canon_research.startswith(dd):
+                research_match = True
+                break
+        else:
+            if domain_canon == dd or domain_canon.endswith("." + dd):
+                research_match = True
+                break
     if research_match:
         score += 0.40
         signals.append("+0.40 approved-research-domain")
@@ -694,11 +709,12 @@ def verify_source_trust(url: str, section: str = "default") -> dict:
         signals.append("+0.20 huggingface-card")
 
     # +0.50 — official frontier-lab engineering blog ONLY in "In production"
-    #         (the In Production section is exactly where these belong)
+    #         APPROVED_ENGINEERING_BLOGS entries can be "domain.com/path-prefix",
+    #         so match against the URL prefix (after stripping http(s)://[www.]).
     if section == "in_production":
+        url_canon = _re.sub(r"^https?://(www\.)?", "", url)
         eng_blog = any(
-            domain_canon == d.lstrip(".") or domain_canon.endswith("." + d.lstrip("."))
-            for d in APPROVED_ENGINEERING_BLOGS
+            url_canon.startswith(d) for d in APPROVED_ENGINEERING_BLOGS
         )
         if eng_blog:
             score += 0.50
@@ -711,12 +727,23 @@ def verify_source_trust(url: str, section: str = "default") -> dict:
         if gh:
             org = gh.group(1).lower()
             approved_orgs = {
+                # Foundation labs + companies
                 "huggingface", "openai", "facebookresearch", "pytorch",
                 "google-research", "google-deepmind", "deepmind",
                 "tensorflow", "jax-ml", "nvidia", "allenai", "nvlabs",
                 "eleutherai", "anthropics", "stability-ai", "stabilityai",
-                "lucidrains",  # widely-cited unofficial-but-canonical implementations
-                "rwightman", "huggingface-projects",
+                "microsoft", "msr-fiddle", "salesforce",
+                # Canonical research-org repos (paper-anchored)
+                "dao-ailab",         # FlashAttention, Mamba (Tri Dao)
+                "state-spaces",      # Mamba, S4 (Gu, Dao)
+                "vllm-project",      # vLLM serving
+                "openrlhf",          # OpenRLHF
+                "huggingface-projects", "tatsu-lab",  # Stanford Alpaca etc
+                # Widely-cited high-quality unofficial implementations
+                "lucidrains", "rwightman",
+                "karpathy",          # nanoGPT, minGPT
+                # Academic groups
+                "stanfordnlp", "uw-nlp", "princeton-nlp", "yandex",
             }
             if org in approved_orgs:
                 score += 0.50
@@ -907,6 +934,9 @@ def log_run(state: dict, runs_dir: str = "runs") -> None:
         "error": state.get("error", ""),
         "review_issues": state.get("review_issues", []),
         "review_feedback": state.get("review_feedback", "")[:500],  # first 500 chars for debug
+        "critic_panel": state.get("critic_panel", {}),  # per-critic {score, issues, fixes}
+        "review_rubric": state.get("review_rubric", {}),  # structured rubric dimensions
+        "mvb_persona": state.get("mvb_persona", ""),
     }
 
     # Append to JSONL (machine log, never rewritten)

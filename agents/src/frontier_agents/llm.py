@@ -24,9 +24,9 @@ _DEFAULTS = {
     "WRITER_MODEL":   "anthropic/claude-opus-4.7",
     "MVB_MODEL":      "anthropic/claude-opus-4.7",
     "REVIEWER_MODEL": "google/gemini-3.1-pro-preview",
-    "CRITIC_MODEL":   "google/gemini-2.0-flash-lite-001",
-    "RESEARCH_MODEL": "google/gemini-3.5-flash",
-    "FALLBACK_MODEL": "anthropic/claude-sonnet-4.6",
+    "CRITIC_MODEL":   "google/gemini-3.1-flash-lite",  # non-reasoning, latest cheap+good
+    "RESEARCH_MODEL": "google/gemini-3.1-flash-lite",  # 3.1 > 2.0 for synthesis
+    "FALLBACK_MODEL": "google/gemini-3.1-flash-lite",
 }
 
 
