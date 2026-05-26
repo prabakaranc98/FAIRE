@@ -53,7 +53,7 @@ import uvicorn
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
 from fastapi import FastAPI, BackgroundTasks
-from fastapi.responses import PlainTextResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse
 
 load_dotenv(Path(__file__).parent / ".env")
 
@@ -326,6 +326,302 @@ def get_metrics():
         return json.loads(metrics_path.read_text(encoding="utf-8"))
     except Exception as e:
         return {"error": str(e)}
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+def get_dashboard():
+    """Live HTML metrics dashboard — auto-refreshes every 20s."""
+    metrics_path = RUNS_DIR / "metrics.json"
+    runs_path = RUNS_DIR / "runs.jsonl"
+
+    m: dict = {}
+    if metrics_path.exists():
+        try:
+            m = json.loads(metrics_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    recent_runs: list[dict] = []
+    if runs_path.exists():
+        try:
+            lines = runs_path.read_text(encoding="utf-8").splitlines()
+            for line in reversed(lines[-30:]):
+                if line.strip():
+                    recent_runs.append(json.loads(line))
+            recent_runs = list(reversed(recent_runs))
+        except Exception:
+            pass
+
+    # ── helpers ────────────────────────────────────────────────────────────────
+    def pct_bar(pct: float, width: int = 120) -> str:
+        fill = int(pct * width)
+        color = "#22c55e" if pct >= 0.8 else "#f59e0b" if pct >= 0.4 else "#ef4444"
+        return (
+            f'<div style="background:#1e293b;border-radius:4px;height:8px;width:{width}px;display:inline-block;vertical-align:middle">'
+            f'<div style="background:{color};border-radius:4px;height:8px;width:{fill}px"></div></div>'
+        )
+
+    def conf_color(c: float) -> str:
+        return "#22c55e" if c >= 0.8 else "#f59e0b" if c >= 0.6 else "#ef4444"
+
+    def status_badge(status: str) -> str:
+        colors = {"approved": "#22c55e", "flagged": "#f59e0b", "error": "#ef4444", "skipped": "#64748b"}
+        c = colors.get(status, "#94a3b8")
+        return f'<span style="background:{c};color:#fff;padding:1px 7px;border-radius:10px;font-size:11px">{status}</span>'
+
+    # ── track rows ─────────────────────────────────────────────────────────────
+    track_rows = ""
+    track_metrics = m.get("track_metrics", {})
+    for track, t in sorted(track_metrics.items(), key=lambda x: -x[1].get("coverage_pct", 0)):
+        cov = t.get("coverage_pct", 0)
+        conf = t.get("avg_confidence", 0)
+        gen = t.get("generated", 0)
+        total = t.get("total_pages", 0)
+        appr = t.get("approved", 0)
+        flagged = t.get("flagged", 0)
+        short = track.split("-", 1)[1].replace("-", " ").title() if "-" in track else track
+        track_rows += f"""
+        <tr>
+          <td style="padding:6px 10px;color:#94a3b8;font-size:12px">{track}</td>
+          <td style="padding:6px 10px;color:#e2e8f0">{short}</td>
+          <td style="padding:6px 10px;text-align:center;color:{conf_color(cov)};font-weight:600">{cov*100:.0f}%</td>
+          <td style="padding:6px 10px">{pct_bar(cov, 100)}</td>
+          <td style="padding:6px 10px;text-align:center;color:#e2e8f0">{gen}/{total}</td>
+          <td style="padding:6px 10px;text-align:center;color:#22c55e">{appr}</td>
+          <td style="padding:6px 10px;text-align:center;color:#f59e0b">{flagged}</td>
+          <td style="padding:6px 10px;text-align:center;color:{conf_color(conf)}">{conf:.2f}</td>
+        </tr>"""
+
+    # ── recent runs rows ────────────────────────────────────────────────────────
+    run_rows = ""
+    for r in recent_runs[:20]:
+        topic = r.get("topic", "")
+        track = r.get("track", "").split("-", 1)[-1].replace("-", " ")
+        conf = r.get("confidence", 0)
+        status = r.get("status", "")
+        revisions = r.get("revision_count", 0)
+        committed = "✓" if r.get("committed") else "—"
+        ts = r.get("finished_at", "")[:16].replace("T", " ")
+        issues = r.get("review_issues") or []
+        issues_str = "; ".join(issues[:2]) if issues else "—"
+        run_rows += f"""
+        <tr>
+          <td style="padding:5px 10px;color:#94a3b8;font-size:11px">{ts}</td>
+          <td style="padding:5px 10px;color:#e2e8f0;font-weight:500">{topic}</td>
+          <td style="padding:5px 10px;color:#94a3b8;font-size:11px">{track}</td>
+          <td style="padding:5px 10px">{status_badge(status)}</td>
+          <td style="padding:5px 10px;text-align:center;color:{conf_color(conf)};font-weight:600">{conf:.2f}</td>
+          <td style="padding:5px 10px;text-align:center;color:#94a3b8">{revisions}</td>
+          <td style="padding:5px 10px;text-align:center;color:#22c55e">{committed}</td>
+          <td style="padding:5px 10px;color:#64748b;font-size:11px;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="{issues_str}">{issues_str}</td>
+        </tr>"""
+
+    # ── budget ─────────────────────────────────────────────────────────────────
+    budget = m.get("budget", {})
+    usage = budget.get("usage_usd", 0)
+    limit = budget.get("limit_usd")
+    remaining = budget.get("remaining_usd")
+    bmode = budget.get("mode", "full")
+    bmode_color = {"full": "#22c55e", "reduced": "#f59e0b", "paused": "#ef4444"}.get(bmode, "#94a3b8")
+    budget_bar = ""
+    if limit and limit > 0:
+        used_pct = min(usage / limit, 1.0)
+        budget_bar = f"""
+        <div style="margin-top:6px">
+          <div style="background:#1e293b;border-radius:4px;height:10px;width:200px;display:inline-block">
+            <div style="background:#f59e0b;border-radius:4px;height:10px;width:{int(used_pct*200)}px"></div>
+          </div>
+          <span style="color:#94a3b8;font-size:11px;margin-left:8px">${usage:.2f} / ${limit:.2f}</span>
+        </div>"""
+
+    # ── error signals ──────────────────────────────────────────────────────────
+    signals = m.get("error_signals", {})
+
+    def signal_bar(val: float, label: str, max_val: float = 1.0) -> str:
+        pct = min(val / max_val, 1.0) if max_val > 0 else 0
+        color = "#22c55e" if pct < 0.2 else "#f59e0b" if pct < 0.6 else "#ef4444"
+        return f"""
+        <div style="display:flex;align-items:center;gap:10px;margin:4px 0">
+          <span style="color:#94a3b8;font-size:12px;width:140px">{label}</span>
+          <div style="background:#1e293b;border-radius:4px;height:7px;width:150px">
+            <div style="background:{color};border-radius:4px;height:7px;width:{int(pct*150)}px"></div>
+          </div>
+          <span style="color:{color};font-size:12px;font-weight:600">{val:.2f}</span>
+        </div>"""
+
+    # ── quality trend ──────────────────────────────────────────────────────────
+    qt = m.get("quality_trend", {})
+
+    # ── total stats ────────────────────────────────────────────────────────────
+    total = m.get("total_pages", 0)
+    generated = m.get("generated_pages", 0)
+    approved = m.get("approved_pages", 0)
+    stubs = m.get("stub_pages", 0)
+    avg_conf = m.get("avg_confidence", 0)
+    cov_pct = m.get("coverage_pct", 0)
+    obs_at = m.get("observed_at", "—")
+
+    # sprint queue size
+    sprint_pending = 0
+    sprint_path = Path(__file__).parent / "sprints" / "current.md"
+    if sprint_path.exists():
+        sprint_pending = sprint_path.read_text().count("- [ ]")
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIRE Wiki — Dashboard</title>
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    body {{ background: #0f172a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace; font-size: 13px; }}
+    h2 {{ font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; margin-bottom: 12px; }}
+    .card {{ background: #1e293b; border-radius: 8px; padding: 18px 20px; }}
+    table {{ width: 100%; border-collapse: collapse; }}
+    tr:hover td {{ background: rgba(255,255,255,0.03); }}
+    th {{ color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; padding: 6px 10px; text-align: left; border-bottom: 1px solid #1e293b; }}
+    .stat {{ text-align: center; }}
+    .stat .n {{ font-size: 28px; font-weight: 700; color: #f8fafc; }}
+    .stat .l {{ font-size: 11px; color: #64748b; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }}
+    .dot {{ width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 5px; }}
+    .refreshing {{ animation: pulse 1.5s infinite; }}
+    @keyframes pulse {{ 0%,100% {{ opacity:1 }} 50% {{ opacity:0.4 }} }}
+  </style>
+</head>
+<body>
+<div style="max-width:1100px;margin:0 auto;padding:24px 20px">
+
+  <!-- Header -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <div>
+      <div style="font-size:20px;font-weight:700;color:#f8fafc">FAIRE Wiki</div>
+      <div style="color:#475569;font-size:12px;margin-top:2px">Autonomous generation dashboard</div>
+    </div>
+    <div style="text-align:right">
+      <div style="color:#475569;font-size:11px">observed {obs_at}</div>
+      <div style="color:#475569;font-size:11px;margin-top:3px" id="countdown">auto-refresh in 20s</div>
+    </div>
+  </div>
+
+  <!-- Top stats -->
+  <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px">
+    <div class="card stat">
+      <div class="n" style="color:#60a5fa">{cov_pct*100:.1f}%</div>
+      <div class="l">Coverage</div>
+    </div>
+    <div class="card stat">
+      <div class="n">{generated}</div>
+      <div class="l">Generated</div>
+    </div>
+    <div class="card stat">
+      <div class="n" style="color:#22c55e">{approved}</div>
+      <div class="l">Approved</div>
+    </div>
+    <div class="card stat">
+      <div class="n" style="color:#f59e0b">{stubs}</div>
+      <div class="l">Stubs left</div>
+    </div>
+    <div class="card stat">
+      <div class="n" style="color:{conf_color(avg_conf)}">{avg_conf:.2f}</div>
+      <div class="l">Avg conf</div>
+    </div>
+    <div class="card stat">
+      <div class="n" style="color:{bmode_color}">{sprint_pending}</div>
+      <div class="l">In queue</div>
+    </div>
+  </div>
+
+  <!-- Budget + error signals -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+    <div class="card">
+      <h2>Budget</h2>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <span class="dot" style="background:{bmode_color}"></span>
+        <span style="color:{bmode_color};font-weight:600;font-size:14px">{bmode.upper()}</span>
+        <span style="color:#475569">mode</span>
+      </div>
+      <div style="color:#e2e8f0;font-size:14px">${usage:.3f} used
+        {"/ $"+str(limit) if limit else " (no limit set)"}
+      </div>
+      {budget_bar}
+      <div style="color:#475569;font-size:11px;margin-top:8px">
+        WRITER: ~anthropic/claude-sonnet-latest · REVIEWER: gemini-3.1-pro
+      </div>
+    </div>
+    <div class="card">
+      <h2>Error signals</h2>
+      {signal_bar(signals.get("coverage_deficit", 0), "Coverage deficit")}
+      {signal_bar(signals.get("quality_deficit", 0), "Quality deficit")}
+      {signal_bar(min(signals.get("flagged_pages", 0), 10), "Flagged pages", 10)}
+      {signal_bar(signals.get("budget_pressure", 0), "Budget pressure")}
+    </div>
+  </div>
+
+  <!-- Quality trend -->
+  <div class="card" style="margin-bottom:20px">
+    <h2>Quality trend (last {qt.get("window_size", 10)} runs)</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
+      <div>
+        <div style="font-size:22px;font-weight:700;color:{conf_color(qt.get('avg_confidence',0))}">{qt.get('avg_confidence',0):.2f}</div>
+        <div style="color:#475569;font-size:11px">avg confidence</div>
+      </div>
+      <div>
+        <div style="font-size:22px;font-weight:700;color:{conf_color(qt.get('approval_rate',0))}">{qt.get('approval_rate',0)*100:.0f}%</div>
+        <div style="color:#475569;font-size:11px">approval rate</div>
+      </div>
+      <div>
+        <div style="font-size:22px;font-weight:700;color:#94a3b8">{qt.get('avg_revisions',0):.1f}</div>
+        <div style="color:#475569;font-size:11px">avg revisions</div>
+      </div>
+      <div>
+        <div style="font-size:22px;font-weight:700;color:{'#22c55e' if qt.get('confidence_delta',0)>=0 else '#ef4444'}">
+          {'↑' if qt.get('confidence_delta',0)>=0 else '↓'}{abs(qt.get('confidence_delta',0)):.2f}
+        </div>
+        <div style="color:#475569;font-size:11px">conf delta</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Track coverage table -->
+  <div class="card" style="margin-bottom:20px">
+    <h2>Per-track coverage</h2>
+    <table>
+      <thead><tr>
+        <th>Track</th><th>Name</th><th>Coverage</th><th></th>
+        <th>Gen/Total</th><th>Approved</th><th>Flagged</th><th>Avg Conf</th>
+      </tr></thead>
+      <tbody>{track_rows}</tbody>
+    </table>
+  </div>
+
+  <!-- Recent runs table -->
+  <div class="card">
+    <h2>Recent runs (last 20)</h2>
+    <table>
+      <thead><tr>
+        <th>Time</th><th>Topic</th><th>Track</th><th>Status</th>
+        <th>Conf</th><th>Rev</th><th>Committed</th><th>Issues</th>
+      </tr></thead>
+      <tbody>{run_rows if run_rows else '<tr><td colspan="8" style="text-align:center;color:#475569;padding:20px">No runs yet — cycle is starting</td></tr>'}</tbody>
+    </table>
+  </div>
+
+</div>
+
+<script>
+  // Live countdown + auto-refresh
+  let secs = 20;
+  const el = document.getElementById('countdown');
+  setInterval(() => {{
+    secs--;
+    if (secs <= 0) {{ location.reload(); }}
+    el.textContent = `auto-refresh in ${{secs}}s`;
+  }}, 1000);
+</script>
+</body>
+</html>"""
+    return HTMLResponse(html)
 
 
 @app.get("/observer", response_class=PlainTextResponse)

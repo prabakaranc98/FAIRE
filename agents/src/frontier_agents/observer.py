@@ -332,6 +332,17 @@ def check_budget() -> BudgetState:
     remaining = data.get("limit_remaining")
     is_free = bool(data.get("is_free_tier", False))
 
+    # Allow a local soft cap via BUDGET_LIMIT_USD even when OpenRouter has no hard limit.
+    # This lets users set a $10 cap without needing an OpenRouter account-level limit.
+    local_limit = os.getenv("BUDGET_LIMIT_USD")
+    if local_limit and remaining is None:
+        try:
+            cap = float(local_limit)
+            remaining = max(0.0, cap - usage)
+            limit = cap
+        except ValueError:
+            pass
+
     # Determine operating mode based on remaining budget
     if remaining is None:
         mode = "full"  # no limit set (pay-as-you-go)
