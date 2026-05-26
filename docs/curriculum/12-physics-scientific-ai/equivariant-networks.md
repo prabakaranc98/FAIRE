@@ -37,9 +37,9 @@ AlphaFold 2's structure module is E(3)-equivariant. MACE, NequIP, and Allegro ar
 MACE (Batatia et al., 2022) is the current best equivariant force field, used in AlphaFold 3's molecular dynamics. Equiformer v2 extends equivariance to attention-based architectures for materials and catalysis (Open Catalyst Project). RFDiffusion uses SE(3) equivariance for protein design.
 
 ## Connected topics
-- [[equivariant-gnn]] — GNNs with E(3) equivariance for molecules and materials
-- [[protein-structure]] — AlphaFold uses equivariance in its structure module
-- [[molecular-simulation]] — equivariant force fields for MD simulation
+- [Equivariant Graph Neural Networks](../13-graph-relational-ai/equivariant-gnn.md) — GNNs with E(3) equivariance for molecules and materials
+- [Protein Structure Prediction](../14-biology-life-sciences/protein-structure.md) — AlphaFold uses equivariance in its structure module
+- Molecular Simulation — equivariant force fields for MD simulation
 
 ## Further reading
 - [A Hitchhiker's Guide to Geometric GNNs for 3D Atomic Systems](https://arxiv.org/abs/2312.07511) — Duval et al. 2023

@@ -28,10 +28,14 @@ VAEs provide the latent space backbone for latent diffusion models (Stable Diffu
 
 ## Mathematical foundations
 ELBO objective:
-$$\mathcal{L}(\theta, \phi) = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - \text{KL}(q_\phi(z|x) \| p(z))$$
+\[
+\mathcal{L}(\theta, \phi) = \mathbb{E}_{q_\phi(z|x)}[\log p_\theta(x|z)] - \text{KL}(q_\phi(z|x) \| p(z))
+\]
 
 Reparameterization:
-$$z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)$$
+\[
+z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -50,9 +54,9 @@ $$z = \mu_\phi(x) + \sigma_\phi(x) \odot \epsilon, \quad \epsilon \sim \mathcal{
 VAEs are now primarily used as compression backbones rather than standalone generative models. Latent diffusion models (Stable Diffusion 3, FLUX) use VQ-VAE or continuous VAE to encode images into 4-16× compressed latents before applying diffusion. The VAE itself is often pretrained and frozen.
 
 ## Connected topics
-- [[diffusion-models]] — latent diffusion uses VAE as encoder
-- [[variational-inference]] — ELBO is the central tool
-- [[normalizing-flows]] — alternative to VAE's approximate posterior
+- [Diffusion Models](./diffusion-models.md) — latent diffusion uses VAE as encoder
+- [Variational Inference](../05-statistical-probabilistic-ml/variational-inference.md) — ELBO is the central tool
+- Normalizing Flows — alternative to VAE's approximate posterior
 
 ## Further reading
 - [Tutorial on Variational Autoencoders](https://arxiv.org/abs/1606.05908) — Doersch 2016; clear pedagogical treatment

@@ -30,9 +30,9 @@ MPNN (Gilmer et al., 2017) frames GNNs as a two-phase process per layer: (1) mes
 | [Semi-supervised Classification with Graph Convolutional Networks](https://arxiv.org/abs/1609.02907) | 2016 | Kipf & Welling | GCN — the simplest practical GNN |
 
 ## Connected topics
-- [[equivariant-gnn]] — MPNN + physical symmetry constraints
-- [[gnn-expressivity]] — what functions can message passing compute?
-- [[molecular-property]] — MPNNs applied to molecular graphs
+- [Equivariant Graph Neural Networks](./equivariant-gnn.md) — MPNN + physical symmetry constraints
+- [Expressive Power of GNNs](./gnn-expressivity.md) — what functions can message passing compute?
+- Molecular Property — MPNNs applied to molecular graphs
 
 ## Further reading
 - [A Gentle Introduction to Graph Neural Networks](https://distill.pub/2021/gnn-intro/) — Sanchez-Lengeling et al.; distill.pub

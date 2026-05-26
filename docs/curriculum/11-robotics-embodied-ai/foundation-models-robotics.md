@@ -42,9 +42,9 @@ VLAs are the current frontier paradigm for generalist robots. They leverage the 
 π0 and OpenVLA-OFT represent the current open frontier. NVIDIA GR00T N1 (2025) is the first humanoid-specific foundation model. V-JEPA 2 (Meta, 2025) enables zero-shot robot planning via world model predictions without action labels. RL fine-tuning of VLAs (GRPO-style) is emerging as a post-training step.
 
 ## Connected topics
-- [[vision-language-models]] — the VLM backbone of VLAs
-- [[imitation-learning]] — VLAs are trained on large imitation learning datasets
-- [[world-models-robotics]] — planning using learned dynamics models
+- [Vision-Language Models](../07-attention-memory-reasoning/vision-language-models.md) — the VLM backbone of VLAs
+- [Imitation Learning](./imitation-learning.md) — VLAs are trained on large imitation learning datasets
+- World Models Robotics — planning using learned dynamics models
 
 ## Further reading
 - [Open X-Embodiment: Robotic Learning Datasets and RT-X Models](https://arxiv.org/abs/2310.08864) — Open X-Embodiment Collaboration 2023

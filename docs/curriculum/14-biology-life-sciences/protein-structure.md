@@ -43,9 +43,9 @@ AlphaFold 2 is the landmark demonstration that deep learning can solve fundament
 AlphaFold 3 handles protein-ligand, protein-DNA, protein-RNA complexes with a diffusion head. Boltz-1/2 (MIT, 2024/25) are open-source AF3-class models. RoseTTAFold All-Atom (Baker lab) is another open-source alternative. The frontier is moving to protein dynamics (MD-level simulation) and conditional protein design.
 
 ## Connected topics
-- [[protein-lm]] — protein language models as feature extractors
-- [[equivariant-gnn]] — AF2's structure module is E(3)-equivariant
-- [[protein-design]] — generating novel proteins with desired properties
+- [Protein Language Models](./protein-lm.md) — protein language models as feature extractors
+- [Equivariant Graph Neural Networks](../13-graph-relational-ai/equivariant-gnn.md) — AF2's structure module is E(3)-equivariant
+- Protein Design — generating novel proteins with desired properties
 
 ## Further reading
 - [A structural biology community assessment of AlphaFold2 applications](https://www.nature.com/articles/s41594-022-00849-w) — 2022

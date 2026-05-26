@@ -31,9 +31,9 @@ updated: 2026-05-25
 ESM-3 (Hayes et al., 2024) is a 98B multimodal protein model conditioning on sequence, structure, and function simultaneously. It can generate novel proteins and has demonstrated "reasoning" about protein biology. ProteinMPNN remains SotA for inverse folding.
 
 ## Connected topics
-- [[protein-structure]] — PLMs provide features for structure prediction
-- [[protein-design]] — PLMs enable sequence generation for desired properties
-- [[single-cell]] — similar SSL pretraining paradigm for cell state representations
+- [Protein Structure Prediction](./protein-structure.md) — PLMs provide features for structure prediction
+- Protein Design — PLMs enable sequence generation for desired properties
+- [Single-Cell Omics & Foundation Models](./single-cell.md) — similar SSL pretraining paradigm for cell state representations
 
 ## Further reading
 - [Protein language models](https://www.nature.com/articles/s41587-024-02229-x) — Xu et al. 2024; review in Nature Biotechnology

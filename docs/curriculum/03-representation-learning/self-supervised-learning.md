@@ -43,10 +43,10 @@ SSL is the dominant pretraining paradigm for language (GPT, BERT), vision (MAE, 
 SSL at scale remains the core pretraining strategy. DINOv2 and MAE dominate vision. For language, GPT-style causal LM pretraining is dominant. Joint-embedding predictive architectures (I-JEPA, V-JEPA) are the current Lecun-group frontier for learning world representations without reconstruction.
 
 ## Connected topics
-- [[contrastive-learning]] — one SSL objective class
-- [[masked-autoencoders]] — generative SSL; MAE
-- [[jepa]] — predictive SSL without pixel reconstruction
-- [[lm-pretraining]] — SSL applied to language sequences
+- [Contrastive Learning](./contrastive-learning.md) — one SSL objective class
+- Masked Autoencoders — generative SSL; MAE
+- [Joint Embedding Predictive Architectures (JEPA)](./jepa.md) — predictive SSL without pixel reconstruction
+- Lm Pretraining — SSL applied to language sequences
 
 ## Further reading
 - [Self-Supervised Learning: Generative or Contrastive](https://arxiv.org/abs/2006.08218) — Liu et al. 2021; survey

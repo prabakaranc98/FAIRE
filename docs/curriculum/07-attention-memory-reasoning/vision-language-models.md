@@ -42,10 +42,10 @@ CLIP is the most widely deployed vision encoder in AI systems. VLMs (LLaVA, GPT-
 GPT-4o, Gemini Ultra, and Claude 3 Opus represent the frontier for multimodal understanding. For open models, InternVL 2.5 and LLaVA-OneVision achieve near-proprietary performance. SigLIP (Google, 2023) is the current best open vision encoder. DFN-CLIP scales contrastive pretraining with data filtering.
 
 ## Connected topics
-- [[contrastive-learning]] — CLIP's training objective
-- [[transformer]] — vision encoder + LLM both transformer-based
-- [[multimodal-reasoning]] — downstream reasoning capabilities
-- [[foundation-models-robotics]] — VLMs as the perception backbone in VLAs
+- [Contrastive Learning](../03-representation-learning/contrastive-learning.md) — CLIP's training objective
+- [Transformer Architecture](./transformer.md) — vision encoder + LLM both transformer-based
+- Multimodal Reasoning — downstream reasoning capabilities
+- [Foundation Models for Robotics](../11-robotics-embodied-ai/foundation-models-robotics.md) — VLMs as the perception backbone in VLAs
 
 ## Further reading
 - [An Introduction to Vision-Language Modeling](https://arxiv.org/abs/2405.17247) — Bordes et al. 2024

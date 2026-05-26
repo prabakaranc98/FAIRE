@@ -27,7 +27,9 @@ FNO achieves 1000× speedup over classical finite-element solvers on Navier-Stok
 
 ## Mathematical foundations
 FNO layer (simplified):
-$$u_{l+1}(x) = \sigma\left(W u_l(x) + \mathcal{F}^{-1}\left[R_\phi \cdot \mathcal{F}[u_l]\right](x)\right)$$
+\[
+u_{l+1}(x) = \sigma\left(W u_l(x) + \mathcal{F}^{-1}\left[R_\phi \cdot \mathcal{F}[u_l]\right](x)\right)
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -40,9 +42,9 @@ $$u_{l+1}(x) = \sigma\left(W u_l(x) + \mathcal{F}^{-1}\left[R_\phi \cdot \mathca
 Geometry-Informed Neural Operator (GINO, 2023) handles irregular geometries. UNO (U-Net-style) improves resolution handling. Aurora (Microsoft, 2024) and NeuralGCM apply operator learning to global weather prediction. The frontier: unifying neural operators with equivariant architectures for physics with symmetries.
 
 ## Connected topics
-- [[pinn]] — PINNs enforce physics as constraints; FNO learns solution operators
-- [[equivariant-networks]] — combining equivariance with operator learning
-- [[molecular-simulation]] — neural operators as fast force fields
+- [Physics-Informed Neural Networks (PINNs)](./pinn.md) — PINNs enforce physics as constraints; FNO learns solution operators
+- [Equivariant Neural Networks](./equivariant-networks.md) — combining equivariance with operator learning
+- Molecular Simulation — neural operators as fast force fields
 
 ## Further reading
 - [Neural Operator: Graph Kernel Network for PDEs](https://arxiv.org/abs/2003.03485) — Li et al. 2020

@@ -44,9 +44,9 @@ Optimization choices directly determine whether large models train stably, how f
 AdamW remains the standard for transformer pretraining. Lion (symbolic optimizer, Chen et al. 2023) is more memory-efficient. Muon (Kosson et al. 2024) and Shampoo (second-order) are competitive for small-to-medium runs. For very large models, the muP (maximal update parametrization) regime changes hyperparameter scaling.
 
 ## Connected topics
-- [[backpropagation]] — gradients that optimization acts on
-- [[scaling-laws]] — learning rate schedule design interacts with scaling
-- [[normalization]] — LayerNorm stabilizes the loss landscape
+- [Backpropagation](./backpropagation.md) — gradients that optimization acts on
+- [Scaling Laws](./scaling-laws.md) — learning rate schedule design interacts with scaling
+- Normalization — LayerNorm stabilizes the loss landscape
 
 ## Further reading
 - [An overview of gradient descent optimization algorithms](https://arxiv.org/abs/1609.04747) — Ruder 2016

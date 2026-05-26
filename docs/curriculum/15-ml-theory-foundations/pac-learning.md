@@ -25,7 +25,9 @@ PAC learning formalizes the question: how many examples do I need to learn a con
 
 ## Mathematical foundations
 PAC sample complexity bound:
-$$m \geq \frac{1}{\epsilon}\left(\text{VC}(H)\ln\frac{1}{\epsilon} + \ln\frac{1}{\delta}\right)$$
+\[
+m \geq \frac{1}{\epsilon}\left(\text{VC}(H)\ln\frac{1}{\epsilon} + \ln\frac{1}{\delta}\right)
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -37,9 +39,9 @@ $$m \geq \frac{1}{\epsilon}\left(\text{VC}(H)\ln\frac{1}{\epsilon} + \ln\frac{1}
 Classical PAC theory doesn't directly explain deep learning (VC dimension of networks is enormous, yet they generalize). Modern extensions include algorithmic stability, PAC-Bayes, and the Decision-Estimation Coefficient (Foster et al. 2021) for interactive learning. Double descent has partially reconciled theory with practice.
 
 ## Connected topics
-- [[vc-dimension]] — the primary complexity measure in PAC theory
-- [[rademacher-complexity]] — data-dependent generalization bounds
-- [[double-descent]] — modern empirical phenomenon that challenges PAC predictions
+- Vc Dimension — the primary complexity measure in PAC theory
+- Rademacher Complexity — data-dependent generalization bounds
+- [Double Descent](./double-descent.md) — modern empirical phenomenon that challenges PAC predictions
 
 ## Further reading
 - [Understanding Machine Learning](https://www.cs.huji.ac.il/~shais/UnderstandingMachineLearning/) — Shalev-Shwartz & Ben-David; free online

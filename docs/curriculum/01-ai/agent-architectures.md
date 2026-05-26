@@ -41,9 +41,9 @@ Modern LLM agents (tool-using, multi-step reasoning, RAG systems) are direct des
 [stub]
 
 ## Connected topics
-- [[tool-use]] — agent scaffolds in LLMs
-- [[multi-agent-systems]] — coordination between agents
-- [[search-algorithms]] — the reasoning engine inside goal-based agents
+- Tool Use — agent scaffolds in LLMs
+- Multi Agent Systems — coordination between agents
+- [Search Algorithms](./search-algorithms.md) — the reasoning engine inside goal-based agents
 
 ## Further reading
 [stub]

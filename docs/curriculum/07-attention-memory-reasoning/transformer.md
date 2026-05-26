@@ -17,7 +17,7 @@ has_mvb: true
 
 | I am... | Start here | Goal |
 |---|---|---|
-| MS/applied practitioner | [Key algorithms](#key-algorithms--techniques) → [MVB](#minimum-valuable-build) | Build and fine-tune a transformer |
+| MS/applied practitioner | [Key algorithms](#key-algorithms-techniques) → [MVB](#minimum-valuable-build) | Build and fine-tune a transformer |
 | Curious generalist | [What it is](#what-it-is) → [Why it matters](#why-it-matters-at-the-frontier) | Understand why transformers beat RNNs |
 | Math/theory student | [Core concepts](#core-concepts) → [Mathematical foundations](#mathematical-foundations) | Derive multi-head attention and understand the residual stream |
 | Researcher / frontier | [Current SotA](#current-sota) → [What's happening now](#whats-happening-now) | Know where transformers are being challenged |
@@ -53,17 +53,27 @@ Why did it win? Two reasons: (1) self-attention parallelizes over sequence lengt
 ## Mathematical foundations
 
 Scaled dot-product attention:
-$$\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V$$
+\[
+\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\]
 
 where Q, K ∈ ℝ^{N×d_k}, V ∈ ℝ^{N×d_v}, N is sequence length, d_k is key dimension.
 
 Multi-head attention (h heads, each of dimension d_k = d_model / h):
-$$\text{head}_i = \text{Attention}(QW_i^Q,\; KW_i^K,\; VW_i^V)$$
-$$\text{MHA}(Q,K,V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\, W^O$$
+\[
+\text{head}_i = \text{Attention}(QW_i^Q,\; KW_i^K,\; VW_i^V)
+\]
+\[
+\text{MHA}(Q,K,V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\, W^O
+\]
 
 Full transformer block (pre-norm variant, used in GPT-2 and beyond):
-$$x \leftarrow x + \text{MHA}(\text{LayerNorm}(x))$$
-$$x \leftarrow x + \text{FFN}(\text{LayerNorm}(x))$$
+\[
+x \leftarrow x + \text{MHA}(\text{LayerNorm}(x))
+\]
+\[
+x \leftarrow x + \text{FFN}(\text{LayerNorm}(x))
+\]
 
 **Complexity:** Self-attention is O(N²·d) in time and O(N²) in memory — the quadratic bottleneck that FlashAttention and SSMs address.
 
@@ -115,7 +125,7 @@ All frontier LLMs are decoder-only transformers with: pre-norm, RoPE, SwiGLU act
 - **OpenAI (GPT-4, ChatGPT):** Decoder-only transformer at scale; speculative decoding + continuous batching for serving. [openai.com/research/gpt-4](https://openai.com/research/gpt-4)
 - **Google DeepMind (Gemini):** Multi-modal transformer handling text, image, audio, video natively; Flash attention variants for long context. [arxiv.org/abs/2312.11805](https://arxiv.org/abs/2312.11805)
 - **Meta AI (Llama 3):** 70B-405B open-weight decoder-only transformer; GQA, RoPE, SwiGLU; the reference open model. [arxiv.org/abs/2407.21783](https://arxiv.org/abs/2407.21783)
-- **DeepSeek (V3):** 671B MoE transformer with MLA and multi-token prediction; trained for $6M vs. GPT-4's ~$100M. [arxiv.org/abs/2412.19437](https://arxiv.org/abs/2412.19437)
+- **DeepSeek (V3):** 671B MoE transformer with MLA and multi-token prediction; trained for \(6M vs. GPT-4's ~\)100M. [arxiv.org/abs/2412.19437](https://arxiv.org/abs/2412.19437)
 - **NVIDIA (NeMo framework):** Tensor parallelism + pipeline parallelism + FlashAttention for training 70B+ transformers on H100 clusters. [developer.nvidia.com/nemo](https://developer.nvidia.com/nemo)
 
 ## Minimum Valuable Build
@@ -162,21 +172,21 @@ All frontier LLMs are decoder-only transformers with: pre-norm, RoPE, SwiGLU act
 You built a transformer and understand attention. The natural next question is: how do you take this architecture and turn it into a model that actually follows instructions? That requires alignment — and that's RLHF.
 
 **Go deeper on this concept:**
-→ [[flash-attention]] — the single optimization that makes transformers viable at scale; implement it and see the memory/throughput difference directly
+→ Flash Attention — the single optimization that makes transformers viable at scale; implement it and see the memory/throughput difference directly
 
 **Build a system with this:**
-→ [[rlhf]] — take your fine-tuned GPT-2 and run DPO on a preference dataset; that's the arc from "model that predicts tokens" to "model that follows instructions"
+→ [Reinforcement Learning from Human Feedback (RLHF)](../06-reinforcement-learning/rlhf.md) — take your fine-tuned GPT-2 and run DPO on a preference dataset; that's the arc from "model that predicts tokens" to "model that follows instructions"
 
 **The arc this page belongs to:**
 → [MLP → Transformer arc](../../arcs/mlp-to-transformer/index.md) — the transformer is the arc's culmination; the Language Models arc picks up here
 
 ## Connected topics
 
-- [[self-attention]] — the core mechanism inside the transformer
-- [[state-space-models]] — Mamba; O(N) alternative to O(N²) attention
-- [[flash-attention]] — IO-aware computation of attention; the reason transformers scale
-- [[lm-pretraining]] — how transformers are trained on tokens at scale
-- [[rotary-position-embedding]] — RoPE; the default positional encoding in modern LLMs
+- Self Attention — the core mechanism inside the transformer
+- [State Space Models](./state-space-models.md) — Mamba; O(N) alternative to O(N²) attention
+- Flash Attention — IO-aware computation of attention; the reason transformers scale
+- Lm Pretraining — how transformers are trained on tokens at scale
+- Rotary Position Embedding — RoPE; the default positional encoding in modern LLMs
 
 ## Further reading
 

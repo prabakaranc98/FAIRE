@@ -31,9 +31,9 @@ updated: 2026-05-25
 scGPT and scFoundation represent the current SotA for multi-task single-cell analysis. Geneformer (Theodoris et al., Nature 2023) showed in silico perturbation for drug target discovery. The frontier: perturbation foundation models (CellOT, GEARS) and spatial transcriptomics models integrating spatial context.
 
 ## Connected topics
-- [[protein-lm]] — analogous SSL pretraining paradigm for biological sequences
-- [[causal-discovery]] — inferring gene regulatory networks from perturbation data
-- [[molecular-generation]] — generating drug molecules that affect specific cell states
+- [Protein Language Models](./protein-lm.md) — analogous SSL pretraining paradigm for biological sequences
+- Causal Discovery — inferring gene regulatory networks from perturbation data
+- Molecular Generation — generating drug molecules that affect specific cell states
 
 ## Further reading
 - [Best practices for single-cell analysis across modalities](https://www.nature.com/articles/s41576-023-00586-w) — Heumos et al. 2023

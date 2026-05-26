@@ -28,6 +28,6 @@ updated: 2026-05-25
 | Reinforcement Learning: An Introduction (Ch. 3–4) | 2018 | Sutton & Barto | The textbook; available at [incompleteideas.net](http://incompleteideas.net/book/the-book.html) |
 
 ## Connected topics
-- [[td-learning]] — learning V and Q from experience
-- [[ppo]] — policy gradient methods optimize in the MDP framework
-- [[model-based-rl]] — learning the transition function p(s'|s,a)
+- Td Learning — learning V and Q from experience
+- [Proximal Policy Optimization (PPO)](./ppo.md) — policy gradient methods optimize in the MDP framework
+- Model Based Rl — learning the transition function p(s'|s,a)

@@ -35,9 +35,9 @@ Counterfactual inference asks: given that we observed X=x and Y=y, what would Y 
 Counterfactual reasoning is a central challenge for AI interpretability: "what input would have changed this model's output?" Counterfactual explanations in ML use this framework. Causal representation learning aims to learn models where counterfactuals are well-defined.
 
 ## Connected topics
-- [[scm]] — counterfactuals are computed using structural equations
-- [[causal-discovery]] — discovering the graph that enables counterfactual queries
-- [[disentanglement]] — learning representations where counterfactuals are meaningful
+- [Structural Causal Models](./scm.md) — counterfactuals are computed using structural equations
+- Causal Discovery — discovering the graph that enables counterfactual queries
+- Disentanglement — learning representations where counterfactuals are meaningful
 
 ## Further reading
 - [Counterfactual Explanations Without Opening the Black Box](https://arxiv.org/abs/1711.00399) — Wachter et al. 2017

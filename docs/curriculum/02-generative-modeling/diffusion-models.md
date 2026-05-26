@@ -17,7 +17,7 @@ has_mvb: true
 
 | I am... | Start here | Goal |
 |---|---|---|
-| MS/applied practitioner | [Key algorithms](#key-algorithms--techniques) → [MVB](#minimum-valuable-build) | Fine-tune or run a diffusion model |
+| MS/applied practitioner | [Key algorithms](#key-algorithms-techniques) → [MVB](#minimum-valuable-build) | Fine-tune or run a diffusion model |
 | Curious generalist | [What it is](#what-it-is) → [Why it matters](#why-it-matters-at-the-frontier) | Understand why diffusion became dominant |
 | Math/theory student | [Core concepts](#core-concepts) → [Mathematical foundations](#mathematical-foundations) | Derive the ELBO and the ε-prediction objective |
 | Researcher / frontier | [Current SotA](#current-sota) → [What's happening now](#whats-happening-now) | Know where diffusion ends and flow matching begins |
@@ -52,15 +52,21 @@ The reason diffusion beat GANs is training stability: no adversarial game, no mo
 ## Mathematical foundations
 
 Forward process (closed-form marginal, the key identity):
-$$q(x_t | x_0) = \mathcal{N}\!\left(x_t;\, \sqrt{\bar{\alpha}_t}\, x_0,\; (1 - \bar{\alpha}_t)I\right)$$
+\[
+q(x_t | x_0) = \mathcal{N}\!\left(x_t;\, \sqrt{\bar{\alpha}_t}\, x_0,\; (1 - \bar{\alpha}_t)I\right)
+\]
 
-where $\bar{\alpha}_t = \prod_{s=1}^{t}(1 - \beta_s)$ and $\beta_t$ is the noise schedule.
+where \(\bar{\alpha}_t = \prod_{s=1}^{t}(1 - \beta_s)\) and \(\beta_t\) is the noise schedule.
 
 Training objective (simplified ε-prediction loss):
-$$\mathcal{L} = \mathbb{E}_{t \sim \mathcal{U}[1,T],\, x_0,\, \epsilon \sim \mathcal{N}(0,I)}\!\left[\|\epsilon - \epsilon_\theta(x_t, t)\|^2\right]$$
+\[
+\mathcal{L} = \mathbb{E}_{t \sim \mathcal{U}[1,T],\, x_0,\, \epsilon \sim \mathcal{N}(0,I)}\!\left[\|\epsilon - \epsilon_\theta(x_t, t)\|^2\right]
+\]
 
 Reverse process step (from ε-prediction to x_{t-1}):
-$$x_{t-1} = \frac{1}{\sqrt{\alpha_t}}\!\left(x_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon_\theta(x_t, t)\right) + \sigma_t z, \quad z \sim \mathcal{N}(0,I)$$
+\[
+x_{t-1} = \frac{1}{\sqrt{\alpha_t}}\!\left(x_t - \frac{1-\alpha_t}{\sqrt{1-\bar{\alpha}_t}}\epsilon_\theta(x_t, t)\right) + \sigma_t z, \quad z \sim \mathcal{N}(0,I)
+\]
 
 ## Key algorithms / techniques
 
@@ -160,21 +166,21 @@ A practical recipe: something real you can build with what's on this page.
 Having trained a diffusion model and understood ε-prediction, you now have the intuition to ask: why 1000 steps? The answer leads directly to flow matching — straighter paths, fewer steps, same quality. That's the natural next build.
 
 **Go deeper on this concept:**
-→ [[score-matching]] — the theoretical foundation behind ε-prediction; understanding score functions unlocks a unified view of all diffusion variants
+→ [Score Matching](./score-matching.md) — the theoretical foundation behind ε-prediction; understanding score functions unlocks a unified view of all diffusion variants
 
 **Build a system with this:**
-→ [[flow-matching]] — train a flow matching model on the same CIFAR-10 setup; observe the 4-8× inference speedup directly
+→ [Flow Matching](./flow-matching.md) — train a flow matching model on the same CIFAR-10 setup; observe the 4-8× inference speedup directly
 
 **The arc this page belongs to:**
 → [Generative Stack arc](../../arcs/generative-stack/index.md) — the full journey from VAEs to FLUX.1; diffusion is the arc's turning point
 
 ## Connected topics
 
-- [[flow-matching]] — the emerging alternative; simpler training, fewer inference steps
-- [[score-matching]] — theoretical foundation (Stein score, Langevin dynamics)
-- [[variational-autoencoders]] — latent diffusion uses a VAE encoder
-- [[consistency-models]] — single-step distillation of a trained diffusion model
-- [[diffusion-transformer]] — DiT backbone replacing UNet in modern systems
+- [Flow Matching](./flow-matching.md) — the emerging alternative; simpler training, fewer inference steps
+- [Score Matching](./score-matching.md) — theoretical foundation (Stein score, Langevin dynamics)
+- [Variational Autoencoders](./variational-autoencoders.md) — latent diffusion uses a VAE encoder
+- Consistency Models — single-step distillation of a trained diffusion model
+- Diffusion Transformer — DiT backbone replacing UNet in modern systems
 
 ## Further reading
 

@@ -40,8 +40,8 @@ Exclude any paper whose arXiv URL looks malformed or whose title seems dubious.
 ## Key equations
 ────────────────────────────────────────────
 3–5 equations that are central to understanding this topic. For each:
-  EQUATION: [LaTeX — use $$ ... $$ block format]
-  ANNOTATION: where $x$ is ..., $y$ is ... (annotate EVERY symbol)
+  EQUATION: [LaTeX — use \[ ... \] block format for display math]
+  ANNOTATION: where \(x\) is ..., \(y\) is ... (annotate EVERY symbol — use \(...\) for inline math)
   ROLE: what this equation computes and why it matters
 
 ────────────────────────────────────────────
@@ -290,9 +290,9 @@ Every page must serve all four simultaneously:
 3. **Math/theory student** (undergrad/grad, wants rigor)
    - Wants: "What are the actual equations? What's the proof sketch?"
    - Give them: Precise definitions, annotated LaTeX — EVERY variable explained inline
-   - Failure: "The ELBO objective is $$L = \\mathbb{E}[...]$$" with no annotation
-   - Success: "where $x_0$ is the clean data, $\\epsilon$ is the noise we added,
-     and $t \\in \\{1,...,T\\}$ is the timestep — the model learns to predict $\\epsilon$"
+   - Failure: "The ELBO objective is \[L = \mathbb{E}[...]\]" with no annotation
+   - Success: "where \(x_0\) is the clean data, \(\epsilon\) is the noise we added,
+     and \(t \in \{1,...,T\}\) is the timestep — the model learns to predict \(\epsilon\)"
 
 4. **Frontier researcher** (PhD, lab researcher, cutting edge)
    - Wants: "What are the open problems? What just changed?"
@@ -375,8 +375,8 @@ MATH RULES
 ═══════════════════════════════════════════════
 
 Every LaTeX equation: annotate EVERY variable on the line immediately following the equation.
-  Format: "where $x_0$ is the clean data, $t$ is the timestep (integer from 1 to T),
-  and $\\epsilon \\sim \\mathcal{{N}}(0, I)$ is the noise sampled at training time"
+  Format: "where \(x_0\) is the clean data, \(t\) is the timestep (integer from 1 to T),
+  and \(\epsilon \sim \mathcal{N}(0, I)\) is the noise sampled at training time"
 Show the objective function first, then expand it. Give the intuition: "This term penalizes...
 because..." DO NOT just dump equations — every symbol must be grounded in words.
 

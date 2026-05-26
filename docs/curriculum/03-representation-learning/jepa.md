@@ -43,9 +43,9 @@ JEPAs (LeCun's group, Meta AI) are the current alternative to masked autoencoder
 V-JEPA achieves strong video understanding without labels or text supervision. The JEPA framework is being extended to multimodal and robot trajectory prediction domains. A3D-JEPA (audio-3D) and robotic JEPA variants are active research.
 
 ## Connected topics
-- [[masked-autoencoders]] — MAE predicts pixels; JEPA predicts representations
-- [[self-supervised-learning]] — JEPA is a non-generative SSL method
-- [[world-models-robotics]] — JEPA as a learned world model
+- Masked Autoencoders — MAE predicts pixels; JEPA predicts representations
+- [Self-Supervised Learning](./self-supervised-learning.md) — JEPA is a non-generative SSL method
+- World Models Robotics — JEPA as a learned world model
 
 ## Further reading
 - [Emerging Properties of Self-Predictive Architectures](https://arxiv.org/abs/2209.07399) — Garrido et al. 2022

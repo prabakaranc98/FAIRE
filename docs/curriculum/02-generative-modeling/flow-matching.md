@@ -17,7 +17,7 @@ has_mvb: true
 
 | I am... | Start here | Goal |
 |---|---|---|
-| MS/applied practitioner | [Key algorithms](#key-algorithms--techniques) → [MVB](#minimum-valuable-build) | Run a flow matching model and understand why it's faster |
+| MS/applied practitioner | [Key algorithms](#key-algorithms-techniques) → [MVB](#minimum-valuable-build) | Run a flow matching model and understand why it's faster |
 | Curious generalist | [What it is](#what-it-is) → [Why it matters](#why-it-matters-at-the-frontier) | Understand what "flow matching" means and why it beat diffusion |
 | Math/theory student | [Core concepts](#core-concepts) → [Mathematical foundations](#mathematical-foundations) | Derive the CFM objective and understand why OT paths are optimal |
 | Researcher / frontier | [Current SotA](#current-sota) → [What's happening now](#whats-happening-now) | Know the open problems: discrete flow matching, scaling laws |
@@ -51,18 +51,26 @@ The theoretical unification is also compelling: flow matching, diffusion, and sc
 ## Mathematical foundations
 
 Flow matching objective (marginal, intractable):
-$$\mathcal{L}_{FM} = \mathbb{E}_{t,\, p_t(x)}\!\left[\|v_\theta(x,t) - u_t(x)\|^2\right]$$
+\[
+\mathcal{L}_{FM} = \mathbb{E}_{t,\, p_t(x)}\!\left[\|v_\theta(x,t) - u_t(x)\|^2\right]
+\]
 
 Conditional flow matching (tractable — same gradient, efficiently computable):
-$$\mathcal{L}_{CFM} = \mathbb{E}_{t,\, q(x_0),\, p(x_1)}\!\left[\|v_\theta(x_t, t) - u_t(x_t \mid x_1)\|^2\right]$$
+\[
+\mathcal{L}_{CFM} = \mathbb{E}_{t,\, q(x_0),\, p(x_1)}\!\left[\|v_\theta(x_t, t) - u_t(x_t \mid x_1)\|^2\right]
+\]
 
 where on OT (straight-line) paths:
-$$x_t = (1-t)\,x_0 + t\,x_1, \qquad u_t(x_t \mid x_1) = x_1 - x_0$$
+\[
+x_t = (1-t)\,x_0 + t\,x_1, \qquad u_t(x_t \mid x_1) = x_1 - x_0
+\]
 
 The key theorem (Lipman et al. 2022): **L_FM and L_CFM have the same gradient** — so training on the tractable conditional objective exactly optimizes the marginal objective.
 
 Inference: integrate the learned ODE from t=0 to t=1 using any ODE solver (Euler, RK4, DPM-Solver):
-$$x_1 \approx x_0 + \int_0^1 v_\theta(x_t, t)\, dt$$
+\[
+x_1 \approx x_0 + \int_0^1 v_\theta(x_t, t)\, dt
+\]
 
 ## Key algorithms / techniques
 
@@ -157,20 +165,20 @@ $$x_1 \approx x_0 + \int_0^1 v_\theta(x_t, t)\, dt$$
 You now understand how to transport a distribution along straight paths. The natural next question is: can you do this in continuous time, for arbitrary distributions? That's score matching — and it's the theoretical foundation that unifies diffusion and flow matching.
 
 **Go deeper on this concept:**
-→ [[score-matching]] — derive the probability flow ODE that connects score-based models to flow matching; see why they're the same framework viewed differently
+→ [Score Matching](./score-matching.md) — derive the probability flow ODE that connects score-based models to flow matching; see why they're the same framework viewed differently
 
 **Build a system with this:**
-→ [[diffusion-models]] — if you came to flow matching first, go back to diffusion; train DDPM on CIFAR-10 and directly compare training stability and inference steps to your flow matching model
+→ [Diffusion Models](./diffusion-models.md) — if you came to flow matching first, go back to diffusion; train DDPM on CIFAR-10 and directly compare training stability and inference steps to your flow matching model
 
 **The arc this page belongs to:**
 → [Generative Stack arc](../../arcs/generative-stack/index.md) — flow matching is the arc's current frontier; you're at the edge of what's deployed in production
 
 ## Connected topics
 
-- [[diffusion-models]] — flow matching is the successor framework; same generation task, straighter paths
-- [[normalizing-flows]] — classical antecedent; flow matching solves the simulation-during-training bottleneck
-- [[score-matching]] — deep connection: the probability flow ODE of a score model is a special case of flow matching
-- [[consistency-models]] — one-step distillation of diffusion/flow models
+- [Diffusion Models](./diffusion-models.md) — flow matching is the successor framework; same generation task, straighter paths
+- Normalizing Flows — classical antecedent; flow matching solves the simulation-during-training bottleneck
+- [Score Matching](./score-matching.md) — deep connection: the probability flow ODE of a score model is a special case of flow matching
+- Consistency Models — one-step distillation of diffusion/flow models
 
 ## Further reading
 

@@ -33,9 +33,9 @@ PINNs solve forward and inverse PDE problems by encoding physics as additional l
 PINNs are practical for small-to-medium dimensional problems but struggle with high frequencies and chaotic systems. Neural operators (FNO, DeepONet) have largely replaced PINNs for problems with many query points. PINNs remain valuable for inverse problems with sparse data and when incorporating physics regularization for generalization.
 
 ## Connected topics
-- [[fno]] — Fourier Neural Operators are the scalable alternative to PINNs for solution operators
-- [[neural-odes]] — ODE version of physics-constrained learning
-- [[equivariant-networks]] — incorporating physical symmetries directly into architecture
+- [Fourier Neural Operator (FNO)](./fno.md) — Fourier Neural Operators are the scalable alternative to PINNs for solution operators
+- Neural Odes — ODE version of physics-constrained learning
+- [Equivariant Neural Networks](./equivariant-networks.md) — incorporating physical symmetries directly into architecture
 
 ## Further reading
 - [Scientific Machine Learning Through Physics-Informed Neural Networks](https://arxiv.org/abs/2201.05624) — Cuomo et al. 2022

@@ -26,6 +26,6 @@ updated: 2026-05-25
 | [Probabilistic Machine Learning: An Introduction](https://probml.github.io/pml-book/book1.html) | 2022 | Murphy | Authoritative reference (MIT Press open-access) |
 
 ## Connected topics
-- [[variational-inference]] — scalable approximate Bayesian inference
-- [[gaussian-processes]] — Bayesian nonparametrics via kernel functions
-- [[variational-autoencoders]] — VAEs are Bayesian latent variable models
+- [Variational Inference](./variational-inference.md) — scalable approximate Bayesian inference
+- [Gaussian Processes](./gaussian-processes.md) — Bayesian nonparametrics via kernel functions
+- [Variational Autoencoders](../02-generative-modeling/variational-autoencoders.md) — VAEs are Bayesian latent variable models

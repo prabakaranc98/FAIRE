@@ -59,9 +59,9 @@ updated: 2026-05-25
 [stub]
 
 ## Connected topics
-- [[classical-planning]] — search as the engine of symbolic planning
-- [[mdp]] — search in stochastic environments
-- [[muzero]] — modern learned search with MCTS
+- [Classical Planning](./classical-planning.md) — search as the engine of symbolic planning
+- [Markov Decision Processes](../06-reinforcement-learning/mdp.md) — search in stochastic environments
+- Muzero — modern learned search with MCTS
 
 ## Further reading
 [stub]

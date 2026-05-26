@@ -26,9 +26,9 @@ updated: 2026-05-25
 | [Global Workspace Theory as a Framework for Consciousness Research](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7551544/) | 2021 | Baars & Franklin | Global workspace; inspires attention mechanisms |
 
 ## Connected topics
-- [[memory-systems]] — cognitive memory taxonomy (episodic, semantic, working)
-- [[agent-architectures]] — classical AI agent types map onto cognitive architectures
-- [[chain-of-thought]] — System 2-like slow deliberation implemented in LLMs
+- Memory Systems — cognitive memory taxonomy (episodic, semantic, working)
+- [Agent Architectures](../01-ai/agent-architectures.md) — classical AI agent types map onto cognitive architectures
+- Chain Of Thought — System 2-like slow deliberation implemented in LLMs
 
 ## Further reading
 - [Toward a Unified Theory of Cognition](https://sites.google.com/site/soarseven/) — Anderson et al.

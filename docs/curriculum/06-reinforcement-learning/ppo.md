@@ -28,7 +28,9 @@ PPO is the training algorithm behind most RLHF systems (ChatGPT, Claude, Gemini)
 
 ## Mathematical foundations
 PPO-Clip objective:
-$$L^{CLIP}(\theta) = \hat{\mathbb{E}}_t\left[\min\left(r_t(\theta)\hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t\right)\right]$$
+\[
+L^{CLIP}(\theta) = \hat{\mathbb{E}}_t\left[\min\left(r_t(\theta)\hat{A}_t, \text{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t\right)\right]
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -47,9 +49,9 @@ $$L^{CLIP}(\theta) = \hat{\mathbb{E}}_t\left[\min\left(r_t(\theta)\hat{A}_t, \te
 PPO remains the backbone of RLHF (InstructGPT, TRL library). GRPO (DeepSeekMath, 2024) replaces the critic with group-relative advantage estimation, reducing memory cost. DAPO (ByteDance, 2025) further improves stability for reasoning tasks. DPO (NeurIPS 2023) sidesteps PPO entirely for preference learning.
 
 ## Connected topics
-- [[rlhf]] — PPO is how RLHF is implemented in practice
-- [[policy-gradient]] — PPO is a constrained policy gradient method
-- [[dpo]] — the alternative to PPO for preference-based alignment
+- [Reinforcement Learning from Human Feedback (RLHF)](./rlhf.md) — PPO is how RLHF is implemented in practice
+- Policy Gradient — PPO is a constrained policy gradient method
+- Dpo — the alternative to PPO for preference-based alignment
 
 ## Further reading
 - [Towards Theoretical Understanding of RLHF](https://arxiv.org/abs/2401.01672) — 2024 survey

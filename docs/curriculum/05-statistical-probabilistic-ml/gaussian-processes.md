@@ -29,6 +29,6 @@ updated: 2026-05-25
 GPs remain essential for Bayesian optimization (hyperparameter tuning, active learning) and small-data scientific applications. Deep kernel learning and neural tangent kernels connect GPs to modern neural networks. Sparse GPs (inducing points) scale to larger datasets.
 
 ## Connected topics
-- [[bayesian-inference]] — GPs are Bayesian nonparametric models
-- [[ntk]] — infinite-width neural networks converge to GPs
-- [[uncertainty-quantification]] — GPs provide calibrated uncertainty by design
+- [Bayesian Inference](./bayesian-inference.md) — GPs are Bayesian nonparametric models
+- [Neural Tangent Kernel (NTK)](../15-ml-theory-foundations/ntk.md) — infinite-width neural networks converge to GPs
+- Uncertainty Quantification — GPs provide calibrated uncertainty by design

@@ -37,9 +37,9 @@ KV cache memory is the bottleneck of LLM inference at scale. Serving a 70B model
 MLA (DeepSeek-V2/V3) achieves 5-13× KV cache compression vs. MHA with no quality loss — the current most efficient attention variant. vLLM with continuous batching + PagedAttention is the production standard. Disaggregated prefill/decode (Mooncake, DistServe) is the next frontier for serving efficiency.
 
 ## Connected topics
-- [[transformer]] — KV cache is a direct consequence of transformer autoregressive generation
-- [[speculative-decoding]] — reduces decode latency complementary to KV cache optimizations
-- [[inference-serving]] — batching strategies that interact with KV cache management
+- [Transformer Architecture](../07-attention-memory-reasoning/transformer.md) — KV cache is a direct consequence of transformer autoregressive generation
+- Speculative Decoding — reduces decode latency complementary to KV cache optimizations
+- Inference Serving — batching strategies that interact with KV cache management
 
 ## Further reading
 - [FlashAttention-2: Faster Attention with Better Parallelism](https://arxiv.org/abs/2307.08691) — Dao et al. 2023

@@ -26,7 +26,9 @@ The do-calculus is a set of three inference rules for transforming expressions i
 
 ## Mathematical foundations
 Backdoor adjustment formula:
-$$P(Y | do(X=x)) = \sum_z P(Y | X=x, Z=z) P(Z=z)$$
+\[
+P(Y | do(X=x)) = \sum_z P(Y | X=x, Z=z) P(Z=z)
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -35,6 +37,6 @@ $$P(Y | do(X=x)) = \sum_z P(Y | X=x, Z=z) P(Z=z)$$
 | [Causal Inference in Statistics: A Primer](http://bayes.cs.ucla.edu/PRIMER/) | 2016 | Pearl, Glymour, Jewell | Accessible introduction to do-calculus |
 
 ## Connected topics
-- [[scm]] — do-calculus operates on structural causal models
-- [[counterfactuals]] — the third rung uses do-calculus as its foundation
-- [[observational-studies]] — do-calculus provides the theoretical basis for causal inference from observational data
+- [Structural Causal Models](./scm.md) — do-calculus operates on structural causal models
+- [Counterfactual Reasoning](./counterfactuals.md) — the third rung uses do-calculus as its foundation
+- Observational Studies — do-calculus provides the theoretical basis for causal inference from observational data

@@ -34,9 +34,9 @@ Imitation learning trains a policy to replicate expert behavior from demonstrati
 Diffusion Policy and ACT (Action Chunking with Transformers, Zhao et al. 2023) are the dominant approaches for dexterous manipulation. π0 (Physical Intelligence, 2024) uses flow matching for the action head at 200+ Hz on diverse robot platforms. Large-scale data collection (DROID, Open X-Embodiment) is shifting the field toward data-driven generalist policies.
 
 ## Connected topics
-- [[foundation-models-robotics]] — scale imitation learning to generalist robot policies
-- [[rl-robotics]] — RL fine-tuning on top of imitation learning initialization
-- [[diffusion-models]] — diffusion policy applies generative models to action sequences
+- [Foundation Models for Robotics](./foundation-models-robotics.md) — scale imitation learning to generalist robot policies
+- Rl Robotics — RL fine-tuning on top of imitation learning initialization
+- [Diffusion Models](../02-generative-modeling/diffusion-models.md) — diffusion policy applies generative models to action sequences
 
 ## Further reading
 - [An Algorithmic Perspective on Imitation Learning](https://arxiv.org/abs/1811.06711) — Osa et al. 2018

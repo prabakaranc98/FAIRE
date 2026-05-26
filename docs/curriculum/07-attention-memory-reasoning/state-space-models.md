@@ -43,9 +43,9 @@ SSMs offer O(N) training (via convolution) and O(1) inference per token (via rec
 Mamba-2 (Dao & Gu, ICML 2024) establishes the SSD framework connecting SSMs and attention. Hybrid Mamba-Transformer models (Jamba, Samba, Zamba) combine the best of both. Mamba-3 (2026 preprint) scales the approach further. SSMs are also gaining traction for audio (SSAMBA), genomics (Caduceus), and long-context video.
 
 ## Connected topics
-- [[transformer]] — SSMs as the recurrent alternative
-- [[efficient-attention]] — both aim to reduce O(N²) attention cost
-- [[titans]] — test-time learnable memory extends SSMs to >2M context
+- [Transformer Architecture](./transformer.md) — SSMs as the recurrent alternative
+- Efficient Attention — both aim to reduce O(N²) attention cost
+- Titans — test-time learnable memory extends SSMs to >2M context
 
 ## Further reading
 - [Structured State Spaces: Combining Continuous-Time Models with Deep Learning](https://arxiv.org/abs/2111.00396) — Gu et al.

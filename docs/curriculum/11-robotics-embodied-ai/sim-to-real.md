@@ -27,9 +27,9 @@ updated: 2026-05-25
 | [Learning Dexterous In-Hand Manipulation (OpenAI Five)](https://arxiv.org/abs/1808.00177) | 2019 | OpenAI | Rubik's cube with domain randomization at scale |
 
 ## Connected topics
-- [[rl-robotics]] — RL in simulation before real deployment
-- [[imitation-learning]] — real demonstrations avoid sim-to-real gap entirely
-- [[foundation-models-robotics]] — internet pretraining reduces reliance on sim
+- Rl Robotics — RL in simulation before real deployment
+- [Imitation Learning](./imitation-learning.md) — real demonstrations avoid sim-to-real gap entirely
+- [Foundation Models for Robotics](./foundation-models-robotics.md) — internet pretraining reduces reliance on sim
 
 ## Further reading
 - [Sim-to-Real Transfer in Deep Reinforcement Learning for Robotics: a Survey](https://arxiv.org/abs/2009.05268) — Zhao et al. 2020

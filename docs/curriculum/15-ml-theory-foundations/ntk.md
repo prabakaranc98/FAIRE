@@ -37,9 +37,9 @@ The NTK provides the first rigorous convergence theory for neural networks. But 
 µP (Yang & Hu) is the practical tool: it gives hyperparameter transfer across widths and distinguishes NTK from feature learning. The frontier is understanding why deep finite-width networks in the feature learning regime generalize better than the NTK predicts.
 
 ## Connected topics
-- [[gaussian-processes]] — infinite-width networks at init converge to GPs
-- [[double-descent]] — NTK theory predicts aspects of double descent behavior
-- [[scaling-laws]] — µP provides the framework for understanding what changes with scale
+- [Gaussian Processes](../05-statistical-probabilistic-ml/gaussian-processes.md) — infinite-width networks at init converge to GPs
+- [Double Descent](./double-descent.md) — NTK theory predicts aspects of double descent behavior
+- [Scaling Laws](../04-neural-networks-dl/scaling-laws.md) — µP provides the framework for understanding what changes with scale
 
 ## Further reading
 - [Tensor Programs I: Wide Feedforward or Recurrent Neural Networks of Any Architecture are Gaussian Processes](https://arxiv.org/abs/1902.04760) — Yang 2019

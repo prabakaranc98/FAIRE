@@ -26,8 +26,8 @@ updated: 2026-05-25
 | [How Powerful are Graph Neural Networks?](https://arxiv.org/abs/1810.00826) | 2018 | Xu et al. | Proves MPNN ≡ 1-WL; introduces GIN |
 
 ## Connected topics
-- [[message-passing]] — MPNNs are bounded by 1-WL expressiveness
-- [[graph-transformers]] — attention extends expressiveness beyond 1-WL
+- [Message Passing Neural Networks](./message-passing.md) — MPNNs are bounded by 1-WL expressiveness
+- Graph Transformers — attention extends expressiveness beyond 1-WL
 
 ## Further reading
 - [Equivariant Subgraph Aggregation Networks](https://arxiv.org/abs/2110.02910) — Bevilacqua et al. 2022

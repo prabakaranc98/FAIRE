@@ -34,9 +34,9 @@ Neural network weights are stored in FP32 (32 bits) by default. Quantization map
 AWQ (Lin et al. 2023) currently matches or outperforms GPTQ. FP8 (supported on H100) is increasingly used for training and inference — better than INT8 with less overhead than BF16. The frontier is W4A8 (INT4 weights, INT8 activations) for maximum throughput.
 
 ## Connected topics
-- [[peft]] — QLoRA uses quantization + LoRA for memory-efficient fine-tuning
-- [[inference-serving]] — quantization dramatically improves inference throughput
-- [[kv-cache]] — KV cache can also be quantized (KVQuant)
+- Peft — QLoRA uses quantization + LoRA for memory-efficient fine-tuning
+- Inference Serving — quantization dramatically improves inference throughput
+- [KV Cache & Attention Efficiency](./kv-cache.md) — KV cache can also be quantized (KVQuant)
 
 ## Further reading
 - [A Survey of Quantization Methods for Efficient Neural Network Inference](https://arxiv.org/abs/2103.13630) — Gholami et al. 2021

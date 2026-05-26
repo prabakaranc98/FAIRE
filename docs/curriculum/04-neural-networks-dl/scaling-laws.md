@@ -27,7 +27,9 @@ Scaling laws are how frontier labs decide how large to make their models and how
 
 ## Mathematical foundations
 Kaplan scaling law (simplified):
-$$L(N, D) \approx \left(\frac{N_c}{N}\right)^{\alpha_N} + \left(\frac{D_c}{D}\right)^{\alpha_D}$$
+\[
+L(N, D) \approx \left(\frac{N_c}{N}\right)^{\alpha_N} + \left(\frac{D_c}{D}\right)^{\alpha_D}
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -46,9 +48,9 @@ $$L(N, D) \approx \left(\frac{N_c}{N}\right)^{\alpha_N} + \left(\frac{D_c}{D}\ri
 Scaling law research has extended to multimodal models, RL post-training, and inference-time compute (test-time scaling). The "inference scaling" regime — where more compute at test time buys better answers — is the current frontier, with implications for model sizing different from training-time scaling.
 
 ## Connected topics
-- [[lm-pretraining]] — scaling laws are derived from LM training runs
-- [[emergent-capabilities]] — the discontinuous phenomena at scale
-- [[optimization]] — learning rate schedules are calibrated against scaling predictions
+- Lm Pretraining — scaling laws are derived from LM training runs
+- [Emergent Capabilities in Large Models](../10-complexity-cognition/emergent-capabilities.md) — the discontinuous phenomena at scale
+- [Optimization for Deep Learning](./optimization.md) — learning rate schedules are calibrated against scaling predictions
 
 ## Further reading
 - [Are Emergent Abilities of Large Language Models a Mirage?](https://arxiv.org/abs/2304.15004) — Schaeffer et al. 2023

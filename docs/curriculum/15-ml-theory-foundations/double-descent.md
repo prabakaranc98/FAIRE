@@ -43,9 +43,9 @@ Double descent is the theoretical foundation for why scaling works. It explains 
 Double descent is well-established theoretically for linear models and empirically for neural networks. The frontier is explaining *why* specific inductive biases of SGD + neural network architectures lead to benign overfitting in practice. µP and feature learning theory (Yang & Hu, 2022) are the current theoretical tools.
 
 ## Connected topics
-- [[pac-learning]] — classical framework that double descent challenges
-- [[scaling-laws]] — double descent is the per-model microcosm of scaling law behavior
-- [[implicit-bias]] — SGD's implicit regularization explains benign overfitting
+- [PAC Learning](./pac-learning.md) — classical framework that double descent challenges
+- [Scaling Laws](../04-neural-networks-dl/scaling-laws.md) — double descent is the per-model microcosm of scaling law behavior
+- Implicit Bias — SGD's implicit regularization explains benign overfitting
 
 ## Further reading
 - [A Unifying Tutorial on Approximate Message Passing](https://arxiv.org/abs/2105.02180) — connections to statistical physics of high-dimensional learning

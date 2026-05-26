@@ -40,9 +40,9 @@ Planning is resurging in modern AI: LLM agents doing multi-step reasoning, tree-
 [stub]
 
 ## Connected topics
-- [[search-algorithms]] — planning is search in a symbolic state space
-- [[tool-use]] — LLM planning as a modern successor
-- [[mdp]] — planning under uncertainty
+- [Search Algorithms](./search-algorithms.md) — planning is search in a symbolic state space
+- Tool Use — LLM planning as a modern successor
+- [Markov Decision Processes](../06-reinforcement-learning/mdp.md) — planning under uncertainty
 
 ## Further reading
 [stub]

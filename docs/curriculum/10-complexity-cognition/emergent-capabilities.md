@@ -37,9 +37,9 @@ Emergence complicates predictions about AI capability development. If most dange
 The debate continues. Schaeffer et al. showed that many emergent abilities disappear under continuous metrics. However, some abilities (like multi-step reasoning with chain-of-thought) appear genuinely discontinuous. Grokking is well-documented in controlled settings. The field is moving toward more rigorous evaluation frameworks.
 
 ## Connected topics
-- [[scaling-laws]] — emergence appears against the backdrop of smooth scaling
-- [[complexity-classes]] — formal treatment of phase transitions in computation
-- [[cognitive-architectures]] — theories of intelligence that might explain discontinuous leaps
+- [Scaling Laws](../04-neural-networks-dl/scaling-laws.md) — emergence appears against the backdrop of smooth scaling
+- [Computational Complexity for AI](./complexity-classes.md) — formal treatment of phase transitions in computation
+- [Cognitive Architectures](./cognitive-architectures.md) — theories of intelligence that might explain discontinuous leaps
 
 ## Further reading
 - [Grokking: Generalization Beyond Overfitting on Small Algorithmic Datasets](https://arxiv.org/abs/2201.02177) — Power et al. 2022

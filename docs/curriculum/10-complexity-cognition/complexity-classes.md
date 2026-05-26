@@ -27,9 +27,9 @@ updated: 2026-05-25
 | [Lower Bounds for Attention by Keles et al.](https://arxiv.org/abs/2302.13214) | 2023 | Keles et al. | SETH-based lower bounds for exact attention |
 
 ## Connected topics
-- [[state-space-models]] — SSMs sit below SETH attention lower bound; O(N) not O(N²)
-- [[ml-theory]] — computational hardness of learning connects to statistical learning theory
-- [[emergent-capabilities]] — complexity theory tools for understanding phase transitions
+- [State Space Models](../07-attention-memory-reasoning/state-space-models.md) — SSMs sit below SETH attention lower bound; O(N) not O(N²)
+- Ml Theory — computational hardness of learning connects to statistical learning theory
+- [Emergent Capabilities in Large Models](./emergent-capabilities.md) — complexity theory tools for understanding phase transitions
 
 ## Further reading
 - [Introduction to the Theory of Computation](http://math.mit.edu/~sipser/book.html) — Sipser; MIT open access chapters

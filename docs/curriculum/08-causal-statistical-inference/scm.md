@@ -49,9 +49,9 @@ Intervention (do(X=x)): remove the equation for X, replace with X = x, recompute
 Causal representation learning — learning the SCM structure from data — is an active frontier. Current work connects disentanglement, ICA, and causal discovery. LLM-assisted causal discovery (using language models to propose causal structures) is emerging. Causal inference methods are being integrated into ML pipelines for robustness.
 
 ## Connected topics
-- [[do-calculus]] — the algebra of interventions on SCMs
-- [[counterfactuals]] — the third rung of Pearl's causal hierarchy
-- [[disentanglement]] — learning causal factors of variation
+- [The Do-Calculus](./do-calculus.md) — the algebra of interventions on SCMs
+- [Counterfactual Reasoning](./counterfactuals.md) — the third rung of Pearl's causal hierarchy
+- Disentanglement — learning causal factors of variation
 
 ## Further reading
 - [Elements of Causal Inference](https://mitpress.mit.edu/9780262037310/elements-of-causal-inference/) — Peters, Janzing, Schölkopf (MIT Press open access)

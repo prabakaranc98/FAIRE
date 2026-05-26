@@ -17,7 +17,7 @@ has_mvb: true
 
 | I am... | Start here | Goal |
 |---|---|---|
-| MS/applied practitioner | [Key algorithms](#key-algorithms--techniques) → [MVB](#minimum-valuable-build) | Fine-tune a model with DPO using TRL |
+| MS/applied practitioner | [Key algorithms](#key-algorithms-techniques) → [MVB](#minimum-valuable-build) | Fine-tune a model with DPO using TRL |
 | Curious generalist | [What it is](#what-it-is) → [Why it matters](#why-it-matters-at-the-frontier) | Understand what alignment actually means mechanistically |
 | Math/theory student | [Core concepts](#core-concepts) → [Mathematical foundations](#mathematical-foundations) | Derive the DPO objective from the RLHF reward model |
 | Researcher / frontier | [Current SotA](#current-sota) → [What's happening now](#whats-happening-now) | Know why GRPO and RLVR are replacing RLHF for reasoning |
@@ -56,13 +56,19 @@ The broader significance: RLHF established that human preferences can be operati
 ## Mathematical foundations
 
 Reward model training (Bradley-Terry pairwise loss):
-$$\mathcal{L}_{RM} = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}}\!\left[\log\sigma\!\left(r_\phi(x, y_w) - r_\phi(x, y_l)\right)\right]$$
+\[
+\mathcal{L}_{RM} = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}}\!\left[\log\sigma\!\left(r_\phi(x, y_w) - r_\phi(x, y_l)\right)\right]
+\]
 
 RLHF objective (maximize reward, penalize KL divergence from SFT):
-$$\max_{\pi_\theta}\; \mathbb{E}_{x \sim \mathcal{D},\, y \sim \pi_\theta(y|x)}\!\left[r_\phi(x, y)\right] - \beta\, D_{\text{KL}}\!\left(\pi_\theta \| \pi_{SFT}\right)$$
+\[
+\max_{\pi_\theta}\; \mathbb{E}_{x \sim \mathcal{D},\, y \sim \pi_\theta(y|x)}\!\left[r_\phi(x, y)\right] - \beta\, D_{\text{KL}}\!\left(\pi_\theta \| \pi_{SFT}\right)
+\]
 
 DPO objective (closed-form, no RM or PPO needed):
-$$\mathcal{L}_{DPO}(\pi_\theta; \pi_{SFT}) = -\mathbb{E}_{(x, y_w, y_l)}\!\left[\log\sigma\!\left(\beta\log\frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta\log\frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)}\right)\right]$$
+\[
+\mathcal{L}_{DPO}(\pi_\theta; \pi_{SFT}) = -\mathbb{E}_{(x, y_w, y_l)}\!\left[\log\sigma\!\left(\beta\log\frac{\pi_\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta\log\frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)}\right)\right]
+\]
 
 The key DPO insight: the optimal RLHF policy has an analytic form in terms of log-ratios. DPO directly optimizes this without needing an explicit reward model.
 
@@ -160,21 +166,21 @@ The frontier has moved to **RLVR** for reasoning tasks: DeepSeek-R1 (2025) uses 
 You've aligned a small model with DPO. The natural next question is: can you do this without any human labels at all — using a verifiable reward signal? That's GRPO, and it's how DeepSeek-R1 achieves reasoning without human annotation.
 
 **Go deeper on this concept:**
-→ [[grpo]] — Group-Relative Policy Optimization; implement it on a math dataset using symbolic verification; no reward model needed
+→ Grpo — Group-Relative Policy Optimization; implement it on a math dataset using symbolic verification; no reward model needed
 
 **Build a system with this:**
-→ [[constitutional-ai]] — replace human preferences with AI-generated feedback; build a fully automated alignment pipeline on top of your DPO-trained model
+→ Constitutional Ai — replace human preferences with AI-generated feedback; build a fully automated alignment pipeline on top of your DPO-trained model
 
 **The arc this page belongs to:**
 → [Reinforcement Learning arc](../../arcs/reinforcement-learning/index.md) — RLHF is the arc's applied peak; GRPO and process reward models are the current frontier
 
 ## Connected topics
 
-- [[ppo]] — the RL algorithm used in RLHF Stage 3
-- [[dpo]] — the simplified alternative; no RM, no PPO, just supervised learning
-- [[grpo]] — Group-Relative Policy Optimization; the algorithm behind DeepSeek-R1
-- [[constitutional-ai]] — AI-generated feedback replaces human preference labeling
-- [[instruction-tuning]] — the SFT stage that precedes RLHF
+- [Proximal Policy Optimization (PPO)](./ppo.md) — the RL algorithm used in RLHF Stage 3
+- Dpo — the simplified alternative; no RM, no PPO, just supervised learning
+- Grpo — Group-Relative Policy Optimization; the algorithm behind DeepSeek-R1
+- Constitutional Ai — AI-generated feedback replaces human preference labeling
+- Instruction Tuning — the SFT stage that precedes RLHF
 
 ## Further reading
 

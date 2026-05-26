@@ -42,9 +42,9 @@ Every parameter update in every neural network trained today uses backpropagatio
 Backprop is stable. The frontier is in gradient estimation for non-differentiable operations (straight-through estimator, REINFORCE), second-order methods (K-FAC, Shampoo), and hardware-aware backward passes (FlashAttention recomputation).
 
 ## Connected topics
-- [[optimization]] — gradient descent uses backprop gradients
-- [[normalization]] — BatchNorm/LayerNorm were designed to address backprop pathologies
-- [[residual-networks]] — skip connections were invented to fix vanishing gradients
+- [Optimization for Deep Learning](./optimization.md) — gradient descent uses backprop gradients
+- Normalization — BatchNorm/LayerNorm were designed to address backprop pathologies
+- Residual Networks — skip connections were invented to fix vanishing gradients
 
 ## Further reading
 - [Calculus on Computational Graphs: Backpropagation](http://colah.github.io) — NOT ALLOWED (blog)

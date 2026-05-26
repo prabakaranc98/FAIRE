@@ -34,9 +34,9 @@ Data parallelism replicates the model across N GPUs. Each GPU processes a mini-b
 DeepSpeed + FSDP are the standard libraries. ZeRO++ reduces communication overhead. For very large training runs (1000+ GPUs), 3D parallelism (data + tensor + pipeline) is required. Most frontier models use all three forms of parallelism simultaneously.
 
 ## Connected topics
-- [[model-parallelism]] — when model doesn't fit on one GPU even with ZeRO
-- [[mixed-precision]] — FP16/BF16 reduces memory and communication bandwidth
-- [[gradient-checkpointing]] — trades compute for memory within each device
+- Model Parallelism — when model doesn't fit on one GPU even with ZeRO
+- Mixed Precision — FP16/BF16 reduces memory and communication bandwidth
+- Gradient Checkpointing — trades compute for memory within each device
 
 ## Further reading
 - [Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism](https://arxiv.org/abs/1909.08053) — Shoeybi et al. 2019

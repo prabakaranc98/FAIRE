@@ -28,7 +28,9 @@ SimCLR and MoCo established contrastive learning as a viable path to representat
 
 ## Mathematical foundations
 NT-Xent loss for a positive pair (i, j):
-$$\mathcal{L}_{i,j} = -\log \frac{\exp(\text{sim}(z_i, z_j)/\tau)}{\sum_{k \neq i} \exp(\text{sim}(z_i, z_k)/\tau)}$$
+\[
+\mathcal{L}_{i,j} = -\log \frac{\exp(\text{sim}(z_i, z_j)/\tau)}{\sum_{k \neq i} \exp(\text{sim}(z_i, z_k)/\tau)}
+\]
 
 ## Essential reading
 | Paper | Year | Authors | Why essential |
@@ -47,9 +49,9 @@ $$\mathcal{L}_{i,j} = -\log \frac{\exp(\text{sim}(z_i, z_j)/\tau)}{\sum_{k \neq 
 Pure contrastive learning has been largely superseded by non-contrastive methods (BYOL, DINOv2) and masked modeling (MAE) for image features. However, contrastive vision-language pretraining (CLIP) remains the standard for zero-shot transfer and multimodal alignment. SigLIP (sigmoid loss) and DFN-CLIP are recent improvements.
 
 ## Connected topics
-- [[self-supervised-learning]] — broader family; contrastive is one objective class
-- [[vision-language-models]] — CLIP as the scaling of contrastive to cross-modal pairs
-- [[bootstrapping-methods]] — non-contrastive alternatives (BYOL, DINOv2)
+- [Self-Supervised Learning](./self-supervised-learning.md) — broader family; contrastive is one objective class
+- [Vision-Language Models](../07-attention-memory-reasoning/vision-language-models.md) — CLIP as the scaling of contrastive to cross-modal pairs
+- Bootstrapping Methods — non-contrastive alternatives (BYOL, DINOv2)
 
 ## Further reading
 - [Intriguing Properties of Contrastive Losses](https://arxiv.org/abs/2011.02803) — Chen & Luo 2021

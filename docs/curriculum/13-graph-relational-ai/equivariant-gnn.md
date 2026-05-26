@@ -31,9 +31,9 @@ updated: 2026-05-25
 MACE-MP-0 (2023) is a universal foundation force field covering most of the periodic table. AlphaFold 3 uses E(3)-equivariant diffusion for structure prediction. Equiformer v2 achieves SotA on OC20 catalyst discovery benchmark with attention + equivariance.
 
 ## Connected topics
-- [[equivariant-networks]] — general symmetry-preserving architectures
-- [[protein-structure]] — AlphaFold's structure module is equivariant
-- [[molecular-simulation]] — equivariant force fields for ab initio MD
+- [Equivariant Neural Networks](../12-physics-scientific-ai/equivariant-networks.md) — general symmetry-preserving architectures
+- [Protein Structure Prediction](../14-biology-life-sciences/protein-structure.md) — AlphaFold's structure module is equivariant
+- Molecular Simulation — equivariant force fields for ab initio MD
 
 ## Further reading
 - [A Hitchhiker's Guide to Geometric GNNs for 3D Atomic Systems](https://arxiv.org/abs/2312.07511) — Duval et al. 2023

@@ -29,6 +29,6 @@ ELBO = E_q[log p(x,z)] - E_q[log q(z)] = log p(x) - KL(q(z)‖p(z|x))
 | [Automatic Differentiation Variational Inference](https://arxiv.org/abs/1603.00788) | 2016 | Kucukelbir et al. | ADVI — general VI via autodiff |
 
 ## Connected topics
-- [[bayesian-inference]] — VI approximates intractable posteriors
-- [[variational-autoencoders]] — VAEs apply VI to deep generative models
-- [[diffusion-models]] — DDPM training loss is a form of variational bound
+- [Bayesian Inference](./bayesian-inference.md) — VI approximates intractable posteriors
+- [Variational Autoencoders](../02-generative-modeling/variational-autoencoders.md) — VAEs apply VI to deep generative models
+- [Diffusion Models](../02-generative-modeling/diffusion-models.md) — DDPM training loss is a form of variational bound
