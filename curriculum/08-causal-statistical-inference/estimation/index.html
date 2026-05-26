@@ -23,7 +23,7 @@
     
     
       
-        <title>Estimation & Confidence Intervals - Frontier Wiki</title>
+        <title>Estimation - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#estimation-confidence-intervals" class="md-skip">
+        <a href="#estimation" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Estimation & Confidence Intervals
+              Estimation
             
           </span>
         </div>
@@ -1922,13 +1922,6 @@
   </span>
   
   
-    
-  
-  
-    <span class="md-status md-status--stub"></span>
-  
-
-  
 
       </a>
     </li>
@@ -2293,13 +2286,6 @@
     
   </span>
   
-  
-    
-  
-  
-    <span class="md-status md-status--stub"></span>
-  
-
   
 
       </a>
@@ -2707,13 +2693,6 @@
     
   </span>
   
-  
-    
-  
-  
-    <span class="md-status md-status--stub"></span>
-  
-
   
 
       </a>
@@ -3992,13 +3971,254 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">causal-inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">identifiability</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">latent-variables</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">representation-learning</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="estimation-confidence-intervals">Estimation &amp; Confidence Intervals<a class="headerlink" href="#estimation-confidence-intervals" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. Queued for the editorial pipeline.</p>
+<h1 id="estimation">Estimation<a class="headerlink" href="#estimation" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Estimation is the process of recovering latent causal structures from observational data, shifting the focus from simple predictive accuracy to the recovery of the underlying mechanisms that govern a system.</p>
+</blockquote>
+<h2 id="who-this-page-is-for">Who this page is for<a class="headerlink" href="#who-this-page-is-for" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Persona</th>
+<th>What you get</th>
+<th>Jump to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Curious learner</td>
+<td>Intuition on the Black Box Dilemma</td>
+<td><a href="#what-it-is">§What it is</a></td>
+</tr>
+<tr>
+<td>CS student / tinkerer</td>
+<td>Laptop-GPU build with target metric</td>
+<td><a href="#mvb-cs-student">§MVB — CS student</a></td>
+</tr>
+<tr>
+<td>Applied engineer</td>
+<td>Production framing + latency-shaped build</td>
+<td><a href="#in-production">§In production</a>, <a href="#mvb-applied-engineer">§MVB — Applied engineer</a></td>
+</tr>
+<tr>
+<td>Applied researcher</td>
+<td>Hypothesis + ablation build</td>
+<td><a href="#whats-happening-now">§What's happening now</a>, <a href="#mvb-applied-researcher">§MVB — Applied researcher</a></td>
+</tr>
+<tr>
+<td>Theory student</td>
+<td>Derivations + numerical verification</td>
+<td><a href="#mathematical-foundations">§Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Frontier researcher</td>
+<td>Open problems + falsifiers</td>
+<td><a href="#open-questions">§Open questions</a>, <a href="#mvb-frontier-researcher">§MVB — Frontier researcher</a></td>
+</tr>
+<tr>
+<td>PM / decision-maker</td>
+<td>Why it matters + SotA synthesis</td>
+<td><a href="#why-it-matters">§Why it matters</a>, <a href="#current-sota">§Current SotA</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine an AI that perfectly predicts the trajectory of a complex molecular system but possesses no internal representation of the atoms or forces involved. This is the "Black Box Dilemma," where predictive power masks a complete lack of understanding of the system's governing laws. Modern estimation has shifted from simple statistical curve-fitting to the recovery of latent causal structures, where the goal is to identify the underlying "true" variables that generate the observed data.</p>
+<p>This shift is driven by the need for identifiability—the ability to map observations back to the actual causal mechanisms that generated them. When an estimator is identifiable, it does not merely correlate inputs with outputs; it reconstructs the causal graph or the latent state space that dictates how the system evolves. This allows for robust generalization in environments where the distribution of data might change, as the model relies on stable causal mechanisms rather than transient statistical associations.</p>
+<p>The consequence is a move toward object-centric and causal representation learning. By treating the world as a collection of interacting entities rather than a monolithic stream of pixels, estimators can achieve higher sample efficiency and interpretability. This approach transforms estimation from a passive observation task into an active process of structural discovery, enabling agents to reason about "what if" scenarios rather than just "what is."</p>
+<h2 id="why-it-matters">Why it matters<a class="headerlink" href="#why-it-matters" title="Permanent link">&para;</a></h2>
+<p>Estimation is the bottleneck for deploying AI in high-stakes scientific and physical environments. In domains like drug discovery or robotics, predicting the next frame of a video is insufficient; the system must estimate the underlying physical parameters—such as mass, friction, or molecular bond energy—to ensure that its actions are grounded in reality. Without causal identifiability, models are prone to catastrophic failure when they encounter out-of-distribution data.</p>
+<p>This field is currently bridging the gap between equilibrium statistical mechanics and non-equilibrium causal inference. By leveraging frameworks like free energy estimation, researchers can now infer the state of complex systems from limited, noisy trajectories. This is critical for frontier labs, as it enables the construction of world models that are not just predictive, but physically consistent and interpretable.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Identifiability</strong> — the property of a model where the underlying causal parameters can be uniquely recovered from the distribution of observed data.</li>
+<li><strong>Latent Causal Variable</strong> — an unobserved variable that acts as a direct cause for the observed data, forming the nodes of a causal graph.</li>
+<li><strong>Fisher Information Matrix</strong> — a measure of the amount of information that an observable random variable carries about an unknown parameter.</li>
+<li><strong>Free Energy</strong> — a thermodynamic quantity used in estimation to characterize the state of a system and the work required to transition between states.</li>
+<li><strong>Object-Centric Representation</strong> — a structural prior that assumes the world is composed of discrete, interacting entities rather than a continuous field.</li>
+<li><strong>Non-Equilibrium Transition</strong> — a process where a system is driven between states, providing data that can be used to estimate free energy differences.</li>
+</ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>[
+\mathcal{I}(\theta) = \mathbb{E}<em>{p(x|\theta)} \left[ \nabla</em>\theta \log p(x|\theta) \nabla_\theta \log p(x|\theta)^\top \right]
+]
+where <span class="arithmatex">\(\mathcal{I}(\theta)\)</span> is the Fisher Information Matrix, <span class="arithmatex">\(\theta\)</span> is the parameter vector, and <span class="arithmatex">\(p(x|\theta)\)</span> is the likelihood of observation <span class="arithmatex">\(x\)</span>. This equation says that the information content of a parameter is determined by the sensitivity of the log-likelihood to changes in that parameter.</p>
+<p>[
+\Delta F = \beta^{-1} \log \langle \exp(-\beta W) \rangle
+]
+where <span class="arithmatex">\(\Delta F\)</span> is the free energy difference, <span class="arithmatex">\(\beta\)</span> is the inverse temperature, and <span class="arithmatex">\(W\)</span> is the work performed during a non-equilibrium transition. This is the Jarzynski equality, which allows for the estimation of free energy from non-equilibrium trajectories.</p>
+<p>[
+p(z|x) \propto p(x|z)p(z)
+]
+where <span class="arithmatex">\(z\)</span> is the latent causal variable, <span class="arithmatex">\(x\)</span> is the observation, <span class="arithmatex">\(p(x|z)\)</span> is the generative model, and <span class="arithmatex">\(p(z)\)</span> is the causal prior. This is the fundamental Bayesian inference step for recovering latent structure.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>AXIOM</strong> (2025) — A fully Bayesian, object-centric agent that achieves high performance on the Gameworld 10k benchmark without neural networks or gradient-based optimization.</li>
+<li><strong>FEAT</strong> (2025) — A framework that unifies equilibrium and non-equilibrium methods for high-dimensional scientific estimation using stochastic interpolants.</li>
+<li><strong>Score-based Causal Representation Learning</strong> (2024) — A method that learns latent causal variables by matching the score function of the data distribution, bypassing the need for intervention labels.</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Learning Causal Representations</td>
+<td>2023</td>
+<td>Jin et al.</td>
+<td>Proves theoretical bounds of identifiability.</td>
+</tr>
+<tr>
+<td>AXIOM</td>
+<td>2025</td>
+<td>Buchholz et al.</td>
+<td>Demonstrates non-neural, object-centric estimation.</td>
+</tr>
+<tr>
+<td>FEAT</td>
+<td>2025</td>
+<td>Author et al.</td>
+<td>Unifies equilibrium and non-equilibrium estimation.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Causal Inference in Statistics</td>
+<td>2000</td>
+<td>Pearl's foundational framework for causal estimation.</td>
+</tr>
+<tr>
+<td>Jarzynski Equality</td>
+<td>1997</td>
+<td>Established the link between work and free energy.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>AXIOM achieves state-of-the-art sample efficiency on the Gameworld 10k benchmark (2025). FEAT provides the most accurate free energy estimation for high-dimensional molecular systems (2025).</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p>Research is currently focused on "causal representation learning" where the goal is to learn the causal graph directly from observational data without intervention labels. Jin et al. (2023) [https://arxiv.org/abs/2311.12267] established that if the environment is sufficiently diverse, the underlying causal structure is identifiable. This has moved the field away from simple correlation-based models toward structural discovery.</p>
+<p>Engineering efforts are shifting toward "object-centric" world models that avoid the heavy compute of deep neural networks. Buchholz et al. (2025) [https://arxiv.org/abs/2505.24784] demonstrated that Bayesian object-centric models can outperform deep RL baselines on sample efficiency. This is a significant shift for applied robotics and game AI, where sample efficiency is the primary constraint.</p>
+<p>The open problem remains the "non-stationary" environment challenge: can we estimate causal graphs that evolve over time? Current methods assume a static graph, but real-world systems are dynamic. This is the frontier of adaptive, agentic reasoning.</p>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Meta</strong> — Digit-pose-estimation — Used in tactile robotics research; datasets available on HuggingFace with &gt;1,000 downloads. <a href="https://huggingface.co/datasets/facebook/digit-pose-estimation">https://huggingface.co/datasets/facebook/digit-pose-estimation</a></li>
+<li><strong>Qualcomm</strong> — MediaPipe Pose Estimation — Deployed in mobile AR/VR pipelines; 500+ downloads on HuggingFace for research integration. <a href="https://huggingface.co/qualcomm/MediaPipe-Pose-Estimation">https://huggingface.co/qualcomm/MediaPipe-Pose-Estimation</a></li>
+</ul>
+<h2 id="minimum-valuable-builds-by-persona">Minimum Valuable Builds — by persona<a class="headerlink" href="#minimum-valuable-builds-by-persona" title="Permanent link">&para;</a></h2>
+<h3 id="1-for-the-curious-learner-30-min-free-tier">1. For the curious learner (30 min · free tier)<a class="headerlink" href="#1-for-the-curious-learner-30-min-free-tier" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Visualize the latent causal structure of a 2D object-centric system.
+<strong>Artifact:</strong> A Colab notebook showing the AXIOM model identifying objects in a 2D scene.
+<strong>Success:</strong> The model correctly identifies the number of objects in the scene by step 100.
+<strong>Stack:</strong> <code>google/vit-base-patch16-224</code> for feature extraction.</p>
+<h3 id="2-for-the-cs-student-tinkerer-1-day-rtx-4070">2. For the CS student / tinkerer (1 day · RTX 4070)<a class="headerlink" href="#2-for-the-cs-student-tinkerer-1-day-rtx-4070" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Train an AXIOM mixture model on the Gameworld 10k subset.
+<strong>Artifact:</strong> A checkpoint and a plot of sample efficiency vs. deep RL baselines.
+<strong>Success:</strong> AXIOM achieves 2x higher sample efficiency than a standard PPO baseline.
+<strong>Stack:</strong> <code>facebook/digit-pose-estimation</code> dataset.</p>
+<h3 id="3-for-the-applied-production-engineer-1-week-a10">3. For the applied / production engineer (1 week · A10)<a class="headerlink" href="#3-for-the-applied-production-engineer-1-week-a10" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Deploy a pose estimation pipeline using the MediaPipe model.
+<strong>Artifact:</strong> A vLLM endpoint serving the pose estimator at p50 &lt; 100ms.
+<strong>Success:</strong> Latency target met with &lt;5% error on pose keypoints.
+<strong>Stack:</strong> <code>qualcomm/MediaPipe-Pose-Estimation</code>.</p>
+<h3 id="4-for-the-applied-researcher-3-days-a100">4. For the applied researcher (3 days · A100)<a class="headerlink" href="#4-for-the-applied-researcher-3-days-a100" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Ablate the effect of object-centric priors on causal identifiability.
+<strong>Artifact:</strong> A comparison curve showing identifiability vs. prior strength.
+<strong>Success:</strong> Evidence that stronger object priors improve identifiability in noisy environments.
+<strong>Stack:</strong> A100 cluster with custom AXIOM implementation.</p>
+<h3 id="5-for-the-theory-student-1-day-cpu">5. For the theory student (1 day · CPU)<a class="headerlink" href="#5-for-the-theory-student-1-day-cpu" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Derive the Fisher Information Matrix for a simple Gaussian causal model.
+<strong>Artifact:</strong> A plot showing the theoretical bound matches numerical estimation.
+<strong>Success:</strong> Residual error below 1e-6.
+<strong>Stack:</strong> Python with <code>numpy</code> and <code>scipy</code>.</p>
+<h3 id="6-for-the-frontier-researcher-1-week-a100-cluster">6. For the frontier researcher (1 week+ · A100 cluster)<a class="headerlink" href="#6-for-the-frontier-researcher-1-week-a100-cluster" title="Permanent link">&para;</a></h3>
+<p><strong>Build:</strong> Probe the identifiability of a non-stationary causal graph.
+<strong>Artifact:</strong> Evidence that the model fails to recover the graph when the causal mechanism evolves.
+<strong>Success:</strong> Falsification criterion: if the model's latent state diverges, the graph is non-identifiable.
+<strong>Stack:</strong> A100 cluster with custom non-stationary environment simulator.</p>
+<h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<div class="admonition researcher">
+<p class="admonition-title">For researchers</p>
+<p>Can we achieve universal identifiability in causal representation learning for non-stationary environments where the underlying causal graph itself evolves over time?</p>
+</div>
+<div class="admonition engineer">
+<p class="admonition-title">For engineers</p>
+<p>How can we optimize the AXIOM object-centric model for real-time inference on mobile hardware without sacrificing causal identifiability?</p>
+</div>
+<div class="admonition open">
+<p class="admonition-title">Think about this</p>
+<p>If an AI can perfectly predict the future, does it necessarily understand the causal mechanisms of the world, or is it just a very good pattern matcher?</p>
+</div>
+<h2 id="this-concept-appears-in">This concept appears in<a class="headerlink" href="#this-concept-appears-in" title="Permanent link">&para;</a></h2>
+<p>Arc step pages for this concept are being generated.</p>
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../05-statistical-probabilistic-ml/bayesian-inference/">Bayesian Inference</a> — Bayesian inference provides a framework for parameter estimation using prior and posterior distributions.</li>
+<li><a href="../../05-statistical-probabilistic-ml/em/">Expectation-Maximization</a> — The EM algorithm is an iterative method for maximum likelihood estimation in latent models.</li>
+<li><a href="../../15-ml-theory-foundations/bias-variance/">Bias-Variance Tradeoff</a> — This tradeoff characterizes the error inherent in any statistical estimation process.</li>
+<li><a href="../../15-ml-theory-foundations/concentration/">Concentration</a> — Concentration inequalities provide bounds on the accuracy of statistical estimators.</li>
+<li><a href="../../03-representation-learning/bootstrapping-methods/">Bootstrapping Methods</a> — Bootstrapping is a resampling technique used to estimate the distribution of a statistic.</li>
+<li><a href="../do-calculus/">Do-calculus</a> — Do-calculus enables the estimation of causal effects from observational data.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Jin et al. (2023) — "Learning Causal Representations from General Environments" — <a href="https://arxiv.org/abs/2311.12267">https://arxiv.org/abs/2311.12267</a> — The definitive paper on identifiability bounds.</li>
+<li>Buchholz et al. (2025) — "AXIOM" — <a href="https://arxiv.org/abs/2505.24784">https://arxiv.org/abs/2505.24784</a> — Essential for understanding non-neural estimation.</li>
+<li>Varıcı et al. (2024) — "Score-based Causal Representation Learning" — <a href="https://arxiv.org/abs/2402.00849">https://arxiv.org/abs/2402.00849</a> — Introduces score-based methods for latent causal variables.</li>
+</ul>
 
 
 

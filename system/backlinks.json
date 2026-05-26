@@ -141,12 +141,18 @@
     "04-neural-networks-dl/cnn": [
       "04-neural-networks-dl/backpropagation",
       "05-statistical-probabilistic-ml/bayesian-nn",
+      "03-representation-learning/contrastive-learning",
       "09-algorithms-systems-ai/ai-hardware",
-      "07-attention-memory-reasoning/single-head-attention",
-      "03-representation-learning/bootstrapping-methods"
+      "05-statistical-probabilistic-ml/em",
+      "15-ml-theory-foundations/bias-variance"
     ],
     "13-graph-relational-ai/combinatorial-opt": [
-      "07-attention-memory-reasoning/single-head-attention"
+      "09-algorithms-systems-ai/ai-hardware",
+      "15-ml-theory-foundations/bias-variance",
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "10-complexity-cognition/circuit-complexity"
     ],
     "10-complexity-cognition/cognitive-architectures": [
       "10-complexity-cognition/circuit-complexity",
@@ -155,6 +161,316 @@
       "05-statistical-probabilistic-ml/bayesian-inference",
       "05-statistical-probabilistic-ml/bayesian-nn",
       "04-neural-networks-dl/backpropagation"
+    ],
+    "10-complexity-cognition/complex-systems": [
+      "10-complexity-cognition/circuit-complexity",
+      "14-biology-life-sciences/cell-simulation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "10-complexity-cognition/complexity-classes": [
+      "10-complexity-cognition/circuit-complexity",
+      "10-complexity-cognition/cognitive-architectures",
+      "09-algorithms-systems-ai/ai-hardware",
+      "15-ml-theory-foundations/bias-variance",
+      "04-neural-networks-dl/cnn",
+      "04-neural-networks-dl/backpropagation"
+    ],
+    "15-ml-theory-foundations/concentration": [
+      "15-ml-theory-foundations/bias-variance",
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "10-complexity-cognition/cognitive-architectures",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference"
+    ],
+    "02-generative-modeling/consistency-models": [
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "15-ml-theory-foundations/bias-variance",
+      "03-representation-learning/bootstrapping-methods"
+    ],
+    "01-ai/constraint-satisfaction": [
+      "10-complexity-cognition/cognitive-architectures",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "09-algorithms-systems-ai/ai-hardware",
+      "10-complexity-cognition/circuit-complexity",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "15-ml-theory-foundations/bias-variance"
+    ],
+    "03-representation-learning/contrastive-learning": [
+      "03-representation-learning/bootstrapping-methods",
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "11-robotics-embodied-ai/control-theory": [
+      "10-complexity-cognition/cognitive-architectures",
+      "04-neural-networks-dl/backpropagation",
+      "09-algorithms-systems-ai/ai-hardware",
+      "04-neural-networks-dl/cnn"
+    ],
+    "15-ml-theory-foundations/convex-optimization": [
+      "15-ml-theory-foundations/bias-variance",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/em",
+      "15-ml-theory-foundations/concentration",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "15-ml-theory-foundations/entropy"
+    ],
+    "08-causal-statistical-inference/counterfactuals": [
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/em",
+      "03-representation-learning/bootstrapping-methods"
+    ],
+    "09-algorithms-systems-ai/custom-kernels": [
+      "04-neural-networks-dl/cnn",
+      "04-neural-networks-dl/backpropagation",
+      "09-algorithms-systems-ai/ai-hardware",
+      "03-representation-learning/contrastive-learning",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "15-ml-theory-foundations/bias-variance"
+    ],
+    "09-algorithms-systems-ai/data-parallelism": [
+      "09-algorithms-systems-ai/ai-hardware",
+      "04-neural-networks-dl/cnn",
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/contrastive-learning",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "12-physics-scientific-ai/deeponet": [
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "09-algorithms-systems-ai/ai-hardware"
+    ],
+    "02-generative-modeling/diffusion-models": [
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/bias-variance"
+    ],
+    "05-statistical-probabilistic-ml/directed-graphical-models": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/bootstrapping-methods",
+      "15-ml-theory-foundations/bias-variance"
+    ],
+    "08-causal-statistical-inference/disentanglement": [
+      "03-representation-learning/contrastive-learning",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "03-representation-learning/bootstrapping-methods",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "15-ml-theory-foundations/bias-variance"
+    ],
+    "05-statistical-probabilistic-ml/distribution-shift": [
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/concentration",
+      "03-representation-learning/bootstrapping-methods"
+    ],
+    "06-reinforcement-learning/distributional-rl": [
+      "03-representation-learning/bootstrapping-methods",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "15-ml-theory-foundations/bias-variance",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "14-biology-life-sciences/dna-sequence-models": [
+      "04-neural-networks-dl/cnn",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "03-representation-learning/contrastive-learning",
+      "07-attention-memory-reasoning/single-head-attention"
+    ],
+    "08-causal-statistical-inference/do-calculus": [
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "15-ml-theory-foundations/entropy",
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/em"
+    ],
+    "15-ml-theory-foundations/double-descent": [
+      "15-ml-theory-foundations/bias-variance",
+      "15-ml-theory-foundations/concentration",
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "03-representation-learning/bootstrapping-methods"
+    ],
+    "06-reinforcement-learning/dqn": [
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "03-representation-learning/bootstrapping-methods",
+      "10-complexity-cognition/cognitive-architectures",
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "14-biology-life-sciences/drug-target": [
+      "14-biology-life-sciences/cell-simulation",
+      "04-neural-networks-dl/cnn",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "06-reinforcement-learning/dynamic-programming": [
+      "10-complexity-cognition/circuit-complexity",
+      "10-complexity-cognition/complexity-classes",
+      "09-algorithms-systems-ai/ai-hardware",
+      "03-representation-learning/bootstrapping-methods",
+      "15-ml-theory-foundations/bias-variance"
+    ],
+    "07-attention-memory-reasoning/efficient-attention": [
+      "07-attention-memory-reasoning/single-head-attention",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "09-algorithms-systems-ai/ai-hardware",
+      "04-neural-networks-dl/cnn",
+      "04-neural-networks-dl/backpropagation",
+      "10-complexity-cognition/circuit-complexity"
+    ],
+    "05-statistical-probabilistic-ml/em": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "03-representation-learning/bootstrapping-methods",
+      "15-ml-theory-foundations/bias-variance",
+      "08-causal-statistical-inference/disentanglement"
+    ],
+    "10-complexity-cognition/emergent-capabilities": [
+      "10-complexity-cognition/cognitive-architectures",
+      "10-complexity-cognition/circuit-complexity",
+      "10-complexity-cognition/complexity-classes",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "04-neural-networks-dl/cnn",
+      "07-attention-memory-reasoning/efficient-attention"
+    ],
+    "02-generative-modeling/energy-based-models": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/entropy",
+      "05-statistical-probabilistic-ml/em",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/bayesian-nn"
+    ],
+    "15-ml-theory-foundations/entropy": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "15-ml-theory-foundations/concentration",
+      "15-ml-theory-foundations/bias-variance",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "08-causal-statistical-inference/disentanglement",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "14-biology-life-sciences/epigenomics": [
+      "14-biology-life-sciences/cell-simulation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "08-causal-statistical-inference/disentanglement",
+      "08-causal-statistical-inference/counterfactuals",
+      "15-ml-theory-foundations/entropy"
+    ],
+    "13-graph-relational-ai/equivariant-gnn": [
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/cnn",
+      "14-biology-life-sciences/cell-simulation",
+      "08-causal-statistical-inference/disentanglement",
+      "15-ml-theory-foundations/entropy"
+    ],
+    "12-physics-scientific-ai/equivariant-networks": [
+      "04-neural-networks-dl/cnn",
+      "08-causal-statistical-inference/disentanglement",
+      "14-biology-life-sciences/cell-simulation",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/entropy",
+      "04-neural-networks-dl/backpropagation"
+    ],
+    "08-causal-statistical-inference/estimation": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/em",
+      "15-ml-theory-foundations/bias-variance",
+      "15-ml-theory-foundations/concentration",
+      "03-representation-learning/bootstrapping-methods",
+      "08-causal-statistical-inference/do-calculus"
+    ],
+    "02-generative-modeling/flow-matching": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "15-ml-theory-foundations/entropy",
+      "08-causal-statistical-inference/disentanglement",
+      "12-physics-scientific-ai/equivariant-networks",
+      "15-ml-theory-foundations/bias-variance",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "12-physics-scientific-ai/fno": [
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/cnn",
+      "14-biology-life-sciences/cell-simulation",
+      "08-causal-statistical-inference/estimation"
+    ],
+    "11-robotics-embodied-ai/foundation-models-robotics": [
+      "10-complexity-cognition/cognitive-architectures",
+      "10-complexity-cognition/emergent-capabilities",
+      "09-algorithms-systems-ai/ai-hardware",
+      "03-representation-learning/contrastive-learning",
+      "07-attention-memory-reasoning/chain-of-thought",
+      "12-physics-scientific-ai/equivariant-networks"
+    ],
+    "05-statistical-probabilistic-ml/gaussian-processes": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-nn",
+      "15-ml-theory-foundations/bias-variance",
+      "08-causal-statistical-inference/estimation",
+      "15-ml-theory-foundations/entropy",
+      "05-statistical-probabilistic-ml/em"
+    ],
+    "14-biology-life-sciences/gene-networks": [
+      "14-biology-life-sciences/cell-simulation",
+      "14-biology-life-sciences/epigenomics",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "08-causal-statistical-inference/do-calculus",
+      "04-neural-networks-dl/backpropagation",
+      "10-complexity-cognition/circuit-complexity"
+    ],
+    "15-ml-theory-foundations/generalization-deep": [
+      "15-ml-theory-foundations/bias-variance",
+      "15-ml-theory-foundations/concentration",
+      "15-ml-theory-foundations/entropy",
+      "10-complexity-cognition/circuit-complexity",
+      "03-representation-learning/contrastive-learning",
+      "08-causal-statistical-inference/disentanglement"
+    ],
+    "02-generative-modeling/generative-adversarial-networks": [
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/cnn",
+      "08-causal-statistical-inference/disentanglement",
+      "15-ml-theory-foundations/entropy",
+      "15-ml-theory-foundations/bias-variance",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "12-physics-scientific-ai/geometric-dl": [
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/cnn",
+      "03-representation-learning/contrastive-learning",
+      "14-biology-life-sciences/cell-simulation",
+      "08-causal-statistical-inference/disentanglement",
+      "15-ml-theory-foundations/entropy"
     ]
   },
   "reverse": {
@@ -197,7 +513,12 @@
       "12-physics-scientific-ai/climate-ai",
       "04-neural-networks-dl/cnn",
       "13-graph-relational-ai/combinatorial-opt",
-      "10-complexity-cognition/cognitive-architectures"
+      "10-complexity-cognition/cognitive-architectures",
+      "15-ml-theory-foundations/concentration",
+      "03-representation-learning/contrastive-learning",
+      "14-biology-life-sciences/dna-sequence-models",
+      "07-attention-memory-reasoning/efficient-attention",
+      "10-complexity-cognition/emergent-capabilities"
     ],
     "05-statistical-probabilistic-ml/bayesian-inference": [
       "03-representation-learning/bootstrapping-methods",
@@ -206,7 +527,32 @@
       "15-ml-theory-foundations/bias-variance",
       "01-ai/classical-planning",
       "12-physics-scientific-ai/climate-ai",
-      "10-complexity-cognition/cognitive-architectures"
+      "10-complexity-cognition/cognitive-architectures",
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/complex-systems",
+      "15-ml-theory-foundations/concentration",
+      "02-generative-modeling/consistency-models",
+      "01-ai/constraint-satisfaction",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/counterfactuals",
+      "12-physics-scientific-ai/deeponet",
+      "02-generative-modeling/diffusion-models",
+      "05-statistical-probabilistic-ml/directed-graphical-models",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/distribution-shift",
+      "06-reinforcement-learning/distributional-rl",
+      "14-biology-life-sciences/dna-sequence-models",
+      "08-causal-statistical-inference/do-calculus",
+      "14-biology-life-sciences/drug-target",
+      "05-statistical-probabilistic-ml/em",
+      "02-generative-modeling/energy-based-models",
+      "15-ml-theory-foundations/entropy",
+      "14-biology-life-sciences/epigenomics",
+      "08-causal-statistical-inference/estimation",
+      "02-generative-modeling/flow-matching",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "14-biology-life-sciences/gene-networks"
     ],
     "05-statistical-probabilistic-ml/bayesian-nn": [
       "03-representation-learning/bootstrapping-methods",
@@ -216,7 +562,29 @@
       "01-ai/classical-planning",
       "12-physics-scientific-ai/climate-ai",
       "04-neural-networks-dl/cnn",
-      "10-complexity-cognition/cognitive-architectures"
+      "10-complexity-cognition/cognitive-architectures",
+      "10-complexity-cognition/complex-systems",
+      "02-generative-modeling/consistency-models",
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/counterfactuals",
+      "09-algorithms-systems-ai/custom-kernels",
+      "09-algorithms-systems-ai/data-parallelism",
+      "12-physics-scientific-ai/deeponet",
+      "02-generative-modeling/diffusion-models",
+      "05-statistical-probabilistic-ml/directed-graphical-models",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/distribution-shift",
+      "06-reinforcement-learning/distributional-rl",
+      "14-biology-life-sciences/dna-sequence-models",
+      "08-causal-statistical-inference/do-calculus",
+      "15-ml-theory-foundations/double-descent",
+      "06-reinforcement-learning/dqn",
+      "14-biology-life-sciences/drug-target",
+      "05-statistical-probabilistic-ml/em",
+      "02-generative-modeling/energy-based-models",
+      "15-ml-theory-foundations/entropy",
+      "14-biology-life-sciences/epigenomics",
+      "05-statistical-probabilistic-ml/gaussian-processes"
     ],
     "04-neural-networks-dl/backpropagation": [
       "10-complexity-cognition/circuit-complexity",
@@ -225,28 +593,263 @@
       "01-ai/classical-planning",
       "12-physics-scientific-ai/climate-ai",
       "04-neural-networks-dl/cnn",
-      "10-complexity-cognition/cognitive-architectures"
+      "10-complexity-cognition/cognitive-architectures",
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/complexity-classes",
+      "15-ml-theory-foundations/concentration",
+      "02-generative-modeling/consistency-models",
+      "03-representation-learning/contrastive-learning",
+      "11-robotics-embodied-ai/control-theory",
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/counterfactuals",
+      "09-algorithms-systems-ai/custom-kernels",
+      "09-algorithms-systems-ai/data-parallelism",
+      "12-physics-scientific-ai/deeponet",
+      "02-generative-modeling/diffusion-models",
+      "05-statistical-probabilistic-ml/directed-graphical-models",
+      "08-causal-statistical-inference/disentanglement",
+      "06-reinforcement-learning/distributional-rl",
+      "14-biology-life-sciences/dna-sequence-models",
+      "15-ml-theory-foundations/double-descent",
+      "06-reinforcement-learning/dqn",
+      "14-biology-life-sciences/drug-target",
+      "07-attention-memory-reasoning/efficient-attention",
+      "02-generative-modeling/energy-based-models",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "14-biology-life-sciences/gene-networks",
+      "02-generative-modeling/generative-adversarial-networks"
     ],
     "09-algorithms-systems-ai/ai-hardware": [
       "10-complexity-cognition/circuit-complexity",
       "09-algorithms-systems-ai/classical-algorithms",
       "01-ai/classical-planning",
       "12-physics-scientific-ai/climate-ai",
-      "04-neural-networks-dl/cnn"
+      "04-neural-networks-dl/cnn",
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/complexity-classes",
+      "01-ai/constraint-satisfaction",
+      "11-robotics-embodied-ai/control-theory",
+      "09-algorithms-systems-ai/custom-kernels",
+      "09-algorithms-systems-ai/data-parallelism",
+      "12-physics-scientific-ai/deeponet",
+      "06-reinforcement-learning/dynamic-programming",
+      "07-attention-memory-reasoning/efficient-attention",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/fno",
+      "11-robotics-embodied-ai/foundation-models-robotics"
     ],
     "10-complexity-cognition/circuit-complexity": [
       "09-algorithms-systems-ai/classical-algorithms",
       "01-ai/classical-planning",
-      "10-complexity-cognition/cognitive-architectures"
+      "10-complexity-cognition/cognitive-architectures",
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/complex-systems",
+      "10-complexity-cognition/complexity-classes",
+      "01-ai/constraint-satisfaction",
+      "06-reinforcement-learning/dynamic-programming",
+      "07-attention-memory-reasoning/efficient-attention",
+      "10-complexity-cognition/emergent-capabilities",
+      "14-biology-life-sciences/gene-networks",
+      "15-ml-theory-foundations/generalization-deep"
     ],
     "03-representation-learning/bootstrapping-methods": [
       "15-ml-theory-foundations/bias-variance",
       "12-physics-scientific-ai/climate-ai",
-      "04-neural-networks-dl/cnn"
+      "04-neural-networks-dl/cnn",
+      "02-generative-modeling/consistency-models",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/counterfactuals",
+      "05-statistical-probabilistic-ml/directed-graphical-models",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/distribution-shift",
+      "06-reinforcement-learning/distributional-rl",
+      "15-ml-theory-foundations/double-descent",
+      "06-reinforcement-learning/dqn",
+      "06-reinforcement-learning/dynamic-programming",
+      "05-statistical-probabilistic-ml/em",
+      "02-generative-modeling/energy-based-models",
+      "08-causal-statistical-inference/do-calculus",
+      "08-causal-statistical-inference/estimation"
     ],
     "07-attention-memory-reasoning/chain-of-thought": [
       "12-physics-scientific-ai/climate-ai",
-      "10-complexity-cognition/cognitive-architectures"
+      "10-complexity-cognition/cognitive-architectures",
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/complex-systems",
+      "15-ml-theory-foundations/concentration",
+      "01-ai/constraint-satisfaction",
+      "07-attention-memory-reasoning/efficient-attention",
+      "10-complexity-cognition/emergent-capabilities",
+      "11-robotics-embodied-ai/foundation-models-robotics"
+    ],
+    "15-ml-theory-foundations/bias-variance": [
+      "13-graph-relational-ai/combinatorial-opt",
+      "10-complexity-cognition/complex-systems",
+      "10-complexity-cognition/complexity-classes",
+      "15-ml-theory-foundations/concentration",
+      "02-generative-modeling/consistency-models",
+      "01-ai/constraint-satisfaction",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/counterfactuals",
+      "09-algorithms-systems-ai/custom-kernels",
+      "02-generative-modeling/diffusion-models",
+      "05-statistical-probabilistic-ml/directed-graphical-models",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/distribution-shift",
+      "06-reinforcement-learning/distributional-rl",
+      "08-causal-statistical-inference/do-calculus",
+      "15-ml-theory-foundations/double-descent",
+      "06-reinforcement-learning/dqn",
+      "06-reinforcement-learning/dynamic-programming",
+      "05-statistical-probabilistic-ml/em",
+      "15-ml-theory-foundations/entropy",
+      "04-neural-networks-dl/cnn",
+      "08-causal-statistical-inference/estimation",
+      "02-generative-modeling/flow-matching",
+      "12-physics-scientific-ai/fno",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks"
+    ],
+    "14-biology-life-sciences/cell-simulation": [
+      "10-complexity-cognition/complex-systems",
+      "14-biology-life-sciences/drug-target",
+      "14-biology-life-sciences/epigenomics",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "14-biology-life-sciences/gene-networks",
+      "12-physics-scientific-ai/geometric-dl"
+    ],
+    "10-complexity-cognition/cognitive-architectures": [
+      "10-complexity-cognition/complexity-classes",
+      "15-ml-theory-foundations/concentration",
+      "01-ai/constraint-satisfaction",
+      "11-robotics-embodied-ai/control-theory",
+      "06-reinforcement-learning/dqn",
+      "10-complexity-cognition/emergent-capabilities",
+      "11-robotics-embodied-ai/foundation-models-robotics"
+    ],
+    "04-neural-networks-dl/cnn": [
+      "10-complexity-cognition/complexity-classes",
+      "03-representation-learning/contrastive-learning",
+      "11-robotics-embodied-ai/control-theory",
+      "09-algorithms-systems-ai/custom-kernels",
+      "09-algorithms-systems-ai/data-parallelism",
+      "12-physics-scientific-ai/deeponet",
+      "02-generative-modeling/diffusion-models",
+      "14-biology-life-sciences/dna-sequence-models",
+      "15-ml-theory-foundations/double-descent",
+      "06-reinforcement-learning/dqn",
+      "14-biology-life-sciences/drug-target",
+      "07-attention-memory-reasoning/efficient-attention",
+      "10-complexity-cognition/emergent-capabilities",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
+    ],
+    "15-ml-theory-foundations/concentration": [
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/counterfactuals",
+      "05-statistical-probabilistic-ml/distribution-shift",
+      "08-causal-statistical-inference/do-calculus",
+      "15-ml-theory-foundations/double-descent",
+      "15-ml-theory-foundations/entropy",
+      "08-causal-statistical-inference/estimation",
+      "15-ml-theory-foundations/generalization-deep"
+    ],
+    "03-representation-learning/contrastive-learning": [
+      "09-algorithms-systems-ai/custom-kernels",
+      "09-algorithms-systems-ai/data-parallelism",
+      "02-generative-modeling/diffusion-models",
+      "08-causal-statistical-inference/disentanglement",
+      "05-statistical-probabilistic-ml/distribution-shift",
+      "14-biology-life-sciences/dna-sequence-models",
+      "14-biology-life-sciences/drug-target",
+      "02-generative-modeling/energy-based-models",
+      "15-ml-theory-foundations/entropy",
+      "04-neural-networks-dl/cnn",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "02-generative-modeling/flow-matching",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
+    ],
+    "08-causal-statistical-inference/disentanglement": [
+      "08-causal-statistical-inference/do-calculus",
+      "05-statistical-probabilistic-ml/em",
+      "02-generative-modeling/energy-based-models",
+      "15-ml-theory-foundations/entropy",
+      "08-causal-statistical-inference/counterfactuals",
+      "14-biology-life-sciences/epigenomics",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "02-generative-modeling/flow-matching",
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
+    ],
+    "10-complexity-cognition/complexity-classes": [
+      "06-reinforcement-learning/dynamic-programming",
+      "10-complexity-cognition/emergent-capabilities"
+    ],
+    "05-statistical-probabilistic-ml/em": [
+      "04-neural-networks-dl/cnn",
+      "15-ml-theory-foundations/convex-optimization",
+      "08-causal-statistical-inference/do-calculus",
+      "08-causal-statistical-inference/counterfactuals",
+      "02-generative-modeling/energy-based-models",
+      "08-causal-statistical-inference/estimation",
+      "05-statistical-probabilistic-ml/gaussian-processes"
+    ],
+    "15-ml-theory-foundations/entropy": [
+      "15-ml-theory-foundations/convex-optimization",
+      "02-generative-modeling/energy-based-models",
+      "14-biology-life-sciences/epigenomics",
+      "08-causal-statistical-inference/do-calculus",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "02-generative-modeling/flow-matching",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "15-ml-theory-foundations/generalization-deep",
+      "02-generative-modeling/generative-adversarial-networks",
+      "12-physics-scientific-ai/geometric-dl"
+    ],
+    "07-attention-memory-reasoning/efficient-attention": [
+      "10-complexity-cognition/emergent-capabilities"
+    ],
+    "08-causal-statistical-inference/counterfactuals": [
+      "14-biology-life-sciences/epigenomics",
+      "08-causal-statistical-inference/do-calculus",
+      "11-robotics-embodied-ai/foundation-models-robotics"
+    ],
+    "12-physics-scientific-ai/equivariant-networks": [
+      "13-graph-relational-ai/equivariant-gnn",
+      "02-generative-modeling/flow-matching",
+      "12-physics-scientific-ai/fno",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "12-physics-scientific-ai/geometric-dl"
+    ],
+    "08-causal-statistical-inference/do-calculus": [
+      "08-causal-statistical-inference/estimation",
+      "14-biology-life-sciences/gene-networks"
+    ],
+    "08-causal-statistical-inference/estimation": [
+      "12-physics-scientific-ai/fno",
+      "05-statistical-probabilistic-ml/gaussian-processes"
+    ],
+    "10-complexity-cognition/emergent-capabilities": [
+      "11-robotics-embodied-ai/foundation-models-robotics"
+    ],
+    "14-biology-life-sciences/epigenomics": [
+      "14-biology-life-sciences/gene-networks"
     ]
   }
 }

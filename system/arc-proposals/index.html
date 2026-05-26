@@ -75,6 +75,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#arc-proposals" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -1917,13 +1922,6 @@
   </span>
   
   
-    
-  
-  
-    <span class="md-status md-status--stub"></span>
-  
-
-  
 
       </a>
     </li>
@@ -2288,13 +2286,6 @@
     
   </span>
   
-  
-    
-  
-  
-    <span class="md-status md-status--stub"></span>
-  
-
   
 
       </a>
@@ -2702,13 +2693,6 @@
     
   </span>
   
-  
-    
-  
-  
-    <span class="md-status md-status--stub"></span>
-  
-
   
 
       </a>
@@ -3992,51 +3976,39 @@
   
 
 
-  <h1>Arc proposals</h1>
-
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>---
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>title: Arc proposals
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>generated_at: 2024-05-26 14:00 UTC
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>remaining_budget: $3.44
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="gu">slots_open: 2</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="gu">---</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a><span class="gh"># Arc proposals</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>This cycle proposes one arc focused on JEPA world models, aiming to build a predictive model for action. The survey revealed promising directions in Gaussian Splatting, JEPA, and Diffusion-based world models. After careful evaluation, the JEPA arc was selected due to its strong compounding trajectory and alignment with existing curriculum. The other branches were either not diagonal or had insufficient curriculum support.
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a><span class="gu">## 1. JEPA World Model for Action — EV/$ = 4.5 — verdict: approve</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="gs">**Destination:**</span> Build a JEPA-style world model and use it to predict future states conditioned on actions.
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a><span class="gs">**Steps:**</span> 6 · <span class="gs">**Cost:**</span> $1.60 · <span class="gs">**Impact:**</span> 8/10
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="gs">**Prereqs in curriculum:**</span> transformer architecture ✓(07-attention-memory-reasoning), representation learning ✓(03-representation-learning), optimization ✓(04-neural-networks-dl), causal inference ✗ (queue first)
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="gs">**Persona span:**</span> 3 (curious-learner, applied-researcher, frontier-researcher)
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="gs">**Seminal anchors:**</span> LeCun 2022 · V-JEPA 2024 ·  Schrittwieser et al. 2020
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="gs">**Outline:**</span>
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="k">1.</span>  <span class="gs">**Build:**</span> Implement a simple autoencoder (representation learning)
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">    </span><span class="k">*</span><span class="w"> </span>  <span class="sb">`mvb_persona`</span>: curious-learner
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="k">2.</span>  <span class="gs">**Build:**</span> Implement a Transformer-based predictor (transformer architecture)
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="k">*</span><span class="w"> </span>  <span class="sb">`mvb_persona`</span>: curious-learner
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="k">3.</span>  <span class="gs">**Build:**</span> Train the predictor to predict future frames (representation learning, optimization)
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="w">    </span><span class="k">*</span><span class="w"> </span>  <span class="sb">`mvb_persona`</span>: applied-researcher
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a><span class="k">4.</span>  <span class="gs">**Build:**</span> Add action conditioning to the predictor (transformer architecture)
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a><span class="w">    </span><span class="k">*</span><span class="w"> </span>  <span class="sb">`mvb_persona`</span>: applied-researcher
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a><span class="k">5.</span>  <span class="gs">**Build:**</span> Evaluate the model&#39;s ability to predict future states given actions.
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a><span class="w">    </span><span class="k">*</span><span class="w"> </span>  <span class="sb">`mvb_persona`</span>: applied-researcher
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a><span class="k">6.</span>  <span class="gs">**Build:**</span> Explore the model&#39;s latent space for planning and control.
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a><span class="w">    </span><span class="k">*</span><span class="w"> </span>  <span class="sb">`mvb_persona`</span>: frontier-researcher
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a><span class="gs">**Editor verdict:**</span> approve
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a><span class="gs">**Approval note:**</span> This arc provides a solid foundation for understanding and building JEPA-style world models, a promising direction for future AI systems. The compounding trajectory is clear, and the persona walk is well-structured.
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a><span class="gu">## 2. Exploration deferred — seed &quot;world models&quot;</span>
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>
-<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>The survey returned 3 distinct branching directions. The Gaussian Splatting and Diffusion-based world model branches were considered, but were not selected due to the lack of a clear diagonal shape, or insufficient curriculum support.
-</code></pre></div>
+<h1 id="arc-proposals">Arc proposals<a class="headerlink" href="#arc-proposals" title="Permanent link">&para;</a></h1>
+<p>I have surveyed the "post-training and RL" seed within the 06-reinforcement-learning track. I propose one high-impact arc: <strong>GRPO-based Reasoning Alignment</strong>. This arc satisfies the diagonal pattern by bridging standard RLHF (specialized tool) with reasoning-chain verification (frontier intersection). A second potential branch (DPO-based alignment) was deferred due to insufficient curriculum depth in the underlying preference-modeling track.</p>
+<h2 id="1-grpo-based-reasoning-alignment-ev-48-verdict-approve">1. GRPO-based Reasoning Alignment — EV/$ = 4.8 — verdict: approve<a class="headerlink" href="#1-grpo-based-reasoning-alignment-ev-48-verdict-approve" title="Permanent link">&para;</a></h2>
+<p><strong>Destination:</strong> Implement Group Relative Policy Optimization (GRPO) to align a base model on chain-of-thought reasoning tasks without a separate reward model.
+<strong>Steps:</strong> 7 · <strong>Cost:</strong> $1.60 · <strong>Impact:</strong> 12/14
+<strong>Prereqs in curriculum:</strong> [policy-gradient: solid, ppo-basics: solid, chain-of-thought-prompting: adequate, reward-modeling: stub]
+<strong>Persona span:</strong> 4 (ml-tinkerer, applied-engineer, applied-researcher, frontier-researcher)
+<strong>Seminal anchors:</strong> Shao et al. 2024 (DeepSeek-R1), Schulman et al. 2017 (PPO), Wei et al. 2022 (CoT)
+<strong>Outline:</strong> 
+1. CoT prompting baseline (ml-tinkerer)
+2. PPO-style reward signal definition (ml-tinkerer)
+3. Group generation pipeline (applied-engineer)
+4. Relative advantage calculation (applied-engineer)
+5. Policy update with KL-penalty (applied-researcher)
+6. Reasoning trace length ablation (applied-researcher)
+7. Final evaluation on MATH/GSM8K (frontier-researcher)
+<strong>Editor verdict:</strong> approve
+<strong>Approval note:</strong> This arc is highly timely and follows a perfect diagonal: it starts with familiar CoT prompting, moves to the broader frame of RL-based alignment, synthesizes a GRPO capability, and lands at the frontier of reasoning-model training. The compounding chain is tight, as each step builds the specific components of the GRPO loop.</p>
+<h2 id="deferred-branches-not-proposed-this-cycle">Deferred branches (not proposed this cycle)<a class="headerlink" href="#deferred-branches-not-proposed-this-cycle" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>DPO-based Preference Alignment:</strong> Deferred. The curriculum for <code>06-reinforcement-learning</code> currently lacks a solid <code>preference-modeling</code> page, which is a required prereq for DPO.</li>
+<li><strong>Online RLHF with Rejection Sampling:</strong> Deferred. The survey indicated this branch is currently too similar to existing PPO implementations; it lacks a distinct "frontier intersection" compared to the GRPO reasoning path.</li>
+<li><strong>Multi-Objective RL for Safety:</strong> Deferred. The diagonal shape is currently vertical (RL → RL → RL), failing the requirement to cross into a broader research community.</li>
+</ul>
 
 
 
 
 
 
+
+  
+  
 
 
 
