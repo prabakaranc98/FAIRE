@@ -68,6 +68,24 @@ Beyond "is it directed," score each variant against the three gates from `mvb-re
 
 A variant that fails ANY gate is a build the reader cannot trust. Critic must surface it explicitly.
 
+### How to verify feasibility (the verifier tool)
+
+`agents/src/frontier_agents/tools.py::verify_mvb_stack(model_id, dataset_id, compute, training)` is the source-of-truth feasibility check. It returns `{feasible, model_check, dataset_check, vram_check, issues}` and:
+
+- pings `huggingface.co/api/models/{model_id}` (follows redirects, treats 401/404 as "not found")
+- pings `huggingface.co/api/datasets/{dataset_id}` (same)
+- extracts parameter count from the model_id name pattern (e.g. "Llama-3-8B" → 8e9) and compares against an inference/training VRAM table (`_PARAMS_TO_MIN_VRAM_GB_INFERENCE`)
+- extracts target VRAM from the compute string (regex on `N GB`)
+- composes a single `feasible: bool` verdict + per-issue strings
+
+When the writer authors an MVB variant, the critic should mentally run `verify_mvb_stack` against the proposed (model, dataset, compute) triple and deduct accordingly:
+
+- `model_check.exists == False` → −0.20 (phantom HF ID)
+- `dataset_check.exists == False` → −0.10 (phantom dataset)
+- `vram_check.fits == False` → −0.20 (compute doesn't fit the model size)
+
+The critic doesn't need to call the tool inside the LLM prompt — the verification can land as a pre-review pass in code. The critic's job is to recognize the issues when the verifier surfaces them, and to score the MVB block accordingly.
+
 ## "What can you build next?" section check
 
 A page is fully nudge-complete only when, after the MVB block, there is a "What can you build next?" section pointing to:

@@ -604,17 +604,36 @@ def maybe_propose_arcs(
     audit,
     docs_path: Path,
     verbose: bool = False,
+    forced_seed: str = "",
+    forced_track: str = "",
 ) -> dict:
     """Run the arc-proposal phase if preconditions are met.
 
-    Reads `arc-selection.md` + `critic-editor.md` skills to drive the proposal;
-    writes candidate arcs to docs/system/arc-proposals.md (does NOT queue them
-    automatically — human picks).
+    Two invocation paths:
+      - Autonomous (default): all three preconditions checked (canonical-track
+        coverage ≥ threshold, budget mode = full, active_arcs < 2).
+      - Human-in-the-loop (forced_seed != ""): bypasses the coverage check,
+        because the user has explicitly named a seed they want explored.
+        Still respects budget mode (refuses if 'paused') and 2-active-arcs cap.
+
+    Reads `arc-exploration.md` + `arc-selection.md` + `arc-anatomy.md` +
+    `critic-editor.md` skills to drive the proposal; writes candidate arcs
+    to docs/system/arc-proposals.md (does NOT queue — human picks).
 
     Returns a summary dict.
     """
     active_arcs = _count_active_arcs(docs_path)
-    ok, reason = _arc_propose_preconditions_met(obs, audit, active_arcs, verbose)
+
+    if forced_seed:
+        # CLI explore path — bypass coverage gate, keep budget + active_arcs gates.
+        if obs is not None and obs.budget.mode == "paused":
+            ok, reason = False, "budget mode = paused (refusing to explore)"
+        elif active_arcs >= 2:
+            ok, reason = False, f"{active_arcs} arcs already active (cap = 2)"
+        else:
+            ok, reason = True, f"CLI explore mode for seed '{forced_seed}'"
+    else:
+        ok, reason = _arc_propose_preconditions_met(obs, audit, active_arcs, verbose)
 
     summary = {
         "ran": False,
@@ -652,6 +671,7 @@ def maybe_propose_arcs(
         sel_skill = next((s for s in skills if s.name == "arc-selection"), None)
         anatomy = next((s for s in skills if s.name == "arc-anatomy"), None)
         editor = next((s for s in skills if s.name == "critic-editor"), None)
+        exploration = next((s for s in skills if s.name == "arc-exploration"), None)
         if not (sel_skill and anatomy and editor):
             summary["reason"] = "missing one of arc-selection / arc-anatomy / critic-editor skill"
             return summary
@@ -668,6 +688,22 @@ def maybe_propose_arcs(
                     f"  {track}: {tm.generated} pages generated, avg_conf={tm.avg_confidence:.2f}"
                 )
 
+        seed_block = ""
+        if forced_seed:
+            seed_block = f"""
+EXPLICIT SEED (CLI explore mode)
+The user named the seed: "{forced_seed}"{" (track: " + forced_track + ")" if forced_track else ""}
+Apply the arc-exploration playbook to THIS seed specifically. Survey via your
+knowledge of the field's branching directions (Gaussian-Splatting vs JEPA vs
+Diffusion-based vs PAN-based, for the world-models example). Map against the
+diagonal pattern. Pick + outline the top 1–2 candidate arcs that branch
+from this seed. Do NOT propose arcs from unrelated tracks — stay on-seed.
+
+The arc-exploration skill body (read this carefully):
+---
+{exploration.body if exploration else "(arc-exploration skill missing — improvise from arc-anatomy)"}
+---
+"""
         prompt = f"""You are the Frontier Wiki supervisor running the ARC PROPOSAL phase.
 
 Reading these skills as context:
@@ -679,17 +715,16 @@ Reading these skills as context:
 ---
 {editor.body}
 ---
-
+{seed_block}
 CURRENT STATE
-- Canonical-track avg coverage: meets threshold {ARC_PROPOSE_COVERAGE_THRESHOLD:.0%}
+- Mode: {"CLI explore (seed-forced)" if forced_seed else "autonomous (coverage-gated)"}
 - Remaining budget: ${remaining:.2f} (arc budget = ${arc_budget:.2f})
 - Slots open for new active arcs: {summary['slots_open']}
 - Curriculum coverage by track:
-{chr(10).join(curriculum_context)}
+{chr(10).join(curriculum_context) if curriculum_context else "  (no tracks have generated content yet)"}
 
 YOUR JOB
-1. Scan the curriculum-track metrics above. Identify 3–6 candidate arcs that
-   would compound the existing curriculum into a frontier capability.
+{"1. Apply the arc-exploration playbook to the seed above. Survey ≥ 3 branches before scoring." if forced_seed else "1. Scan the curriculum-track metrics above. Identify 3–6 candidate arcs that would compound the existing curriculum into a frontier capability."}
 2. Score each by EV/$ per the arc-selection skill.
 3. Apply the critic-editor judgment: veto / reshape / approve each one.
 4. Propose only as many arcs as fit in ${arc_budget:.2f} AND at most

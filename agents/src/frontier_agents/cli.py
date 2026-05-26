@@ -565,14 +565,14 @@ def explore(seed, track, budget, docs_dir):
         task = progress.add_task("Observing wiki state...", total=None)
         obs = observe(docs_dir=str(resolved_docs), runs_dir="runs")
         progress.update(task, description=f"Exploring branches for '{seed}'...")
-        # The current maybe_propose_arcs scans all canonical tracks. For an
-        # explicit seed-based exploration we synthesize a minimal context so
-        # the supervisor's LLM call focuses on the seed (the prompt references
-        # arc-exploration skill which forces survey-then-pick).
-        if track:
-            os.environ["EXPLORE_TRACK"] = track
-        os.environ["EXPLORE_SEED"] = seed
-        summary = maybe_propose_arcs(obs, audit=None, docs_path=resolved_docs, verbose=True)
+        summary = maybe_propose_arcs(
+            obs,
+            audit=None,
+            docs_path=resolved_docs,
+            verbose=True,
+            forced_seed=seed,
+            forced_track=track or "",
+        )
         progress.update(task, description="Exploration complete.")
 
     console.print()

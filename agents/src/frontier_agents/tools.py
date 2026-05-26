@@ -319,6 +319,222 @@ def hf_search_datasets(query: str, limit: int = 5) -> list[dict]:
     ]
 
 
+def hf_model_exists(model_id: str) -> dict:
+    """Verify a HuggingFace model ID exists. Returns dict with feasibility signals.
+
+    Used by MVB feasibility verifier (mvb-recipe.md quality bar). Catches
+    LLM-fabricated model IDs before they ship in MVB recipes.
+
+    Args:
+        model_id: e.g. "meta-llama/Llama-3-8B-Instruct"
+
+    Returns:
+        {
+            "exists": bool,
+            "model_id": str (canonical or input),
+            "downloads": int (popularity proxy),
+            "likes": int,
+            "library_name": str | None (e.g. "transformers", "diffusers"),
+            "pipeline_tag": str | None (e.g. "text-generation"),
+            "private": bool,
+            "gated": bool,
+            "error": str (set if lookup failed, but exists may still be False)
+        }
+    """
+    try:
+        import httpx
+    except ImportError:
+        return {"exists": False, "model_id": model_id, "error": "httpx not installed"}
+
+    if not model_id or "/" not in model_id:
+        return {"exists": False, "model_id": model_id, "error": "malformed model_id (need org/name)"}
+
+    try:
+        resp = httpx.get(
+            f"https://huggingface.co/api/models/{model_id}",
+            timeout=8,
+            follow_redirects=True,
+        )
+    except Exception as exc:
+        return {"exists": False, "model_id": model_id, "error": f"network: {type(exc).__name__}"}
+
+    if resp.status_code == 401:
+        # HF returns 401 for non-existent or private; treat as not-found unless we know it's private.
+        return {"exists": False, "model_id": model_id, "error": "not found or private (401)"}
+    if resp.status_code == 404:
+        return {"exists": False, "model_id": model_id, "error": "not found on HuggingFace"}
+    if resp.status_code != 200:
+        return {"exists": False, "model_id": model_id, "error": f"HTTP {resp.status_code}"}
+
+    data = resp.json()
+    return {
+        "exists": True,
+        "model_id": data.get("modelId") or data.get("id") or model_id,
+        "downloads": int(data.get("downloads", 0)),
+        "likes": int(data.get("likes", 0)),
+        "library_name": data.get("library_name"),
+        "pipeline_tag": data.get("pipeline_tag"),
+        "private": bool(data.get("private", False)),
+        "gated": bool(data.get("gated", False)),
+        "error": "",
+    }
+
+
+def hf_dataset_exists(dataset_id: str) -> dict:
+    """Verify a HuggingFace dataset ID exists. Same shape as hf_model_exists."""
+    try:
+        import httpx
+    except ImportError:
+        return {"exists": False, "dataset_id": dataset_id, "error": "httpx not installed"}
+
+    if not dataset_id:
+        return {"exists": False, "dataset_id": dataset_id, "error": "empty dataset_id"}
+
+    try:
+        resp = httpx.get(
+            f"https://huggingface.co/api/datasets/{dataset_id}",
+            timeout=8,
+            follow_redirects=True,
+        )
+    except Exception as exc:
+        return {"exists": False, "dataset_id": dataset_id, "error": f"network: {type(exc).__name__}"}
+
+    if resp.status_code == 401:
+        return {"exists": False, "dataset_id": dataset_id, "error": "not found or private (401)"}
+    if resp.status_code == 404:
+        return {"exists": False, "dataset_id": dataset_id, "error": "not found on HuggingFace"}
+    if resp.status_code != 200:
+        return {"exists": False, "dataset_id": dataset_id, "error": f"HTTP {resp.status_code}"}
+
+    data = resp.json()
+    return {
+        "exists": True,
+        "dataset_id": data.get("id") or dataset_id,
+        "downloads": int(data.get("downloads", 0)),
+        "likes": int(data.get("likes", 0)),
+        "private": bool(data.get("private", False)),
+        "gated": bool(data.get("gated", False)),
+        "error": "",
+    }
+
+
+# Rough fit table: model parameter count → minimum reasonable GPU VRAM.
+# Source: empirical (fp16 weights + activations + small batch + optimizer
+# states roughly 2-4× weight size for training, 1.2× for inference).
+# These are conservative defaults; real fit depends on quantization +
+# sequence length + batch size, but this catches the obvious cases.
+_PARAMS_TO_MIN_VRAM_GB_INFERENCE = [
+    (1e8, 4),       # 100M params → 4GB (laptop GPU)
+    (1e9, 8),       # 1B params → 8GB
+    (3e9, 12),      # 3B params → 12GB (consumer mid)
+    (9e9, 24),      # up to ~8B (fp16): 16GB weights + KV cache + activations → fits in 24GB
+    (1.5e10, 32),   # 13–15B → 32GB
+    (2.5e10, 48),   # up to 24B → 48GB
+    (4e10, 80),     # 34–40B → 80GB (A100/H100 single GPU)
+    (8e10, 160),    # 70B → 160GB (2×80 or 4×40)
+]
+
+
+def estimate_min_vram_gb(params: int, training: bool = False) -> int:
+    """Estimate minimum GPU VRAM (GB) to run a model of `params` parameters.
+
+    Inference assumes fp16 weights + small KV cache. Training multiplies by
+    ~3× to account for optimizer states + activations.
+    """
+    for threshold, vram in _PARAMS_TO_MIN_VRAM_GB_INFERENCE:
+        if params <= threshold:
+            return vram * (3 if training else 1)
+    return 320 * (3 if training else 1)
+
+
+def verify_mvb_stack(model_id: str = "", dataset_id: str = "",
+                     compute: str = "", training: bool = False) -> dict:
+    """Verify an MVB stack is feasible. Used by critic-build-nudge.
+
+    Args:
+        model_id:  HuggingFace model ID named in the MVB stack
+        dataset_id: HuggingFace dataset ID named in the MVB stack
+        compute:   plain-text compute target, e.g. "RTX 4070 16GB" or "A100 40GB"
+        training:  True if the MVB trains the model; False if inference-only
+
+    Returns:
+        {
+            "feasible": bool,           # overall verdict
+            "model_check": dict,        # from hf_model_exists
+            "dataset_check": dict,      # from hf_dataset_exists (if dataset_id)
+            "vram_check": dict | None,  # {min_required_gb, named_gb, fits}
+            "issues": list[str]         # specific actionable problems
+        }
+    """
+    import re as _re
+
+    issues: list[str] = []
+    feasible = True
+
+    model_check = hf_model_exists(model_id) if model_id else {"exists": True}
+    if model_id and not model_check["exists"]:
+        feasible = False
+        issues.append(
+            f"Model `{model_id}` does not exist on HuggingFace "
+            f"({model_check.get('error', 'unknown')})."
+        )
+
+    dataset_check = hf_dataset_exists(dataset_id) if dataset_id else {"exists": True}
+    if dataset_id and not dataset_check["exists"]:
+        feasible = False
+        issues.append(
+            f"Dataset `{dataset_id}` does not exist on HuggingFace "
+            f"({dataset_check.get('error', 'unknown')})."
+        )
+
+    # Compute fit: extract GB from the compute string, look up model size,
+    # estimate min VRAM, compare.
+    vram_check = None
+    if model_check.get("exists") and compute:
+        # Extract VRAM from compute string. "RTX 4070 16GB", "A100 80GB",
+        # "8GB GPU", "Colab T4 16GB", etc.
+        gb_match = _re.search(r"(\d+)\s*GB", compute, _re.IGNORECASE)
+        if gb_match:
+            named_gb = int(gb_match.group(1))
+            params = 0
+            # HF API exposes `safetensors.total` (params count) when available.
+            # Use the safetensors total if present; otherwise estimate from
+            # the model_id name (e.g. "Llama-3-8B" → 8e9).
+            # Quick heuristic from model name:
+            name_match = _re.search(r"(\d+(?:\.\d+)?)\s*[Bb]", model_id)
+            if name_match:
+                params = int(float(name_match.group(1)) * 1e9)
+            elif _re.search(r"(\d+)\s*[Mm]", model_id):
+                m = _re.search(r"(\d+)\s*[Mm]", model_id)
+                params = int(int(m.group(1)) * 1e6)
+            if params:
+                min_required = estimate_min_vram_gb(params, training=training)
+                fits = named_gb >= min_required
+                vram_check = {
+                    "params": params,
+                    "min_required_gb": min_required,
+                    "named_gb": named_gb,
+                    "training": training,
+                    "fits": fits,
+                }
+                if not fits:
+                    feasible = False
+                    issues.append(
+                        f"Model `{model_id}` (~{params/1e9:.1f}B params) needs "
+                        f"≥{min_required}GB VRAM for "
+                        f"{'training' if training else 'inference'}; "
+                        f"compute target names {named_gb}GB. Build won't fit."
+                    )
+
+    return {
+        "feasible": feasible,
+        "model_check": model_check,
+        "dataset_check": dataset_check if dataset_id else None,
+        "vram_check": vram_check,
+        "issues": issues,
+    }
+
+
 def read_stub(path: str) -> str:
     """Read an existing wiki page stub or return empty string if not found."""
     p = Path(path)
