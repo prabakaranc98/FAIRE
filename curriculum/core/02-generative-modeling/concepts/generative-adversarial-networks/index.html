@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#generative-adversarial-networks" class="md-skip">
+        <a href="#the-territory" class="md-skip">
           Skip to content
         </a>
       
@@ -1157,28 +1157,42 @@
       
       
       
-        <span class="md-tag">adversarial</span>
+        <span class="md-tag">adversarial-distillation</span>
       
     
       
       
       
       
-        <span class="md-tag">gan</span>
+        <span class="md-tag">generative-adversarial-networks</span>
       
     
       
       
       
       
-        <span class="md-tag">generative</span>
+        <span class="md-tag">image-translation</span>
       
     
       
       
       
       
-        <span class="md-tag">minimax</span>
+        <span class="md-tag">patchgan</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">pix2pix</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">real-time-inference</span>
       
     
   </nav>
@@ -1188,8 +1202,96 @@
   
 
 
-<h1 id="generative-adversarial-networks">Generative Adversarial Networks<a class="headerlink" href="#generative-adversarial-networks" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">02 · Generative Modeling</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+  <h1>Generative Adversarial Networks</h1>
+
+<p>Imagine sketching a façade on your phone and expecting a photo-quality rendering before your coffee break ends. The hair-trigger latency of that experience is why GANs still matter: they compact the multi-step creativity of a diffusion or flow model into a single forward pass. Instead of running through tens of denoising sweeps, a GAN’s generator emits a finished image while a discriminator continually nudges it toward the teacher’s distribution. Over the past few years researchers have learned to treat that duel as a distillation batch, where the discriminator is a critic of diffusion-quality samples and the generator is the low-latency inference kernel on the other side of the trade-off. By the end of this page you will see how the minimax objective is reframed as adversarial distillation, what architectural moves keep it stable, where research and production are pushing that distillation today, and how to prove the idea with a Pix2Pix + PatchGAN build that mirrors a diffusion teacher.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>GANs live in the space between likelihood-based generators that slowly unroll a sampling chain and the instantaneous decisions needed in production. The generator <span class="arithmatex">\(G_\theta\)</span> maps either a latent code <span class="arithmatex">\(z \sim p_z\)</span> or a conditioning input <span class="arithmatex">\(x_c\)</span> directly into an image, while the discriminator <span class="arithmatex">\(D_\phi\)</span> judges whether <span class="arithmatex">\(G_\theta\)</span>’s output belongs to the data distribution <span class="arithmatex">\(p_{\text{data}}\)</span>. Unlike diffusion models that gradually denoise through tens or hundreds of iterations, GANs evaluate fidelity in a single pass, making them the default for interactive graphics, mobile stylization, and video super-resolution where every millisecond counts.</p>
+<p>Early GAN research focused on improving divergence estimation, but the narrative shifted when practitioners began viewing GANs as distillation agents. Unified Continuous Generative Models (UCGM) from LINs-lab et al. (2025) recast diffusion, flow matching, and adversarial training as points along a continuous-time trajectory, showing how a discriminator that sweeps through time can replace multi-step Langevin dynamics. That insight allows a GAN to inherit diffusion-level quality—sub-2.0 FID in one or two steps—while keeping inference real-time. In this framing, diffusion models become the high-fidelity teachers and GANs become the accelerator layer that runs the distilled policy on-device. How does that adversarial distillation really work under the hood?</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="adversarial-distillation-through-the-minimax-lens">Adversarial distillation through the minimax lens<a class="headerlink" href="#adversarial-distillation-through-the-minimax-lens" title="Permanent link">&para;</a></h3>
+<p>At the core of GAN training is a two-player minimax game in which the discriminator approximates a divergence between the generator distribution <span class="arithmatex">\(p_g\)</span> and the true data distribution <span class="arithmatex">\(p_{\text{data}}\)</span> while the generator tries to minimize that divergence. The canonical objective is
+[
+\min_\theta \max_\phi \mathbb{E}<em _text_data="\text{data">{x \sim p</em>}}}[\log D_\phi(x)] + \mathbb{E<em>{z \sim p_z}[\log(1 - D</em>\phi(G_\theta(z)))]
+]
+where <span class="arithmatex">\(x\)</span> is a real data sample, <span class="arithmatex">\(z\)</span> is a noise vector sampled from the latent prior <span class="arithmatex">\(p_z\)</span>, <span class="arithmatex">\(G_\theta\)</span> is the generator with parameters <span class="arithmatex">\(\theta\)</span>, and <span class="arithmatex">\(D_\phi\)</span> is the discriminator with parameters <span class="arithmatex">\(\phi\)</span>. The first term rewards the critic for assigning high scores to genuine data; the second penalizes it for accepting generator fakes. The generator receives gradients through <span class="arithmatex">\(D_\phi\)</span>, so it learns to move its samples toward the support of <span class="arithmatex">\(p_{\text{data}}\)</span> in a single evaluation, which enforces the “single-stroke” quality that keeps latency low.</p>
+<p>When a GAN distills a diffusion or flow teacher, the discriminator’s positive examples become teacher outputs <span class="arithmatex">\(x_T\)</span> instead of raw data samples. The distilled adversarial loss becomes
+[
+\mathcal{L}<em _sim="\sim" p__text_teacher="p_{\text{teacher" x_T="x_T">{\text{adv}} = \mathbb{E}</em>}}}[\log D_\phi(x_T)] + \mathbb{E<em>{z \sim p_z}[\log(1 - D</em>\phi(G_\theta(z)))]
+]
+where <span class="arithmatex">\(p_{\text{teacher}}\)</span> denotes the high-fidelity distribution produced by the teacher after many denoising steps. UCGM shows that both diffusion and GAN objectives emerge as special cases of a continuous-time critic <span class="arithmatex">\(D_t(x_t)\)</span> trained over <span class="arithmatex">\(t \in [0, T]\)</span>, and that placing the adversarial pressure at <span class="arithmatex">\(t = T\)</span> recovers sub-2.0 FID quality with far fewer inference steps than the original diffusion sampler <a href="https://arxiv.org/abs/2505.07447">LINs-lab et al. 2025</a>. The GAN now plays the accelerator: it learns a mapping from conditioning or noise to final teacher samples without replaying the entire chain.</p>
+<h3 id="patch-based-critics-and-localized-gradients">Patch-based critics and localized gradients<a class="headerlink" href="#patch-based-critics-and-localized-gradients" title="Permanent link">&para;</a></h3>
+<p>Modeling high-frequency textures in one shot requires gradients that focus on small neighborhoods. PatchGAN discriminators (Isola et al. 2017) score overlapping <span class="arithmatex">\(N\times N\)</span> patches independently, producing a map <span class="arithmatex">\(D_\phi(x)\in\mathbb{R}^{H\times W}\)</span> instead of a single scalar. The adversarial loss sums the log probabilities across patches for real samples and does the same for fake samples:
+[
+\mathcal{L}<em i_j="i,j">{\text{patch}} = -\sum</em>
+]
+where } \log D_\phi(x)_{i,j<span class="arithmatex">\(D_\phi(x)_{i,j}\)</span> denotes the critic’s output for the <span class="arithmatex">\((i,j)\)</span>th patch. The localized gradients constrain the generator to respect texture, edges, and spatial layout without relying on a long denoising sequence. These patch-wise signals are essential when the generator has to mimic diffusion outputs that contain fine detail: each patch enforces realness locally, which softens the adversarial pressure on any single pixel.</p>
+<h3 id="conditional-reconstruction-and-the-total-objective">Conditional reconstruction and the total objective<a class="headerlink" href="#conditional-reconstruction-and-the-total-objective" title="Permanent link">&para;</a></h3>
+<p>In translation problems, the generator takes a conditioning image <span class="arithmatex">\(x_c\)</span> and synthesizes <span class="arithmatex">\(G_\theta(x_c, z)\)</span>. The conditional minimax objective becomes
+[
+\mathbb{E}<em>{x, x_c}[\log D</em>\phi(x_c, x)] + \mathbb{E}<em>{x_c, z}[\log(1 - D</em>\phi(x_c, G_\theta(x_c, z)))]
+]
+where <span class="arithmatex">\(x_c\)</span> is the condition (e.g., a sketch) and <span class="arithmatex">\(x\)</span> is its photographic counterpart. A reconstruction term such as
+[
+\lambda \mathbb{E}<em>{x, x_c, z}[|x - G</em>\theta(x_c, z)|<em _text_total="\text{total">1]
+]
+anchors the generator to the structure implied by <span class="arithmatex">\(x_c\)</span>, and feature matching penalties (matching intermediate discriminator activations) further align intermediate representations with the teacher’s refinement path. The combined generator objective becomes
+[
+\mathcal{L}</em>}} = \mathcal{L<em x_="x," x_c_="x_c," z="z">{\text{adv}} + \lambda \mathbb{E}</em>[|x - G_\theta(x_c, z)|_1]
+]
+where <span class="arithmatex">\(\lambda\)</span> trades off pixel fidelity (L1) with perceptual realism enforced by the discriminator. In the distilled setting, the reconstruction term keeps the generator close to what the diffusion teacher would have produced after many steps, while the adversarial term delivers teacher-quality texture in one pass.</p>
+<h3 id="stability-through-spectral-normalization-and-ttur">Stability through spectral normalization and TTUR<a class="headerlink" href="#stability-through-spectral-normalization-and-ttur" title="Permanent link">&para;</a></h3>
+<p>Training remains a saddle-point problem, so conditioning the discriminator matters. Spectral normalization (Miyato et al. 2018) enforces <span class="arithmatex">\(1\)</span>-Lipschitz continuity by dividing each weight matrix <span class="arithmatex">\(W\)</span> by its largest singular value <span class="arithmatex">\(\sigma(W)\)</span>:
+[
+\bar{W} = \frac{W}{\sigma(W)}
+]
+where <span class="arithmatex">\(\sigma(W)\)</span> is computed via power iteration. This normalization keeps the discriminator’s gradients bounded, preventing the critic from reacting excessively to small changes in its input, and it ensures that the generator sees smoother signals even when it tries to invent high-frequency artifacts.</p>
+<p>Two-time-scale update rule (TTUR) further smooths the adversarial trajectory by setting the discriminator learning rate higher than the generator’s—often four times as large <a href="https://arxiv.org/abs/1706.08500">Heusel et al. 2017</a>. If the critic learns too slowly, the generator chases a shifting target; if it learns too fast, gradients vanish and the generator collapses. TTUR balances those forces by letting the discriminator approach its local optimum faster without completely dominating the game, which is crucial when the discriminator is tasked with matching a teacher’s distribution.</p>
+<h3 id="connecting-to-continuous-teachers">Connecting to continuous teachers<a class="headerlink" href="#connecting-to-continuous-teachers" title="Permanent link">&para;</a></h3>
+<p>UCGM (LINs-lab et al. 2025) expresses the adversarial-distillation loss as an integral over a continuous time parameter:
+[
+\mathcal{L}<em _mathcal_U="\mathcal{U" _sim="\sim" t="t">{\text{UCGM}} = \mathbb{E}</em>}(0, T)}\left[w(t)\mathbb{E<em _sim="\sim" p_z="p_z" z="z">{x_t \sim p_t}[\log D_t(x_t)]\right] + \mathbb{E}</em>[\log(1 - D_T(G_\theta(z)))]
+]
+where <span class="arithmatex">\(w(t)\)</span> is a weighting function, <span class="arithmatex">\(p_t\)</span> is the teacher’s distribution at time <span class="arithmatex">\(t\)</span>, and <span class="arithmatex">\(D_t\)</span> is the discriminator scoring samples along that trajectory. The first term keeps the discriminator aware of intermediate diffusion states, which improves mode coverage, while the second term is the terminal adversarial loss that the generator learns to satisfy in one inference pass. Coupling this continuous-time critic with PatchGAN and spectral-normalized layers keeps the single-step enforcement on solid theoretical footing: the generator internalizes what diffusion modeled across time despite only evaluating <span class="arithmatex">\(D_T\)</span>.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Research-grade distillation is now backed by continuous-time theory and concrete scores. UCGM (LINs-lab et al. 2025) demonstrates that adversarial losses placed at the continuum’s tail can recover the same sub-2.0 FID that formerly required dozens of diffusion steps, and that discriminators trained on intermediate teacher distributions improve mode coverage by keeping the minimax dynamics aware of the teacher trajectory. These empirical gains show that GANs are no longer heuristics but principled accelerators: the same architecture that once collapsed under diffusion targets can now match their fidelity with far fewer forward steps.</p>
+<h3 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h3>
+<p>GAN distillation is already shipping in latency-sensitive applications. The NVIDIA developer blog “Real-Time Image Synthesis with Lightweight GANs” (2024) describes a TensorRT-optimized Pix2Pix+PatchGAN pipeline running inside streaming games, where stylized reflections and augmented background elements render at 90+ FPS on an RTX 4070 without any scheduler heuristics. Earlier work by Johnson et al. (2016) <a href="https://arxiv.org/abs/1603.08155">arxiv:1603.08155</a> proved that feed-forward style transfer networks can match optimization-based photorealism in real-time, which laid the groundwork for today’s GAN-powered mobile stylization chips. Together these demonstrations show both that the generator can live in production runtimes and that the discriminator’s patch-wise feedback is fast enough for on-device scoring. The tension now lies in instrumenting those deployments with monitoring and recovery: if a deployment drifts (different lighting, new styles), how quickly can the teacher/critic pair retrain without retracing the diffusion sampling chain?</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can a purely adversarial GAN guarantee comprehensive mode coverage without relying on diffusion-generated teacher samples? Current distilled pipelines fine-tune against teacher outputs to recover diverse modes; eliminating the teacher or replacing it with a lightweight sampler would make the distillation self-contained but requires new regularization terms that encourage coverage without copied samples.</p>
+<p>Is there a provable discriminator regularization (beyond empirical spectral normalization) that bounds gradients or Lipschitz constants sufficiently to guarantee convergence in the distillation saddle point? We observe that both overly sharp and overly smooth critics lead to collapse, yet a certificate tying gradient norms to convergence remains elusive.</p>
+<p>What is the right parametrization of the PatchGAN grid for extremely high resolutions (4K+) where the patch size and stride must balance structural layout against resource constraints? A formal trade-off would let us scale PatchGAN to video and multi-view rendering without the trial-and-error currently required.</p>
+<p>Can we characterize the subset of diffusion teacher samples that a given GAN architecture can reproduce? Some high-frequency textures remain invisible to even strong discriminators, suggesting an inductive bias that merits theoretical analysis.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation that supplies GANs with distillation targets, see [[diffusion-models]] because it lays out the incremental denoising process that UCGM collapses into one critic pass. The conditioning backbone that still drives most real-time GAN pipelines is [[pix2pix]], so consult it to understand how U-Net generators and PatchGAN critics cooperate in practice. For the continuous-time perspective that generalizes both flows and GANs, [[flow-matching]] presents the inference kernels and samplers that share the same trajectory language as UCGM. The engineering counterpart on low-latency inference is [[real-time-rendering]], which explains how GAN-derived outputs slot into video streams and gaming applications.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build produces a Pix2Pix-style GAN trained against diffusion-quality teacher outputs so that a sketch input is transformed into a photo-real façade in under one second on modest GPUs, demonstrating how adversarial distillation realizes diffusion fidelity in real time.</p>
+<p><strong>Artifact description:</strong> a Pix2Pix generator checkpoint distilled from diffusion-aligned targets with a PatchGAN critic, yielding a single-forward-pass model that preserves texture and layout without requiring multi-step sampling.</p>
+<p><strong>Value:</strong> the build forces you to juggle PatchGAN adversarial pressure, <span class="arithmatex">\(\ell_1\)</span> reconstruction, spectral normalization, and TTUR while learning how a distilled discriminator keeps a real-time generator faithful to a heavy teacher.</p>
+<p><strong>Stack</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/CompVis/pix2pix-facades">CompVis/pix2pix-facades</a> — reference U-Net + PatchGAN weights (1.9k+ downloads) for initialization.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/cmp_facades">cmp_facades</a> — aligned sketch-photo pairs for supervision.
+- <strong>Framework:</strong> PyTorch 2.1 with torchvision 0.17 and diffusers 0.40 (for scheduler utilities and logging tools).
+- <strong>Compute:</strong> Google Colab T4 (16 GB VRAM) with around 15 minutes of wall-clock time for the 5-epoch loop.</p>
+<p><strong>The recipe:</strong>
+1. Install with <code>pip install torch torchvision diffusers matplotlib</code> and load the Pix2Pix reference modules, ensuring the PatchGAN critic includes spectral normalization on every convolution as in Miyato et al. (2018).
+2. Prepare cmp_facades with 256×256 crops normalized to <span class="arithmatex">\([-1, 1]\)</span>, reserving 1,000 images for training and 100 for validation, then build DataLoaders with batch size 12 and deterministic shuffling.
+3. Train for five epochs using Adam with generator <span class="arithmatex">\(\text{lr}=1\times 10^{-4}\)</span> and discriminator <span class="arithmatex">\(\text{lr}=4\times 10^{-4}\)</span> (per TTUR <a href="https://arxiv.org/abs/1706.08500">Heusel et al. 2017</a>), combining the PatchGAN adversarial loss—where teacher outputs are the diffusion-generated final photographs used as real positives—with <span class="arithmatex">\(\ell_1\)</span> reconstruction (<span class="arithmatex">\(\lambda=100\)</span>) and optional feature matching.
+4. Evaluate on the validation sketches by sampling 1,000 outputs, computing FID with InceptionV3 features against the 1,000 actual façade photos (bootstrap if needed), and expect scores in the 25–35 range depending on evaluation seeds.
+5. Once the discriminator loss stabilizes below 1.0, export the <code>GAN_facade.pth</code> checkpoint; this single forward-pass generator is ready for TorchScript or TensorRT deployment.</p>
+<p><strong>Expected outcome:</strong> a distilled Pix2Pix checkpoint that maps CMP sketches to photo-real façades in one inference pass, proving adversarial distillation can match diffusion quality with only a single evaluation.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>CS student:</strong> Run the recipe on an RTX 4070 laptop with <code>batch_size=8</code>, track FID and LPIPS improvements compared to the randomly initialized generator, and visualize how matchings from the PatchGAN grid align with edges.
+- <strong>Applied engineer:</strong> Export the generator with <code>torch.jit.trace</code>, quantize with TensorRT, and demonstrate ~2 ms inference latency on an A10 while keeping p50 image quality within 5% of the fp32 run.
+- <strong>Applied researcher:</strong> Swap the reconstruction term for a perceptual VGG19 loss, report resulting FID and patch-wise discriminator accuracy, and analyze whether the feature matching impacts diversity.
+- <strong>Frontier researcher:</strong> Remove diffusion or teacher outputs entirely—train strictly on CMP sketches and targets—measure LPIPS diversity, and use those results to test whether teacher signals are necessary for covering the full manifold.
+- <strong>Curious learner:</strong> Turn the validation set into a before/after gallery and write a short note comparing GAN outputs with teacher samples, highlighting where the single-pass generator succeeds or misses.
+- <strong>Theory student:</strong> Instrument the discriminator to log <span class="arithmatex">\(\log D_t(x_t)\)</span> at multiple pseudo-timesteps and compare those values to the UCGM continuous-time loss, illustrating how the critic tracks the teacher trajectory.
+- <strong>PM / decision-maker:</strong> Package the trained model into a short case study that reports end-to-end latency, GPU utilization, and expected customer-perceived fidelity compared with a diffusion baseline, justifying the real-time deployment.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
