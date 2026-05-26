@@ -27,124 +27,134 @@ has_mvb: true
 
 ## What it is
 
-Imagine you have a photograph and you want to identify the objects within it. If you treat the image as a flat list of pixels, the computer loses the context that a pixel at the top-left is physically near its neighbor. This makes it difficult for the model to understand shapes or textures. Convolutional Neural Networks (CNNs) solve this by processing data in a way that respects spatial structure, mimicking how the human visual cortex processes visual information through layers of increasing complexity.
+Consider the task of identifying a face in a photograph. If you treat the image as a flat list of pixels, the model lacks any sense of context; it cannot distinguish between a pixel that is part of an eye and one that is part of a background wall. Humans, however, recognize faces by identifying local patterns—edges, textures, and shapes—and assembling them into a coherent whole. CNNs replicate this by sliding small, learnable filters across the image, a process that captures local dependencies and builds a hierarchy of features.
 
-The core idea is to use "filters"—small grids of numbers—that slide across the image. As a filter moves, it performs a mathematical operation to highlight specific patterns, such as edges or curves. Because the same filter is reused across the entire image, the network learns to recognize a feature regardless of where it appears, a property known as translation invariance. By stacking these layers, the network builds a hierarchy: early layers see simple lines, while deeper layers combine those lines into complex objects like ears, whiskers, or faces. This process replaces manual feature engineering, where researchers previously had to define these patterns by hand.
+This architecture relies on two critical principles: weight sharing and translation invariance. Because the same filter is applied across the entire input, the model learns to detect a specific feature (like an edge) regardless of where it appears in the image. This drastically reduces the number of parameters compared to fully connected networks, where every input would require a unique weight. By stacking these layers, the network transforms raw pixel data into increasingly abstract representations, moving from simple lines in early layers to complex object parts in deeper ones.
 
 ## Why it matters at the frontier
 
-CNNs changed AI by automating the process of feature extraction. Before their widespread adoption, researchers had to manually design algorithms to detect edges or shapes in images. CNNs learn these features directly from raw data, allowing models to scale to large datasets like ImageNet. This shift enabled the transition from brittle, domain-specific pipelines to general-purpose visual perception systems.
+CNNs fundamentally changed computer vision by automating feature engineering, which was previously a manual and brittle process. By allowing the network to learn its own representations directly from raw data, CNNs enabled the scaling of vision systems to massive datasets like ImageNet. While pure Transformers have gained dominance in many domains (Dosovitskiy et al. 2020, https://arxiv.org/abs/2010.11929), CNNs remain the standard for high-efficiency, low-latency tasks where computational constraints are paramount.
 
-At the frontier, the challenge has shifted from basic recognition to efficiency and robustness. Research is currently focused on hybrid architectures that bridge the gap between local convolutional processing and global attention mechanisms (Li et al., 2025, [arXiv:2507.07414](https://arxiv.org/abs/2507.07414)). The open problem remains the tension between robustness and efficiency, as models must maintain high accuracy while being resilient to adversarial perturbations (Wang et al., 2025, [arXiv:2505.24207](https://arxiv.org/abs/2505.24207)). Understanding CNNs is the prerequisite for navigating the current transition toward architectures that combine convolutional efficiency with the global context of Transformers.
+At the frontier, the challenge is balancing local convolutional processing with global context. Modern research focuses on hybrid architectures that combine the inductive bias of convolutions with the global attention mechanisms of Transformers to achieve superior performance on dense prediction tasks, such as medical imaging and autonomous driving.
 
 ## Core concepts
 
-- **Convolution** — A mathematical operation where a filter (kernel) slides over the input to produce a feature map by computing the dot product at each position.
-- **Pooling** — A downsampling operation that reduces the spatial dimensions of feature maps, typically using max or average values to provide spatial invariance.
-- **Weight Sharing** — The practice of using the same filter weights across different spatial locations, which reduces parameter count and enforces translation invariance.
-- **Receptive Field** — The region of the input space that a specific neuron in a layer is connected to, which grows as the network depth increases.
-- **Stride** — The step size at which the convolutional filter moves across the input, directly influencing the output spatial resolution.
-- **Padding** — Adding extra pixels to the input boundaries to control the spatial output size and preserve information at the edges.
+- **Convolution** — A mathematical operation where a filter slides over an input grid to produce a feature map highlighting local patterns.
+- **Pooling** — A downsampling operation, typically max-pooling, that reduces the spatial dimensions of feature maps while retaining the most prominent features.
+- **Translation Invariance** — The property where a network recognizes a feature regardless of its location in the input, achieved by weight sharing across the spatial grid.
+- **Weight Sharing** — The practice of using the same filter parameters across different regions of the input, drastically reducing the number of parameters compared to fully connected layers.
+- **Receptive Field** — The region of the input space that a particular neuron in a layer is "looking at," which grows larger as one moves deeper into the network.
 
 ## Mathematical foundations
 
+The output of a convolutional layer is computed by applying a filter to a local region:
 \[
-y_i = f\left(\sum_{j=1}^{k} w_j x_{i+j-1} + b\right)
+y_i = \sigma\left(\sum_{j=1}^{k} w_j x_{i+j-1} + b\right)
 \]
-where \(y_i\) is the output of the neuron at position \(i\), \(w_j\) are the weights of the filter, \(x_{i+j-1}\) are the input values within the filter window, \(b\) is the bias, and \(f\) is the activation function. This equation describes the core convolution operation used in the layers defined above.
+where \(x\) is the input feature map, \(w\) is the filter weights, \(b\) is the bias, \(\sigma\) is the activation function (e.g., ReLU), and \(y_i\) is the output feature map element. This term penalizes the model based on the dot product of the filter and the input, effectively acting as a pattern matcher.
 
+Non-linearity is introduced via the ReLU activation:
 \[
-\text{Output Size} = \frac{\text{Input Size} - \text{Filter Size} + 2 \times \text{Padding}}{\text{Stride}} + 1
+a_{i,j} = \text{ReLU}(x_{i,j}) = \max(0, x_{i,j})
 \]
-where \(\text{Output Size}\) is the spatial dimension of the feature map, \(\text{Input Size}\) is the input dimension, \(\text{Filter Size}\) is the kernel size, \(\text{Padding}\) is the zero-padding added, and \(\text{Stride}\) is the step size. This determines the spatial footprint of the network.
+where \(x_{i,j}\) is the input to the ReLU activation function at position (i, j), and \(a_{i,j}\) is the output. This allows the network to learn complex, non-linear mappings.
 
+Downsampling is performed via max-pooling:
 \[
-L = \frac{1}{N} \sum_{i=1}^{N} \ell(y_i, \hat{y}_i)
+z_{i,j} = \max_{p,q \in R} x_{i+p, j+q}
 \]
-where \(L\) is the total loss, \(N\) is the number of samples, \(\ell\) is the loss function, \(y_i\) is the ground truth, and \(\hat{y}_i\) is the model prediction. This measures the error across the dataset to guide weight updates via backpropagation.
+where \(x\) is the input feature map, \(R\) is the pooling region, and \(z_{i,j}\) is the output after max-pooling. This reduces spatial dimensions and increases robustness to small input variations.
+
+The training objective is defined by the Cross-Entropy Loss:
+\[
+\text{Cross-Entropy Loss} = -\sum_{c=1}^{M} y_{o,c} \log(p_{o,c})
+\]
+where \(M\) is the number of classes, \(y_{o,c}\) is a binary indicator (0 or 1) if class label \(c\) is the correct classification for observation \(o\), and \(p_{o,c}\) is the predicted probability of observation \(o\) belonging to class \(c\).
 
 ## Key algorithms / techniques
 
-- **LeNet-5** — The architecture for digit recognition that established the stack of convolution, pooling, and fully connected layers.
-- **AlexNet** — Introduced deep stacking of convolutions and GPU acceleration, proving that depth is essential for complex image classification.
-- **ResNet** — Introduced residual connections to solve the vanishing gradient problem in very deep networks, allowing for hundreds of layers.
+- **ResNet** — Introduces residual connections that allow gradients to flow through very deep networks, preventing the vanishing gradient problem (He et al. 2016).
+- **Depthwise Separable Convolution** — Splits a standard convolution into depthwise and pointwise operations to significantly reduce computational cost while maintaining performance.
 
 ## Essential reading
 
 | Paper | Year | Authors | Why essential |
 |---|---|---|---|
-| Neocognitron | 1980 | Fukushima | Introduces the foundational concept of convolutional layers and max-pooling. It provides the biological inspiration for modern CNNs. |
-| Gradient Based Learning | 1998 | LeCun et al. | First practical application of CNNs to real-world problems using backpropagation. It demonstrates how to train these networks on handwritten digits. |
-| ImageNet Classification | 2012 | Krizhevsky et al. | Demonstrates the power of deep CNNs and the necessity of GPU acceleration. It triggered the modern deep learning revolution. |
-| Very Deep ConvNets | 2014 | Simonyan & Zisserman | Explores the effect of network depth on accuracy. It established the VGG architecture as a standard for feature extraction. |
+| [ImageNet Classification with Deep CNNs](https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862ec079d7d3f139615696cc3173-Paper.pdf) | 2012 | Krizhevsky et al. | The foundational work that proved deep CNNs outperform traditional methods. |
+| [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) | 2016 | He et al. | Introduces residual connections, the standard for training deep architectures. |
+| [GNN-CNN: Hybrid Model for Text Representation](https://arxiv.org/abs/2507.07414) | 2025 | Gao et al. | Demonstrates modern hybrid architectures combining CNNs with graph neural networks. |
 
 ## Seminal papers & test-of-time
 
 | Paper | Year | Key contribution |
 |---|---|---|
-| Neocognitron | 1980 | Foundation of convolutional and pooling layers for pattern recognition. |
-| Gradient Based Learning | 1998 | Practical backpropagation for CNNs, enabling training on large datasets. |
-| ImageNet Classification | 2012 | Deep CNNs and GPU-accelerated training, setting the standard for computer vision. |
+| [ImageNet Classification with Deep CNNs](https://proceedings.neurips.cc/paper_files/paper/2012/file/c399862ec079d7d3f139615696cc3173-Paper.pdf) | 2012 | Established the deep CNN architecture as the standard for computer vision. |
+| [Deep Residual Learning for Image Recognition](https://arxiv.org/abs/1512.03385) | 2016 | Solved the degradation problem in deep networks via skip connections. |
 
 ## Current SotA
 
-CNNs remain highly competitive in specialized domains. SAMba-UNet (Yu et al., 2025, [arXiv:2505.16304](https://arxiv.org/abs/2505.16304)) achieves state-of-the-art performance in cardiac MRI segmentation using a dual-encoder architecture. StrokeNet (Zhang et al., 2025, [arXiv:2512.06290](https://arxiv.org/abs/2512.06290)) demonstrates superior fine-grained interaction learning for handwritten stroke classification.
+State-of-the-art performance in vision is increasingly driven by hybrid architectures. While pure Transformers dominate, models like ConvNeXt (Liu et al., 2022, https://arxiv.org/abs/2201.03545) demonstrate that modernized CNNs can match or exceed Transformer performance on ImageNet-1K, achieving 87.8% top-1 accuracy.
 
 ## Open questions
 
-> **Researcher:** How can we provably trade off robustness and parameter/compute efficiency in CNN backbones for dense prediction tasks?
+> **Researcher:** How can we mathematically guarantee the robustness of CNNs against adversarial perturbations without sacrificing performance?
 
-> **Engineer:** What are the optimal quantization strategies for deploying deep CNNs on low-power edge hardware without sacrificing the spatial hierarchy captured by high-precision weights?
+> **Engineer:** What are the optimal hardware-aware quantization strategies for deploying hybrid CNN-Transformer models on edge devices with < 4GB VRAM?
 
-> **Open:** Can we develop a unified theory of "feature reuse" that explains why CNNs generalize across diverse visual domains despite their rigid inductive biases?
+> **Open:** Can we develop a universal interpretability framework that maps deep convolutional filters to human-understandable concepts, as explored in early feature visualization work (Olah et al. 2017, https://distill.pub/2017/feature-visualization/)?
+
+## What's happening now
+
+Research is currently focused on the integration of CNNs with non-grid architectures. Gao et al. (2025) (https://arxiv.org/abs/2507.07414) demonstrate that combining CNNs with Graph Neural Networks (GNNs) allows for superior text representation by capturing both local and structural dependencies.
+
+Engineering efforts are centered on optimizing these hybrid models for production. Zhang et al. (2025) (https://arxiv.org/abs/2505.16304) introduce SAMba-UNet, which synergizes SAM2 and Mamba architectures within a UNet framework for high-precision medical imaging, showing that CNN-based backbones remain critical for dense prediction tasks.
+
+Open problems include the "black box" nature of deep CNNs. While feature extraction is automated, interpreting exactly what specific filters represent in deep layers remains a significant hurdle for safety-critical applications.
 
 ## In production
 
-- **CCC Intelligent Solutions** — Uses Amazon SageMaker for multi-model ensemble hosting of complex computer vision models. [Source](https://aws.amazon.com/blogs/machine-learning/how-ccc-intelligent-solutions-created-a-custom-approach-for-hosting-complex-ai-models-using-amazon-sagemaker/)
-- **Salesforce** — Achieves high-performance model deployment for vision tasks using Amazon SageMaker AI. [Source](https://aws.amazon.com/blogs/machine-learning/how-salesforce-achieves-high-performance-model-deployment-with-amazon-sagemaker-ai/)
-- **NVIDIA** — The GPU Inference Engine (GIE) provides high-performance, power-efficient inference for production CNNs. [Source](https://developer.nvidia.com/blog/production-deep-learning-nvidia-gpu-inference-engine/)
-- **Official Repositories** — [PyTorch Vision](https://pytorch.org/vision/stable/index.html) and [TensorFlow Models](https://www.tensorflow.org/guide/keras/custom_layers_and_models) provide the standard implementations for production-grade CNNs.
+- **CCC Intelligent Solutions** — Uses custom multi-model ensemble hosting on Amazon SageMaker for automated damage assessment [AWS Blog](https://aws.amazon.com/blogs/machine-learning/how-ccc-intelligent-solutions-created-a-custom-approach-for-hosting-complex-ai-models-using-amazon-sagemaker/).
+- **Salesforce** — Leverages high-performance CNN deployment systems on Amazon SageMaker AI for document processing [AWS Blog](https://aws.amazon.com/blogs/machine-learning/how-salesforce-achieves-high-performance-model-deployment-with-amazon-sagemaker-ai/).
+- **Implementation Resources** — The [PyTorch Vision](https://pytorch.org/vision/stable/models.html) library provides official, production-ready implementations of standard CNN architectures.
 
 ## Minimum Valuable Build
 
-This build trains a simple CNN on the CIFAR-10 dataset using PyTorch. It runs on an RTX 3080 (10GB VRAM) or a free Colab T4.
+**Build: Train a ResNet50 on CIFAR-10**
+*Compute: Runs on RTX 3080 (10GB VRAM) or free Colab T4.*
 
-1. **Setup:** Install dependencies: `pip install torch torchvision`.
-2. **Data:** Load CIFAR-10 using `torchvision.datasets.CIFAR10(root='./data', train=True, download=True)`.
-3. **Architecture:** Define a `nn.Module` with two `nn.Conv2d(3, 16, 3)` layers, `nn.MaxPool2d(2)`, and two `nn.Linear` layers.
-4. **Training:** Use `nn.CrossEntropyLoss` and `optim.Adam(model.parameters(), lr=0.001)`. Train for 10 epochs with a batch size of 64.
-5. **Evaluation:** Run inference on the test set.
-6. **Artifact:** Save the model using `torch.save(model.state_dict(), 'cnn_cifar.pth')`.
+1. Install dependencies: `pip install torch torchvision timm`.
+2. Load the dataset: `datasets.CIFAR10(root='./data', train=True, download=True)`.
+3. Initialize model: `model = timm.create_model('resnet50', pretrained=False, num_classes=10)`.
+4. Define training loop: Use `nn.CrossEntropyLoss` and `optim.Adam`.
+5. Train for 10 epochs and save the checkpoint.
+6. Use the HuggingFace Hub ID `timm/resnet50.a1_in1k` as a reference for pre-trained weights.
 
-**Expected Outcome:** A trained model checkpoint with >70% test accuracy.
+*Expected outcome: A model checkpoint with validation accuracy ≥ 80%.*
 
 ---
 
-> *If this build worked for you — a ⭐ on the [PyTorch Vision GitHub](https://github.com/pytorch/vision) is the best way to support the ecosystem.*
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
 
 ---
 
 ## Code & implementations
-
-- [PyTorch Vision](https://pytorch.org/vision/stable/index.html) — Official library containing standard CNN architectures like ResNet and VGG.
-- [TensorFlow Models](https://www.tensorflow.org/guide/keras/custom_layers_and_models) — Official documentation for building custom CNNs in TensorFlow.
-
-## This concept appears in
-
-- ../../arcs/generative-stack/step-01-cnn-backbones.md — This page provides the foundational understanding of spatial feature extraction required for the U-Net architectures used in diffusion models.
+- [PyTorch Vision](https://pytorch.org/vision/stable/models.html) — Official implementations of standard CNN architectures.
+- [timm](https://huggingface.co/docs/timm/index) — The industry-standard library for state-of-the-art CNN and vision transformer models.
 
 ## What comes next
 
-Understanding CNNs provides the structural foundation for modern generative models, as many diffusion architectures rely on U-Net backbones built from convolutional blocks. Future work in this space is moving toward hardware-aware neural architecture search to optimize these models for specific silicon.
+Understanding CNNs provides the structural foundation for processing grid-based data, which is the prerequisite for building more complex vision-language models.
+
+- [[cnn-arc]] — This page serves as the foundational entry point for the computer vision arc, establishing the mechanics of spatial feature extraction.
 
 ## Connected topics
-
-- [[backpropagation]] — The fundamental algorithm used to train CNNs by calculating gradients of the loss function with respect to weights.
-- [[bayesian-nn]] — Incorporates probabilistic methods into CNNs to estimate model uncertainty.
-- [[ai-hardware]] — Specialized silicon designed to accelerate the matrix multiplications inherent in convolutional layers.
+- [[backpropagation]] — The fundamental algorithm used to compute gradients and update weights in CNNs.
+- [[Bayesian Neural Networks]] — Probabilistic extensions of CNNs used to quantify uncertainty in visual predictions.
+- [[Contrastive Learning]] — A self-supervised training paradigm often used to pre-train CNN backbones.
+- [[AI Hardware]] — Specialized compute architectures like GPUs and TPUs that accelerate the massive matrix multiplications required by CNNs.
+- [[Expectation-Maximization]] — A statistical framework used in unsupervised variants of CNN training.
+- [[Bias-Variance Tradeoff]] — A core theoretical concept for diagnosing overfitting in deep CNN architectures.
 
 ## Further reading
-
-- [LeCun et al. (1998)](http://vision.stanford.edu/cs598_spring07/papers/Lecun98.pdf) — The classic paper that defined the modern CNN architecture.
-- [Krizhevsky et al. (2012)](https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf) — The paper that triggered the deep learning boom by scaling CNNs to ImageNet.
-- [Lilian Weng's Blog](https://lilianweng.github.io/posts/2017-06-21-overview-convnets/) — A comprehensive technical overview of CNN architectures and their evolution.
+- [A Guide to Convolution Arithmetic](https://arxiv.org/abs/1603.07285) — The definitive guide to understanding the shapes and dimensions of convolutional operations.
+- [Visualizing CNNs](https://distill.pub/2017/feature-visualization/) — An interactive guide to understanding what filters actually learn.
