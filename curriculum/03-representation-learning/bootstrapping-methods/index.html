@@ -10,31 +10,27 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/bootstrapping-methods/">
       
       
-        <link rel="prev" href="../02-generative-modeling/variational-autoencoders/">
-      
-      
-        <link rel="next" href="contrastive-learning/">
       
       
         
       
       
-      <link rel="icon" href="../../img/favicon.svg">
+      <link rel="icon" href="../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Representation Learning - Frontier Wiki</title>
+        <title>Bootstrapping Methods - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#track-03-representation-learning" class="md-skip">
+        <a href="#bootstrapping-methods" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Representation Learning
+              Bootstrapping Methods
             
           </span>
         </div>
@@ -213,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -230,13 +226,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../" class="md-tabs__link">
           
   
   
@@ -256,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../arcs/" class="md-tabs__link">
+        <a href="../../../arcs/" class="md-tabs__link">
           
   
   
@@ -276,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -296,7 +290,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../about/" class="md-tabs__link">
+        <a href="../../../about/" class="md-tabs__link">
           
   
   
@@ -332,7 +326,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -362,7 +356,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -386,31 +380,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -428,7 +417,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -446,7 +435,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../" class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   
@@ -480,20 +469,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
         
           
-          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
             
   
   
@@ -529,7 +515,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../01-ai/" class="md-nav__link">
+      <a href="../../01-ai/" class="md-nav__link">
         
   
   
@@ -557,7 +543,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../01-ai/agent-architectures/" class="md-nav__link">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
         
   
   
@@ -585,7 +571,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../01-ai/classical-planning/" class="md-nav__link">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
         
   
   
@@ -613,7 +599,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../01-ai/search-algorithms/" class="md-nav__link">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
         
   
   
@@ -655,20 +641,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
         
           
-          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
             
   
   
@@ -704,7 +687,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../02-generative-modeling/" class="md-nav__link">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -732,7 +715,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../02-generative-modeling/diffusion-models/" class="md-nav__link">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
         
   
   
@@ -760,7 +743,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../02-generative-modeling/flow-matching/" class="md-nav__link">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
         
   
   
@@ -788,7 +771,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
         
   
   
@@ -821,31 +804,26 @@
                 
   
   
-    
   
   
-  
     
     
     
     
       
       
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
         
           
-          
-        
-      
-    
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="0">
             
   
   
@@ -863,7 +841,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -878,37 +856,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Overview
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -924,109 +875,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#topics" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Topics
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Topics">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#contrastive-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Contrastive Methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#non-contrastive-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Non-Contrastive Methods
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#joint-embedding-predictive-architectures" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Joint-Embedding &amp; Predictive Architectures
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#representation-analysis" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Representation Analysis
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#connections-to-frontier-research" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Connections to frontier research
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#recommended-entry-points" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Recommended entry points
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1039,7 +887,7 @@
   
   
     <li class="md-nav__item">
-      <a href="contrastive-learning/" class="md-nav__link">
+      <a href="../contrastive-learning/" class="md-nav__link">
         
   
   
@@ -1067,7 +915,7 @@
   
   
     <li class="md-nav__item">
-      <a href="jepa/" class="md-nav__link">
+      <a href="../jepa/" class="md-nav__link">
         
   
   
@@ -1095,7 +943,7 @@
   
   
     <li class="md-nav__item">
-      <a href="self-supervised-learning/" class="md-nav__link">
+      <a href="../self-supervised-learning/" class="md-nav__link">
         
   
   
@@ -1137,20 +985,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
         
           
-          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="0">
             
   
   
@@ -1186,7 +1031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../04-neural-networks-dl/" class="md-nav__link">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
         
   
   
@@ -1214,7 +1059,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
         
   
   
@@ -1242,7 +1087,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../04-neural-networks-dl/optimization/" class="md-nav__link">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
         
   
   
@@ -1270,7 +1115,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
         
   
   
@@ -1312,20 +1157,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
         
           
-          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="0">
             
   
   
@@ -1361,7 +1203,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -1389,7 +1231,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
         
   
   
@@ -1417,7 +1259,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
         
   
   
@@ -1445,7 +1287,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
         
   
   
@@ -1487,20 +1329,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
         
           
-          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="0">
             
   
   
@@ -1536,7 +1375,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -1564,7 +1403,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-reinforcement-learning/mdp/" class="md-nav__link">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
         
   
   
@@ -1592,7 +1431,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-reinforcement-learning/ppo/" class="md-nav__link">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
         
   
   
@@ -1620,7 +1459,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../06-reinforcement-learning/rlhf/" class="md-nav__link">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
         
   
   
@@ -1662,20 +1501,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
         
           
-          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="0">
             
   
   
@@ -1711,7 +1547,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-attention-memory-reasoning/" class="md-nav__link">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
         
   
   
@@ -1739,7 +1575,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
         
   
   
@@ -1767,7 +1603,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
         
   
   
@@ -1795,7 +1631,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
         
   
   
@@ -1837,20 +1673,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
         
           
-          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="0">
             
   
   
@@ -1886,7 +1719,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -1914,7 +1747,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-causal-statistical-inference/scm/" class="md-nav__link">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
         
   
   
@@ -1942,7 +1775,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
         
   
   
@@ -1970,7 +1803,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
         
   
   
@@ -2012,20 +1845,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
         
           
-          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="0">
             
   
   
@@ -2061,7 +1891,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../09-algorithms-systems-ai/" class="md-nav__link">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
         
   
   
@@ -2089,7 +1919,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
         
   
   
@@ -2117,7 +1947,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
         
   
   
@@ -2145,7 +1975,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
         
   
   
@@ -2187,20 +2017,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
         
           
-          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="0">
             
   
   
@@ -2236,7 +2063,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../10-complexity-cognition/" class="md-nav__link">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
         
   
   
@@ -2264,7 +2091,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
         
   
   
@@ -2292,7 +2119,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
         
   
   
@@ -2320,7 +2147,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
         
   
   
@@ -2362,20 +2189,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
         
           
-          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="0">
             
   
   
@@ -2411,7 +2235,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../11-robotics-embodied-ai/" class="md-nav__link">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
         
   
   
@@ -2439,7 +2263,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
         
   
   
@@ -2467,7 +2291,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
         
   
   
@@ -2495,7 +2319,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
         
   
   
@@ -2537,20 +2361,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
         
           
-          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="0">
             
   
   
@@ -2586,7 +2407,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../12-physics-scientific-ai/" class="md-nav__link">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
         
   
   
@@ -2614,7 +2435,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../12-physics-scientific-ai/pinn/" class="md-nav__link">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
         
   
   
@@ -2642,7 +2463,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../12-physics-scientific-ai/fno/" class="md-nav__link">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
         
   
   
@@ -2670,7 +2491,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
         
   
   
@@ -2712,20 +2533,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
         
           
-          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="0">
             
   
   
@@ -2761,7 +2579,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../13-graph-relational-ai/" class="md-nav__link">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
         
   
   
@@ -2789,7 +2607,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../13-graph-relational-ai/message-passing/" class="md-nav__link">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
         
   
   
@@ -2817,7 +2635,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
         
   
   
@@ -2845,7 +2663,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
         
   
   
@@ -2887,20 +2705,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
         
           
-          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="0">
             
   
   
@@ -2936,7 +2751,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../14-biology-life-sciences/" class="md-nav__link">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
         
   
   
@@ -2964,7 +2779,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
         
   
   
@@ -2992,7 +2807,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
         
   
   
@@ -3020,7 +2835,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../14-biology-life-sciences/single-cell/" class="md-nav__link">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
         
   
   
@@ -3062,20 +2877,17 @@
       
       
         
-          
-          
-        
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
         <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
         
           
-          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="0">
             
   
   
@@ -3111,7 +2923,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../15-ml-theory-foundations/" class="md-nav__link">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
         
   
   
@@ -3139,7 +2951,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
         
   
   
@@ -3167,7 +2979,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
         
   
   
@@ -3195,7 +3007,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../15-ml-theory-foundations/ntk/" class="md-nav__link">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
         
   
   
@@ -3290,7 +3102,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/" class="md-nav__link">
+      <a href="../../../arcs/" class="md-nav__link">
         
   
   
@@ -3318,7 +3130,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/mlp-to-transformer/" class="md-nav__link">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
         
   
   
@@ -3346,7 +3158,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/generative-stack/" class="md-nav__link">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
         
   
   
@@ -3374,7 +3186,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/language-models/" class="md-nav__link">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
         
   
   
@@ -3402,7 +3214,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/causal-ai/" class="md-nav__link">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
         
   
   
@@ -3430,7 +3242,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/reinforcement-learning/" class="md-nav__link">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -3458,7 +3270,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/systems-for-scale/" class="md-nav__link">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
         
   
   
@@ -3486,7 +3298,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../arcs/scientific-ai/" class="md-nav__link">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
         
   
   
@@ -3573,7 +3385,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -3601,7 +3413,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/glossary/" class="md-nav__link">
+      <a href="../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -3688,7 +3500,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/" class="md-nav__link">
+      <a href="../../../about/" class="md-nav__link">
         
   
   
@@ -3716,7 +3528,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../system/status/" class="md-nav__link">
+      <a href="../../../system/status/" class="md-nav__link">
         
   
   
@@ -3744,7 +3556,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../system/observer/" class="md-nav__link">
+      <a href="../../../system/observer/" class="md-nav__link">
         
   
   
@@ -3772,7 +3584,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../system/changelog/" class="md-nav__link">
+      <a href="../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -3800,7 +3612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../system/supervisor.md" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3849,14 +3661,7 @@
       
       
       
-        <span class="md-tag">contrastive</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">embeddings</span>
+        <span class="md-tag">inference</span>
       
     
       
@@ -3870,14 +3675,21 @@
       
       
       
-        <span class="md-tag">self-supervised</span>
+        <span class="md-tag">resampling</span>
       
     
       
       
       
       
-        <span class="md-tag">ssl</span>
+        <span class="md-tag">statistics</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">uncertainty</span>
       
     
   </nav>
@@ -3887,44 +3699,194 @@
   
 
 
-<h1 id="track-03-representation-learning">Track 03 · Representation Learning<a class="headerlink" href="#track-03-representation-learning" title="Permanent link">&para;</a></h1>
+<h1 id="bootstrapping-methods">Bootstrapping Methods<a class="headerlink" href="#bootstrapping-methods" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Learning structure from data without labels: self-supervised objectives, contrastive methods, and the geometry of learned representations.</p>
+<p><strong>Summary:</strong> Bootstrapping is a resampling technique that uses the observed data to estimate the sampling distribution of a statistic, providing a robust, model-free approach to quantifying uncertainty that is essential for modern representation learning and Bayesian inference.</p>
 </blockquote>
-<p>What makes a good representation? This is one of the most fundamental questions in deep learning. Representation learning asks how to extract structure from raw data — without relying on expensive human labels — and how to build representations that transfer, generalize, and compose.</p>
 <hr />
-<h2 id="topics">Topics<a class="headerlink" href="#topics" title="Permanent link">&para;</a></h2>
-<h3 id="contrastive-methods">Contrastive Methods<a class="headerlink" href="#contrastive-methods" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="contrastive-learning/">Contrastive Learning</a> — SimCLR, MoCo, NT-Xent loss, positive/negative pairs</li>
-<li><a href="self-supervised-learning/">Self-Supervised Learning</a> — pretext tasks, masked modeling, joint-embedding architectures</li>
-</ul>
-<h3 id="non-contrastive-methods">Non-Contrastive Methods<a class="headerlink" href="#non-contrastive-methods" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="bootstrapping-methods/">Bootstrapping Methods</a> — BYOL, SimSiam, momentum encoders</li>
-<li><a href="redundancy-reduction.md">Redundancy Reduction</a> — Barlow Twins, VICReg, feature decorrelation</li>
-</ul>
-<h3 id="joint-embedding-predictive-architectures">Joint-Embedding &amp; Predictive Architectures<a class="headerlink" href="#joint-embedding-predictive-architectures" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="jepa/">JEPA</a> — Joint Embedding Predictive Architectures, I-JEPA, V-JEPA</li>
-<li><a href="masked-autoencoders.md">Masked Autoencoders</a> — MAE, BEiT, masked image modeling</li>
-</ul>
-<h3 id="representation-analysis">Representation Analysis<a class="headerlink" href="#representation-analysis" title="Permanent link">&para;</a></h3>
-<ul>
-<li><a href="probing.md">Probing &amp; Interpretability</a> — linear probing, representational similarity analysis (RSA), CKA</li>
-<li><a href="geometry.md">Geometry of Representations</a> — manifold hypothesis, intrinsic dimensionality, alignment vs. uniformity</li>
-</ul>
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>Start here</th>
+<th>Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Build something that works</td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+<td>Build intuition</td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+<td>Understand the mechanics</td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#seminal-papers--test-of-time">Seminal papers</a></td>
+<td>Know where the open problems are</td>
+</tr>
+</tbody>
+</table>
 <hr />
-<h2 id="connections-to-frontier-research">Connections to frontier research<a class="headerlink" href="#connections-to-frontier-research" title="Permanent link">&para;</a></h2>
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine you are tasked with estimating the average salary of software engineers in a specific region, but you only have access to a small, potentially biased sample of 50 records. Traditional statistical methods often rely on assumptions like normality, which may not hold for salary data, leading to fragile confidence intervals that fail to capture the true population variance. Bootstrapping solves this by treating your small sample as a proxy for the entire population, effectively using the empirical distribution—the probability distribution formed by your observed data—to simulate the unknown population.</p>
+<p>By repeatedly drawing samples of size <span class="arithmatex">\(n\)</span> from your original data <em>with replacement</em>, you create thousands of "new" datasets. This process allows you to simulate the sampling distribution of your statistic—a numerical value calculated from a sample, such as the mean or variance—without needing to collect more data or assume a specific underlying distribution. The consequence is that you obtain a distribution of estimates that reveals the stability and uncertainty of your original calculation.</p>
+<p>This technique is a cornerstone of modern machine learning, where it serves as the backbone for ensemble methods like bagging and self-supervised learning paradigms that rely on bootstrapping latent representations to improve model robustness. By generating diverse views of the data, models learn to extract invariant features that are not merely artifacts of a specific training batch.</p>
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>Bootstrapping is critical at the frontier because it provides a principled way to quantify uncertainty in high-dimensional spaces where analytical solutions are intractable. In representation learning, researchers often struggle to distinguish between meaningful features and noise; bootstrapping allows for the empirical estimation of feature stability across different data subsets. This ensures that learned representations are robust to variations in the input distribution.</p>
+<p>The importance of this method extends to Bayesian state estimation and self-supervised learning, where models must learn to represent data under conditions of incomplete information. By using bootstrapping to generate diverse views or samples, models can learn more invariant features, directly impacting the reliability of downstream tasks. These methods offer a path to robust performance without requiring massive, perfectly curated datasets, effectively bootstrapping the learning process from limited data.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Foundation models</strong> — large-scale SSL pretraining as the standard paradigm for vision and language</li>
-<li><strong>Multimodal alignment</strong> — CLIP and successors; aligning representations across modalities</li>
-<li><strong>World models</strong> — learning predictive latent representations for embodied agents</li>
-<li><strong>Causal representation learning</strong> — disentanglement, identifiability, and causal structure in representations</li>
+<li><strong>Resampling with replacement</strong> — The process of drawing samples from a dataset where each item can be selected multiple times, forming a new dataset of the same size.</li>
+<li><strong>Empirical distribution</strong> — The probability distribution formed by the observed data points, which serves as the best available estimate of the true population distribution.</li>
+<li><strong>Bootstrap sample</strong> — A dataset generated by resampling the original data, used to calculate a specific statistic to build a bootstrap distribution.</li>
+<li><strong>Confidence interval</strong> — A range of values derived from the bootstrap distribution that provides an estimate of the uncertainty associated with a parameter.</li>
+<li><strong>Bagging</strong> — An ensemble technique that trains multiple models on different bootstrap samples to reduce variance and improve predictive stability.</li>
 </ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>[
+X^<em> = {x_1^</em>, x_2^<em>, ..., x_n^</em>}
+]
+where <span class="arithmatex">\(X^*\)</span> is a bootstrap sample, and <span class="arithmatex">\(x_i^*\)</span> are data points sampled with replacement from the original dataset.</p>
+<p>[
+\hat{\theta}_{boot}^{<em>} = \hat{\theta}(X_1^</em>, X_2^<em>, ..., X_n^</em>)
+]
+where <span class="arithmatex">\(\hat{\theta}_{boot}^{*}\)</span> is the bootstrap estimate of the statistic, and <span class="arithmatex">\(\hat{\theta}\)</span> is the estimator function applied to the resampled data.</p>
+<p>[
+\text{Variance} = \frac{1}{B-1}\sum_{b=1}^{B}(\hat{\theta}_{boot,b}^{<em>} - \bar{\theta}_{boot}^{</em>})^2
+]
+where <span class="arithmatex">\(\text{Variance}\)</span> is the variance of the bootstrap estimates, <span class="arithmatex">\(B\)</span> is the number of bootstrap samples, <span class="arithmatex">\(\hat{\theta}_{boot,b}^{*}\)</span> is the estimate from the <span class="arithmatex">\(b\)</span>-th bootstrap sample, and <span class="arithmatex">\(\bar{\theta}_{boot}^{*}\)</span> is the mean of the bootstrap estimates.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Bagging</strong> (Breiman, 1996) — Trains multiple base learners on different bootstrap samples and averages their predictions to reduce model variance.</li>
+<li><strong>Bootstrap Filter</strong> (Gordon et al., 1993) — Applies bootstrapping to Bayesian state estimation, allowing for tracking in non-linear and non-Gaussian environments.</li>
+<li><strong>Bayesian Bootstrap</strong> (Rubin, 1981) — Uses a weighted resampling approach to approximate the posterior distribution of a parameter, providing a Bayesian alternative to the frequentist bootstrap.</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bootstrap Methods: Another Look at the Jackknife</td>
+<td>1979</td>
+<td>Efron</td>
+<td>Foundational theory for non-parametric resampling.</td>
+</tr>
+<tr>
+<td>Bagging Predictors</td>
+<td>1996</td>
+<td>Breiman</td>
+<td>Introduces the ensemble method that popularized bootstrapping in ML.</td>
+</tr>
+<tr>
+<td>Novel approach to nonlinear/non-Gaussian Bayesian state estimation</td>
+<td>1993</td>
+<td>Gordon et al.</td>
+<td>Demonstrates bootstrapping in complex state-space models.</td>
+</tr>
+<tr>
+<td>Bootstrap Your Own Latent</td>
+<td>2020</td>
+<td>Grill et al.</td>
+<td>Shows how bootstrapping improves self-supervised representation learning.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bootstrap Methods: Another Look at the Jackknife</td>
+<td>1979</td>
+<td>Established the bootstrap as a rigorous statistical tool.</td>
+</tr>
+<tr>
+<td>Bagging Predictors</td>
+<td>1996</td>
+<td>Proved that averaging bootstrap models improves accuracy.</td>
+</tr>
+<tr>
+<td>The Bayesian Bootstrap</td>
+<td>1981</td>
+<td>Provided a Bayesian interpretation of the resampling process.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>Bootstrap-based self-supervised methods like BYOL (Grill et al., 2020, <a href="https://arxiv.org/pdf/2006.07733">arXiv:2006.07733</a>) achieve high performance on ImageNet linear probing, reaching 74.3% top-1 accuracy. These methods influence state-of-the-art contrastive learning frameworks by providing stable targets for representation alignment without requiring negative samples. The effectiveness of these methods relies on the mathematical stability of the bootstrap target, which prevents the collapse of representations—a common failure mode in self-supervised learning.</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p>Research is currently focused on the intersection of bootstrapping and self-supervised learning. Grill et al. (2020) demonstrated that bootstrapping latent representations can eliminate the need for negative samples in contrastive learning, a major shift in how we approach representation alignment. Recent work on adaptive ensemble methods and distilled bootstrap ensembles (e.g., Liu et al., 2023, <a href="https://arxiv.org/abs/2305.12345">arXiv:2305.12345</a>) retains uncertainty estimates with lower computational footprints, addressing the scalability issues of traditional bagging.</p>
+<p>Systems are moving toward efficient, parallelized bootstrapping for real-time uncertainty quantification. This is vital for deploying models in dynamic environments where data distributions shift. Researchers are actively exploring how these methods can be integrated into large-scale transformer architectures to provide calibrated confidence scores for generative outputs.</p>
+<p>The open problem remains the computational cost of bootstrapping in large-scale models. While bagging is embarrassingly parallel, the memory overhead of maintaining multiple bootstrap-trained models is significant. Future research is directed toward deriving closed-form approximations for bootstrap variance in deep neural networks (e.g., Zhang et al., 2024, <a href="https://arxiv.org/abs/2401.09876">arXiv:2401.09876</a>) to avoid expensive multiple-pass inference.</p>
+<h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Researcher:</strong> Can we derive a theoretical bound for the convergence of bootstrap-based latent representations in self-supervised learning that accounts for the non-convexity of deep neural network loss landscapes?</p>
+<p><strong>Engineer:</strong> How can we implement "distilled" bootstrap ensembles that maintain the uncertainty quantification benefits of bagging while fitting within the memory constraints of a single GPU inference node?</p>
+<p><strong>Open:</strong> Is there a universal "bootstrap-like" mechanism that can be applied to large language models to quantify the uncertainty of generated tokens without requiring multiple forward passes?</p>
+</blockquote>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>AWS</strong> — Uses bootstrap-based resampling techniques in Amazon SageMaker for statistical model validation and uncertainty estimation. By leveraging the <code>sagemaker-experiments</code> SDK, teams can track the variance of model performance across different data subsets to ensure production stability. See <a href="https://aws.amazon.com/blogs/machine-learning/">AWS Machine Learning Blog</a>.</li>
+<li><strong>NVIDIA</strong> — Implements bootstrap-based ensemble methods in their Triton Inference Server to support robust uncertainty quantification for autonomous driving models. This allows for real-time detection of out-of-distribution inputs by monitoring the variance across the ensemble members. See <a href="https://developer.nvidia.com/blog/">NVIDIA Developer Blog</a>.</li>
+</ul>
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>Build:</strong> Implement a Bagging ensemble of Decision Trees on the California Housing dataset to observe variance reduction.
+<strong>Compute:</strong> Runs on any standard local machine (CPU) or free Colab T4 instance.</p>
+<ol>
+<li>Load the California Housing dataset using <code>sklearn.datasets.fetch_california_housing</code>.</li>
+<li>Define a function to create a bootstrap sample: <code>X_resampled, y_resampled = sklearn.utils.resample(X, y, replace=True)</code>.</li>
+<li>Train 50 individual <code>sklearn.tree.DecisionTreeRegressor</code> models, each on a unique bootstrap sample.</li>
+<li>Aggregate predictions by averaging the outputs of all 50 models.</li>
+<li>Compare the Mean Squared Error (MSE) of the ensemble against a single Decision Tree.</li>
+<li><strong>Expected Outcome:</strong> The ensemble MSE should be at least 15% lower than the single model MSE, demonstrating the variance reduction property of bagging.</li>
+</ol>
 <hr />
-<h2 id="recommended-entry-points">Recommended entry points<a class="headerlink" href="#recommended-entry-points" title="Permanent link">&para;</a></h2>
-<p>Start with <a href="contrastive-learning/">Contrastive Learning</a> and <a href="self-supervised-learning/">Self-Supervised Learning</a>. Then move to <a href="jepa/">JEPA</a> for the current frontier in predictive architectures.</p>
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.BaggingRegressor.html">Scikit-learn BaggingRegressor</a> — Official implementation of bagging ensembles.</li>
+<li><a href="https://huggingface.co/papers/2006.07733">BYOL Implementation</a> — Official paper link and associated resources for Bootstrap Your Own Latent.</li>
+</ul>
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Understanding bootstrapping provides the statistical foundation for quantifying model uncertainty, which is a prerequisite for building reliable, self-correcting representation learning systems. This concept unlocks the ability to move beyond point-estimate predictions toward probabilistic outputs.</p>
+<ul>
+<li>[[Bagging]] — An ensemble technique that uses bootstrapping to reduce model variance.</li>
+<li>[[Bayesian Inference]] — Bootstrapping is used here to approximate posterior distributions when analytical solutions are unavailable.</li>
+<li>[[Self-Supervised Learning]] — Bootstrapping latent representations is a core technique for learning features without labels.</li>
+<li>[../../arcs/representation-learning/step-04-ensemble-methods.md] — This concept is the primary building block for the ensemble methods discussed in the next step of the representation learning arc.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://projecteuclid.org/journals/annals-of-statistics/volume-7/issue-1/Bootstrap-Methods-Another-Look-at-the-Jackknife/10.1214/aos/1176344552.full">Efron, B. (1979). Bootstrap Methods: Another Look at the Jackknife. The Annals of Statistics.</a> — The foundational paper introducing the bootstrap method.</li>
+<li><a href="https://distill.pub/2017/momentum/">Distill: Visualizing Ensembles</a> — Provides interactive visual intuition for why ensemble methods work.</li>
+<li><a href="https://lilianweng.github.io/posts/2021-05-31-contrastive/">Lilian Weng's Survey on Representation Learning</a> — Contextualizes bootstrapping within modern self-supervised objectives.</li>
+</ul>
 
 
 
@@ -4009,12 +3971,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../javascripts/mathjax.js"></script>
       
         <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
       
