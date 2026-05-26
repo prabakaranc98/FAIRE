@@ -24,6 +24,7 @@ _DEFAULTS = {
     "WRITER_MODEL":   "anthropic/claude-opus-4.7",
     "MVB_MODEL":      "anthropic/claude-opus-4.7",
     "REVIEWER_MODEL": "google/gemini-3.1-pro-preview",
+    "CRITIC_MODEL":   "google/gemini-2.0-flash-lite-001",
     "RESEARCH_MODEL": "google/gemini-3.5-flash",
     "FALLBACK_MODEL": "anthropic/claude-sonnet-4.6",
 }
@@ -60,6 +61,7 @@ def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
     model_env_key = {
         "writer":   "WRITER_MODEL",
         "reviewer": "REVIEWER_MODEL",
+        "critic":   "CRITIC_MODEL",
         "mvb":      "MVB_MODEL",
         "research": "RESEARCH_MODEL",
         "fallback": "FALLBACK_MODEL",
@@ -73,13 +75,15 @@ def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
         "X-Title": "Frontier Wiki Agent",
     }
 
-    # Full wiki pages need 4000-8000 tokens of output — set explicitly per role
+    # Full wiki pages need up to 12000 tokens of output — set explicitly per role
     max_tokens_by_role = {
-        "writer":   8192,   # full schema page: ~3000-6000 tokens
+        "writer":   16000,  # full schema page: ~4000-8000 tokens; 16K gives headroom for longer pages
         "mvb":      4096,   # MVB section only
-        "reviewer": 2048,   # structured JSON feedback
+        "reviewer": 8192,   # one structured rubric call per page; reasoning model.
+        "critic":   4096,   # one call per critic skill, 8 in parallel; non-reasoning model,
+                            # all tokens visible, 4K covers structured JSON + small reasoning.
         "research": 4096,   # plan + summaries
-        "fallback": 8192,
+        "fallback": 16000,
     }
     max_tokens = max_tokens_by_role.get(role, 8192)
 

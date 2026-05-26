@@ -31,11 +31,14 @@ from .prompts import (
     REVIEWER_SYSTEM,
     SCRATCH_SYSTEM,
     WRITE_INSTRUCTIONS,
+    WRITE_INSTRUCTIONS_ARC_INDEX,
+    WRITE_INSTRUCTIONS_ARC_STEP,
     WRITER_SYSTEM,
 )
 from .skills import context_tokens_from_state, format_skills_block, load_skills, select_skills
 from .state import WikiPageState
 from .tools import (
+    exa_find_similar,
     exa_search_papers,
     exa_search_production,
     exa_search_sota,
@@ -96,6 +99,14 @@ class ReviewResult(BaseModel):
         default=0.8, ge=0.0, le=1.0,
         description="Frontier sections cite papers with author/year/URL inline; vague claims like 'recent work suggests' score 0 (0=uncited vague claims, 1=every frontier claim has author-year-URL)"
     )
+    open_questions_score: float = Field(
+        default=0.7, ge=0.0, le=1.0,
+        description="Open questions section quality: three admonition blocks (researcher/engineer/open), each with a specific publishable-level question (0=absent/vague, 1=three specific questions present)"
+    )
+    backlink_score: float = Field(
+        default=0.7, ge=0.0, le=1.0,
+        description="Arc backlinks: curriculum pages link to arc steps (This concept appears in), arc steps link to curriculum (Go deeper) with context sentences (0=absent, 1=present with context)"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -106,11 +117,31 @@ def load_persona_node(state: WikiPageState) -> WikiPageState:
     persona = load_persona(state["topic"], str(_PERSONAS_DIR))
     if persona.get("track") != state["track"]:
         persona = load_persona(state["track"], str(_PERSONAS_DIR))
-    output_path = f"{DOCS_DIR}/curriculum/{state['track']}/{state['topic']}.md"
+    output_path = _resolve_output_path(state)
     run_id = str(uuid.uuid4())
     started_at = datetime.now(timezone.utc).isoformat()
     return {**state, "persona": persona, "output_path": output_path,
             "run_id": run_id, "started_at": started_at}
+
+
+def _resolve_output_path(state: WikiPageState) -> str:
+    """Route output to the correct tree based on mode/page_type.
+
+    - mode == "arc-step"   → docs/arcs/{arc_id}/step-{pos:02d}-{slug}.md
+    - mode == "arc-index"  → docs/arcs/{arc_id}/index.md
+    - everything else      → docs/curriculum/{track}/{slug}.md
+    """
+    mode = state.get("mode", "full")
+    arc_ctx = state.get("arc_context") or {}
+    arc_id = arc_ctx.get("arc_id", "")
+    topic = state["topic"]
+
+    if mode == "arc-step" and arc_id:
+        pos = int(arc_ctx.get("position") or 0)
+        return f"{DOCS_DIR}/arcs/{arc_id}/step-{pos:02d}-{topic}.md"
+    if mode == "arc-index" and arc_id:
+        return f"{DOCS_DIR}/arcs/{arc_id}/index.md"
+    return f"{DOCS_DIR}/curriculum/{state['track']}/{topic}.md"
 
 
 def read_stub_node(state: WikiPageState) -> WikiPageState:
@@ -134,18 +165,32 @@ def research_node(state: WikiPageState) -> WikiPageState:
         except Exception:
             return []
 
-    # Build parallel search tasks: (bucket, fn, args, kwargs)
+    # Build parallel search tasks using Exa neural query best practices.
+    # Neural queries: phrase as "A paper that introduced/proved/showed [X]"
+    # Keyword queries: use for specific named systems, benchmarks, companies
     search_tasks = [
-        ("paper", exa_search_papers, (f"{topic} foundational paper",), {"foundational": True}),
-        ("paper", exa_search_papers, (f"{topic} {domain} original contribution",), {"foundational": True}),
-        ("sota",  exa_search_sota,   (f"{topic} state of the art 2024 2025 benchmark",), {}),
-        ("sota",  exa_search_sota,   (f"{topic} best result arxiv 2025",), {}),
-        ("prod",  exa_search_production, (f"{topic} production deployment engineering at scale",), {}),
+        # Foundational papers: neural query describing the contribution
+        ("paper", exa_search_papers,
+         (f"A paper that introduced or defined {topic} as a method or concept",),
+         {"foundational": True}),
+        ("paper", exa_search_papers,
+         (f"The original {topic} paper {domain} seminal contribution arxiv",),
+         {"foundational": True}),
+        # SotA: neural for contribution description, keyword for benchmark names
+        ("sota",  exa_search_sota,
+         (f"A paper showing state-of-the-art results using {topic} on benchmark 2024 2025",), {}),
+        ("sota",  exa_search_sota,
+         (f"{topic} best result {domain} benchmark metric performance 2025 arxiv",), {}),
+        # Production: keyword search for company + system names
+        ("prod",  exa_search_production,
+         (f"{topic} production deployment {domain} engineering at scale real system",), {}),
+        # HuggingFace
         ("hf_m",  hf_search_models,  (topic,), {}),
         ("hf_d",  hf_search_datasets,(topic,), {}),
     ]
     for seed in seeds:
-        search_tasks.append(("paper", exa_search_papers, (seed,), {"foundational": True}))
+        search_tasks.append(("paper", exa_search_papers,
+                             (f"A paper about {seed}",), {"foundational": True}))
 
     paper_results: list[dict] = []
     sota_results:  list[dict] = []
@@ -175,6 +220,17 @@ def research_node(state: WikiPageState) -> WikiPageState:
         if r["url"] not in seen:
             seen.add(r["url"])
             deduped_papers.append(r)
+
+    # Expand with find_similar on the top 2 foundational papers (Exa best practice:
+    # find_similar surfaces related work that keyword/neural queries miss).
+    # Run sequentially — pool is closed above; only 2 calls so threading is not worth it.
+    arxiv_seeds = [r["url"] for r in deduped_papers if "arxiv.org" in r.get("url", "")][:2]
+    if arxiv_seeds and int(_os.getenv("EXA_USE_FIND_SIMILAR", "1")):
+        for url in arxiv_seeds:
+            for sim in (_safe(exa_find_similar, url, 3) or []):
+                if sim["url"] not in seen:
+                    seen.add(sim["url"])
+                    deduped_papers.append(sim)
 
     return {
         **state,
@@ -376,6 +432,155 @@ WORKING MEMORY (verified facts — use ONLY these citations, equations, examples
     return {**state, "draft": draft}
 
 
+def write_arc_step_node(state: WikiPageState) -> WikiPageState:
+    """Write an arc step build page using the arc-step schema and instructions.
+
+    Uses the same WRITER_SYSTEM persona + scratch_pad as write_draft_node, but
+    applies WRITE_INSTRUCTIONS_ARC_STEP instead of the curriculum WRITE_INSTRUCTIONS.
+    Arc step pages always have has_mvb: true and use the arc_context for breadcrumbs.
+    """
+    writer = get_llm("writer", temperature=0.3)
+    persona = state.get("persona", {})
+    writing_plan = state.get("writing_plan", "")
+    scratch_pad = state.get("scratch_pad", "")
+    page_type = state.get("page_type", "arc-step")
+    depth_emphasis = state.get("depth_emphasis", ["applied"])
+    topic = state["topic"]
+    track = state["track"]
+    arc_context = state.get("arc_context", {})
+
+    ctx_tokens = context_tokens_from_state(state)
+    skills_block = format_skills_block(select_skills(_SKILLS, "write_draft", ctx_tokens))
+    system = (
+        WRITER_SYSTEM
+        .replace("{domain}", persona.get("domain", "AI/ML"))
+        .replace("{schema}", "")  # arc step uses WRITE_INSTRUCTIONS_ARC_STEP, not SCHEMA.md
+    ) + skills_block
+
+    arc_info = ""
+    if arc_context:
+        arc_info = (
+            f"\nArc: {arc_context.get('arc_id', 'unknown')} "
+            f"— Step {arc_context.get('position', '?')} of {arc_context.get('total', '?')}\n"
+            f"Arc title: {arc_context.get('arc_title', '')}\n"
+            f"Previous step: {arc_context.get('prev', 'none')}\n"
+            f"Next step: {arc_context.get('next', 'none')}\n"
+            f"Output path: {state.get('output_path', '')}"
+        )
+
+    depth_note = (
+        "Depth emphasis: " + ", ".join(depth_emphasis) + ". "
+        + ("Lean applied: more specific recipe steps, exact hyperparameters. "
+           if "applied" in depth_emphasis else "")
+        + ("Lean theoretical: fuller theory section, equation derivation steps. "
+           if "theoretical" in depth_emphasis else "")
+    )
+
+    existing = state.get("existing_stub", "")
+    improve_note = (
+        "\n⚠ IMPROVE MODE — existing content below. Keep what's good, rewrite what's weak:\n"
+        + existing[:3000]
+        if existing.strip() and "🚧" not in existing else ""
+    )
+
+    user = f"""Topic: **{topic}** | Track: {track} | Page type: {page_type}
+{depth_note}
+{arc_info}
+
+════════════════════════════════════
+WRITING PLAN
+════════════════════════════════════
+{writing_plan}
+
+════════════════════════════════════
+WORKING MEMORY (verified facts — use ONLY these citations, equations, examples)
+════════════════════════════════════
+{scratch_pad}
+{improve_note}
+
+{WRITE_INSTRUCTIONS_ARC_STEP}
+"""
+
+    response = writer.invoke([
+        SystemMessage(content=system),
+        HumanMessage(content=user),
+    ])
+    draft = response.content.strip()
+    return {**state, "draft": draft}
+
+
+def write_arc_index_node(state: WikiPageState) -> WikiPageState:
+    """Write an arc index page: destination, chapters, curated readings, compounding trajectory.
+
+    Uses WRITE_INSTRUCTIONS_ARC_INDEX. Arc index pages have has_mvb: false — builds live
+    in the step pages. The arc_context.chapters list drives the chapter structure.
+    """
+    writer = get_llm("writer", temperature=0.3)
+    persona = state.get("persona", {})
+    writing_plan = state.get("writing_plan", "")
+    scratch_pad = state.get("scratch_pad", "")
+    topic = state["topic"]
+    track = state["track"]
+    arc_context = state.get("arc_context", {})
+
+    ctx_tokens = context_tokens_from_state(state)
+    skills_block = format_skills_block(select_skills(_SKILLS, "write_draft", ctx_tokens))
+    system = (
+        WRITER_SYSTEM
+        .replace("{domain}", persona.get("domain", "AI/ML"))
+        .replace("{schema}", "")
+    ) + skills_block
+
+    chapters_info = ""
+    if arc_context.get("chapters"):
+        chapters_info = "\nArc chapters:\n" + "\n".join(
+            f"  Chapter {c.get('number', i+1)}: {c.get('title', '')} "
+            f"— steps {c.get('steps', [])}"
+            for i, c in enumerate(arc_context["chapters"])
+        )
+
+    arc_info = (
+        f"\nArc: {arc_context.get('arc_id', topic)}\n"
+        f"Arc title: {arc_context.get('arc_title', topic.replace('-', ' ').title())}\n"
+        f"Destination: {arc_context.get('destination', '')}\n"
+        f"Total steps: {arc_context.get('total', '?')}\n"
+        f"Tracks: {arc_context.get('tracks', [])}\n"
+        f"Prerequisites: {arc_context.get('prereqs', [])}"
+        + chapters_info
+    ) if arc_context else ""
+
+    existing = state.get("existing_stub", "")
+    improve_note = (
+        "\n⚠ IMPROVE MODE — existing arc index below. Keep structure, rewrite for new schema:\n"
+        + existing[:3000]
+        if existing.strip() and "🚧" not in existing else ""
+    )
+
+    user = f"""Topic: **{topic}** | Track: {track} | Page type: arc-index
+{arc_info}
+
+════════════════════════════════════
+WRITING PLAN
+════════════════════════════════════
+{writing_plan}
+
+════════════════════════════════════
+WORKING MEMORY (verified citations and readings — use ONLY these)
+════════════════════════════════════
+{scratch_pad}
+{improve_note}
+
+{WRITE_INSTRUCTIONS_ARC_INDEX}
+"""
+
+    response = writer.invoke([
+        SystemMessage(content=system),
+        HumanMessage(content=user),
+    ])
+    draft = response.content.strip()
+    return {**state, "draft": draft}
+
+
 def mvb_recipe_node(state: WikiPageState) -> WikiPageState:
     """On-demand: generate only the MVB section using HuggingFace search + LLM."""
     writer = get_llm("mvb", temperature=0.2)
@@ -470,21 +675,127 @@ def _rubric_approve(result: ReviewResult) -> bool:
         and result.prose_score >= 0.6
         and result.mvb_score >= 0.6
         and result.frontier_citation_score >= 0.65
+        and result.open_questions_score >= 0.4
         and result.confidence >= 0.65
     )
 
 
-def review_node(state: WikiPageState) -> WikiPageState:
-    """Structured review using Gemini 3.1 Pro Preview via OpenRouter.
+class CriticScore(BaseModel):
+    """One critic's output from the review panel."""
+    score: float = Field(ge=0.0, le=1.0)
+    issues: list[str] = Field(default_factory=list)
+    fix_suggestions: list[str] = Field(default_factory=list)
 
-    Approval is rubric-based: schema, sources, prose, and MVB are scored
-    independently. All dimensions must pass their thresholds.
+
+def _run_critic_panel(draft: str, state: WikiPageState) -> dict[str, CriticScore]:
+    """Fan out all critic-* skills in parallel; one API call per critic.
+
+    Each critic gets the full draft + its own skill prompt and returns a
+    structured CriticScore. Results aggregate into a per-critic dict the
+    reviewer's confidence is then derived from.
     """
+    from .skills import load_skills
+    from concurrent.futures import ThreadPoolExecutor as _TPE, as_completed as _asc
+
+    skills = [s for s in load_skills() if "review" in s.applies_to and s.name.startswith("critic-")]
+    if not skills:
+        return {}
+
+    # Critics use a dedicated non-reasoning model (see llm.py "critic" role).
+    # Reasoning models eat the max_tokens budget on internal CoT before producing
+    # JSON, which previously caused LengthFinishReasonError across the panel.
+    critic_llm = get_llm("critic", temperature=0.0)
+    critic_reviewer = critic_llm.with_structured_output(CriticScore)
+
+    def _run_one(skill) -> tuple[str, CriticScore]:
+        prompt = f"""You are running ONE focused critic on a wiki page. Your skill is:
+
+{skill.body}
+
+---
+PAGE TO REVIEW:
+{draft}
+
+Return your CriticScore JSON. Score only the dimension your skill covers — leave the
+broader review to other critics. Be specific in `issues` (point at the section or
+the exact phrase you saw) and actionable in `fix_suggestions` (name the edit).
+"""
+        try:
+            result: CriticScore = critic_reviewer.invoke([HumanMessage(content=prompt)])
+            return skill.name, result
+        except Exception as exc:
+            return skill.name, CriticScore(
+                score=0.7,
+                issues=[f"critic call failed: {type(exc).__name__}"],
+                fix_suggestions=[],
+            )
+
+    results: dict[str, CriticScore] = {}
+    # 8 critics; OpenRouter handles concurrency fine. Cap workers at 8.
+    with _TPE(max_workers=min(8, max(1, len(skills))), thread_name_prefix="critic") as pool:
+        futures = {pool.submit(_run_one, s): s for s in skills}
+        for fut in _asc(futures):
+            name, score = fut.result()
+            results[name] = score
+    return results
+
+
+def _aggregate_review(
+    structured: ReviewResult,
+    panel: dict[str, CriticScore],
+) -> tuple[float, bool, list[str], dict[str, float]]:
+    """Combine the structured rubric reviewer with the critic panel.
+
+    Returns (confidence, approved, all_issues, per_dim_scores).
+
+    Confidence is the MINIMUM of (structured.confidence, min(panel scores)) —
+    any critic flagging a real problem can block. This is the conservative gate.
+    """
+    panel_scores = {name: cs.score for name, cs in panel.items()}
+    min_panel = min(panel_scores.values()) if panel_scores else 1.0
+    confidence = min(structured.confidence, min_panel)
+
+    # Approval gate: existing rubric must pass AND every critic ≥ 0.6
+    rubric_ok = _rubric_approve(structured)
+    panel_ok = all(s >= 0.6 for s in panel_scores.values())
+    approved = rubric_ok and panel_ok
+
+    all_issues = list(structured.issues)
+    for name, cs in panel.items():
+        for iss in cs.issues:
+            all_issues.append(f"[{name}] {iss}")
+
+    per_dim = {
+        "schema": structured.schema_score,
+        "source": structured.source_score,
+        "prose": structured.prose_score,
+        "mvb": structured.mvb_score,
+        "frontier_citations": structured.frontier_citation_score,
+        "open_questions": structured.open_questions_score,
+        "backlinks": structured.backlink_score,
+        **panel_scores,
+    }
+    return confidence, approved, all_issues, per_dim
+
+
+def review_node(state: WikiPageState) -> WikiPageState:
+    """Multi-critic panel review.
+
+    Runs in two halves, concurrently:
+      1. Structured rubric reviewer (existing schema/source/prose/MVB/citations check)
+      2. Critic panel: each critic-* skill spawns one parallel API call
+         scoring its single dimension
+
+    The two halves are combined: confidence = min(rubric, min(critic scores)).
+    Approval requires both rubric_ok AND every critic >= 0.6.
+    Any critic flagging a real problem blocks — this is the conservative gate.
+    """
+    from concurrent.futures import ThreadPoolExecutor as _TPE
+
     reviewer = get_llm("reviewer", temperature=0.0)
     draft = state.get("draft", "")
 
     structured_reviewer = reviewer.with_structured_output(ReviewResult)
-
     prompt = f"""{REVIEWER_SYSTEM}
 
 ---
@@ -492,53 +803,75 @@ PAGE TO REVIEW:
 {draft}
 """
 
-    try:
-        result: ReviewResult = structured_reviewer.invoke([HumanMessage(content=prompt)])
-        approved = _rubric_approve(result)
-        return {
-            **state,
-            "review_feedback": (
-                f"PASS: {result.passed}\nConfidence: {result.confidence:.2f}\n"
-                f"Schema: {result.schema_score:.2f}  Source: {result.source_score:.2f}  "
-                f"Prose: {result.prose_score:.2f}  MVB: {result.mvb_score:.2f}  "
-                f"Citations: {result.frontier_citation_score:.2f}\n"
-                f"Issues: {result.issues}\nSuggestions: {result.suggestions}"
-            ),
-            "review_issues": result.issues,
-            "review_pass": result.passed,
-            "review_confidence": result.confidence,
-            "review_rubric": {
-                "schema": result.schema_score,
-                "source": result.source_score,
-                "prose": result.prose_score,
-                "mvb": result.mvb_score,
-                "frontier_citations": result.frontier_citation_score,
-            },
-            "approved": approved,
-        }
-    except Exception:
-        fallback = reviewer.invoke([
-            HumanMessage(content=prompt + (
-                "\n\nRespond in this exact format:\n"
-                "VERDICT: PASS or FAIL\n"
-                "CONFIDENCE: 0.0-1.0\n"
-                "ISSUES: bullet list of issues\n"
-            ))
-        ])
-        text = fallback.content
+    # Run the structured rubric reviewer and the critic panel concurrently.
+    with _TPE(max_workers=2, thread_name_prefix="review") as pool:
+        rubric_future = pool.submit(
+            lambda: structured_reviewer.invoke([HumanMessage(content=prompt)])
+        )
+        panel_future = pool.submit(_run_critic_panel, draft, state)
 
-        import re as _re
-        passed = "PASS" in text.upper() and "FAIL" not in text.upper().split("PASS")[0]
-        conf_match = _re.search(r"\b(0\.\d+|1\.0)\b", text)
-        fallback_conf = float(conf_match.group(1)) if conf_match else 0.7
+        try:
+            structured: ReviewResult = rubric_future.result()
+        except Exception:
+            # Same fallback as before — unstructured reviewer
+            fallback = reviewer.invoke([
+                HumanMessage(content=prompt + (
+                    "\n\nRespond in this exact format:\n"
+                    "VERDICT: PASS or FAIL\n"
+                    "CONFIDENCE: 0.0-1.0\n"
+                    "ISSUES: bullet list of issues\n"
+                ))
+            ])
+            text = fallback.content
+            import re as _re
+            passed = "PASS" in text.upper() and "FAIL" not in text.upper().split("PASS")[0]
+            conf_match = _re.search(r"\b(0\.\d+|1\.0)\b", text)
+            fallback_conf = float(conf_match.group(1)) if conf_match else 0.7
+            # Still try to consume panel results for richer feedback
+            try:
+                panel = panel_future.result()
+            except Exception:
+                panel = {}
+            panel_min = min((cs.score for cs in panel.values()), default=1.0)
+            return {
+                **state,
+                "review_feedback": text + ("\n\nCritic panel:\n" + "\n".join(
+                    f"  {name}: {cs.score:.2f} — {'; '.join(cs.issues[:2])}"
+                    for name, cs in panel.items()
+                ) if panel else ""),
+                "review_pass": passed,
+                "review_confidence": min(fallback_conf, panel_min),
+                "approved": passed and fallback_conf >= 0.65 and panel_min >= 0.6,
+                "critic_panel": {n: {"score": cs.score, "issues": cs.issues}
+                                 for n, cs in panel.items()},
+            }
 
-        return {
-            **state,
-            "review_feedback": text,
-            "review_pass": passed,
-            "review_confidence": fallback_conf,
-            "approved": passed and fallback_conf >= 0.65,
-        }
+        panel = panel_future.result()
+
+    confidence, approved, all_issues, per_dim = _aggregate_review(structured, panel)
+
+    summary = (
+        f"PASS: {structured.passed}\nConfidence: {confidence:.2f} "
+        f"(rubric={structured.confidence:.2f}, panel_min={min((cs.score for cs in panel.values()), default=1.0):.2f})\n"
+        + " · ".join(f"{k}:{v:.2f}" for k, v in per_dim.items())
+        + ("\n\nCritic panel detail:\n" + "\n".join(
+            f"  [{name}] {cs.score:.2f} — {'; '.join(cs.issues[:3]) or 'no issues'}"
+            for name, cs in panel.items()
+        ) if panel else "")
+    )
+
+    return {
+        **state,
+        "review_feedback": summary,
+        "review_issues": all_issues,
+        "review_pass": structured.passed,
+        "review_confidence": confidence,
+        "review_rubric": per_dim,
+        "critic_panel": {n: {"score": cs.score, "issues": cs.issues,
+                              "fixes": cs.fix_suggestions}
+                          for n, cs in panel.items()},
+        "approved": approved,
+    }
 
 
 def revise_draft_node(state: WikiPageState) -> WikiPageState:
@@ -579,6 +912,12 @@ After fixing other reviewer issues, append these sections immediately.
 The last line of your output MUST be inside ## Further reading.
 """
 
+    writing_plan = state.get("writing_plan", "")
+    plan_note = (
+        f"\nORIGINAL WRITING PLAN (revision must not contradict this):\n{writing_plan[:400]}\n"
+        if writing_plan else ""
+    )
+
     prompt = f"""You are revising a Frontier Wiki page. The reviewer flagged specific issues. Fix all of them.
 
 REVIEWER FEEDBACK (fix every issue listed):
@@ -586,7 +925,7 @@ REVIEWER FEEDBACK (fix every issue listed):
 
 SPECIFIC ISSUES TO ADDRESS:
 {chr(10).join(f"  - {i}" for i in issues) if issues else "(see feedback above)"}
-{truncation_note}
+{truncation_note}{plan_note}
 WORKING MEMORY (verified facts — use ONLY these citations when adding new content):
 {scratch_pad[:3000]}
 
@@ -602,8 +941,44 @@ Return the COMPLETE revised page. Include ALL sections from frontmatter through
     return {**state, "draft": response.content, "revision_count": count}
 
 
+def _sanitize_draft(text: str) -> str:
+    """Strip writer-model artifacts that prevent the file from starting with valid frontmatter.
+
+    Handles three real failure modes seen in production:
+      1. Writer wraps the whole page in ```yaml ... ``` or ```markdown ... ```.
+      2. Writer prepends a preamble like "Here's the revised page:" or "I'll fix two issues:".
+      3. Writer emits an opening fence on a line by itself with no language tag.
+
+    The contract is simple: the saved file MUST start with `---\\n` (YAML frontmatter).
+    Anything before the first `---\\n` that isn't whitespace is junk.
+    """
+    if not text:
+        return text
+    stripped = text.lstrip()
+    # Drop opening code fence (```yaml, ```markdown, ```md, or bare ```)
+    if stripped.startswith("```"):
+        first_newline = stripped.find("\n")
+        if first_newline != -1:
+            stripped = stripped[first_newline + 1:]
+    # Drop a trailing closing fence
+    if stripped.rstrip().endswith("```"):
+        stripped = stripped.rstrip()
+        stripped = stripped[: stripped.rfind("```")].rstrip() + "\n"
+    # If first non-whitespace content isn't frontmatter, scan forward and drop the preamble
+    if not stripped.lstrip().startswith("---"):
+        idx = stripped.find("\n---\n")
+        if idx != -1:
+            stripped = stripped[idx + 1:]
+        else:
+            # Last resort: also try `---` at the very start after dropping leading lines
+            idx = stripped.find("---\n")
+            if idx != -1:
+                stripped = stripped[idx:]
+    return stripped
+
+
 def write_file_node(state: WikiPageState) -> WikiPageState:
-    final = state.get("draft", "")
+    final = _sanitize_draft(state.get("draft", ""))
 
     # Inject arc breadcrumb immediately after frontmatter closing ---
     arc_context = state.get("arc_context", {})

@@ -70,10 +70,17 @@ If no MVB, write: "No MVB for this page — feeds into [[parent-page]]."
 ────────────────────────────────────────────
 ## Opening scenario
 ────────────────────────────────────────────
-Write 3–4 sentences — the concrete scenario the writer will use to open "What it is".
-This must NOT start with a definition. It must start with the human problem or a
-surprising fact that makes the reader immediately understand WHY this concept exists.
-Draw on the writing plan's opening move. Make it vivid and specific.
+Write 3–4 sentences for the writer to use in "What it is" or "Why this step exists".
+
+For CURRICULUM pages:
+  The FIRST sentence states a concrete human problem or a surprising observable fact —
+  NOT a definition. Ask yourself: what would make someone who has never heard of this
+  concept immediately feel why it must exist? Make it vivid and specific.
+
+For ARC STEP pages:
+  The FIRST sentence states exactly what the reader will have built by the end, and
+  what they will be able to observe. Frame it as a capability gain: "After this step
+  you can train a model that generates X" — not "you'll understand Y".
 
 ────────────────────────────────────────────
 ## The open problem
@@ -81,130 +88,456 @@ Draw on the writing plan's opening move. Make it vivid and specific.
 One specific unsolved question. Stated as a research question, not a direction.
 Must be specific enough that a researcher could write a paper to answer it.
 Draw from the most recent SotA results and the writing plan.
+
+────────────────────────────────────────────
+## Arc connections (curriculum pages only)
+────────────────────────────────────────────
+List 1–3 arc step pages that USE this concept. For each:
+  STEP: [arc-id/step-NN-topic] — one sentence on HOW that step uses this concept
+  (If none are known yet, write: "No arc steps generated yet for this concept.")
 """
 
 
 # ── Full-page write instructions ──────────────────────────────────────────────
 
-WRITE_INSTRUCTIONS = """Write the complete wiki page in a single pass.
+WRITE_INSTRUCTIONS = """Write the complete CURRICULUM REFERENCE page in a single pass.
 
-CRITICAL: You MUST write every section listed below. Do NOT stop after the MVB
-section or after any code block. Keep writing until you have completed section 20
-(## Further reading). The last line of your output must be in ## Further reading.
-If you find yourself finishing a code block or a recipe section, continue immediately
-to the next section — never stop mid-page.
+Curriculum pages are REFERENCE WIKI ARTICLES. They serve the seven reader personas
+(see faire-sense skill) by routing each one to their entry section and giving each
+their own MVB variant. The deep builds live in the arc step pages; curriculum pages
+have a compact 6-variant MVB block that nudges each persona toward a build shaped
+for their day.
 
-Write ALL sections in order. The model has full context — do not hold back or
-abbreviate. Every section must be substantive. Do not truncate.
+CRITICAL: Write every section in order. Do NOT stop before ## Further reading.
+Every section must be substantive. Do not truncate.
 
-SECTION ORDER (use EXACTLY these heading names):
+SECTION ORDER (use EXACTLY these heading names — the reviewer checks every heading):
 
 1.  Frontmatter (YAML block between ---):
-      title: [Topic Name]
+      title: [Concept Name]
       track: [track-slug]
-      tags: [list of 4–6 keywords]
-      depth: [foundational | intermediate | advanced]
-      prereqs: [list of 2–4 prerequisite topic slugs]
+      tags: [4–6 keywords]
+      depth: foundational | intermediate | advanced
+      prereqs: [2–4 prerequisite topic slugs]
+      arc_refs: []
       updated: [today's date YYYY-MM-DD]
-      has_mvb: [true | false]
+      has_mvb: true            ← curriculum pages now carry a multi-persona MVB block
 
-2.  # [Page Title]
+2.  # [Title]
 
-3.  > **TL;DR:** [one sentence — what this is and why it matters at the frontier]
+3.  > **TL;DR:** [one sentence: what this is + why frontier researchers care]
 
-4.  ## For your reader type
-    (4-row table: Reader type | What you get | Go to)
+4.  ## Who this page is for
+    Table with 7 rows, 3 columns (persona × section routing — see faire-sense skill):
+    | Persona | What you get | Jump to |
+    |---|---|---|
+    | Curious learner | Plain-English intuition, why this matters | [§What it is](#what-it-is) |
+    | CS student / tinkerer | Laptop-GPU build with a target metric | [§Minimum Valuable Builds — CS student](#mvb-cs-student) |
+    | Applied engineer | Production framing + latency-shaped build | [§In production](#in-production), [§MVB — Applied engineer](#mvb-applied-engineer) |
+    | Applied researcher | Hypothesis + ablation build | [§What's happening now](#whats-happening-now), [§MVB — Applied researcher](#mvb-applied-researcher) |
+    | Theory student | Derivations + numerical verification | [§Mathematical foundations](#mathematical-foundations) |
+    | Frontier researcher | Open problems + falsifiers | [§Open questions](#open-questions), [§MVB — Frontier researcher](#mvb-frontier-researcher) |
+    | PM / decision-maker | "Why it matters" + SotA synthesis (no MVB) | [§Why it matters](#why-it-matters), [§Current SotA](#current-sota) |
+    (Adjust anchor slugs as needed for the actual headings on this page.)
 
 5.  ## What it is
-    2–3 prose paragraphs. MUST open with the opening scenario from the scratch pad,
-    NOT a definition. No nested lists.
+    3 prose paragraphs. The FIRST sentence states the human problem or a surprising fact
+    that makes the reader immediately feel WHY this concept exists. NEVER opens with a
+    definition ("X is a..."). Paragraphs are causally connected: each flows from the prior.
+    Use connectives: "This is why...", "The consequence is...", "That led directly to..."
 
-6.  ## Why it matters at the frontier
-    2 prose paragraphs connecting to open problems and lab priorities.
+6.  ## Why it matters
+    2 paragraphs. Connect to frontier open problems, active lab priorities, and the
+    adjacent concepts that depend on this one. Every claim uses causal connectives.
 
 7.  ## Core concepts
-    Flat bullet list — 5–8 key ideas, each defined in one precise sentence.
+    Flat bullet list. 5–8 items. Each: **term** — one precise definition sentence.
 
 8.  ## Mathematical foundations
-    3–5 equations from scratch pad. After EVERY equation, write:
+    3–5 equations. After EACH equation block, write:
     "where \(symbol\) is ..., \(symbol\) is ..." — annotate EVERY symbol.
-    Then one sentence of intuition: "This equation says that..."
+    Then one intuition sentence: "This equation says that..."
+    Use \\[...\\] for display math, \\(...\\) for inline. NEVER $...$ or $$...$$
 
 9.  ## Key algorithms / techniques
-    Flat list — named methods, 1–2 sentences each (name, year, what it does).
+    Flat list: **Name** (Year) — 2 sentences: what it does, when to use it over alternatives.
 
 10. ## Essential reading
-    Table: Paper | Year | Authors | Why essential
-    Use ONLY verified citations from the scratch pad. 2–4 papers.
+    Table: | Paper | Year | Authors | Why essential |
+    2–4 papers. Only verified arXiv/edu URLs from scratch pad.
+    Each entry answers: what does reading this teach that nothing else does?
 
 11. ## Seminal papers & test-of-time
-    Table: Paper | Year | Key contribution
-    Papers that durably changed the field — not just recent SotA.
+    Table: | Paper | Year | Key contribution |
+    Papers that reshaped the field AND held up. Cite with arXiv URL.
 
 12. ## Current SotA
     2–3 sentences. Named systems + specific benchmark numbers + years.
     Format: "[Model] achieves [metric] on [benchmark] ([year])."
 
 13. ## What's happening now
-    3 prose paragraphs (one each): Research frontiers / Engineering & Systems / Open problems.
-    EVERY frontier claim MUST name a specific paper inline: "Author et al. (YEAR) showed that
-    [CLAIM] ([arXiv URL])". Vague language ("recent work suggests", "may depend on", "in certain
-    settings", "some approaches") is a reviewer violation — name the paper or cut the claim.
-    Open problems must be specific research questions a researcher would write a paper to answer.
+    3 prose paragraphs: Research frontiers / Engineering & Systems / Open problems.
+    EVERY factual claim names a paper inline: "Author et al. (YEAR) showed [CLAIM] ([arXiv URL])."
+    Vague language without a citation ("recent work suggests", "some approaches",
+    "it has been shown") is a reviewer violation — name the paper or cut the claim.
 
 14. ## In production
-    3–5 bullet points. Each: Company — System — Scale number — Source URL.
-    Sources must be from approved engineering blogs (ai.meta.com, research.google, etc.).
+    3–5 bullets: Company — System — Scale (real number) — [Source](URL)
+    Source must be an approved engineering blog. No Wikipedia, no Medium.
 
-15. ## Minimum Valuable Build     ← include if has_mvb=true
-    (if has_mvb=false: one sentence pointing to the arc or parent page that has the build)
-    Structure:
-      **What you're building:** [one-sentence artifact]
-      **Why this build:** [what it demonstrates]
-      **Stack:** [libraries + versions + HuggingFace model IDs]
-      **Estimated time:** [realistic estimate]
-      ### The recipe
-      Numbered steps. Each step does one thing.
-      ### Expected output
-      Specific — shapes, numbers, or qualitative description.
-      ### Common failure modes
-      - [Failure] → [Fix]
+15. ## Minimum Valuable Builds — by persona
+    SIX sub-sections, one per persona (skip a variant only if the topic genuinely
+    has no fit for that persona — pure theory may skip the production engineer).
 
-16. > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
-    (include only if MVB was written)
+    ### 1. For the curious learner (30 min · free tier) {{ #mvb-curious-learner }}
+    **Build:** [one sentence — what they will see in a notebook or interactive demo]
+    **Artifact:** [the named output — e.g., "a Colab notebook visualizing the forward diffusion process"]
+    **Success:** [observable signal — e.g., "the Gaussian collapses to N(0, I) by step 1000"]
+    **Stack:** [link or HF model/dataset ID]
 
-17. ## Code & implementations
-    Official repos + HuggingFace links. No tutorials. Real GitHub URLs.
+    ### 2. For the CS student / tinkerer (1 day · RTX 4070 / M-series) {{ #mvb-cs-student }}
+    **Build:** [a small training run]
+    **Artifact:** [a checkpoint + a plot]
+    **Success:** [a specific number — e.g., "FID ≤ 20 on MNIST 32×32"]
+    **Stack:** [verified HuggingFace IDs and library versions]
 
-18. ## What comes next
-    ← USE EXACTLY THIS HEADING — the reviewer checks this name literally
-    2–3 links to related pages in this wiki. Real relative markdown paths.
-    One sentence per link: the relationship, not "next in sequence".
+    ### 3. For the applied / production engineer (1 week · A10 / L4 / cloud) {{ #mvb-applied-engineer }}
+    **Build:** [shipping-shaped — quantization, serving, latency target]
+    **Artifact:** [e.g., "a vLLM endpoint serving model X at p50 < 1.5s on A10"]
+    **Success:** [latency, throughput, or cost number]
+    **Stack:** [HF model ID + serving framework + version]
 
-19. ## Connected topics
-    ← USE EXACTLY THIS HEADING — the reviewer checks this name literally
-    3–5 cross-track connections. Real relative paths to pages that exist.
-    For each link write ONE sentence explaining the mechanistic relationship — the specific
-    concept, equation, or structure they share. NOT "also related to" or "see also".
-    Example: "[Attention](../transformers/attention.md) uses the same query-key-value
-    decomposition as memory networks, replacing the fixed memory with a learned context window."
+    ### 4. For the applied researcher (3 days · A100) {{ #mvb-applied-researcher }}
+    **Build:** [stated hypothesis + ablation]
+    **Artifact:** [a comparison table or curve]
+    **Success:** [evidence that confirms or falsifies the hypothesis]
+    **Stack:** [setup details]
 
-20. ## Further reading
-    4–6 items: arXiv, *.edu, distill.pub, or lilianweng.github.io only.
-    One sentence per item on what it adds beyond what's in the page.
+    ### 5. For the theory student (1 day · CPU) {{ #mvb-theory-student }}
+    **Build:** [a derivation followed by numerical verification]
+    **Artifact:** [a plot or table showing theory matches simulation]
+    **Success:** [residual below threshold, or correct closed-form match]
+    **Stack:** [paper section referenced + minimal Python]
+
+    ### 6. For the frontier researcher (1 week+ · A100 cluster) {{ #mvb-frontier-researcher }}
+    **Build:** [probe of a named open problem from the "Open questions" section]
+    **Artifact:** [evidence the proposed answer holds or fails]
+    **Success:** [a falsification criterion — what would change your mind]
+    **Stack:** [cluster + framework]
+
+    HARD RULES for this section:
+    - All six variants share the same underlying mechanism — only artifact, scale, and metric diverge.
+    - Each variant: 3–5 lines, no more. The full section is ~25 lines, not 100.
+    - Named artifacts only. "Train a model" is wrong; "Train a 4M-param UNet DDPM on MNIST 32×32, hit FID ≤ 20" is right.
+    - Real HuggingFace IDs — no abbreviations.
+    - No code blocks unless they name a config — link to the library's quick-start instead.
+    - If a variant truly does not fit (pure theory page has no production engineer build), SKIP that
+      sub-section and add one explanatory line: "*No production engineer variant for this topic — see [related page].*"
+
+16. ## Open questions
+    THREE admonition blocks — one per persona:
+    ```
+    !!! researcher "For researchers"
+        [Theoretical or mathematical question no paper has cleanly answered.
+         Specific enough to design a study around.]
+
+    !!! engineer "For engineers"
+        [Practical experiment or ablation no one has published.
+         Should be runnable in under a day on a consumer GPU or free Colab.]
+
+    !!! open "Think about this"
+        [Conceptual puzzle that makes you question something assumed obvious.
+         Phrased as a question, not a direction.]
+    ```
+
+16. ## This concept appears in
+    Flat list: arc step pages that use this concept. Use information from scratch pad
+    "Arc connections" section. If no arc steps are known yet, write:
+    "Arc step pages for this concept are being generated."
+    Format: `- [Step N — Title](../../arcs/{arc}/step-NN-{topic}.md) — one sentence on the connection`
+
+17. ## Connected topics
+    3–5 cross-curriculum links. Each with ONE sentence on the mechanistic relationship —
+    what specific concept, equation, or structure they share. Not "also related to".
+
+18. ## Further reading
+    4–6 items: arXiv, *.edu, distill.pub, lilianweng.github.io only.
+    One sentence per item on what it adds beyond this page.
 
 HARD RULES (violations cause the reviewer to reject):
-- URLs: only arxiv.org, *.edu, huggingface.co, pytorch.org, distill.pub, lilianweng.github.io,
-  official engineering blogs (ai.meta.com, research.google, openai.com/research, stability.ai/research)
-- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com
+- has_mvb: true in frontmatter — curriculum pages carry the 6-persona MVB block.
+- The "Minimum Valuable Builds — by persona" section is REQUIRED. Each present variant
+  must pass the SENSIBLE · VALUABLE · FEASIBLE quality bar (see mvb-recipe skill):
+    SENSIBLE: build matches persona's compute/time/build-type (curious learner = browser;
+              frontier researcher = cluster; applied researcher = ablation not train).
+    VALUABLE: success metric distinguishes right behavior from wrong (FID ≤ 20, not "loss decreases");
+              build forces contact with the concept's hard part, not just an API call.
+    FEASIBLE: hardware fits the named model in memory; time realistic for compute;
+              model/dataset/library versions all real and compatible; metric measurable.
+- An MVB variant that fails any gate is worse than no variant — drop it before emitting.
+- "What it is" must NOT open with a definition. Fail test: does it start "[Topic] is a..."?
+- Every prose section must use causal connectives per paragraph.
+- Tables may not be nested inside other tables.
+- Bullet lists may not be nested (no bullet inside a bullet in explanatory sections).
 - Math: ONLY \\[...\\] for display, \\(...\\) for inline. NEVER $...$ or $$...$$
-- No nested lists anywhere (bullet inside bullet = fail)
-- No roadmap language: "step 1", "next you'll", "your learning journey", "continue to"
-- No source-policy footer banner
-- Academic voice: write for a researcher who reads papers, not a student who needs encouragement.
-  State facts, cite papers, explain mechanism. NEVER use motivational language ("you'll learn",
-  "let's explore", "your journey", "feel free to", "don't worry").
-- Every claim in ## What's happening now must name an author, year, and URL. No anonymous "work".
+- URLs: arxiv.org, *.edu, huggingface.co, pytorch.org, distill.pub, lilianweng.github.io,
+  approved engineering blogs (ai.meta.com, research.google, openai.com/research) only.
+- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com, youtube.com
+- No motivational language: "you'll learn", "let's explore", "your journey", "feel free to"
+- ## This concept appears in section is required — at least one link or placeholder.
+- Academic voice: write for a researcher who reads papers. State facts, cite papers, explain mechanism.
+"""
+
+
+WRITE_INSTRUCTIONS_ARC_STEP = """Write the complete ARC STEP BUILD page in a single pass.
+
+Arc step pages are BUILD PAGES — the reader builds something and thinks about what they built.
+This is NOT a curriculum reference page. The theory lives in the curriculum page.
+Your job is to get the reader to BUILD something and REFLECT on what they built.
+
+PHILOSOPHY:
+- The build is the point. Every other section supports the build.
+- "The idea you're testing" must be a FALSIFIABLE CLAIM, not a description.
+  BAD: "DDPM is a diffusion model that uses noise prediction."
+  GOOD: "DDPM claims that learning to denoise in 300 small steps is easier than learning to
+        generate in one step. This build validates that claim on 2D toy data."
+- The recipe must be followable without opening a browser. Every step has a sanity check.
+- Open questions must be inspired by the BUILD — things the reader will wonder AFTER running code.
+- "What this unlocks" shows the NEXT step becoming possible.
+- COMPOUNDING CONTRACT: "Why this step exists" must name the PREVIOUS step's artifact verbatim
+  (from prev_artifact in state). The build in this step must extend or use that artifact.
+  BAD: "Building on what we learned about VAEs..."
+  GOOD: "Step 1 produced a trained encoder E(x)→z and decoder D(z)→x. That encoder can
+        compress images, but the latent space has no structure — z-dimensions are entangled
+        and semantically meaningless. This step adds β-weighting to the ELBO to fix that."
+
+SECTION ORDER (use EXACTLY these heading names):
+
+1.  Frontmatter (YAML block between ---):
+      title: "Step [N] — [What You're Building]"
+      arc: [arc-id]
+      step: [N]
+      total: [M]
+      topic_refs:
+        - [curriculum/track/slug]
+      has_mvb: true            ← ALWAYS true for arc step pages
+      mvb_persona: [one of: curious-learner | ml-tinkerer | applied-engineer |
+                            applied-researcher | theory-student | frontier-researcher]
+      updated: [today's date YYYY-MM-DD]
+
+    The mvb_persona declaration tells readers which lane this step walks. An arc
+    typically walks the same persona's lane for 2–3 consecutive steps before
+    opening up (e.g., ml-tinkerer for steps 1–5, then applied-researcher for steps
+    6–7, then frontier-researcher for step 8). See arc-anatomy skill for the
+    pre-training arc as the canonical example.
+
+2.  Arc navigation breadcrumb (immediately after frontmatter):
+    > **Arc:** [Arc Title](../index.md) — Step N of M
+    > ← [Previous Step](./step-NN-topic.md) &nbsp;&nbsp; [Next Step →](./step-NN-topic.md)
+    (omit ← on first step; omit → on last step; use real relative paths from arc_context)
+
+3.  # Step [N] — [What You're Building]
+    Title names the artifact, not the concept.
+    GOOD: "# Step 2 — Train a DDPM on 2D Toy Data"
+    BAD:  "# Step 2 — Understanding Diffusion Models"
+
+4.  > **TL;DR:** After this step you will have [specific artifact] that demonstrates [falsifiable claim].
+
+5.  ## Why this step exists
+    2 paragraphs. Para 1: what the PREVIOUS step gave the reader and what gap it left.
+    Para 2: what THIS step adds and why this ordering is right.
+    Must reference the previous step by name. Must use causal connectives.
+
+6.  ## The idea you're testing
+    1–2 paragraphs. State the conceptual claim the build will validate as a falsifiable assertion.
+    The claim must be specific enough that running the build either confirms or falsifies it.
+
+7.  ## The theory you need
+    2–3 paragraphs. Minimal theory — exactly what is needed to implement the recipe.
+    DO NOT reproduce the full curriculum page here. Link to it for derivations.
+    Include the 1–2 key equations, annotate EVERY symbol with \\(...\\) inline math.
+    Then one intuition sentence per equation: "This equation says that..."
+
+8.  ## Minimum Valuable Build
+    This step has ONE MVB, shaped for the persona declared in frontmatter
+    (mvb_persona). Calibrate compute, time, and success metric to that persona.
+
+    **What you're building:** [1 sentence — specific named artifact]
+
+    **For:** [the declared mvb_persona, written out — e.g., "ml-tinkerer (CS student / tinkerer)"]
+
+    **Why this:** [1–2 sentences — what the build demonstrates that reading could not.
+    Must force contact with the concept's hard part, not just an API call.]
+
+    **Stack:**
+    - **Model:** [exact class or HuggingFace model ID — verified to exist]
+    - **Dataset:** [exact HuggingFace dataset ID or sklearn/torchvision source]
+    - **Framework:** [library + version — verified compatible with the model]
+    - **Compute:** [calibrated to persona: browser/Colab · consumer GPU · A10/L4 · A100 · cluster]
+
+    **Estimated time:** [realistic wall-clock time for the named compute — verify before naming]
+
+    **Success criterion:** [a specific number that distinguishes right from wrong —
+    "FID ≤ 20 on MNIST 32×32" not "loss decreases"]
+
+    ### The recipe
+    Numbered steps. Each step: ONE operation + ONE sanity check.
+    Every step MUST include either `assert` or `print` so the reader knows it worked.
+
+    ### Expected output
+    Specific: shapes, ranges, qualitative description.
+    One sentence on what SUCCESS looks like. One sentence on what FAILURE looks like.
+
+    ### Common failure modes
+    3–5 bullets. Each: [Symptom] → [Diagnosis] → [Fix]
+
+    QUALITY BAR (see mvb-recipe skill — critic-build-nudge enforces these):
+    - SENSIBLE: compute/time/build-type matches the declared mvb_persona.
+    - VALUABLE: success criterion distinguishes right from wrong behavior; build
+      forces contact with the hard part of the concept (not just an API call).
+    - FEASIBLE: hardware fits the model in memory; time realistic for compute;
+      model + dataset + library versions all real and compatible.
+
+9.  ## Stretch goals
+    2–3 extensions. Each: one sentence on what to try, one sentence on what you'd learn.
+    All achievable on the same hardware as the build.
+
+10. ## What this unlocks
+    2 paragraphs. Para 1: what capability you now have, stated as a concrete ability.
+    Para 2: how this capability is the prerequisite for the NEXT arc step (the specific
+    conceptual dependency, not just "you're ready for step N+1").
+
+11. ## Open questions
+    THREE admonition blocks — inspired by what the reader will observe after running the build:
+    ```
+    !!! researcher "For researchers"
+        [Theoretical question raised by the build — something observable no paper has cleanly explained.]
+
+    !!! engineer "For engineers"
+        [Practical experiment: what happens if you change X? No published clean ablation.
+         Runnable in under a day on the same hardware.]
+
+    !!! open "Think about this"
+        [Something the build makes concrete that was abstract before. Phrased as a question.]
+    ```
+
+12. ## Go deeper
+    3–5 links to curriculum pages. Each with one sentence on the specific theory from
+    that page that illuminates what was just built.
+    Format: `- [Concept Name](../../curriculum/{track}/{slug}.md) — one sentence`
+    Must link to at least one curriculum page.
+
+HARD RULES (violations cause the reviewer to reject):
+- has_mvb: true in frontmatter — ALWAYS. No exceptions.
+- Every recipe step includes either `assert` or `print`.
+- "The idea you're testing" must contain exactly ONE falsifiable claim.
+- "Expected output" must give specific numbers or shapes, not "a plot".
+- Compute must fit on free Colab T4 (≤15GB GPU RAM) — if not, redesign the build.
+- No nested lists anywhere.
+- No definition-first openings ("Diffusion models are..." → FAIL).
+- "Why this step exists" must reference the PREVIOUS step by name.
+- Open questions must be phrased as questions, not directions.
+- "Go deeper" must link to at least one curriculum page with a real relative path.
+- Arc breadcrumb must appear immediately after frontmatter.
+- Math: ONLY \\[...\\] for display, \\(...\\) for inline. NEVER $...$ or $$...$$
+- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com, youtube.com
+- No motivational language: "you'll learn", "let's explore", "your journey"
+"""
+
+
+WRITE_INSTRUCTIONS_ARC_INDEX = """Write the complete ARC INDEX page in a single pass.
+
+Arc index pages are PATH pages — they define the destination, the chapter structure, and the
+curated reading list. They are the opinionated guide: THIS path, in THIS order, to THIS destination.
+They contain NO builds. Every build lives in the arc step pages.
+
+PHILOSOPHY:
+- The destination comes first. A reader chooses this arc because they want a specific capability.
+  State that capability in one concrete sentence before anything else.
+- The arc is opinionated. It does not say "here are some approaches." It says "read these four
+  papers in this order because each one was needed because the previous one failed at X."
+- Curated readings are NOT a reading list. They are guided, with a reason for each selection
+  at THIS specific point in the arc — not just "this is an important paper."
+- The compounding trajectory table makes the builds feel like a real project, not homework.
+
+SECTION ORDER (use EXACTLY these heading names):
+
+1.  Frontmatter (YAML block between ---):
+      title: "Arc: [Arc Name] — [Destination]"
+      arc: [arc-id]
+      destination: "[one phrase: concrete capability]"
+      tracks: [list of curriculum tracks this arc draws from]
+      prereqs: [list of curriculum slugs reader should know first]
+      total_steps: N
+      estimated_time: "[e.g., 6–8 weeks, 3–4 hrs/week]"
+      has_mvb: false           ← ALWAYS false for arc index pages
+
+2.  # Arc: [Arc Name]
+
+3.  > **Destination:** [one sentence: what capability you will have built/understood by the end.
+    Stated as a concrete ability: "You will have trained..." not "You will understand..."]
+
+4.  ## Why this arc exists
+    2 paragraphs. Para 1: what specific gap this arc fills — the question a motivated practitioner
+    would have that makes this arc the right choice. Para 2: why THIS sequence, not random paper
+    reading. What does the ordering give you that jumping to the end would not?
+
+5.  ## Prerequisites
+    Flat list: 3–5 curriculum page links.
+    Format: `- [Name](../../curriculum/{track}/{slug}.md) — what specifically you need from it`
+    Be direct: "you need to know the ELBO, not just that VAEs exist."
+
+6.  ## The compounding trajectory
+    Table: | Step | What you build | Artifact produced | Used by |
+    Every row must have a specific artifact — not "understanding" but a trained model,
+    a visualization, a working inference script, a checkpoint, a number.
+
+    Then one paragraph BELOW the table: the narrative of how the artifacts stack.
+    "Step 1's encoder becomes the input to Step 4's latent diffusion. Step 4's checkpoint
+    is what Steps 5 and 6 load — no retraining." Make the compounding explicit.
+
+7.  `## Chapter [K] — [Chapter Title]`
+    Repeat this block for each chapter. Each block contains:
+
+    **One paragraph overview**: what this chapter covers, what problem it solves that
+    the previous chapter left open. Opens by naming what the previous chapter produced.
+    Uses causal connectives throughout.
+
+    **Curated readings table**:
+    | Reading | Type | Why this, why now |
+    |---|---|---|
+    | [Title](URL) | seminal paper | one sentence specific to where reader is in the arc |
+    2–4 rows. Types: seminal paper / test-of-time / sota model / practitioner guide.
+    Only verified arXiv/edu/official engineering blog URLs. No Medium, no Wikipedia.
+
+    **Steps in this chapter** (flat list):
+    `- [Step N — What You're Building](./step-NN-{topic}.md) — one sentence on the claim it tests`
+
+8.  ## The reading order
+    One paragraph, opinionated. How to use this arc: read the chapter overview, do the curated
+    readings in order, then do the builds. State which readings can be skipped by applied-only
+    readers and which are required for everyone. No wishy-washy "feel free to skip."
+
+9.  ## Key figures
+    Flat list: 3–5 researchers. Each: `- **Name** (Affiliation) — specific contribution to this arc`
+
+10. ## Where this arc leads
+    2–3 sentences. What other arcs become accessible after this one. Be specific about the
+    dependency: "The generative stack arc is the prerequisite for the Scientific AI arc's
+    protein structure generation chapter, which uses latent diffusion over 3D coordinates."
+
+HARD RULES (violations cause the reviewer to reject):
+- has_mvb: false — arc index pages have no builds
+- Every chapter must have curated readings (no empty chapter)
+- The compounding trajectory table must have non-empty "Artifact produced" for every row
+- Step links must be real relative paths (./step-NN-topic.md format)
+- Only approved URLs in curated readings: arxiv.org, *.edu, distill.pub,
+  lilianweng.github.io, ai.meta.com, research.google, openai.com/research
+- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com, youtube.com
+- No motivational language: "your journey", "feel free to", "explore at your own pace"
+- Chapters must be causally ordered — each opens by naming what the previous left unresolved
+- Arc index does NOT reproduce curriculum page content — it links to it
+- Math: ONLY \\[...\\] for display, \\(...\\) for inline. NEVER $...$ or $$...$$
 """
 
 
@@ -685,13 +1018,50 @@ Check ## What's happening now and ## Current SotA for citation discipline.
 Flag specific vague phrases as issues: quote the phrase and note it needs a paper citation.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 6 — OPEN QUESTIONS (open_questions_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Check ## Open questions section for THREE admonition blocks (researcher, engineer, open):
+
+  1.0 — all three blocks present; each contains a specific, non-trivial question;
+         researcher question is publishable-level specific; engineer question is
+         runnable on consumer hardware; "Think about this" is phrased as a question
+  0.7 — two blocks present; questions are genuine but could be more specific
+  0.4 — one block; OR questions are vague ("more research is needed in this area")
+  0.0 — section absent OR contains only vague directions, not questions
+
+Flag: any question phrased as a direction ("investigate X", "explore Y") not a question.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DIMENSION 7 — ARC BACKLINKS (backlink_score)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+For CURRICULUM pages: check ## This concept appears in section.
+For ARC STEP pages: check ## Go deeper section.
+
+For curriculum pages:
+  1.0 — at least 1 arc step link with context sentence; link path looks like
+         ../../arcs/{arc}/step-NN-{topic}.md OR placeholder text is present
+  0.7 — section present but no context sentence
+  0.3 — section absent but arc connections exist in Connected topics
+  0.0 — no arc backlinks and no arc context signals anywhere in the page
+
+For arc step pages:
+  1.0 — at least 1 curriculum page link with context sentence; path matches
+         ../../curriculum/{track}/{slug}.md format
+  0.7 — link present but no context sentence
+  0.3 — section present but link paths look wrong
+  0.0 — ## Go deeper section absent
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OVERALL CONFIDENCE AND PASSED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-confidence = weighted average: 0.30×schema + 0.20×source + 0.20×prose + 0.15×mvb + 0.15×frontier_citation
+confidence = weighted average:
+  0.25×schema + 0.20×source + 0.18×prose + 0.12×mvb + 0.13×frontier_citation
+  + 0.07×open_questions + 0.05×backlink
 
 passed = True only if:
   - schema_score >= 0.8 (all main sections present)
   - source_score >= 0.8 (no clearly banned URLs)
+  - open_questions_score >= 0.4 (open questions section exists with real questions)
   Otherwise passed = False regardless of overall confidence.
 
 IMPORTANT: A page with good content but one heading typo should score schema≥0.8.

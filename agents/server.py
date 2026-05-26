@@ -39,10 +39,12 @@ Architecture:
 
 from __future__ import annotations
 
+import atexit
 import json
 import os
 import sys
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -79,6 +81,12 @@ _dry_run: bool = False
 _last_cycle_result: dict = {}
 _server_started_at: str = ""
 _cycle_count: int = 0
+
+_POOL = ThreadPoolExecutor(max_workers=12, thread_name_prefix="wiki")
+atexit.register(_POOL.shutdown, wait=False)
+
+_active: dict[str, str] = {}
+_active_lock = threading.Lock()
 
 
 # ── Health dashboard ──────────────────────────────────────────────────────────
@@ -500,7 +508,7 @@ def get_dashboard():
     </div>
     <div style="text-align:right">
       <div style="color:#475569;font-size:11px">observed {obs_at}</div>
-      <div style="color:#475569;font-size:11px;margin-top:3px" id="countdown">auto-refresh in 20s</div>
+      <div style="color:#475569;font-size:11px;margin-top:3px" id="countdown">auto-refresh in 8s</div>
     </div>
   </div>
 
@@ -611,7 +619,7 @@ def get_dashboard():
 
 <script>
   // Live countdown + auto-refresh
-  let secs = 20;
+  let secs = 8;
   const el = document.getElementById('countdown');
   setInterval(() => {{
     secs--;
@@ -650,6 +658,13 @@ def get_budget():
         return {"error": str(e)}
 
 
+@app.get("/progress")
+def get_progress():
+    """Live view of pages currently being generated."""
+    with _active_lock:
+        return {"active_pages": dict(_active), "count": len(_active)}
+
+
 # ── Background workers ────────────────────────────────────────────────────────
 
 def _run_cycle_background():
@@ -672,6 +687,8 @@ def _run_supervisor_background(dry_run: bool = False):
 
 
 def _generate_page_background(topic: str, track: str, page_type: str, depth_emphasis: list[str]):
+    with _active_lock:
+        _active[topic] = "running"
     try:
         from frontier_agents.graph import compile_wiki_graph
         graph = compile_wiki_graph()
@@ -686,6 +703,9 @@ def _generate_page_background(topic: str, track: str, page_type: str, depth_emph
         })
     except Exception as e:
         print(f"[generate] Error on {topic}: {e}")
+    finally:
+        with _active_lock:
+            _active.pop(topic, None)
 
 
 # ── CLI startup ───────────────────────────────────────────────────────────────
@@ -716,13 +736,7 @@ def serve(host, port, interval, dry_run, run_now):
     # Step 1: Bootstrap — run supervisor immediately in background to populate sprint
     # This ensures the sprint is always fresh when the server starts, regardless
     # of whether --run-now is set.
-    bootstrap_thread = threading.Thread(
-        target=_run_supervisor_background,
-        args=(dry_run,),
-        daemon=True,
-        name="supervisor-bootstrap",
-    )
-    bootstrap_thread.start()
+    _POOL.submit(_run_supervisor_background, dry_run)
     click.echo(f"[{_server_started_at}] Supervisor bootstrapping sprint queue...")
 
     # Step 2: Set up the APScheduler for recurring cycles
@@ -741,12 +755,7 @@ def serve(host, port, interval, dry_run, run_now):
     # Step 3: Optionally run a full cycle immediately (in background so HTTP starts first)
     if run_now:
         click.echo("Scheduling immediate cycle (HTTP server starts first)...")
-        run_now_thread = threading.Thread(
-            target=_run_cycle_background,
-            daemon=True,
-            name="run-now-cycle",
-        )
-        run_now_thread.start()
+        _POOL.submit(_run_cycle_background)
 
     click.echo(
         f"\nFrontier Wiki agent server running — http://{host}:{port}\n"

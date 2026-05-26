@@ -11,6 +11,7 @@ from frontier_agents.nodes import (
     link_node,
     load_persona_node,
     merge_mvb_node,
+    plan_and_scratch_node,
     read_stub_node,
     research_node,
     review_node,
@@ -119,6 +120,10 @@ class TestReviewNode:
             confidence=0.92,
             issues=[],
             suggestions=["Add more LaTeX detail"],
+            schema_score=1.0,
+            source_score=1.0,
+            prose_score=0.9,
+            mvb_score=1.0,
         )
         mock_llm = MagicMock()
         mock_llm.with_structured_output.return_value.invoke.return_value = mock_result
@@ -128,21 +133,53 @@ class TestReviewNode:
 
         assert result["review_pass"] is True
         assert result["review_confidence"] == 0.92
-        assert result["approved"] is True
+        assert result["approved"] is True  # all rubric dimensions pass
+        assert "review_rubric" in result
 
-    def test_approved_requires_confidence_above_threshold(self, draft_state):
-        """Confidence below GIT_COMMIT_THRESHOLD means not approved."""
+    def test_rubric_blocks_on_schema_failure(self, draft_state):
+        """Page with good prose but missing sections should not approve."""
         from frontier_agents.nodes import ReviewResult
-        # Use 0.5 — well below any reasonable threshold (0.7 or 0.8)
-        mock_result = ReviewResult(passed=True, confidence=0.5, issues=["Missing sources"], suggestions=[])
+        mock_result = ReviewResult(
+            passed=False, confidence=0.75, issues=["Missing ## Connected topics"],
+            suggestions=[], schema_score=0.5, source_score=1.0, prose_score=0.9, mvb_score=1.0,
+        )
         mock_llm = MagicMock()
         mock_llm.with_structured_output.return_value.invoke.return_value = mock_result
 
         with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
             result = review_node(draft_state)
 
-        assert result["review_pass"] is True
-        assert result["approved"] is False  # confidence below threshold
+        assert result["approved"] is False  # schema_score < 0.8 blocks approval
+
+    def test_rubric_approves_with_minor_prose_issue(self, draft_state):
+        """Good schema+source but prose=0.65 should still approve (above prose threshold 0.6)."""
+        from frontier_agents.nodes import ReviewResult
+        mock_result = ReviewResult(
+            passed=True, confidence=0.78, issues=["One nested list in What it is"],
+            suggestions=[], schema_score=1.0, source_score=1.0, prose_score=0.65, mvb_score=0.9,
+        )
+        mock_llm = MagicMock()
+        mock_llm.with_structured_output.return_value.invoke.return_value = mock_result
+
+        with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
+            result = review_node(draft_state)
+
+        assert result["approved"] is True  # prose 0.65 >= 0.6, all others pass
+
+    def test_approved_requires_confidence_floor(self, draft_state):
+        """Even with all rubric dims passing, confidence < 0.65 blocks approval."""
+        from frontier_agents.nodes import ReviewResult
+        mock_result = ReviewResult(
+            passed=True, confidence=0.5, issues=[], suggestions=[],
+            schema_score=1.0, source_score=1.0, prose_score=0.8, mvb_score=0.8,
+        )
+        mock_llm = MagicMock()
+        mock_llm.with_structured_output.return_value.invoke.return_value = mock_result
+
+        with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
+            result = review_node(draft_state)
+
+        assert result["approved"] is False  # confidence 0.5 < 0.65 floor
 
     def test_fallback_text_parsing_on_structured_failure(self, draft_state):
         mock_llm = MagicMock()
@@ -249,6 +286,30 @@ class TestFlagHumanReviewNode:
         result = flag_human_review_node(state)
         assert result["approved"] is False
         assert result["committed"] is False
+
+
+class TestPlanAndScratchNode:
+    def test_returns_writing_plan_and_scratch_pad(self, base_state):
+        mock_llm = _make_mock_llm("Planning output.")
+        with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
+            result = plan_and_scratch_node(base_state)
+        assert "writing_plan" in result
+        assert "scratch_pad" in result
+        assert result["writing_plan"] == "Planning output."
+        assert result["scratch_pad"] == "Planning output."
+
+    def test_runs_both_llm_calls(self, base_state):
+        mock_llm = _make_mock_llm("Output.")
+        with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
+            plan_and_scratch_node(base_state)
+        assert mock_llm.invoke.call_count == 2
+
+    def test_preserves_existing_state_fields(self, base_state):
+        mock_llm = _make_mock_llm("x")
+        with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
+            result = plan_and_scratch_node(base_state)
+        assert result["topic"] == base_state["topic"]
+        assert result["track"] == base_state["track"]
 
 
 class TestLinkNode:

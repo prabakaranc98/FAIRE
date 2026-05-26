@@ -10,22 +10,47 @@ class WikiPageState(TypedDict, total=False):
     topic: str                          # e.g., "diffusion-models"
     track: str                          # e.g., "02-generative-modeling"
     depth: Literal["all", "applied", "foundations", "research"]
-    mode: Literal["full", "mvb-only", "review-only", "update"]
+    mode: Literal["full", "mvb-only", "review-only", "update", "arc-step", "arc-index"]
+    # full:        curriculum reference page (no MVB)
+    # arc-step:    arc step build page (MVB always present)
+    # arc-index:   arc index page (chapters + curated readings + compounding trajectory)
+    # mvb-only:    inject/update only the MVB section of an existing page
+    # review-only: re-review an existing page without rewriting
+    # update:      improve an existing page in-place
 
     # ── Arc context (set by CLI; tells agent where this page sits) ─────────────
-    page_type: Literal["arc-entry", "core-concept", "supporting"]
-    # arc-entry: opens an arc; MVB unless cost-prohibitive
-    # core-concept: pivotal mid-arc; agent judges if it earns MVB
-    # supporting: builds vocabulary for parent; NO standalone MVB
+    page_type: Literal["arc-entry", "core-concept", "supporting", "arc-step", "arc-index"]
+    # arc-entry:   opens a curriculum arc; sets the stage
+    # core-concept: pivotal curriculum concept; no MVB (builds live in arc steps)
+    # supporting:  builds vocabulary for a parent curriculum page
+    # arc-step:    one build step inside an arc; has_mvb always true
+    # arc-index:   top-level arc page; chapters + readings + compounding trajectory
 
     depth_emphasis: list[str]           # ["applied"] | ["theoretical"] | ["frontier"] | combo
-    # applied:     longer MVB, JAX/code examples, serving/inference angle
-    # theoretical: derivation sketches, proof intuition, key theorems
+    # applied:     longer recipe, exact hyperparams, production framing
+    # theoretical: derivation steps, proof intuition, key theorems
     # frontier:    open problems as specific questions, named papers, benchmark numbers
 
-    arc_context: dict                   # {"arc_id": "generative-stack", "position": 3,
-                                        #  "prev": "vae", "next": "score-matching"}
+    arc_context: dict                   # {
+                                        #   "arc_id": "generative-stack",
+                                        #   "arc_title": "The Generative Stack",
+                                        #   "destination": "conditional latent diffusion",
+                                        #   "position": 3,        # step number (arc-step only)
+                                        #   "total": 8,           # total steps in arc
+                                        #   "chapter": 2,         # chapter number
+                                        #   "chapter_title": "Score-Based Denoising",
+                                        #   "prev": "beta-vae",   # previous step slug
+                                        #   "next": "ddim",       # next step slug
+                                        #   "prev_artifact": "trained VAE encoder/decoder weights",
+                                        #   "chapters": [...]     # arc-index only: list of chapter dicts
+                                        # }
     mvb_decision: bool                  # resolved by plan_node from page_type + depth_emphasis
+
+    # ── Chapter / compounding context (arc-step pages) ────────────────────────
+    chapter: int                        # chapter number this step belongs to (1-based)
+    chapter_title: str                  # e.g., "Score-Based Denoising"
+    compounding_artifact: str           # what this step's build produces (artifact name)
+    prev_artifact: str                  # artifact produced by the previous step (input to this build)
 
     # ── Loaded at runtime ──────────────────────────────────────────────────────
     persona: dict                       # from personas/[track].yaml
@@ -53,7 +78,17 @@ class WikiPageState(TypedDict, total=False):
     review_feedback: str                # structured feedback from reviewer agent
     review_confidence: float            # 0.0-1.0; <0.8 flags for human review
     review_pass: bool                   # True if reviewer approved
+    review_issues: list                 # union of structured + panel issues
+    review_rubric: dict                 # per-dimension scores (structured + critic panel)
     revision_count: int                 # number of revision loops (max 2)
+
+    # ── Critic panel (multi-critic review, runs in parallel) ──────────────────
+    critic_panel: dict                  # {critic_name: {score: float, issues: list, fixes: list}}
+
+    # ── Persona (for arc step pages with multi-persona MVB) ───────────────────
+    mvb_persona: str                    # one of: curious-learner, ml-tinkerer,
+                                        # applied-engineer, applied-researcher,
+                                        # theory-student, frontier-researcher
 
     # ── Output phase ───────────────────────────────────────────────────────────
     final_content: str                  # approved page content

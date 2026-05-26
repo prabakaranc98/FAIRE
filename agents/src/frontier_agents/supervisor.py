@@ -220,6 +220,22 @@ def run_supervisor(
     if verbose:
         print(f"[supervisor] Report written to docs/system/supervisor.md")
 
+    # 6. ARC PROPOSAL phase — run only if curriculum is ready, budget allows,
+    #    and fewer than 2 arcs are already active (see arc-selection skill).
+    if not dry_run:
+        try:
+            arc_summary = maybe_propose_arcs(obs, audit, docs_path, verbose=verbose)
+            if verbose and arc_summary.get("ran"):
+                print(
+                    f"[supervisor] arc-proposals → {arc_summary.get('wrote_to')} "
+                    f"({arc_summary.get('slots_open')} slot(s) open)"
+                )
+            elif verbose:
+                print(f"[supervisor] arc-proposal skipped — {arc_summary.get('reason')}")
+        except Exception as e:
+            if verbose:
+                print(f"[supervisor] arc-proposal phase failed (non-fatal): {e}")
+
     return report
 
 
@@ -511,3 +527,216 @@ def _write_report(report: SupervisorReport, docs_path: Path) -> None:
     system_dir = docs_path / "system"
     system_dir.mkdir(parents=True, exist_ok=True)
     (system_dir / "supervisor.md").write_text(report.to_markdown(), encoding="utf-8")
+
+
+# ── Arc proposal phase (Unit C) ───────────────────────────────────────────────
+
+ARC_PROPOSE_COVERAGE_THRESHOLD = float(os.environ.get("ARC_PROPOSE_COVERAGE_THRESHOLD", "0.60"))
+
+
+def _count_active_arcs(docs_path: Path) -> int:
+    """An arc is 'active' if its arc-index exists AND at least one step is missing.
+
+    Counts arcs under docs/arcs/{arc}/ where index.md exists but the total step
+    files declared in arcs.json (or detected via step-NN-*.md pattern) are not
+    all present yet.
+    """
+    arcs_dir = docs_path / "arcs"
+    if not arcs_dir.exists():
+        return 0
+    active = 0
+    for arc_dir in arcs_dir.iterdir():
+        if not arc_dir.is_dir():
+            continue
+        index = arc_dir / "index.md"
+        if not index.exists():
+            continue
+        # Heuristic: scan the arc index for "Step N — ..." references and
+        # see if all corresponding step files exist.
+        text = index.read_text(encoding="utf-8", errors="ignore")
+        import re as _re
+        referenced = set(_re.findall(r"step-(\d{2})-[a-z0-9-]+\.md", text))
+        present = {f.name.split("-")[1] for f in arc_dir.glob("step-*.md") if f.is_file()}
+        if referenced and present < referenced:
+            active += 1
+    return active
+
+
+def _arc_propose_preconditions_met(
+    obs, audit, active_arcs: int, verbose: bool = False
+) -> tuple[bool, str]:
+    """Check the three preconditions for arc proposal (see arc-selection skill)."""
+    if obs is None:
+        return False, "no observer snapshot — cannot evaluate readiness"
+
+    # 1. Curriculum coverage on canonical tracks ≥ threshold
+    canonical_tracks = [f"{i:02d}-" for i in range(1, 11)]
+    # Find the actual track keys that start with these prefixes
+    canonical_coverage = []
+    for tm in obs.track_metrics.values():
+        if any(tm.track.startswith(p) for p in canonical_tracks):
+            canonical_coverage.append(tm.coverage_pct)
+    if not canonical_coverage:
+        return False, "no canonical-track metrics available"
+    avg_canonical = sum(canonical_coverage) / len(canonical_coverage)
+    if avg_canonical < ARC_PROPOSE_COVERAGE_THRESHOLD:
+        return False, (
+            f"canonical-track coverage {avg_canonical:.1%} < "
+            f"threshold {ARC_PROPOSE_COVERAGE_THRESHOLD:.0%}"
+        )
+
+    # 2. Budget mode must be 'full'
+    if obs.budget.mode != "full":
+        return False, f"budget mode = {obs.budget.mode} (need 'full' to propose arcs)"
+
+    # 3. Active arcs must be < 2 (the canonical 2-arcs-at-a-time rule)
+    if active_arcs >= 2:
+        return False, f"{active_arcs} arcs already active (cap = 2)"
+
+    return True, (
+        f"all 3 preconditions met: canonical-coverage {avg_canonical:.1%}, "
+        f"budget=full, active_arcs={active_arcs}"
+    )
+
+
+def maybe_propose_arcs(
+    obs,
+    audit,
+    docs_path: Path,
+    verbose: bool = False,
+) -> dict:
+    """Run the arc-proposal phase if preconditions are met.
+
+    Reads `arc-selection.md` + `critic-editor.md` skills to drive the proposal;
+    writes candidate arcs to docs/system/arc-proposals.md (does NOT queue them
+    automatically — human picks).
+
+    Returns a summary dict.
+    """
+    active_arcs = _count_active_arcs(docs_path)
+    ok, reason = _arc_propose_preconditions_met(obs, audit, active_arcs, verbose)
+
+    summary = {
+        "ran": False,
+        "preconditions_met": ok,
+        "reason": reason,
+        "active_arcs": active_arcs,
+        "slots_open": max(0, 2 - active_arcs),
+    }
+
+    if not ok:
+        if verbose:
+            print(f"[supervisor] arc-proposal skipped — {reason}")
+        # Write a small marker so docs/system/arc-proposals.md reflects current state
+        try:
+            (docs_path / "system" / "arc-proposals.md").write_text(
+                "---\n"
+                "title: Arc proposals\n"
+                "description: When the supervisor judges the wiki ready for new arcs, candidates appear here.\n"
+                "---\n\n"
+                "# Arc proposals\n\n"
+                f"> Current cycle: **no proposals**. Reason: {reason}\n\n"
+                "Arcs are derived from the curriculum, bounded by budget, and capped at 2 active "
+                "at a time. The supervisor proposes new arcs only when all three preconditions hold "
+                "(see `agents/skills/arc-selection.md` and `agents/skills/critic-editor.md`).\n",
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
+        return summary
+
+    # Preconditions met — invoke the LLM with arc-selection skill to draft proposals.
+    try:
+        from .skills import load_skills
+        skills = load_skills()
+        sel_skill = next((s for s in skills if s.name == "arc-selection"), None)
+        anatomy = next((s for s in skills if s.name == "arc-anatomy"), None)
+        editor = next((s for s in skills if s.name == "critic-editor"), None)
+        if not (sel_skill and anatomy and editor):
+            summary["reason"] = "missing one of arc-selection / arc-anatomy / critic-editor skill"
+            return summary
+
+        # Build the budget context
+        remaining = obs.budget.remaining_usd or 0.0
+        arc_budget = remaining * 0.5
+
+        # Build curriculum context: list of approved curriculum slugs by track
+        curriculum_context = []
+        for track, tm in sorted(obs.track_metrics.items()):
+            if tm.generated > 0:
+                curriculum_context.append(
+                    f"  {track}: {tm.generated} pages generated, avg_conf={tm.avg_confidence:.2f}"
+                )
+
+        prompt = f"""You are the Frontier Wiki supervisor running the ARC PROPOSAL phase.
+
+Reading these skills as context:
+
+---
+{sel_skill.body}
+---
+{anatomy.body}
+---
+{editor.body}
+---
+
+CURRENT STATE
+- Canonical-track avg coverage: meets threshold {ARC_PROPOSE_COVERAGE_THRESHOLD:.0%}
+- Remaining budget: ${remaining:.2f} (arc budget = ${arc_budget:.2f})
+- Slots open for new active arcs: {summary['slots_open']}
+- Curriculum coverage by track:
+{chr(10).join(curriculum_context)}
+
+YOUR JOB
+1. Scan the curriculum-track metrics above. Identify 3–6 candidate arcs that
+   would compound the existing curriculum into a frontier capability.
+2. Score each by EV/$ per the arc-selection skill.
+3. Apply the critic-editor judgment: veto / reshape / approve each one.
+4. Propose only as many arcs as fit in ${arc_budget:.2f} AND at most
+   {summary['slots_open']} new arcs.
+
+Return a markdown document with this structure:
+
+---
+title: Arc proposals
+generated_at: [today]
+remaining_budget: ${remaining:.2f}
+slots_open: {summary['slots_open']}
+---
+
+# Arc proposals
+
+[One-paragraph summary of which arcs you propose and why.]
+
+## 1. [Arc Title] — EV/$ = X.X — verdict: approve | reshape | veto
+**Destination:** ...
+**Steps:** N · **Cost:** $X.XX · **Impact:** X/10
+**Prereqs in curriculum:** [list with status]
+**Persona span:** N personas (list them)
+**Seminal anchors:** [papers]
+**Outline:** [step list with mvb_persona for each step]
+**Editor verdict:** approve | reshape | veto
+**If reshape/veto:** [reasons + specific reshape suggestions]
+[If approve:] **Approval note:** [one paragraph on why this arc is worth materializing]
+
+## 2. ...
+"""
+        llm = get_llm("research", temperature=0.2)
+        try:
+            response = llm.invoke([HumanMessage(content=prompt)])
+            proposal_md = response.content
+        except Exception as exc:
+            summary["reason"] = f"LLM call failed: {exc}"
+            return summary
+
+        (docs_path / "system" / "arc-proposals.md").write_text(
+            proposal_md, encoding="utf-8"
+        )
+        summary["ran"] = True
+        summary["wrote_to"] = "docs/system/arc-proposals.md"
+        if verbose:
+            print(f"[supervisor] wrote arc proposals to {summary['wrote_to']}")
+    except Exception as exc:
+        summary["reason"] = f"proposal failed: {exc}"
+
+    return summary

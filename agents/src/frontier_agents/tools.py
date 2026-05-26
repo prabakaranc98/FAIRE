@@ -71,13 +71,17 @@ def exa_search_papers(
 ) -> list[dict]:
     """Search for academic papers on arXiv and .edu.
 
+    Uses neural search with highlights to surface the most relevant excerpts.
+    Query should describe the paper's contribution or finding, not just keywords.
+    Exa best practice: phrase as "A paper that explains/proves/shows [claim]."
+
     Args:
-        query: semantic search query (describe the paper's contribution, not just keywords)
+        query: Exa neural query — describe the contribution, not keywords
         num_results: defaults to EXA_NUM_RESULTS_PAPERS env var or 8
-        foundational: True → all-time papers; False → 2024+ only (for SotA)
+        foundational: True → all-time; False → 2024+ (for SotA searches)
 
     Returns:
-        List of {url, title, text, domain, published_date}
+        List of {url, title, text, highlights, domain, published_date}
     """
     n = num_results or int(os.getenv("EXA_NUM_RESULTS_PAPERS", "8"))
     exa = _get_exa()
@@ -85,10 +89,13 @@ def exa_search_papers(
     kwargs: dict = dict(
         query=query,
         num_results=n,
-        type="auto",
+        type="neural",            # neural search is best for academic discovery
         category="research paper",
         include_domains=["arxiv.org", ".edu"],
-        contents={"text": {"max_characters": 4000}},
+        contents={
+            "text": {"max_characters": 3000},
+            "highlights": {"num_sentences": 3, "highlights_per_url": 2},
+        },
     )
     if not foundational:
         kwargs["start_published_date"] = "2024-01-01"
@@ -99,6 +106,7 @@ def exa_search_papers(
             "url": r.url,
             "title": r.title or "",
             "text": getattr(r, "text", "") or "",
+            "highlights": getattr(r, "highlights", []) or [],
             "domain": _extract_domain(r.url),
             "published_date": getattr(r, "published_date", None),
             "source_type": "paper",
@@ -108,10 +116,11 @@ def exa_search_papers(
 
 
 def exa_search_sota(query: str, num_results: int | None = None) -> list[dict]:
-    """Search for current SotA — recent papers (2024+) with highlights.
+    """Search for current SotA — papers from 2024+ with benchmark highlights.
 
-    Uses highlights (not full text) to avoid flooding the LLM context window.
-    Best for finding specific benchmark numbers and named systems.
+    Exa best practice: use keyword search for specific model names/benchmarks,
+    neural for finding papers by contribution description.
+    Uses highlights (not full text) to surface benchmark numbers efficiently.
 
     Returns:
         List of {url, title, highlights, domain, published_date}
@@ -122,11 +131,17 @@ def exa_search_sota(query: str, num_results: int | None = None) -> list[dict]:
     results = exa.search(
         query=query,
         num_results=n,
-        type="auto",
+        type="auto",              # auto picks neural vs keyword based on query
         category="research paper",
-        include_domains=["arxiv.org", ".edu", "huggingface.co"],
+        include_domains=["arxiv.org", ".edu"],
         start_published_date="2024-01-01",
-        contents={"highlights": True},
+        contents={
+            "highlights": {
+                "num_sentences": 4,
+                "highlights_per_url": 3,
+                "query": f"benchmark results, model name, metric numbers: {query}",
+            }
+        },
     )
     return [
         {
@@ -144,7 +159,9 @@ def exa_search_sota(query: str, num_results: int | None = None) -> list[dict]:
 def exa_search_production(query: str, num_results: int | None = None) -> list[dict]:
     """Search engineering blogs for production deployments at scale.
 
-    Uses LLM-generated summaries targeted to deployment context.
+    Uses LLM summary targeted to deployment context.
+    Exa best practice: use keyword search for exact company/system names,
+    neural search for finding deployment patterns.
     Only searches approved engineering blog domains.
 
     Returns:
@@ -156,11 +173,14 @@ def exa_search_production(query: str, num_results: int | None = None) -> list[di
     results = exa.search(
         query=query,
         num_results=n,
-        type="auto",
+        type="keyword",           # keyword for blog post discovery (exact names)
         include_domains=APPROVED_ENGINEERING_BLOGS,
         contents={
             "summary": {
-                "query": f"production deployment at scale, architecture, real numbers: {query}"
+                "query": (
+                    f"What system did this company build, at what scale "
+                    f"(users/requests/parameters), and how does it work? {query}"
+                )
             }
         },
     )
@@ -174,6 +194,42 @@ def exa_search_production(query: str, num_results: int | None = None) -> list[di
         }
         for r in results.results
     ]
+
+
+def exa_find_similar(url: str, num_results: int = 5) -> list[dict]:
+    """Find papers similar to a known paper using Exa's find-similar endpoint.
+
+    Exa best practice: once you have one good paper, use find_similar to
+    discover related work the query might have missed.
+
+    Args:
+        url: arXiv or .edu URL of the seed paper
+        num_results: number of similar papers to return
+
+    Returns:
+        List of {url, title, highlights, domain, published_date}
+    """
+    exa = _get_exa()
+    try:
+        results = exa.find_similar(
+            url=url,
+            num_results=num_results,
+            include_domains=["arxiv.org", ".edu"],
+            contents={"highlights": {"num_sentences": 2, "highlights_per_url": 1}},
+        )
+        return [
+            {
+                "url": r.url,
+                "title": r.title or "",
+                "highlights": getattr(r, "highlights", []) or [],
+                "domain": _extract_domain(r.url),
+                "published_date": getattr(r, "published_date", None),
+                "source_type": "similar",
+            }
+            for r in results.results
+        ]
+    except Exception:
+        return []
 
 
 def exa_search(
@@ -369,7 +425,8 @@ def git_commit(
 
     try:
         repo_root = Path(docs_dir).parent.resolve()
-        subprocess.run(["git", "add", path], cwd=repo_root, check=True, capture_output=True)
+        abs_path = str(Path(path).resolve())
+        subprocess.run(["git", "add", abs_path], cwd=repo_root, check=True, capture_output=True)
         subprocess.run(
             ["git", "commit", "-m", message],
             cwd=repo_root,

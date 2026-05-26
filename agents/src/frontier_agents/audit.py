@@ -87,9 +87,10 @@ class AuditReport:
 
 
 def audit_wiki(docs_dir: str | Path = "../docs") -> AuditReport:
-    """Scan all curriculum pages and return an AuditReport."""
+    """Scan all curriculum pages and arc step pages and return an AuditReport."""
     docs_path = Path(docs_dir)
     curriculum_dir = docs_path / "curriculum"
+    arcs_dir = docs_path / "arcs"
     now = datetime.now(timezone.utc)
 
     report = AuditReport(
@@ -97,18 +98,124 @@ def audit_wiki(docs_dir: str | Path = "../docs") -> AuditReport:
         docs_dir=str(docs_path),
     )
 
-    if not curriculum_dir.exists():
-        return report
+    if curriculum_dir.exists():
+        pages = [p for p in curriculum_dir.rglob("*.md") if p.name != "index.md"]
+        report.pages_scanned += len(pages)
+        for page in pages:
+            rel = str(page.relative_to(docs_path))
+            content = page.read_text(encoding="utf-8")
+            _check_page(content, rel, report, now)
 
-    pages = [p for p in curriculum_dir.rglob("*.md") if p.name != "index.md"]
-    report.pages_scanned = len(pages)
-
-    for page in pages:
-        rel = str(page.relative_to(docs_path))
-        content = page.read_text(encoding="utf-8")
-        _check_page(content, rel, report, now)
+    if arcs_dir.exists():
+        _check_compounding_chain(arcs_dir, docs_path, report)
 
     return report
+
+
+def _check_compounding_chain(arcs_dir: Path, docs_path: Path, report: AuditReport) -> None:
+    """For each arc, verify step N's prev_artifact matches step N-1's artifact.
+
+    A broken compounding chain is a warning, not a critical, because the page
+    might still be readable — but it violates the arc-anatomy contract.
+
+    Also emits info-level entries when an arc step page is missing the
+    mvb_persona declaration in frontmatter.
+    """
+    import re as _re
+    import yaml as _yaml
+
+    for arc_dir in arcs_dir.iterdir():
+        if not arc_dir.is_dir():
+            continue
+        arc_id = arc_dir.name
+        steps = sorted(arc_dir.glob("step-*.md"))
+        report.pages_scanned += len(steps)
+        if not steps:
+            continue
+
+        parsed = []  # list of (pos, slug, frontmatter dict, rel-path)
+        for step_path in steps:
+            rel = str(step_path.relative_to(docs_path))
+            text = step_path.read_text(encoding="utf-8", errors="ignore")
+            # Extract YAML frontmatter
+            m = _re.match(r"^---\n(.+?)\n---", text, _re.DOTALL)
+            fm: dict = {}
+            if m:
+                try:
+                    fm = _yaml.safe_load(m.group(1)) or {}
+                except _yaml.YAMLError:
+                    report.issues.append(PageIssue(
+                        severity="critical",
+                        check="invalid-frontmatter",
+                        page=rel,
+                        message=f"YAML frontmatter could not be parsed",
+                    ))
+                    fm = {}
+            else:
+                report.issues.append(PageIssue(
+                    severity="critical",
+                    check="missing-frontmatter",
+                    page=rel,
+                    message=f"Page does not start with `---` frontmatter",
+                ))
+            # Extract position from filename like step-04-ddpm.md
+            file_match = _re.match(r"step-(\d{2})-(.+)\.md", step_path.name)
+            pos = int(file_match.group(1)) if file_match else 0
+            slug = file_match.group(2) if file_match else step_path.stem
+            parsed.append((pos, slug, fm, rel))
+
+            # Per-step checks
+            if "mvb_persona" not in fm and (fm.get("has_mvb") is True or fm.get("has_mvb") is None):
+                report.issues.append(PageIssue(
+                    severity="info",
+                    check="missing-mvb-persona",
+                    page=rel,
+                    message=(
+                        f"Arc step lacks `mvb_persona:` in frontmatter — readers can't see "
+                        f"which lane this step walks. Add one of: curious-learner, ml-tinkerer, "
+                        f"applied-engineer, applied-researcher, theory-student, frontier-researcher."
+                    ),
+                ))
+
+        # Compounding chain check — step N's prev_artifact must match step N-1's artifact
+        parsed.sort(key=lambda x: x[0])
+        for i in range(1, len(parsed)):
+            prev_pos, prev_slug, prev_fm, prev_rel = parsed[i - 1]
+            curr_pos, curr_slug, curr_fm, curr_rel = parsed[i]
+            if curr_pos != prev_pos + 1:
+                report.issues.append(PageIssue(
+                    severity="warning",
+                    check="arc-chain-gap",
+                    page=curr_rel,
+                    message=(
+                        f"Step ordering gap: step {prev_pos} → step {curr_pos} "
+                        f"in arc {arc_id} (expected consecutive)"
+                    ),
+                ))
+                continue
+            prev_artifact_declared = (
+                prev_fm.get("compounding_artifact")
+                or prev_fm.get("artifact")
+                or ""
+            ).strip()
+            curr_prev_artifact = (curr_fm.get("prev_artifact") or "").strip()
+            if not prev_artifact_declared or not curr_prev_artifact:
+                continue  # one side undeclared — already flagged elsewhere
+            # Normalize whitespace for comparison
+            norm_a = " ".join(prev_artifact_declared.split()).lower()
+            norm_b = " ".join(curr_prev_artifact.split()).lower()
+            if norm_a != norm_b:
+                report.issues.append(PageIssue(
+                    severity="warning",
+                    check="compounding-chain-broken",
+                    page=curr_rel,
+                    message=(
+                        f"Step {curr_pos}'s prev_artifact does not match step {prev_pos}'s "
+                        f"artifact verbatim. Step {prev_pos} produces: {prev_artifact_declared[:80]!r}. "
+                        f"Step {curr_pos} expects: {curr_prev_artifact[:80]!r}. "
+                        f"Compounding chain is broken — reader cannot follow."
+                    ),
+                ))
 
 
 def _check_page(content: str, rel: str, report: AuditReport, now: datetime) -> None:

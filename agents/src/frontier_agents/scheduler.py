@@ -15,10 +15,16 @@ Run order: audit → sprint → changelog (enforced by the server).
 from __future__ import annotations
 
 import json
+import random
 import re
 import shutil
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from pathlib import Path
+
+_sprint_lock = threading.Lock()
 
 
 AGENTS_DIR = Path(__file__).parent.parent.parent  # agents/
@@ -34,8 +40,8 @@ def parse_sprint_backlog(sprint_path: Path | None = None) -> list[dict]:
     """Parse unchecked items from sprints/current.md.
 
     Returns list of task dicts with keys:
-      type: "generate" | "improve" | "mvb-only"
-      topic, track, page_type, depth_emphasis, arc_context (for generate)
+      type: "generate" | "improve" | "mvb-only" | "arc-step" | "arc-index"
+      topic, track, page_type, depth_emphasis, arc_context, mode
     """
     path = sprint_path or SPRINTS_DIR / "current.md"
     if not path.exists():
@@ -47,11 +53,15 @@ def parse_sprint_backlog(sprint_path: Path | None = None) -> list[dict]:
     for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
 
-        # Handle both legacy headers and supervisor-generated headers
-        if line.startswith("## New pages") or line.startswith("## New Content"):
+        # Section headers
+        if line.startswith("## New pages") or line.startswith("## New Content") or line.startswith("## Curriculum"):
             current_section = "generate"
         elif line.startswith("## MVB-only"):
             current_section = "mvb-only"
+        elif line.startswith("## Arc Steps") or line.startswith("## Arc Step"):
+            current_section = "arc-step"
+        elif line.startswith("## Arc Index") or line.startswith("## Arc Indexes"):
+            current_section = "arc-index"
         elif line.startswith("## Critical") or line.startswith("## High") or line.startswith("## Improvements"):
             current_section = "improve"
         elif line.startswith("- [ ]"):
@@ -66,10 +76,18 @@ def parse_sprint_backlog(sprint_path: Path | None = None) -> list[dict]:
 def _parse_sprint_item(item: str, section: str) -> dict | None:
     """Parse a sprint line into a task dict.
 
-    Format:  topic | track | page_type | depth_emphasis [| arc:id pos:N prev:x next:y]
-    Example: score-matching | 02-generative-modeling | core-concept | theoretical | arc:generative-stack pos:4 prev:ddpm next:flow-matching
+    Curriculum format:
+      topic | track | page_type | depth_emphasis
+      Example: diffusion-models | 02-generative-modeling | core-concept | theoretical frontier
+
+    Arc step format:
+      topic | track | arc-step | depth_emphasis | arc:id pos:N ch:K ch_title:"Chapter Title" prev:slug next:slug prev_artifact:"artifact desc" artifact:"this artifact desc" total:M
+      Example: ddpm | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:4 ch:2 ch_title:"Score-Based Denoising" prev:score-matching next:ddim prev_artifact:"score network on 2D data" artifact:"working DDPM checkpoint" total:8
+
+    Arc index format:
+      topic | track | arc-index | frontier | arc:id dest:"destination phrase" total:N
+      Example: generative-stack-index | 02-generative-modeling | arc-index | frontier | arc:generative-stack dest:"conditional latent diffusion from scratch" total:8
     """
-    # Strip HTML comments before parsing (e.g. "applied frontier  <!-- reason -->")
     item = re.sub(r"<!--.*?-->", "", item).strip()
 
     parts = [p.strip() for p in item.split("|")]
@@ -80,28 +98,57 @@ def _parse_sprint_item(item: str, section: str) -> dict | None:
     track = parts[1] if len(parts) > 1 else ""
     page_type = parts[2] if len(parts) > 2 else "core-concept"
     depth_str = parts[3] if len(parts) > 3 else "applied"
-    # Normalize depth: split on comma or space, drop empty tokens
     depth_emphasis = [d.strip() for d in re.split(r"[,\s]+", depth_str) if d.strip()]
     if not depth_emphasis:
         depth_emphasis = ["applied"]
 
+    # Determine mode from page_type or section
+    if page_type == "arc-step" or section == "arc-step":
+        mode = "arc-step"
+        page_type = "arc-step"
+    elif page_type == "arc-index" or section == "arc-index":
+        mode = "arc-index"
+        page_type = "arc-index"
+    elif section == "mvb-only":
+        mode = "mvb-only"
+    else:
+        mode = "full"
+
     arc_context: dict = {}
     if len(parts) > 4:
         arc_str = parts[4]
-        arc_match = re.search(r"arc:(\S+)", arc_str)
-        pos_match = re.search(r"pos:(\d+)", arc_str)
-        prev_match = re.search(r"prev:(\S+)", arc_str)
-        next_match = re.search(r"next:(\S+)", arc_str)
-        if arc_match:
+
+        def _extract(pattern: str, default="") -> str:
+            m = re.search(pattern, arc_str)
+            return m.group(1) if m else default
+
+        def _extract_quoted(key: str, default="") -> str:
+            # (?<!\w) prevents "artifact" from matching inside "prev_artifact"
+            m = re.search(rf'(?<!\w){re.escape(key)}:"([^"]*)"', arc_str)
+            if m:
+                return m.group(1)
+            m = re.search(rf'(?<!\w){re.escape(key)}:(\S+)', arc_str)
+            return m.group(1) if m else default
+
+        arc_id = _extract(r"arc:(\S+)")
+        if arc_id:
             arc_context = {
-                "arc_id": arc_match.group(1),
-                "position": int(pos_match.group(1)) if pos_match else 0,
-                "prev": prev_match.group(1) if prev_match else "",
-                "next": next_match.group(1) if next_match else "",
+                "arc_id": arc_id,
+                "arc_title": arc_id.replace("-", " ").title(),
+                "destination": _extract_quoted("dest"),
+                "position": int(_extract(r"pos:(\d+)", "0")),
+                "total": int(_extract(r"total:(\d+)", "0")),
+                "chapter": int(_extract(r"ch:(\d+)", "0")),
+                "chapter_title": _extract_quoted("ch_title"),
+                "prev": _extract(r"prev:(\S+)"),
+                "next": _extract(r"next:(\S+)"),
+                "prev_artifact": _extract_quoted("prev_artifact"),
+                "compounding_artifact": _extract_quoted("artifact"),
             }
 
     return {
         "type": section,
+        "mode": mode,
         "topic": topic,
         "track": track,
         "page_type": page_type,
@@ -259,14 +306,14 @@ def sprint_job(dry_run: bool = False) -> list[dict]:
         _os.environ["WRITER_MODEL"] = fallback
         print(f"[sprint] Reduced budget mode — using {fallback} for all writes")
 
-    results = []
     wiki_graph = compile_wiki_graph()
     mvb_graph = compile_mvb_graph()
 
-    for task in tasks:
+    def _run_task(task):
+        time.sleep(random.uniform(0, 3))  # jitter to spread API calls
         topic = task["topic"]
-        mode = task["type"] if task["type"] == "mvb-only" else "full"
-
+        mode = task.get("mode", "full")
+        arc_ctx = task.get("arc_context", {})
         initial_state = {
             "topic": topic,
             "track": task["track"],
@@ -274,33 +321,58 @@ def sprint_job(dry_run: bool = False) -> list[dict]:
             "mode": mode,
             "page_type": task["page_type"],
             "depth_emphasis": task["depth_emphasis"],
-            "arc_context": task["arc_context"],
+            "arc_context": arc_ctx,
+            # chapter / compounding fields (arc-step only)
+            "chapter": arc_ctx.get("chapter", 0),
+            "chapter_title": arc_ctx.get("chapter_title", ""),
+            "compounding_artifact": arc_ctx.get("compounding_artifact", ""),
+            "prev_artifact": arc_ctx.get("prev_artifact", ""),
         }
-
         try:
             graph = mvb_graph if mode == "mvb-only" else wiki_graph
             result = graph.invoke(initial_state)
-            results.append({
+            r = {
                 "topic": topic,
                 "track": task["track"],
                 "approved": result.get("approved", False),
                 "status": "approved" if result.get("approved") else "flagged",
                 "confidence": result.get("review_confidence", 0.0),
-            })
+            }
             if not dry_run:
-                mark_sprint_item_done(topic)
+                with _sprint_lock:
+                    mark_sprint_item_done(topic)
+            return r
         except Exception as exc:
-            results.append({
+            return {
                 "topic": topic,
                 "track": task["track"],
                 "approved": False,
                 "status": "error",
                 "confidence": 0.0,
                 "error": str(exc),
-            })
+            }
+
+    max_workers = int(_os.getenv("SPRINT_WORKERS", "4"))
+    results = []
+    with ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="sprint") as pool:
+        futures = {pool.submit(_run_task, t): t for t in tasks}
+        for fut in as_completed(futures):
+            try:
+                results.append(fut.result())
+            except Exception as exc:
+                t = futures[fut]
+                results.append({
+                    "topic": t["topic"],
+                    "track": t["track"],
+                    "approved": False,
+                    "status": "error",
+                    "confidence": 0.0,
+                    "error": str(exc),
+                })
 
     if not dry_run:
-        archive_sprint()
+        with _sprint_lock:
+            archive_sprint()
 
     # Restore original writer model if we overrode it
     if _original_writer is not None:

@@ -1,14 +1,12 @@
 """LangGraph StateGraph definition for the Frontier Wiki editorial agent system.
 
-Two graphs:
-1. `build_wiki_graph()` — full editorial pipeline (research → plan → write → review → commit → log)
-2. `build_mvb_graph()`  — MVB-only pipeline (HF search → generate MVB → merge → review → commit → log)
+Three graphs:
+1. `build_wiki_graph()` — curriculum page pipeline (research → plan_and_scratch → write → review → commit → log)
+2. `build_arc_step_graph()` — arc step build page pipeline (same flow but write_arc_step_node instead of write_draft)
+3. `build_mvb_graph()`  — MVB-only pipeline (HF search → generate MVB → merge → review → commit → log)
 
-The `plan` node (between research and write_draft) forces deliberate thinking before writing —
-the primary fix for the vague, listy output of the previous version.
-
-The `log_run` node fires at END regardless of outcome, writing to agents/runs/runs.jsonl
-and updating agents/runs/wiki_status.md for coverage/quality tracking.
+Routing: after plan_and_scratch, state["mode"] == "arc-step" routes to write_arc_step_node;
+everything else routes to write_draft_node (curriculum pages).
 """
 
 from __future__ import annotations
@@ -23,33 +21,41 @@ from .nodes import (
     log_run_node,
     merge_mvb_node,
     mvb_recipe_node,
-    plan_node,
+    plan_and_scratch_node,
     read_stub_node,
     research_node,
     review_node,
     revise_draft_node,
     route_after_review,
-    scratch_node,
+    write_arc_index_node,
+    write_arc_step_node,
     write_draft_node,
     write_file_node,
 )
 from .state import WikiPageState
 
 
+def _route_after_plan_scratch(state: WikiPageState) -> str:
+    """Route to the correct writer based on mode."""
+    mode = state.get("mode", "full")
+    if mode == "arc-step":
+        return "write_arc_step"
+    if mode == "arc-index":
+        return "write_arc_index"
+    return "write_draft"
+
+
 def build_wiki_graph() -> StateGraph:
-    """Full editorial pipeline: persona → stub → research → plan → draft → review → commit → log.
+    """Curriculum page pipeline: persona → stub → research → plan_and_scratch → draft → review → commit → log.
 
     Graph topology:
         START
-          → load_persona
-          → read_stub
-          → research
-          → plan             ← deliberate planning before writing
-          → scratch          ← compile working-memory fact sheet from research
-          → write_draft      ← chunked: 3 sequential LLM calls with scratch_pad context
-          → review ─────────────── [approved] ──→ write_file → commit → log_run → END
-                    └── [revise, count<2] ──→ revise_draft → review
-                    └── [revise, count≥2] ──→ flag_human_review → log_run → END
+          → load_persona → read_stub → research → plan_and_scratch
+          → [mode==arc-step] write_arc_step → link → review
+          → [mode==curriculum] write_draft → link → review
+          review ─── [approved] ──→ write_file → commit → log_run → END
+                └── [revise, count<2] ──→ revise_draft → review
+                └── [revise, count≥2] ──→ flag_human_review → log_run → END
     """
     graph = StateGraph(WikiPageState)
 
@@ -57,9 +63,10 @@ def build_wiki_graph() -> StateGraph:
     graph.add_node("load_persona", load_persona_node)
     graph.add_node("read_stub", read_stub_node)
     graph.add_node("research", research_node)
-    graph.add_node("plan", plan_node)
-    graph.add_node("scratch", scratch_node)
+    graph.add_node("plan_and_scratch", plan_and_scratch_node)
     graph.add_node("write_draft", write_draft_node)
+    graph.add_node("write_arc_step", write_arc_step_node)
+    graph.add_node("write_arc_index", write_arc_index_node)
     graph.add_node("link", link_node)
     graph.add_node("review", review_node)
     graph.add_node("revise_draft", revise_draft_node)
@@ -72,10 +79,21 @@ def build_wiki_graph() -> StateGraph:
     graph.add_edge(START, "load_persona")
     graph.add_edge("load_persona", "read_stub")
     graph.add_edge("read_stub", "research")
-    graph.add_edge("research", "plan")
-    graph.add_edge("plan", "scratch")
-    graph.add_edge("scratch", "write_draft")
+    graph.add_edge("research", "plan_and_scratch")
+
+    graph.add_conditional_edges(
+        "plan_and_scratch",
+        _route_after_plan_scratch,
+        {
+            "write_arc_step": "write_arc_step",
+            "write_arc_index": "write_arc_index",
+            "write_draft": "write_draft",
+        },
+    )
+
     graph.add_edge("write_draft", "link")
+    graph.add_edge("write_arc_step", "link")
+    graph.add_edge("write_arc_index", "link")
     graph.add_edge("link", "review")
 
     graph.add_conditional_edges(

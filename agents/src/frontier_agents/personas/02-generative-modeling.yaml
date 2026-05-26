@@ -1,4 +1,4 @@
-track: "02-generative-modeling"
+lettrack: "02-generative-modeling"
 domain: "Generative modeling in deep learning"
 expertise: "diffusion models, score matching, flow matching, VAEs, GANs, energy-based models, normalizing flows"
 depth_focus: "mathematical foundations + research-level understanding + practical generation"

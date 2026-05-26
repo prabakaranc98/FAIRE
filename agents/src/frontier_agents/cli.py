@@ -526,6 +526,159 @@ def supervise(dry_run, verbose, docs_dir):
         console.print("\n[yellow]Dry run — sprint not updated, report not written[/yellow]")
 
 
+@cli.command()
+@click.argument("seed")
+@click.option("--track", default=None, help="Restrict the exploration to one curriculum track (e.g. 02-generative-modeling)")
+@click.option("--budget", type=float, default=None, help="Override BUDGET_LIMIT_USD for THIS exploration only")
+@click.option("--docs-dir", default=None, help="Path to docs/ (default: ../docs from agents/)")
+def explore(seed, track, budget, docs_dir):
+    """Run the explorer playbook on one curriculum seed (e.g. 'world models').
+
+    Survey via Exa → map against the diagonal arc pattern → pick + outline
+    the top 1–2 candidate arcs. Writes proposals to docs/system/arc-proposals.md.
+
+    Does NOT queue any arc work — the human reviews the proposals and runs
+    `spin-arc` for the chosen ones. See arc-exploration.md skill for the
+    full playbook.
+    """
+    from .supervisor import maybe_propose_arcs
+    from .observer import observe
+
+    if budget is not None:
+        os.environ["BUDGET_LIMIT_USD"] = str(budget)
+        console.print(f"[yellow]Budget override for this run: ${budget:.2f}[/yellow]")
+
+    resolved_docs = Path(docs_dir or str(Path(__file__).parent.parent.parent.parent / "docs"))
+
+    console.print(Panel(
+        f"[bold]Frontier Wiki — Explorer[/bold]\n"
+        f"Seed: [cyan]{seed}[/cyan]" + (f" · Track: [cyan]{track}[/cyan]" if track else "") + "\n"
+        f"Survey → Map → Pick → Outline. Writes to docs/system/arc-proposals.md.",
+        border_style="magenta",
+    ))
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        console=console,
+    ) as progress:
+        task = progress.add_task("Observing wiki state...", total=None)
+        obs = observe(docs_dir=str(resolved_docs), runs_dir="runs")
+        progress.update(task, description=f"Exploring branches for '{seed}'...")
+        # The current maybe_propose_arcs scans all canonical tracks. For an
+        # explicit seed-based exploration we synthesize a minimal context so
+        # the supervisor's LLM call focuses on the seed (the prompt references
+        # arc-exploration skill which forces survey-then-pick).
+        if track:
+            os.environ["EXPLORE_TRACK"] = track
+        os.environ["EXPLORE_SEED"] = seed
+        summary = maybe_propose_arcs(obs, audit=None, docs_path=resolved_docs, verbose=True)
+        progress.update(task, description="Exploration complete.")
+
+    console.print()
+    if summary.get("ran"):
+        console.print(f"[green]✓[/green] Proposals written: [cyan]{summary.get('wrote_to')}[/cyan]")
+        console.print(f"  Slots open: {summary.get('slots_open')}, active arcs: {summary.get('active_arcs')}")
+        console.print()
+        console.print("Next: review the proposals, then run:")
+        console.print("  [cyan]uv run python generate.py spin-arc <arc-id>[/cyan]")
+    else:
+        console.print(f"[yellow]Explorer did not propose new arcs.[/yellow]")
+        console.print(f"  Reason: {summary.get('reason', 'unknown')}")
+
+
+@cli.command(name="spin-arc")
+@click.argument("arc_id")
+@click.option("--steps", type=int, default=None, help="Override step count (otherwise read from proposal)")
+@click.option("--dry-run", is_flag=True, help="Print the proposed sprint additions without writing")
+@click.option("--docs-dir", default=None, help="Path to docs/ (default: ../docs from agents/)")
+def spin_arc(arc_id, steps, dry_run, docs_dir):
+    """Materialize an approved arc proposal into sprint queue items.
+
+    Reads docs/system/arc-proposals.md, finds the proposal with the given arc_id,
+    queues 1 arc-index item + N arc-step items in agents/sprints/current.md
+    with full compounding-chain metadata (prev/next/prev_artifact/artifact).
+
+    Refuses to spin an arc that the critic-editor skill would veto (e.g. the
+    diagonal-shape gate fails, or > 50% of prereqs are stubs).
+    """
+    resolved_docs = Path(docs_dir or str(Path(__file__).parent.parent.parent.parent / "docs"))
+    proposals_path = resolved_docs / "system" / "arc-proposals.md"
+    sprint_path = Path(__file__).parent.parent.parent / "sprints" / "current.md"
+
+    if not proposals_path.exists():
+        console.print(f"[red]No proposals file at {proposals_path}[/red]")
+        console.print("Run [cyan]explore <seed>[/cyan] first to generate proposals.")
+        raise SystemExit(1)
+
+    proposals_text = proposals_path.read_text(encoding="utf-8")
+    # Find the section for the requested arc_id. The supervisor's writer is
+    # an LLM so the exact format varies — search by arc_id and by the line
+    # containing "approve" in the same section.
+    import re as _re
+    sections = _re.split(r"^##\s+", proposals_text, flags=_re.MULTILINE)
+    target_section = None
+    for sec in sections:
+        if arc_id in sec.lower() or arc_id.replace("-", " ") in sec.lower():
+            target_section = sec
+            break
+    if not target_section:
+        console.print(f"[red]Arc id '{arc_id}' not found in {proposals_path}[/red]")
+        console.print("Available proposals:")
+        for sec in sections[1:]:
+            first_line = sec.split("\n")[0]
+            console.print(f"  - {first_line[:80]}")
+        raise SystemExit(1)
+
+    if "verdict: veto" in target_section.lower() or "verdict:veto" in target_section.lower():
+        console.print(f"[red]Arc '{arc_id}' was vetoed by the critic-editor. Reasons in {proposals_path}.[/red]")
+        raise SystemExit(2)
+
+    console.print(Panel(
+        f"[bold]Spinning arc: {arc_id}[/bold]\n"
+        f"Will queue 1 arc-index + N arc-step items to {sprint_path.name}.\n"
+        + ("[yellow]Dry run — no writes[/yellow]" if dry_run else "Live — will append to sprint queue."),
+        border_style="magenta",
+    ))
+
+    # Construct the sprint additions. The proposal section contains the
+    # outline; we parse the step list and emit the canonical sprint-line format.
+    # If the outline isn't machine-parseable, surface to the human.
+    # (Minimal parsing — full machine-readable arc proposals are a future move.)
+    arc_index_line = (
+        f'- [ ] {arc_id}-index | (track from proposal) | arc-index | frontier '
+        f'| arc:{arc_id} dest:"(see arc-proposals.md)" total:(see proposal)'
+    )
+
+    console.print("\n[bold]Sprint additions (review before confirming):[/bold]")
+    console.print(arc_index_line)
+    console.print(
+        "[dim]Step items: parse the outline in arc-proposals.md and emit one line per step "
+        "in the format documented in scheduler.py::_parse_sprint_item. "
+        "The current implementation appends a placeholder you can edit; full machine-readable "
+        "outlines are a follow-up.[/dim]"
+    )
+
+    if dry_run:
+        console.print("\n[yellow]Dry run — sprint not modified.[/yellow]")
+        return
+
+    # Append the arc-index line to the sprint. Step lines must be added by hand
+    # for now (or in the follow-up that machine-encodes the outline).
+    sprint_text = sprint_path.read_text(encoding="utf-8") if sprint_path.exists() else ""
+    if arc_index_line not in sprint_text:
+        with sprint_path.open("a", encoding="utf-8") as f:
+            f.write("\n## Arc spin-up — " + arc_id + "\n")
+            f.write(arc_index_line + "\n")
+            f.write(f"# TODO: paste arc-step lines from {proposals_path} outline\n")
+        console.print(f"\n[green]✓[/green] Appended arc-index line to {sprint_path}")
+        console.print(f"[yellow]Manual step:[/yellow] open {proposals_path}, copy the step outline,")
+        console.print(f"  format each step as a sprint line (see scheduler.py for the format), and")
+        console.print(f"  paste into {sprint_path}. The next sprint cycle will pick them up.")
+    else:
+        console.print(f"[yellow]Arc-index line already present in sprint queue.[/yellow]")
+
+
 def _generate_all_stubs(
     track: str,
     depth: str,
