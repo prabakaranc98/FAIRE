@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+        <meta name="description" content="When the supervisor judges the wiki ready for new arcs, candidates appear here.">
       
       
       
@@ -1157,29 +1157,10 @@
 
 
 <h1 id="arc-proposals">Arc proposals<a class="headerlink" href="#arc-proposals" title="Permanent link">&para;</a></h1>
-<p>I have surveyed the "post-training and RL" seed within the 06-reinforcement-learning track. I propose one high-impact arc: <strong>GRPO-based Reasoning Alignment</strong>. This arc satisfies the diagonal pattern by bridging standard RLHF (specialized tool) with reasoning-chain verification (frontier intersection). A second potential branch (DPO-based alignment) was deferred due to insufficient curriculum depth in the underlying preference-modeling track.</p>
-<h2 id="1-grpo-based-reasoning-alignment-ev-48-verdict-approve">1. GRPO-based Reasoning Alignment — EV/$ = 4.8 — verdict: approve<a class="headerlink" href="#1-grpo-based-reasoning-alignment-ev-48-verdict-approve" title="Permanent link">&para;</a></h2>
-<p><strong>Destination:</strong> Implement Group Relative Policy Optimization (GRPO) to align a base model on chain-of-thought reasoning tasks without a separate reward model.
-<strong>Steps:</strong> 7 · <strong>Cost:</strong> $1.60 · <strong>Impact:</strong> 12/14
-<strong>Prereqs in curriculum:</strong> [policy-gradient: solid, ppo-basics: solid, chain-of-thought-prompting: adequate, reward-modeling: stub]
-<strong>Persona span:</strong> 4 (ml-tinkerer, applied-engineer, applied-researcher, frontier-researcher)
-<strong>Seminal anchors:</strong> Shao et al. 2024 (DeepSeek-R1), Schulman et al. 2017 (PPO), Wei et al. 2022 (CoT)
-<strong>Outline:</strong> 
-1. CoT prompting baseline (ml-tinkerer)
-2. PPO-style reward signal definition (ml-tinkerer)
-3. Group generation pipeline (applied-engineer)
-4. Relative advantage calculation (applied-engineer)
-5. Policy update with KL-penalty (applied-researcher)
-6. Reasoning trace length ablation (applied-researcher)
-7. Final evaluation on MATH/GSM8K (frontier-researcher)
-<strong>Editor verdict:</strong> approve
-<strong>Approval note:</strong> This arc is highly timely and follows a perfect diagonal: it starts with familiar CoT prompting, moves to the broader frame of RL-based alignment, synthesizes a GRPO capability, and lands at the frontier of reasoning-model training. The compounding chain is tight, as each step builds the specific components of the GRPO loop.</p>
-<h2 id="deferred-branches-not-proposed-this-cycle">Deferred branches (not proposed this cycle)<a class="headerlink" href="#deferred-branches-not-proposed-this-cycle" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>DPO-based Preference Alignment:</strong> Deferred. The curriculum for <code>06-reinforcement-learning</code> currently lacks a solid <code>preference-modeling</code> page, which is a required prereq for DPO.</li>
-<li><strong>Online RLHF with Rejection Sampling:</strong> Deferred. The survey indicated this branch is currently too similar to existing PPO implementations; it lacks a distinct "frontier intersection" compared to the GRPO reasoning path.</li>
-<li><strong>Multi-Objective RL for Safety:</strong> Deferred. The diagonal shape is currently vertical (RL → RL → RL), failing the requirement to cross into a broader research community.</li>
-</ul>
+<blockquote>
+<p>Current cycle: <strong>no proposals</strong>. Reason: no canonical-track metrics available</p>
+</blockquote>
+<p>Arcs are derived from the curriculum, bounded by budget, and capped at 2 active at a time. The supervisor proposes new arcs only when all three preconditions hold (see <code>agents/skills/arc-selection.md</code> and <code>agents/skills/critic-editor.md</code>).</p>
 
 
 
