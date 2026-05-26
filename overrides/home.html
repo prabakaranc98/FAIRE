@@ -1,0 +1,190 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+{{ super() }}
+
+<style>
+  /* ── Hero ──────────────────────────────────────────────────── */
+  .fw-hero {
+    background: #FFFFFF;
+    border-bottom: 3px solid #E8452A;
+    padding: 4rem 1.5rem 3rem;
+    text-align: center;
+  }
+
+  .fw-hero__inner {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .fw-hero__eyebrow {
+    display: inline-block;
+    background: rgba(232, 69, 42, 0.08);
+    color: #E8452A;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.3rem 0.9rem;
+    border-radius: 9999px;
+    margin-bottom: 1.25rem;
+    border: 1px solid rgba(232, 69, 42, 0.2);
+  }
+
+  .fw-hero__title {
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: #111827;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+  }
+
+  .fw-hero__title span {
+    color: #E8452A;
+  }
+
+  .fw-hero__subtitle {
+    font-size: 1.05rem;
+    color: #4B5563;
+    margin: 1rem auto 2rem;
+    line-height: 1.75;
+    max-width: 620px;
+    font-weight: 400;
+  }
+
+  .fw-hero__cta {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+
+  .fw-hero__cta a {
+    display: inline-block;
+    padding: 0.65rem 1.4rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    text-decoration: none !important;
+    transition: all 0.18s ease;
+    letter-spacing: -0.01em;
+  }
+
+  .fw-hero__cta a.cta-primary {
+    background: #E8452A;
+    color: #FFFFFF !important;
+    box-shadow: 0 2px 8px rgba(232, 69, 42, 0.3);
+  }
+
+  .fw-hero__cta a.cta-primary:hover {
+    background: #C63818;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(232, 69, 42, 0.38);
+  }
+
+  .fw-hero__cta a.cta-secondary {
+    background: #FFFFFF;
+    color: #374151 !important;
+    border: 1.5px solid #D1D5DB;
+  }
+
+  .fw-hero__cta a.cta-secondary:hover {
+    border-color: #9CA3AF;
+    color: #1a1a1a !important;
+    transform: translateY(-1px);
+  }
+
+  .fw-hero__stats {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-top: 1.5rem;
+    border-top: 1px solid #F3F4F6;
+  }
+
+  .fw-hero__stat {
+    text-align: center;
+  }
+
+  .fw-hero__stat-num {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #E8452A;
+    display: block;
+    line-height: 1.2;
+  }
+
+  .fw-hero__stat-label {
+    font-size: 0.78rem;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+  }
+
+  /* ── By line ────────────────────────────────────────────────── */
+  .fw-byline {
+    text-align: center;
+    padding: 0.6rem;
+    font-size: 0.82rem;
+    color: #9CA3AF;
+    background: #FAFAFA;
+    border-bottom: 1px solid #F3F4F6;
+  }
+
+  .fw-byline a {
+    color: #E8452A;
+    text-decoration: none;
+    font-weight: 500;
+  }
+</style>
+
+<div class="fw-hero">
+  <div class="fw-hero__inner">
+    <div class="fw-hero__eyebrow">Machine Learning · Frontier Research · Open Reference</div>
+    <h1 class="fw-hero__title">
+      Frontier Wiki
+    </h1>
+    <p class="fw-hero__subtitle">
+      A reference on machine learning covering mathematical foundations,
+      model architectures, training methods, and current research.
+      Each topic includes core concepts, key algorithms, state-of-the-art results,
+      and a minimal working implementation.
+      Sources: arXiv, peer-reviewed venues, and official documentation.
+    </p>
+    <div class="fw-hero__cta">
+      <a href="curriculum/" class="cta-primary">Browse Curriculum</a>
+      <a href="arcs/" class="cta-secondary">Learning Arcs</a>
+      <a href="references/seminal-papers/" class="cta-secondary">Seminal Papers</a>
+    </div>
+    <div class="fw-hero__stats">
+      <div class="fw-hero__stat">
+        <span class="fw-hero__stat-num">15</span>
+        <span class="fw-hero__stat-label">Curriculum tracks</span>
+      </div>
+      <div class="fw-hero__stat">
+        <span class="fw-hero__stat-num">7</span>
+        <span class="fw-hero__stat-label">Structured arcs</span>
+      </div>
+      <div class="fw-hero__stat">
+        <span class="fw-hero__stat-num">4</span>
+        <span class="fw-hero__stat-label">Reader perspectives per page</span>
+      </div>
+      <div class="fw-hero__stat">
+        <span class="fw-hero__stat-num">MVB</span>
+        <span class="fw-hero__stat-label">Working implementation on key pages</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="fw-byline">
+  Maintained by <a href="https://pracha.me" target="_blank">Prabakaran Chandran</a> ·
+  Sources: arXiv · .edu · HuggingFace ·
+  <a href="https://github.com/prabakaranc98/FAIRE" target="_blank">GitHub</a>
+</div>
+
+{% endblock %}

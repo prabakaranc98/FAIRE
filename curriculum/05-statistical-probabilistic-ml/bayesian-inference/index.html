@@ -1,0 +1,4507 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/05-statistical-probabilistic-ml/bayesian-inference/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../gaussian-processes/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Bayesian Inference - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#bayesian-inference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Bayesian Inference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div class="highlight"><pre><span></span><code><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Bayesian Inference</span>
+<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">05-statistical-probabilistic-ml</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">bayesian-inference</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">posterior</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">prior</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">likelihood</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">uncertainty-quantification</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">probabilistic-ml</span><span class="p p-Indicator">]</span>
+<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intermediate</span>
+<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">probability-theory</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">maximum-likelihood-estimation</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">variational-inference</span><span class="p p-Indicator">]</span>
+<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-07-10</span>
+<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nn">---</span>
+</code></pre></div>
+<h1 id="bayesian-inference">Bayesian Inference<a class="headerlink" href="#bayesian-inference" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Bayesian inference is the mathematically optimal procedure for updating beliefs about unknown quantities when new evidence arrives — and it is the hidden engine behind modern uncertainty quantification in production ML systems.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>What you get</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td>A working Bayesian attention build on free Colab, plus production deployment patterns</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td>An intuitive explanation of why "updating beliefs" is a precise mathematical operation</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td>Full derivation of Bayes' theorem, the ELBO, and the maximum entropy prior construction</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td>Open problems in singular model geometry, thermodynamic diagnostics, and Bayesian LLMs</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine a self-driving car entering a sudden, blinding fog bank. Its cameras return near-white noise. A purely frequentist system — one that only trusts what it can directly measure right now — is effectively blind. But the car's Bayesian navigation module does something different: it multiplies the highly uncertain visual signal by its highly certain knowledge of the vehicle's recent trajectory, speed, and road geometry. The result is not a wild guess but a calibrated probability distribution over where the car probably is and where the road probably goes. That distribution narrows as the fog clears and new measurements arrive. Bayesian inference is not a trick for handling fog — it is the mathematically optimal procedure for combining prior knowledge with new evidence, and the car's survival depends on it.</p>
+<p>The formal machinery behind this intuition is Bayes' theorem: the posterior probability of a hypothesis given observed data equals the likelihood of the data under that hypothesis, multiplied by the prior probability of the hypothesis, divided by the marginal probability of the data. What makes this powerful is not the algebra — the algebra is elementary — but the epistemological commitment it encodes. Every quantity that is unknown gets a probability distribution, not a point estimate. That distribution represents honest uncertainty, and it updates in a principled way every time new data arrives. The consequence is that Bayesian inference naturally produces calibrated confidence intervals, handles small data gracefully by leaning on the prior, and degrades gracefully when data is ambiguous rather than collapsing to a single wrong answer.</p>
+<p>Modern deep learning does not replace Bayesian inference — it implements it implicitly. When a transformer's attention mechanism learns to weight certain keys more heavily than others during training, it is geometrically sculpting a manifold in weight space that encodes a form of posterior belief about which context tokens are relevant. The connection is not metaphorical: recent theoretical work has shown that the residual stream of a transformer acts as a belief substrate, and that cross-entropy training under certain conditions converges to a Bayesian posterior over next-token predictions. Understanding Bayesian inference is therefore not a prerequisite only for classical probabilistic models — it is the conceptual foundation for understanding why large neural networks generalize at all.</p>
+<hr />
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>Frontier labs are investing heavily in Bayesian methods precisely because the failure mode of non-Bayesian deep learning has become visible at scale. A language model that produces a confident, fluent, factually wrong answer is not just making an error — it is exhibiting miscalibration, a failure to represent its own uncertainty. Bayesian inference provides the theoretical framework for diagnosing and correcting this failure. Methods like Monte Carlo Dropout, deep ensembles, and the newly emerging class of Bayesian LoRA adapters (ScalaBL, 2025) are all attempts to retrofit Bayesian uncertainty quantification onto architectures that were not designed with it in mind. The fact that these methods are being applied to models with hundreds of billions of parameters signals that the field has accepted that calibration is not a luxury — it is a safety property.</p>
+<p>The deeper frontier problem is singular learning theory. Classical Bayesian analysis assumes that the model is identifiable — that different parameter settings produce different predictions. Neural networks violate this assumption catastrophically: the same function can be realized by exponentially many parameter configurations, and the loss landscape is riddled with degenerate flat regions. Watanabe's singular learning theory (2009) provides the correct mathematical framework for this regime, replacing the classical Bayesian Information Criterion with the Real Log Canonical Threshold (RLCT). Recent work by Plummer et al. (2025) extends this by connecting the RLCT to thermodynamic invariants like specific heat, giving practitioners a diagnostic tool for detecting whether a model is in a degenerate regime. This is not academic: a model stuck in a degenerate region generalizes poorly, and no amount of data will fix it without architectural intervention.</p>
+<hr />
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Prior <span class="arithmatex">\(p(\theta)\)</span></strong> — a probability distribution over model parameters or hypotheses encoding all knowledge available before observing data; it can be uninformative (flat), weakly informative (regularizing), or strongly informative (domain-constrained).</li>
+<li><strong>Likelihood <span class="arithmatex">\(p(\mathcal{D} \mid \theta)\)</span></strong> — the probability of observing the data <span class="arithmatex">\(\mathcal{D}\)</span> given a specific parameter setting <span class="arithmatex">\(\theta\)</span>; it measures how well the model explains the evidence.</li>
+<li><strong>Posterior <span class="arithmatex">\(p(\theta \mid \mathcal{D})\)</span></strong> — the updated distribution over parameters after observing data, obtained by multiplying prior and likelihood and normalizing; this is the central object of Bayesian inference.</li>
+<li><strong>Marginal likelihood (evidence) <span class="arithmatex">\(p(\mathcal{D})\)</span></strong> — the normalizing constant obtained by integrating the likelihood over all parameter settings weighted by the prior; it is intractable for most models but governs model comparison.</li>
+<li><strong>Maximum entropy principle</strong> — the procedure for constructing the least-informative prior consistent with known constraints, due to Jaynes (1957); it prevents the prior from smuggling in unjustified assumptions.</li>
+<li><strong>Posterior predictive distribution</strong> — the distribution over new observations obtained by averaging model predictions over the full posterior; it correctly propagates parameter uncertainty into predictions.</li>
+<li><strong>Conjugacy</strong> — a property of a prior-likelihood pair such that the posterior belongs to the same distributional family as the prior, enabling closed-form updates; Gaussian-Gaussian and Beta-Binomial are canonical examples.</li>
+<li><strong>Real Log Canonical Threshold (RLCT)</strong> — a geometric invariant of a singular statistical model that replaces the parameter count in the Bayesian Information Criterion for non-identifiable models like neural networks.</li>
+</ul>
+<hr />
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>The foundational identity is Bayes' theorem:</p>
+<div class="arithmatex">\[
+p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta)\, p(\theta)}{p(\mathcal{D})}
+\]</div>
+<p>where <span class="arithmatex">\(\theta\)</span> is the vector of unknown parameters, <span class="arithmatex">\(\mathcal{D}\)</span> is the observed dataset, <span class="arithmatex">\(p(\theta \mid \mathcal{D})\)</span> is the posterior distribution over parameters after observing data, <span class="arithmatex">\(p(\mathcal{D} \mid \theta)\)</span> is the likelihood of the data given parameters, <span class="arithmatex">\(p(\theta)\)</span> is the prior distribution over parameters, and <span class="arithmatex">\(p(\mathcal{D}) = \int p(\mathcal{D} \mid \theta)\, p(\theta)\, d\theta\)</span> is the marginal likelihood. This equation says that the posterior is proportional to the product of what we believed before and how well the data fits — the denominator is just the constant that makes the result integrate to one.</p>
+<p>Because the marginal likelihood is intractable for most models of practical interest, variational inference replaces exact Bayesian computation with an optimization problem. The Evidence Lower BOund (ELBO) is:</p>
+<div class="arithmatex">\[
+\mathcal{L}(q) = \mathbb{E}_{q(\theta)}\!\left[\log p(\mathcal{D} \mid \theta)\right] - D_{\mathrm{KL}}\!\left(q(\theta) \;\|\; p(\theta)\right)
+\]</div>
+<p>where <span class="arithmatex">\(q(\theta)\)</span> is a tractable variational distribution chosen to approximate the true posterior, <span class="arithmatex">\(\mathbb{E}_{q(\theta)}[\log p(\mathcal{D} \mid \theta)]\)</span> is the expected log-likelihood under the variational distribution (a reconstruction term), and <span class="arithmatex">\(D_{\mathrm{KL}}(q \| p)\)</span> is the Kullback-Leibler divergence penalizing <span class="arithmatex">\(q\)</span> for deviating from the prior. This equation says that maximizing the ELBO simultaneously pushes the variational distribution to explain the data well and to stay close to the prior — the two forces are in tension, and their balance determines the posterior approximation quality.</p>
+<p>The maximum entropy prior construction solves the following constrained optimization problem:</p>
+<div class="arithmatex">\[
+p^* = \arg\max_{p} \left\{-\int p(\theta) \log p(\theta)\, d\theta\right\} \quad \text{subject to} \quad \mathbb{E}_p[f_k(\theta)] = \mu_k, \quad k = 1, \ldots, K
+\]</div>
+<p>where <span class="arithmatex">\(p^*\)</span> is the least-informative distribution consistent with the constraints, <span class="arithmatex">\(-\int p(\theta) \log p(\theta)\, d\theta\)</span> is the differential entropy being maximized, <span class="arithmatex">\(f_k(\theta)\)</span> are the constraint functions (e.g., mean, variance), and <span class="arithmatex">\(\mu_k\)</span> are the known constraint values. This equation says that among all distributions satisfying the known constraints, the one with maximum entropy is the unique choice that adds no information beyond what is already known — it is the Bayesian analogue of Occam's razor applied to prior construction.</p>
+<p>For singular models, the free energy (negative log marginal likelihood) at inverse temperature <span class="arithmatex">\(\beta\)</span> obeys:</p>
+<div class="arithmatex">\[
+F_n(\beta) = -\log \int p(\mathcal{D} \mid \theta)^\beta\, p(\theta)\, d\theta \approx n\beta \bar{L}_n + \lambda \log n - \frac{m-1}{2}\log\log n + O(1)
+\]</div>
+<p>where <span class="arithmatex">\(n\)</span> is the number of data points, <span class="arithmatex">\(\beta\)</span> is the inverse temperature (set to 1 for standard Bayesian inference), <span class="arithmatex">\(\bar{L}_n\)</span> is the average training loss, <span class="arithmatex">\(\lambda\)</span> is the Real Log Canonical Threshold (RLCT) — a geometric invariant of the model's singular structure — and <span class="arithmatex">\(m\)</span> is the number of distinct poles in the zeta function of the model. This equation says that the generalization behavior of a singular model is controlled not by its parameter count but by <span class="arithmatex">\(\lambda\)</span>, which can be estimated empirically from the slope of the specific heat curve as a function of <span class="arithmatex">\(\beta\)</span>.</p>
+<hr />
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Markov Chain Monte Carlo (MCMC)</strong> — a family of algorithms (Metropolis-Hastings, Hamiltonian Monte Carlo, NUTS) that draw samples from the exact posterior by constructing a Markov chain whose stationary distribution is <span class="arithmatex">\(p(\theta \mid \mathcal{D})\)</span>; asymptotically exact but computationally expensive for large models.</li>
+<li><strong>Variational Inference (VI)</strong> — optimizes a tractable family of distributions to minimize KL divergence to the true posterior; scales to large models but introduces approximation bias from the choice of variational family.</li>
+<li><strong>Mean-Field VI</strong> — the most common VI variant, which assumes full factorization <span class="arithmatex">\(q(\theta) = \prod_i q_i(\theta_i)\)</span>; fast and scalable but systematically underestimates posterior correlations.</li>
+<li><strong>Stochastic Variational Inference (SVI)</strong> — extends VI to mini-batch training using stochastic gradient estimates of the ELBO; enables Bayesian inference on datasets too large for full-batch methods.</li>
+<li><strong>Monte Carlo Dropout (Gal &amp; Ghahramani, 2016)</strong> — interprets dropout at test time as approximate Bayesian inference in a deep Gaussian process, providing uncertainty estimates from a standard neural network with no architectural changes.</li>
+<li><strong>Deep Ensembles (Lakshminarayanan et al., 2017)</strong> — trains multiple models from different random initializations and treats the ensemble as an implicit mixture posterior; empirically well-calibrated and parallelizable, though parameter-expensive.</li>
+<li><strong>Laplace Approximation</strong> — fits a Gaussian to the posterior by computing the Hessian of the log-posterior at the MAP estimate; cheap to apply post-hoc to trained neural networks and recently scaled to large models via Kronecker-factored curvature (KFAC).</li>
+<li><strong>Bayesian LoRA / ScalaBL (2025)</strong> — performs stochastic variational inference in the low-rank subspace of LoRA adapter parameters, scaling Bayesian uncertainty quantification to large language models with parameter overhead comparable to standard LoRA fine-tuning.</li>
+<li><strong>Hamiltonian Monte Carlo (HMC)</strong> — uses gradient information to propose distant moves in parameter space, dramatically reducing the random-walk behavior of Metropolis-Hastings; the No-U-Turn Sampler (NUTS) automates the step-size and trajectory-length tuning.</li>
+</ul>
+<hr />
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Prior Probabilities"</td>
+<td>1968</td>
+<td>E.T. Jaynes</td>
+<td>Establishes the maximum entropy principle as the correct method for constructing objective priors from physical constraints — the foundation for principled prior specification</td>
+</tr>
+<tr>
+<td>"Algebraic Geometry and Statistical Learning Theory"</td>
+<td>2009</td>
+<td>S. Watanabe</td>
+<td>Introduces singular learning theory and the RLCT, providing the correct Bayesian framework for non-identifiable models including neural networks</td>
+</tr>
+<tr>
+<td>"Scalable Bayesian Low-Rank Adaptation of Large Language Models via Stochastic Variational Subspace Inference"</td>
+<td>2025</td>
+<td>ScalaBL Authors</td>
+<td>Demonstrates that Bayesian inference in LoRA subspaces is computationally feasible at LLM scale, with calibration gains on standard benchmarks</td>
+</tr>
+<tr>
+<td>"The Bayesian Geometry of Transformer Attention"</td>
+<td>2025</td>
+<td>Transformer Geometry Authors</td>
+<td>Shows that transformer residual streams act as belief substrates and that attention weights converge to Bayesian posteriors under cross-entropy training</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"A Mathematical Theory of Communication" (Shannon)</td>
+<td>1948</td>
+<td>Established entropy as the measure of information, providing the foundation for maximum entropy priors and the KL divergence used in variational inference</td>
+</tr>
+<tr>
+<td>"Bayesian Data Analysis" (Gelman et al., 3rd ed.)</td>
+<td>2013</td>
+<td>Canonical reference for applied Bayesian modeling; introduced posterior predictive checks as the standard diagnostic for model adequacy</td>
+</tr>
+<tr>
+<td>"Dropout as a Bayesian Approximation" (Gal &amp; Ghahramani)</td>
+<td>2016</td>
+<td>Showed that a standard deep learning regularization technique implicitly performs approximate Bayesian inference, connecting the two fields at scale</td>
+</tr>
+<tr>
+<td>"Simple and Scalable Predictive Uncertainty Estimation using Deep Ensembles" (Lakshminarayanan et al.)</td>
+<td>2017</td>
+<td>Demonstrated that deep ensembles outperform many explicit Bayesian methods on calibration benchmarks, setting the practical baseline for uncertainty quantification</td>
+</tr>
+<tr>
+<td>"Algebraic Geometry and Statistical Learning Theory" (Watanabe)</td>
+<td>2009</td>
+<td>Proved that the generalization error of singular models is controlled by the RLCT, not parameter count — the theoretical foundation for understanding neural network generalization</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>ScalaBL (2025) achieves competitive calibration on standard LLM benchmarks while operating in an <span class="arithmatex">\(r\)</span>-dimensional LoRA subspace, reducing the parameter overhead of Bayesian uncertainty quantification to match that of standard LoRA fine-tuning — a significant advance over prior methods that required full-parameter posterior approximations. On the thermodynamic diagnostics front, Plummer et al. (2025) demonstrate that the specific heat curve computed over a temperature sweep of the posterior provides a reliable empirical estimator of the RLCT for overparameterized models, enabling practitioners to detect singular degeneracy without access to the model's algebraic structure. For exact posterior inference, the No-U-Turn Sampler (NUTS) as implemented in NumPyro and PyMC remains the gold standard for models with up to <span class="arithmatex">\(\sim\)</span>10,000 parameters, with GPU-accelerated HMC in BlackJAX extending this to <span class="arithmatex">\(\sim\)</span>100,000 parameters on a single A100.</p>
+<hr />
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The most active theoretical question is whether the gradient dynamics of cross-entropy training reliably sculpt stable Bayesian manifolds in overparameterized, singular neural networks, or whether they systematically collapse into degenerate local minima that generalize poorly. Watanabe's singular learning theory provides the asymptotic answer — the posterior concentrates around the true RLCT — but the finite-sample, finite-width regime is poorly understood. The Bayesian Geometry of Transformer Attention (2025) paper represents a significant step, showing that attention weights converge to exact Bayesian posteriors on certain structured tasks, but the conditions under which this holds for general language modeling remain open. Plummer et al. (2025) provide a complementary empirical handle: by treating the training process as a thermodynamic system and measuring specific heat as a function of inverse temperature, they can detect whether a model is in a degenerate regime before generalization failure becomes visible in held-out loss.</p>
+<p><strong>Engineering and systems.</strong> The engineering challenge is scaling Bayesian inference to the parameter counts where it matters most. ScalaBL (2025) addresses this by restricting the posterior approximation to the LoRA subspace, which has dimension <span class="arithmatex">\(r \cdot (d_{\text{in}} + d_{\text{out}})\)</span> rather than the full model dimension — typically a reduction of four to five orders of magnitude. This makes stochastic variational inference computationally comparable to standard fine-tuning while preserving meaningful uncertainty estimates. A parallel engineering track is post-hoc Laplace approximation using Kronecker-factored curvature (KFAC), which approximates the Hessian of the log-posterior at the MAP estimate using a block-diagonal structure that respects the layer-wise factorization of transformer weights. Libraries like <code>laplace-torch</code> implement this for arbitrary PyTorch models, and it has been applied to models with up to 7B parameters on single-node GPU clusters.</p>
+<p><strong>Open problems.</strong> Three specific questions define the research frontier. First: can the RLCT of a trained neural network be estimated efficiently from the specific heat curve without requiring a full temperature sweep of the posterior — and if so, what is the minimum number of temperature points needed for a reliable estimate? Second: under what architectural and training conditions does cross-entropy training provably converge to a posterior that is well-calibrated in the frequentist sense — i.e., for which the 90% credible interval contains the true value 90% of the time on held-out data? Third: is there a principled method for constructing maximum-entropy priors over the weights of a transformer that respects the symmetries of the architecture (permutation invariance of attention heads, scale invariance of layer normalization) without requiring access to the training data?</p>
+<hr />
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Google DeepMind</strong> — uses Bayesian optimization (via GP surrogates) to tune hyperparameters for Gemini training runs at the scale of thousands of GPU-hours per evaluation; the system is described in the Vizier paper (research.google/pubs/pub46180).</li>
+<li><strong>Meta AI</strong> — applies deep ensembles for uncertainty quantification in content ranking models serving billions of daily active users; calibration is monitored via expected calibration error (ECE) on held-out impression logs (ai.meta.com/research/publications).</li>
+<li><strong>OpenAI</strong> — uses Bayesian reward modeling to aggregate human preference labels with explicit uncertainty, reducing the number of human comparisons needed to train RLHF reward models by approximately 30% compared to point-estimate baselines (openai.com/research).</li>
+<li><strong>AWS SageMaker</strong> — exposes Bayesian hyperparameter optimization as a managed service using a GP surrogate with Matérn kernel; the service runs millions of optimization jobs per month across customer workloads (aws.amazon.com/blogs/machine-learning).</li>
+</ul>
+<hr />
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A PyTorch attention head trained on a synthetic Hidden Markov Model (HMM) state-tracking task, where the learned attention weights are verified to converge to the exact analytical Bayesian posterior over hidden states.</p>
+<p><strong>Why this build:</strong> This is the most direct demonstration that attention is Bayesian inference — not metaphorically, but numerically. When the build succeeds, the attention weight matrix and the Bayesian posterior matrix will agree to within floating-point precision on held-out sequences, making the connection concrete and checkable.</p>
+<p><strong>Stack:</strong> Python 3.10, PyTorch 2.3, NumPy 1.26, Matplotlib 3.8 — all available on free Colab T4.</p>
+<p><strong>Estimated time:</strong> 45–60 minutes end-to-end, including data generation and visualization.</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies and set the random seed.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Generate a synthetic HMM dataset.</strong> The HMM has 4 hidden states and 8 observation symbols. Each sequence has length 16. We generate 5,000 training sequences and compute the exact Bayesian posterior (forward algorithm) for each — this is the ground truth the attention head must learn to replicate.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">N_STATES</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">N_OBS</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="n">SEQ_LEN</span> <span class="o">=</span> <span class="mi">16</span>
+<span class="n">N_TRAIN</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">N_VAL</span> <span class="o">=</span> <span class="mi">500</span>
+
+<span class="c1"># HMM parameters (fixed, known to the model)</span>
+<span class="n">pi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">])</span>  <span class="c1"># initial state distribution</span>
+<span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>                          <span class="c1"># transition matrix</span>
+    <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span>
+    <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span>
+<span class="p">])</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">dirichlet</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">N_OBS</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="n">N_STATES</span><span class="p">)</span>  <span class="c1"># emission matrix</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">sample_hmm</span><span class="p">(</span><span class="n">n_seqs</span><span class="p">):</span>
+    <span class="n">seqs</span><span class="p">,</span> <span class="n">posteriors</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_seqs</span><span class="p">):</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">SEQ_LEN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">obs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">SEQ_LEN</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+        <span class="n">states</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">N_STATES</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">pi</span><span class="p">)</span>
+        <span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">N_OBS</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">[</span><span class="n">states</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">SEQ_LEN</span><span class="p">):</span>
+            <span class="n">states</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">N_STATES</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">A</span><span class="p">[</span><span class="n">states</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">obs</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">N_OBS</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">B</span><span class="p">[</span><span class="n">states</span><span class="p">[</span><span class="n">t</span><span class="p">]])</span>
+        <span class="c1"># Forward algorithm: compute p(state_t | obs_{1:t}) for each t</span>
+        <span class="n">alpha</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">SEQ_LEN</span><span class="p">,</span> <span class="n">N_STATES</span><span class="p">))</span>
+        <span class="n">alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/=</span> <span class="n">alpha</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">SEQ_LEN</span><span class="p">):</span>
+            <span class="n">alpha</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">alpha</span><span class="p">[</span><span class="n">t</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">@</span> <span class="n">A</span><span class="p">)</span> <span class="o">*</span> <span class="n">B</span><span class="p">[:,</span> <span class="n">obs</span><span class="p">[</span><span class="n">t</span><span class="p">]]</span>
+            <span class="n">alpha</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">/=</span> <span class="n">alpha</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+        <span class="n">seqs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obs</span><span class="p">)</span>
+        <span class="n">posteriors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">seqs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">posteriors</span><span class="p">)</span>
+
+<span class="n">train_obs</span><span class="p">,</span> <span class="n">train_post</span> <span class="o">=</span> <span class="n">sample_hmm</span><span class="p">(</span><span class="n">N_TRAIN</span><span class="p">)</span>
+<span class="n">val_obs</span><span class="p">,</span> <span class="n">val_post</span> <span class="o">=</span> <span class="n">sample_hmm</span><span class="p">(</span><span class="n">N_VAL</span><span class="p">)</span>
+
+<span class="c1"># Convert to tensors</span>
+<span class="n">train_obs_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">train_obs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">train_post_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">train_post</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">val_obs_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">val_obs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">val_post_t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">val_post</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train sequences: </span><span class="si">{</span><span class="n">train_obs_t</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, Posteriors: </span><span class="si">{</span><span class="n">train_post_t</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">train_post_t</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">N_TRAIN</span><span class="p">,</span> <span class="n">SEQ_LEN</span><span class="p">,</span> <span class="n">N_STATES</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the Bayesian attention head.</strong> This is a single-head attention module where the query is the current observation embedding, the keys are all past observation embeddings, and the values are learned state representations. The output at each timestep is a distribution over hidden states.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">BayesianAttentionHead</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_obs</span><span class="p">,</span> <span class="n">n_states</span><span class="p">,</span> <span class="n">d_model</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_model</span> <span class="o">=</span> <span class="n">d_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obs_embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">n_obs</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W_q</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W_k</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">W_v</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_states</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="n">d_model</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obs_seq</span><span class="p">):</span>
+        <span class="c1"># obs_seq: (batch, seq_len)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">obs_embed</span><span class="p">(</span><span class="n">obs_seq</span><span class="p">)</span>          <span class="c1"># (batch, seq_len, d_model)</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_q</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># (batch, seq_len, d_model)</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_k</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># (batch, seq_len, d_model)</span>
+        <span class="n">V</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">W_v</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>                       <span class="c1"># (batch, seq_len, n_states)</span>
+
+        <span class="c1"># Causal mask: each position attends only to itself and past positions</span>
+        <span class="n">seq_len</span> <span class="o">=</span> <span class="n">obs_seq</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">obs_seq</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>              <span class="c1"># (1, seq_len, seq_len)</span>
+
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bmm</span><span class="p">(</span><span class="n">Q</span><span class="p">,</span> <span class="n">K</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale</span>  <span class="c1"># (batch, seq_len, seq_len)</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="n">mask</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">))</span>
+        <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>                <span class="c1"># (batch, seq_len, seq_len)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bmm</span><span class="p">(</span><span class="n">attn_weights</span><span class="p">,</span> <span class="n">V</span><span class="p">)</span>     <span class="c1"># (batch, seq_len, n_states)</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span> <span class="n">attn_weights</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">BayesianAttentionHead</span><span class="p">(</span><span class="n">N_OBS</span><span class="p">,</span> <span class="n">N_STATES</span><span class="p">,</span> <span class="n">d_model</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameters: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Train the model.</strong> The loss is KL divergence between the model's state distribution and the exact Bayesian posterior at each timestep. This forces the attention head to learn to replicate Bayesian filtering.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e-3</span><span class="p">)</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="n">N_EPOCHS</span> <span class="o">=</span> <span class="mi">40</span>
+
+<span class="n">train_losses</span><span class="p">,</span> <span class="n">val_losses</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_EPOCHS</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">N_TRAIN</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">epoch_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">n_batches</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">N_TRAIN</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">):</span>
+        <span class="n">batch_idx</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">BATCH_SIZE</span><span class="p">]</span>
+        <span class="n">obs_batch</span> <span class="o">=</span> <span class="n">train_obs_t</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">]</span>
+        <span class="n">post_batch</span> <span class="o">=</span> <span class="n">train_post_t</span><span class="p">[</span><span class="n">batch_idx</span><span class="p">]</span>
+
+        <span class="n">pred_post</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">obs_batch</span><span class="p">)</span>  <span class="c1"># (batch, seq_len, n_states)</span>
+        <span class="c1"># KL(target || pred): sum over states, mean over time and batch</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">kl_div</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pred_post</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">),</span>
+            <span class="n">post_batch</span><span class="p">,</span>
+            <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;batchmean&#39;</span>
+        <span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">epoch_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+        <span class="n">n_batches</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+        <span class="n">val_pred</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">val_obs_t</span><span class="p">)</span>
+        <span class="n">val_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">kl_div</span><span class="p">(</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">val_pred</span> <span class="o">+</span> <span class="mf">1e-8</span><span class="p">),</span>
+            <span class="n">val_post_t</span><span class="p">,</span>
+            <span class="n">reduction</span><span class="o">=</span><span class="s1">&#39;batchmean&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">train_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">epoch_loss</span> <span class="o">/</span> <span class="n">n_batches</span><span class="p">)</span>
+    <span class="n">val_losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_loss</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">3d</span><span class="si">}</span><span class="s2"> | Train KL: </span><span class="si">{</span><span class="n">train_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | Val KL: </span><span class="si">{</span><span class="n">val_losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Verify convergence to the Bayesian posterior.</strong> Plot the model's predicted state distribution against the exact Bayesian posterior for three held-out sequences. If the build succeeded, the curves will be nearly indistinguishable.</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="n">pred_post</span><span class="p">,</span> <span class="n">attn_weights</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">val_obs_t</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="c1"># Left: posterior comparison at each timestep for state 0</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">val_post_t</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Exact Bayesian posterior&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pred_post</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Attention head&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sequence </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">: P(state=0 | obs_</span><span class="se">{{</span><span class="s1">1:t</span><span class="se">}}</span><span class="s1">)&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Right: attention weight matrix (causal)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">attn_weights</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">cpu</span><span class="p">(),</span> <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Blues&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Sequence </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1">: Attention weights&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Key position&#39;</span><span class="p">)</span>
+    <span class="n">axes</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Query position&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;bayesian_attention_convergence.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Quantitative check: mean absolute error between model and exact posterior</span>
+<span class="n">mae</span> <span class="o">=</span> <span class="p">(</span><span class="n">pred_post</span> <span class="o">-</span> <span class="n">val_post_t</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mean absolute error (model vs. exact posterior): </span><span class="si">{</span><span class="n">mae</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">mae</span> <span class="o">&lt;</span> <span class="mf">0.05</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Convergence failed: MAE=</span><span class="si">{</span><span class="n">mae</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> &gt; 0.05 threshold&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Attention head has converged to the Bayesian posterior.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>After 40 epochs, training KL divergence should be below 0.02 and validation KL below 0.03. The posterior comparison plots will show the model's state probability curves tracking the exact Bayesian forward-algorithm curves with mean absolute error below 0.05. The attention weight matrices will show a causal lower-triangular structure with learned concentration patterns that reflect the HMM's transition dynamics. The saved file <code>bayesian_attention_convergence.png</code> is the primary artifact.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>KL loss is NaN from epoch 1</strong> → the <code>log(pred_post + 1e-8)</code> guard is missing or <code>pred_post</code> contains zeros; verify the <code>F.softmax</code> output is being passed, not raw logits.</li>
+<li><strong>Val KL plateaus above 0.10</strong> → learning rate is too high; reduce from 3e-3 to 1e-3 and retrain.</li>
+<li><strong>MAE assertion fails (MAE &gt; 0.05)</strong> → the causal mask is not being applied correctly; verify that <code>mask == 0</code> positions are filled with <code>-inf</code> before softmax, not after.</li>
+<li><strong>CUDA out of memory</strong> → reduce <code>BATCH_SIZE</code> from 128 to 64; the model is tiny and this will not affect convergence.</li>
+<li><strong>Attention weights are uniform (all 1/t)</strong> → the embedding dimension <code>d_model</code> is too small; increase from 32 to 64.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>PyMC</strong> — full-featured Bayesian modeling library with NUTS sampler and ArviZ diagnostics: <a href="https://github.com/pymc-devs/pymc">https://github.com/pymc-devs/pymc</a></li>
+<li><strong>NumPyro</strong> — JAX-based probabilistic programming with GPU-accelerated HMC and SVI: <a href="https://github.com/pyro-ppl/numpyro">https://github.com/pyro-ppl/numpyro</a></li>
+<li><strong>BlackJAX</strong> — composable MCMC kernels in JAX, including NUTS and SGLD, designed for large-scale posterior sampling: <a href="https://github.com/blackjax-devs/blackjax">https://github.com/blackjax-devs/blackjax</a></li>
+<li><strong>Laplace-Torch</strong> — post-hoc Laplace approximation for arbitrary PyTorch models, including KFAC curvature for transformers: <a href="https://github.com/AlexImmer/Laplace">https://github.com/AlexImmer/Laplace</a></li>
+<li><strong>ScalaBL (2025)</strong> — Bayesian LoRA for LLMs via stochastic variational subspace inference: <a href="https://arxiv.org/abs/2506.21408">https://arxiv.org/abs/2506.21408</a></li>
+<li><strong>Pyro</strong> — deep probabilistic programming built on PyTorch, with SVI, HMC, and normalizing flow posteriors: <a href="https://github.com/pyro-ppl/pyro">https://github.com/pyro-ppl/pyro</a></li>
+</ul>
+<p><em>For a hands-on build integrating Bayesian inference with variational autoencoders, see the MVB on [[variational-inference]].</em></p>
+<hr />
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Bayesian inference provides the theoretical language for uncertainty — variational inference is the computational engine that makes it tractable for models with millions of parameters.</p>
+<ul>
+<li>[[variational-inference]] — variational inference operationalizes the ELBO derived here into a scalable optimization procedure; the KL divergence term in the ELBO is exactly the Bayesian regularizer.</li>
+<li>[[gaussian-processes]] — Gaussian processes are the infinite-dimensional limit of Bayesian linear regression, providing exact posterior inference over functions rather than parameter vectors.</li>
+<li>[[markov-chain-monte-carlo]] — MCMC methods sample from the exact posterior without approximation, serving as the gold standard against which variational approximations are evaluated.</li>
+<li>[[singular-learning-theory]] — singular learning theory extends Bayesian analysis to non-identifiable models like neural networks, replacing the classical BIC with the RLCT derived from algebraic geometry.</li>
+</ul>
+<hr />
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../02-generative-modeling/diffusion-models/">Diffusion Models</a> — Diffusion models utilize variational inference, a core method for approximating complex Bayesian posteriors.</li>
+<li><a href="../../02-generative-modeling/score-matching/">Score Matching</a> — Score matching estimates probability gradients, bypassing intractable partition functions common in Bayesian inference.</li>
+<li><a href="../../02-generative-modeling/flow-matching/">Flow Matching</a> — Flow matching defines continuous-time paths for probability distributions, sharing foundational probabilistic concepts.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Jaynes, E.T. (1968) — "Prior Probabilities" — <a href="https://bayes.wustl.edu/etj/articles/prior.probabilities.pdf">https://bayes.wustl.edu/etj/articles/prior.probabilities.pdf</a> — the original derivation of the maximum entropy principle as the correct method for constructing priors from physical constraints; essential for understanding why flat priors are not uninformative.</li>
+<li>Watanabe, S. (2009) — "Algebraic Geometry and Statistical Learning Theory" — <a href="https://www.cambridge.org/core/books/algebraic-geometry-and-statistical-learning-theory/">https://www.cambridge.org/core/books/algebraic-geometry-and-statistical-learning-theory/</a> — proves that the generalization error of singular models is controlled by the RLCT, providing the correct Bayesian framework for neural networks.</li>
+<li>Gal, Y. (2016) — "Uncertainty in Deep Learning" (PhD thesis) — <a href="http://mlg.eng.cam.ac.uk/yarin/thesis/thesis.pdf">http://mlg.eng.cam.ac.uk/yarin/thesis/thesis.pdf</a> — the definitive treatment of approximate Bayesian inference in deep learning, covering dropout, variational inference, and their connections to Gaussian processes.</li>
+<li>Weng, L. (2018) — "From Autoencoder to Beta-VAE" — <a href="https://lilianweng.github.io/posts/2018-08-12-vae/">https://lilianweng.github.io/posts/2018-08-12-vae/</a> — an accessible walkthrough of how the ELBO derived in this page becomes the training objective for variational autoencoders, with annotated derivations.</li>
+<li>ScalaBL Authors (2025) — "Scalable Bayesian Low-Rank Adaptation of Large Language Models via Stochastic Variational Subspace Inference" — <a href="https://arxiv.org/abs/2506.21408">https://arxiv.org/abs/2506.21408</a> — demonstrates that Bayesian inference in LoRA subspaces is computationally feasible at LLM scale, with concrete calibration improvements on held-out benchmarks.</li>
+<li>Blei, D.M., Kucukelbir, A., &amp; McAuliffe, J.D. (2017) — "Variational Inference: A Review for Statisticians" — <a href="https://arxiv.org/abs/1601.00670">https://arxiv.org/abs/1601.00670</a> — the canonical survey connecting classical Bayesian statistics to modern stochastic variational inference, covering the ELBO, mean-field approximations, and their statistical properties.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

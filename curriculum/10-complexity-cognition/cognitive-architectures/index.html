@@ -1,0 +1,4603 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/10-complexity-cognition/cognitive-architectures/">
+      
+      
+        <link rel="prev" href="../emergent-capabilities/">
+      
+      
+        <link rel="next" href="../../11-robotics-embodied-ai/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Cognitive Architectures - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cognitive-architectures" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Cognitive Architectures
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">cognitive-architectures</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">hybrid-ai</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">llm-agents</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">symbolic-reasoning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">working-memory</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="cognitive-architectures">Cognitive Architectures<a class="headerlink" href="#cognitive-architectures" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Cognitive architectures are structured frameworks that combine symbolic reasoning, persistent memory, and perception into a unified agent loop — and the frontier question is how to wrap LLMs inside these structures to get reliable, stateful autonomy that pure next-token prediction cannot provide.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>What you get</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td>A working hybrid agent recipe with free-tier APIs and symbolic working memory</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td>An intuitive explanation of why brilliant LLMs still need architectural scaffolding</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td>Formal production-system semantics, conflict resolution, and chunking mechanics</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td>Open problems in dynamic rule compilation and neurosymbolic grounding</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Consider a state-of-the-art language model asked to play a game of chess over a long conversation. It can write a brilliant essay on Nimzo-Indian theory, explain the strategic logic of pawn structure, and quote Kasparov. Then, three moves into an actual game, it hallucinates a piece position — not because it lacks chess knowledge, but because it has no persistent board state. Every token it generates is conditioned only on the context window, which is a flat, undifferentiated sequence of text. There is no separate register that says "the knight is on f3 and has been there since move two." This is the core problem that cognitive architectures exist to solve: decoupling raw generation from persistent, structured state tracking.</p>
+<p>A cognitive architecture is a theory of mind made executable. The term originates in cognitive science, where researchers like Allen Newell and John Anderson asked whether human cognition could be explained by a single, unified computational framework rather than a patchwork of task-specific models. The answer they built — systems like Soar and ACT-R — separated cognition into distinct functional components: a working memory that holds the current situation, a long-term declarative memory that stores facts, a procedural memory that stores condition-action rules (called productions), and a central executive that cycles through perceiving, matching rules, selecting actions, and updating state. The cycle is tight, explicit, and auditable in a way that a neural network's forward pass is not.</p>
+<p>The modern relevance of this framework is that LLMs are extraordinarily powerful pattern-matchers but structurally weak at the things classical architectures were designed for: maintaining consistent state across time, applying rules without exception, and detecting when their own knowledge is insufficient. The emerging consensus at frontier labs is that neither pure symbolic systems nor pure neural networks are adequate alone. The productive direction is hybrid: use the LLM as an intuitive, language-capable pattern recognizer that initializes and expands a symbolic rule base, while the symbolic layer handles state persistence, conflict resolution, and verifiable execution. This is not a new idea — it is the rediscovery of Newell's insight, now equipped with a vastly more capable sub-symbolic component.</p>
+<hr />
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>The practical stakes are high because the failure modes of pure LLM agents in production are well-documented and structurally predictable. An LLM agent without explicit working memory will contradict itself across a long session. Without a conflict-resolution mechanism, it will apply incompatible strategies simultaneously. Without a meta-cognitive monitor, it will not know when it does not know something — it will confabulate. These are not bugs to be patched with better prompting; they are consequences of the architecture. Research in 2025 has begun to formalize this gap: work analyzing cognitive foundations for reasoning identifies 28 distinct cognitive elements present in human problem-solving traces and shows that current LLMs reliably fail on meta-cognitive self-awareness, episodic memory retrieval, and compositional rule application — precisely the components that classical architectures were built to handle.</p>
+<p>At the lab level, the interest is driven by the agent deployment problem. Systems like Google's Gemini agents, Meta's tool-use frameworks, and OpenAI's operator-facing products all require that an LLM maintain coherent task state across dozens of tool calls, recover gracefully from failures, and know when to escalate to a human. Each of these requirements maps directly onto a classical cognitive architecture component. The frontier question is not whether to use cognitive architecture principles — it is how to make the symbolic and neural components learn from each other dynamically, so that the system improves its rule base from experience without requiring a human to write every production rule by hand. That is the open problem that makes this an active research area rather than a solved engineering problem.</p>
+<hr />
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Working memory</strong> — a bounded, rapidly-accessible store holding the current situation representation; in classical systems this is a set of typed attribute-value pairs (called "working memory elements") that productions match against.</li>
+<li><strong>Production rules</strong> — condition-action pairs of the form IF <span class="arithmatex">\(\langle\text{pattern}\rangle\)</span> THEN <span class="arithmatex">\(\langle\text{action}\rangle\)</span>; the entire behavioral repertoire of a classical cognitive architecture is encoded as a set of these rules.</li>
+<li><strong>Recognize-Act cycle</strong> — the fundamental execution loop: match all productions whose conditions are satisfied by working memory, select one via a conflict-resolution strategy, fire it to update working memory, repeat.</li>
+<li><strong>Chunking</strong> — Soar's mechanism for compiling a successful problem-solving episode into a new production rule, so that the same reasoning does not need to be redone from scratch; the architectural analog of learning from experience.</li>
+<li><strong>Impasse</strong> — a state in Soar where no production rule applies or multiple rules conflict irresolvably; the system responds by spawning a subgoal to resolve the impasse, which is where LLM integration is most natural.</li>
+<li><strong>Declarative vs. procedural memory</strong> — declarative memory stores retrievable facts (ACT-R's "chunks"); procedural memory stores executable rules; the distinction matters because LLMs conflate both into a single weight matrix, losing the separation that makes auditing possible.</li>
+<li><strong>Global workspace</strong> — Baars' theory, implemented in architectures like LIDA, where a "broadcast" mechanism makes a selected representation available to all specialized cognitive modules simultaneously, enabling coordinated behavior from modular components.</li>
+<li><strong>Meta-cognition</strong> — a system's capacity to monitor and regulate its own reasoning process; the component most consistently absent from current LLM deployments and most consistently present in human expert problem-solving traces.</li>
+</ul>
+<hr />
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>The production-system semantics can be stated precisely. Let <span class="arithmatex">\(W\)</span> be the current working memory state, represented as a set of typed attribute-value triples. A production rule <span class="arithmatex">\(p_i\)</span> is a pair <span class="arithmatex">\((C_i, A_i)\)</span> where <span class="arithmatex">\(C_i\)</span> is a conjunction of pattern-matching conditions and <span class="arithmatex">\(A_i\)</span> is a set of working memory modifications.</p>
+<p>The <strong>conflict set</strong> at cycle <span class="arithmatex">\(t\)</span> is:</p>
+<div class="arithmatex">\[
+\mathcal{K}(W_t) = \{ p_i \in P \mid C_i \subseteq W_t \}
+\]</div>
+<p>where <span class="arithmatex">\(P\)</span> is the full production set, <span class="arithmatex">\(C_i \subseteq W_t\)</span> means every condition in <span class="arithmatex">\(C_i\)</span> is matched by some element of <span class="arithmatex">\(W_t\)</span>, and <span class="arithmatex">\(\mathcal{K}(W_t)\)</span> is the set of all rules whose conditions are currently satisfied. This equation says that the conflict set is exactly the subset of productions that "fire-eligible" given the current world state — it is the architecture's perception of what it can do right now.</p>
+<p>The <strong>conflict resolution</strong> step selects a single rule to fire. In Soar, this is done by a preference system; in ACT-R, by utility maximization:</p>
+<div class="arithmatex">\[
+p^* = \arg\max_{p_i \in \mathcal{K}(W_t)} \left[ U(p_i) + \epsilon_i \right]
+\]</div>
+<p>where <span class="arithmatex">\(U(p_i)\)</span> is the learned utility of production <span class="arithmatex">\(p_i\)</span> (updated by reinforcement), and <span class="arithmatex">\(\epsilon_i \sim \mathcal{N}(0, \sigma^2)\)</span> is a noise term that implements stochastic exploration. This equation says that the architecture selects the rule with the highest expected payoff, with noise to prevent deterministic lock-in on suboptimal rules.</p>
+<p>The <strong>working memory update</strong> after firing <span class="arithmatex">\(p^*\)</span> is:</p>
+<div class="arithmatex">\[
+W_{t+1} = (W_t \setminus D^*) \cup A^*
+\]</div>
+<p>where <span class="arithmatex">\(D^*\)</span> is the set of working memory elements deleted by <span class="arithmatex">\(p^*\)</span> and <span class="arithmatex">\(A^*\)</span> is the set of new elements asserted by <span class="arithmatex">\(p^*\)</span>. This equation says that firing a rule is a destructive update — the old state is partially erased and new facts are written in, making the cycle irreversible without an explicit undo mechanism.</p>
+<p>The <strong>chunking</strong> operation, which is the key learning mechanism, compiles a successful subgoal resolution into a new production. If the system resolved an impasse by executing a sequence of rules <span class="arithmatex">\((p_{i_1}, p_{i_2}, \ldots, p_{i_k})\)</span> to produce result <span class="arithmatex">\(r\)</span> from initial conditions <span class="arithmatex">\(C_\text{sub}\)</span>, chunking creates:</p>
+<div class="arithmatex">\[
+p_\text{new} = \left( C_\text{sub} \cap W_\text{top}, \; \{r\} \right)
+\]</div>
+<p>where <span class="arithmatex">\(C_\text{sub} \cap W_\text{top}\)</span> is the intersection of the subgoal's triggering conditions with the top-level working memory elements that were relevant, and <span class="arithmatex">\(\{r\}\)</span> is the result asserted back into the top-level context. This equation says that chunking abstracts away the intermediate steps and stores only the input-output mapping, making future recognition of the same situation instantaneous.</p>
+<hr />
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Soar (Laird et al., 1987; continuously updated)</strong> — a production-system architecture with universal subgoaling: whenever no rule applies, the system automatically creates a subgoal to resolve the impasse, and chunking compiles successful resolutions into new rules; the reference implementation for studying cognitive architecture dynamics.</li>
+<li><strong>ACT-R (Anderson et al., 1998)</strong> — a modular architecture with separate buffers for visual, motor, declarative, and procedural processing; each module has its own timing parameters fitted to human reaction-time data, making it the standard for cognitive modeling of human performance.</li>
+<li><strong>LIDA (Franklin et al., 2007)</strong> — implements Baars' Global Workspace Theory with a broadcast mechanism; a "codelets" model where many small agents compete for access to the global workspace, and the winner broadcasts its content to all other modules.</li>
+<li><strong>CogRec (2025)</strong> — a hybrid architecture where an LLM initializes a symbolic production rule base from natural language task descriptions and dynamically expands it by resolving impasses through LLM queries, then compiling the result into a new persistent Python rule; the first system to demonstrate LLM-driven chunking on open-domain tasks.</li>
+<li><strong>ReAct (Yao et al., 2022)</strong> — interleaves chain-of-thought reasoning traces with tool-use actions in a flat prompt loop; lacks persistent working memory but demonstrates that explicit reasoning steps before actions substantially reduce hallucination in tool-use settings.</li>
+<li><strong>Reflexion (Shinn et al., 2023)</strong> — adds a verbal self-reflection step after each episode, storing the reflection as a natural-language memory that conditions the next episode; a lightweight approximation of meta-cognition without a formal symbolic layer.</li>
+<li><strong>MemGPT (Packer et al., 2023)</strong> — implements a two-tier memory system (in-context "main memory" and external "archival memory") with explicit paging operations, giving an LLM agent the ability to manage its own context window as a virtual memory system.</li>
+<li><strong>Predictive Coding Architectures (Rao &amp; Ballard, 1999; revived 2024–2025)</strong> — frame perception and action as joint inference in a hierarchical generative model where each layer predicts the layer below and updates on prediction error; recent work applies this to ground LLM representations in sensorimotor loops, reducing hallucination by anchoring generation to action consequences.</li>
+</ul>
+<hr />
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Is In-Context Learning Learning?"</td>
+<td>2025</td>
+<td>de Wynter</td>
+<td>Establishes formal boundaries on what pure next-token prediction can and cannot learn algorithmically — the theoretical foundation for why symbolic scaffolding is necessary</td>
+</tr>
+<tr>
+<td>"In-Context Learning with Representations: Contextual Generalization of Trained Transformers"</td>
+<td>2024</td>
+<td>Yang et al.</td>
+<td>Proves how transformers achieve contextual generalization through representation learning, clarifying what the neural component of a hybrid system actually contributes</td>
+</tr>
+<tr>
+<td>"Building Machines That Learn and Think Like People"</td>
+<td>2017</td>
+<td>Lake et al.</td>
+<td>The canonical statement of what cognitive architecture principles (compositionality, causality, learning-to-learn) are missing from pure neural systems — still the clearest framing of the hybrid agenda</td>
+</tr>
+<tr>
+<td>"Cognitive Architectures for Language Agents"</td>
+<td>2023</td>
+<td>Sumers et al.</td>
+<td>Systematic taxonomy mapping classical cognitive architecture components (memory, action, learning) onto LLM agent design patterns — the practical bridge between the two literatures</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Newell &amp; Simon — "Human Problem Solving"</td>
+<td>1972</td>
+<td>Introduced production systems and the physical symbol system hypothesis; established that cognition is substrate-independent symbol manipulation</td>
+</tr>
+<tr>
+<td>Anderson — "The Architecture of Cognition"</td>
+<td>1983</td>
+<td>Introduced ACT*, the precursor to ACT-R; separated declarative and procedural memory and showed both could be unified under a single computational framework</td>
+</tr>
+<tr>
+<td>Laird, Newell &amp; Rosenbloom — "Soar: An Architecture for General Intelligence"</td>
+<td>1987</td>
+<td>Introduced universal subgoaling and chunking; demonstrated that a single architecture could exhibit learning, planning, and reactive behavior simultaneously</td>
+</tr>
+<tr>
+<td>Baars — "A Cognitive Theory of Consciousness"</td>
+<td>1988</td>
+<td>Introduced Global Workspace Theory; the theoretical basis for LIDA and for modern "attention broadcast" interpretations of transformer self-attention</td>
+</tr>
+<tr>
+<td>Rao &amp; Ballard — "Predictive Coding in the Visual Cortex"</td>
+<td>1999</td>
+<td>Introduced hierarchical predictive coding as a unified theory of perception and learning; foundational for current neurosymbolic grounding work</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>The strongest hybrid cognitive architecture results in 2024–2025 come from systems that use LLMs as rule initializers rather than as end-to-end reasoners. CogRec-style systems, which compile LLM-resolved impasses into persistent symbolic rules, outperform pure ReAct baselines on multi-step planning benchmarks by reducing repeated reasoning errors — the symbolic rule cache prevents the LLM from re-deriving the same conclusion incorrectly on a second pass. On the cognitive element taxonomy introduced in recent 2025 work, the best hybrid systems cover approximately 18 of 28 identified cognitive elements, compared to roughly 11 for pure LLM agents and 22 for human expert traces, with the remaining gap concentrated in meta-cognitive self-monitoring and episodic memory retrieval. Reflexion and MemGPT remain strong baselines for lightweight deployments where a full production-system backend is impractical, with MemGPT demonstrating coherent multi-session task continuity on document QA tasks that exceed the context window of any current model.</p>
+<hr />
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The most active theoretical direction is formalizing the interface between neural and symbolic components. The question is not whether to combine them but how to specify the contract: what representation does the LLM hand to the symbolic layer, and what guarantees does the symbolic layer provide back? Work drawing on neuroscience (particularly predictive coding frameworks) argues that the interface should be action-grounded — the LLM's representations should be conditioned on the consequences of actions in the world, not just on text. This prevents the symbolic layer from receiving hallucinated inputs that it then faithfully executes, which is a failure mode observed in early ReAct deployments. Separately, the question of whether in-context learning constitutes genuine algorithmic learning (de Wynter, 2025) has direct implications for whether the LLM component of a hybrid system can be trusted to generalize its rule-expansion behavior to novel impasse types, or whether it is merely retrieving surface-similar patterns from pretraining.</p>
+<p><strong>Engineering and systems.</strong> On the engineering side, the practical challenge is latency. A classical Soar recognize-act cycle runs in microseconds; an LLM API call runs in hundreds of milliseconds to seconds. Hybrid systems that call the LLM only on impasse (when no symbolic rule applies) achieve a reasonable amortized latency because most cycles are handled by the fast symbolic layer. The engineering pattern that is emerging in production systems is a two-tier dispatch: a local rule cache (implemented as a Python dictionary or a lightweight Datalog engine) handles the common case, and the LLM is invoked only when the cache misses. The compiled rule is then written back to the cache, so the LLM call cost is paid once per novel situation type. This is architecturally identical to Soar's chunking, implemented with modern tooling.</p>
+<p><strong>Open problems.</strong> The central unsolved problem is dynamic rule compilation without human verification: <em>given a natural-language description of a novel situation and an LLM-generated resolution, how can a hybrid system automatically verify that the compiled production rule is conflict-free with the existing rule base, does not introduce infinite loops, and is semantically correct — without requiring a human to inspect the rule?</em> This is a formal verification problem over a dynamically growing rule set, and current approaches either require human-in-the-loop review (which breaks autonomy) or accept unverified rules (which introduces silent failures). A second open problem is the granularity of working memory elements: classical architectures use hand-designed ontologies, but hybrid systems need to auto-induce the right level of abstraction from natural language, and the wrong granularity causes either rule explosion (too fine) or loss of discriminative power (too coarse).</p>
+<hr />
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Google DeepMind</strong> — Gemini agent pipelines use structured tool-call graphs with explicit state tracking between calls, implementing a lightweight working memory over multi-turn sessions; described in the Gemini 1.5 technical report at <a href="https://deepmind.google/research/publications/gemini-15-technical-report/">deepmind.google/research</a>.</li>
+<li><strong>Meta AI</strong> — the CICERO system for the game Diplomacy combined a language model for negotiation with a symbolic planning module (based on Picard) for strategic action selection, achieving human-level performance; described at <a href="https://ai.meta.com/research/cicero/">ai.meta.com/research</a>.</li>
+<li><strong>Microsoft Research</strong> — AutoGen implements a multi-agent conversation framework where each agent maintains its own context state and agents communicate via structured messages, approximating a distributed working memory across agent instances; documented at <a href="https://www.microsoft.com/en-us/research/project/autogen/">microsoft.com/en-us/research/project/autogen</a>.</li>
+<li><strong>IBM Research</strong> — the Neuro-Symbolic AI toolkit integrates neural perception with symbolic reasoning engines (including a production-rule backend) for enterprise document processing, handling millions of documents per day with auditable rule traces; described at <a href="https://research.ibm.com/topics/neuro-symbolic-ai">research.ibm.com/topics/neuro-symbolic-ai</a>.</li>
+</ul>
+<hr />
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A "CogRec-lite" hybrid agent that maintains a symbolic Python rule cache, detects impasses when no rule matches a user query, calls the Gemini API to resolve the impasse, and compiles the solution into a new persistent production rule — demonstrating LLM-driven chunking in under 150 lines of code.</p>
+<p><strong>Why this build:</strong> It makes the abstract architecture concrete: you will see the recognize-act cycle running, watch the rule cache grow from zero rules to a working knowledge base over a session, and observe the latency difference between a cache hit (microseconds) and an LLM call (seconds) — the core engineering tradeoff of hybrid cognitive systems.</p>
+<p><strong>Stack:</strong> Python 3.10+, <code>google-generativeai</code> 0.5+, no GPU required, free-tier Gemini API key (15 requests/minute free as of 2025), runs on Google Colab CPU or any laptop.</p>
+<p><strong>Estimated time:</strong> 45–60 minutes end-to-end, including API key setup.</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies and configure the Gemini API key.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># In a Colab cell or terminal</span>
+<span class="c1"># pip install google-generativeai</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">google.generativeai</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">genai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span><span class="o">,</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="c1"># Set your free-tier API key from https://aistudio.google.com/app/apikey</span>
+<span class="n">GEMINI_API_KEY</span> <span class="o">=</span> <span class="s2">&quot;YOUR_API_KEY_HERE&quot;</span>
+<span class="n">genai</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="n">GEMINI_API_KEY</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">genai</span><span class="o">.</span><span class="n">GenerativeModel</span><span class="p">(</span><span class="s2">&quot;gemini-1.5-flash&quot;</span><span class="p">)</span>  <span class="c1"># free-tier model</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gemini configured:&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the working memory and the production rule store.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># Working memory: a simple dict of attribute -&gt; value pairs</span>
+<span class="n">working_memory</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="c1"># Production rule store: list of (condition_fn, action_fn, description) tuples</span>
+<span class="c1"># condition_fn: takes working_memory dict, returns bool</span>
+<span class="c1"># action_fn: takes working_memory dict, returns (response_str, updated_wm)</span>
+<span class="n">production_rules</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">add_rule</span><span class="p">(</span><span class="n">condition_fn</span><span class="p">,</span> <span class="n">action_fn</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add a new production rule to the rule base.&quot;&quot;&quot;</span>
+    <span class="n">production_rules</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">condition_fn</span><span class="p">,</span> <span class="n">action_fn</span><span class="p">,</span> <span class="n">description</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[RULE COMPILED] </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Seed with two hand-written bootstrap rules</span>
+<span class="n">add_rule</span><span class="p">(</span>
+    <span class="n">condition_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wm</span><span class="p">:</span> <span class="n">wm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;query_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;greeting&quot;</span><span class="p">,</span>
+    <span class="n">action_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wm</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Hello! I&#39;m CogRec-lite. What can I help you with?&quot;</span><span class="p">,</span> <span class="n">wm</span><span class="p">),</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Respond to greetings&quot;</span>
+<span class="p">)</span>
+
+<span class="n">add_rule</span><span class="p">(</span>
+    <span class="n">condition_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wm</span><span class="p">:</span> <span class="n">wm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;query_type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;farewell&quot;</span><span class="p">,</span>
+    <span class="n">action_fn</span><span class="o">=</span><span class="k">lambda</span> <span class="n">wm</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;Goodbye! Session state has been saved.&quot;</span><span class="p">,</span> <span class="n">wm</span><span class="p">),</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Respond to farewells&quot;</span>
+<span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rule base initialized with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">production_rules</span><span class="p">)</span><span class="si">}</span><span class="s2"> rules.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Implement the perception step — classify the incoming query into working memory.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">perceive</span><span class="p">(</span><span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Classify the user input and update working memory.</span>
+<span class="sd">    Uses simple keyword matching for speed; LLM fallback handled at impasse.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">wm</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;raw_input&quot;</span><span class="p">:</span> <span class="n">user_input</span><span class="p">,</span> <span class="s2">&quot;query_type&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">w</span> <span class="ow">in</span> <span class="n">lower</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;hi&quot;</span><span class="p">,</span> <span class="s2">&quot;hey&quot;</span><span class="p">,</span> <span class="s2">&quot;greetings&quot;</span><span class="p">]):</span>
+        <span class="n">wm</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;greeting&quot;</span>
+    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">w</span> <span class="ow">in</span> <span class="n">lower</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bye&quot;</span><span class="p">,</span> <span class="s2">&quot;goodbye&quot;</span><span class="p">,</span> <span class="s2">&quot;farewell&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">]):</span>
+        <span class="n">wm</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;farewell&quot;</span>
+    <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">w</span> <span class="ow">in</span> <span class="n">lower</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;what is&quot;</span><span class="p">,</span> <span class="s2">&quot;define&quot;</span><span class="p">,</span> <span class="s2">&quot;explain&quot;</span><span class="p">]):</span>
+        <span class="n">wm</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;definition_request&quot;</span>
+        <span class="c1"># Extract the subject</span>
+        <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(?:what is|define|explain)\s+(.+)&quot;</span><span class="p">,</span> <span class="n">lower</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+            <span class="n">wm</span><span class="p">[</span><span class="s2">&quot;subject&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">wm</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+
+    <span class="k">return</span> <span class="n">wm</span>
+
+<span class="c1"># Sanity check</span>
+<span class="n">test_wm</span> <span class="o">=</span> <span class="n">perceive</span><span class="p">(</span><span class="s2">&quot;Hello there!&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">test_wm</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;greeting&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Expected greeting, got </span><span class="si">{</span><span class="n">test_wm</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Perception check passed:&quot;</span><span class="p">,</span> <span class="n">test_wm</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Implement the recognize-act cycle with impasse detection.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">recognize_act</span><span class="p">(</span><span class="n">wm</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Match working memory against all production rules.</span>
+<span class="sd">    Returns (response, updated_wm).</span>
+<span class="sd">    If no rule matches, returns (None, wm) to signal an impasse.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">condition_fn</span><span class="p">,</span> <span class="n">action_fn</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">production_rules</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">condition_fn</span><span class="p">(</span><span class="n">wm</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[RULE FIRED] </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">response</span><span class="p">,</span> <span class="n">updated_wm</span> <span class="o">=</span> <span class="n">action_fn</span><span class="p">(</span><span class="n">wm</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="n">updated_wm</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[RULE ERROR] </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+    <span class="c1"># No rule matched — impasse</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[IMPASSE] No rule matched for query_type=&#39;</span><span class="si">{</span><span class="n">wm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;query_type&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;, input=&#39;</span><span class="si">{</span><span class="n">wm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;raw_input&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">wm</span>
+</code></pre></div>
+<ol>
+<li><strong>Implement the LLM-based impasse resolver and rule compiler (the chunking step).</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">CHUNKING_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">You are a cognitive architecture assistant. A symbolic rule-based agent has reached an impasse:</span>
+<span class="s2">it cannot handle the following user query.</span>
+
+<span class="s2">User query: </span><span class="si">{raw_input}</span>
+<span class="s2">Detected query type: </span><span class="si">{query_type}</span>
+<span class="s2">Working memory state: </span><span class="si">{wm_json}</span>
+
+<span class="s2">Your task:</span>
+<span class="s2">1. Generate a helpful, concise response to the user query (2-3 sentences max).</span>
+<span class="s2">2. Generate a Python condition function body that would match this type of query in the future.</span>
+<span class="s2">   The function receives a dict called `wm` with keys like &#39;query_type&#39;, &#39;raw_input&#39;, &#39;subject&#39;.</span>
+<span class="s2">   Return True if the rule should fire, False otherwise.</span>
+<span class="s2">3. Generate a Python action function body that returns a (response_string, wm) tuple.</span>
+
+<span class="s2">Respond in this exact JSON format:</span>
+<span class="s2">{{</span>
+<span class="s2">  &quot;response&quot;: &quot;...&quot;,</span>
+<span class="s2">  &quot;condition_code&quot;: &quot;return wm.get(&#39;query_type&#39;) == &#39;...&#39;&quot;,</span>
+<span class="s2">  &quot;action_code&quot;: &quot;return (&#39;...&#39;, wm)&quot;,</span>
+<span class="s2">  &quot;rule_description&quot;: &quot;...&quot;</span>
+<span class="s2">}}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_impasse_and_chunk</span><span class="p">(</span><span class="n">wm</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Call the LLM to resolve an impasse, then compile the solution into a new rule.</span>
+<span class="sd">    Returns the LLM&#39;s response to the user.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">prompt</span> <span class="o">=</span> <span class="n">CHUNKING_PROMPT</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+        <span class="n">raw_input</span><span class="o">=</span><span class="n">wm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw_input&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="n">query_type</span><span class="o">=</span><span class="n">wm</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;query_type&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+        <span class="n">wm_json</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">({</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">wm</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="o">!=</span> <span class="s2">&quot;raw_input&quot;</span><span class="p">},</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[LLM CALL] Resolving impasse via Gemini...&quot;</span><span class="p">)</span>
+    <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">llm_response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span>
+    <span class="n">latency</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">t0</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[LLM CALL] Completed in </span><span class="si">{</span><span class="n">latency</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Parse the JSON response</span>
+    <span class="n">raw_text</span> <span class="o">=</span> <span class="n">llm_response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="c1"># Strip markdown code fences if present</span>
+    <span class="n">raw_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^```(?:json)?\n?&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">raw_text</span><span class="p">)</span>
+    <span class="n">raw_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\n?```$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">raw_text</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">parsed</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">raw_text</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[PARSE ERROR] Could not parse LLM JSON: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;I encountered an issue processing that. Raw response: </span><span class="si">{</span><span class="n">raw_text</span><span class="p">[:</span><span class="mi">200</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="n">user_response</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;response&quot;</span><span class="p">,</span> <span class="s2">&quot;I&#39;m not sure how to handle that.&quot;</span><span class="p">)</span>
+    <span class="n">condition_code</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;condition_code&quot;</span><span class="p">,</span> <span class="s2">&quot;return False&quot;</span><span class="p">)</span>
+    <span class="n">action_code</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;action_code&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;return (&#39;</span><span class="si">{</span><span class="n">user_response</span><span class="si">}</span><span class="s2">&#39;, wm)&quot;</span><span class="p">)</span>
+    <span class="n">rule_description</span> <span class="o">=</span> <span class="n">parsed</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rule_description&quot;</span><span class="p">,</span> <span class="s2">&quot;LLM-compiled rule&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Compile the new rule dynamically (the chunking step)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">condition_fn</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda wm: </span><span class="si">{</span><span class="n">condition_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">action_fn</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;lambda wm: </span><span class="si">{</span><span class="n">action_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">add_rule</span><span class="p">(</span><span class="n">condition_fn</span><span class="p">,</span> <span class="n">action_fn</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;[CHUNKED] </span><span class="si">{</span><span class="n">rule_description</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[COMPILE ERROR] Could not compile rule: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">user_response</span>
+</code></pre></div>
+<ol>
+<li><strong>Assemble the full agent loop and run a demo session.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">cogrec_lite_agent</span><span class="p">(</span><span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Full cognitive cycle: perceive → recognize-act → (impasse → chunk) → respond.&quot;&quot;&quot;</span>
+    <span class="c1"># Step 1: Perception — update working memory</span>
+    <span class="n">wm</span> <span class="o">=</span> <span class="n">perceive</span><span class="p">(</span><span class="n">user_input</span><span class="p">)</span>
+
+    <span class="c1"># Step 2: Recognize-Act cycle</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">updated_wm</span> <span class="o">=</span> <span class="n">recognize_act</span><span class="p">(</span><span class="n">wm</span><span class="p">)</span>
+
+    <span class="c1"># Step 3: If impasse, call LLM and compile new rule</span>
+    <span class="k">if</span> <span class="n">response</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">resolve_impasse_and_chunk</span><span class="p">(</span><span class="n">updated_wm</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">response</span>
+
+<span class="c1"># Demo session — run these in sequence to watch the rule base grow</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SESSION START&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+<span class="n">queries</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Hello!&quot;</span><span class="p">,</span>                                    <span class="c1"># hits bootstrap rule (cache hit)</span>
+    <span class="s2">&quot;What is working memory?&quot;</span><span class="p">,</span>                   <span class="c1"># impasse → LLM → new rule compiled</span>
+    <span class="s2">&quot;What is chunking?&quot;</span><span class="p">,</span>                         <span class="c1"># likely impasse → LLM → new rule compiled</span>
+    <span class="s2">&quot;What is working memory?&quot;</span><span class="p">,</span>                   <span class="c1"># should now hit the compiled rule (cache hit)</span>
+    <span class="s2">&quot;Goodbye&quot;</span><span class="p">,</span>                                   <span class="c1"># hits bootstrap rule</span>
+<span class="p">]</span>
+
+<span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">USER: </span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">cogrec_lite_agent</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AGENT: </span><span class="si">{</span><span class="n">response</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[RULE BASE SIZE] </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">production_rules</span><span class="p">)</span><span class="si">}</span><span class="s2"> rules&quot;</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># respect free-tier rate limits</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SESSION END&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Inspect the compiled rule base to verify chunking occurred.</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">[COMPILED RULE BASE]&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">cond_fn</span><span class="p">,</span> <span class="n">action_fn</span><span class="p">,</span> <span class="n">desc</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">production_rules</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Rule </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">desc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Verify that the second &quot;What is working memory?&quot; query was faster</span>
+<span class="c1"># (no LLM call) by checking that the rule base grew after the first call</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">production_rules</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;No rules were compiled — check LLM response parsing&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Verification passed: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">production_rules</span><span class="p">)</span><span class="si">}</span><span class="s2"> rules in base (started with 2)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>A successful run produces output like:</p>
+<div class="highlight"><pre><span></span><code>SESSION START
+USER: Hello!
+[RULE FIRED] Respond to greetings
+AGENT: Hello! I&#39;m CogRec-lite. What can I help you with?
+[RULE BASE SIZE] 2 rules
+
+USER: What is working memory?
+[IMPASSE] No rule matched for query_type=&#39;definition_request&#39;, input=&#39;What is working memory?&#39;
+[LLM CALL] Resolving impasse via Gemini...
+[LLM CALL] Completed in 1.43s
+[RULE COMPILED] [CHUNKED] Handle definition requests about cognitive concepts
+AGENT: Working memory is a cognitive system that temporarily holds and manipulates information...
+[RULE BASE SIZE] 3 rules
+
+USER: What is working memory?
+[RULE FIRED] [CHUNKED] Handle definition requests about cognitive concepts
+AGENT: Working memory is a cognitive system...
+[RULE BASE SIZE] 3 rules  ← same size: no LLM call needed
+</code></pre></div>
+<p>The key observable: the rule base grows from 2 to 3+ rules during the session, and the second "What is working memory?" query fires a cached rule without an LLM call. The latency difference (milliseconds vs. ~1.5 seconds) is directly visible in the terminal output.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>JSON parse error from LLM</strong> → The Gemini model sometimes wraps JSON in markdown code fences; the <code>re.sub</code> stripping in step 5 handles this, but if it fails, add <code>print(raw_text)</code> before parsing to inspect the raw response and adjust the regex.</li>
+<li><strong><code>eval()</code> compile error on condition/action code</strong> → The LLM occasionally generates multi-line code or uses variables not in scope; add a try/except around the <code>eval</code> calls (already included) and fall back to a no-op rule that returns the user response without caching.</li>
+<li><strong>Rate limit error (429) on free tier</strong> → The <code>time.sleep(1)</code> between queries handles the 15 RPM limit; if running in a fast loop, increase to <code>time.sleep(5)</code>.</li>
+<li><strong>Rule fires incorrectly on second query</strong> → The compiled condition code may be too broad (e.g., <code>return True</code>); inspect the compiled rule description and manually remove it from <code>production_rules</code> with <code>production_rules.pop(-1)</code> before re-running.</li>
+<li><strong><code>google.generativeai</code> import error</strong> → Run <code>pip install google-generativeai --upgrade</code> and restart the Colab runtime; the package name changed from <code>google-generativeai</code> to <code>google-generativeai</code> in 0.5 but the import path is stable.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Soar cognitive architecture (official)</strong> — <a href="https://github.com/SoarGroup/Soar">https://github.com/SoarGroup/Soar</a> — the reference C++ implementation with Python bindings; includes the chunking and universal subgoaling mechanisms described in this page.</li>
+<li><strong>ACT-R Python port</strong> — <a href="https://github.com/jakdot/pyactr">https://github.com/jakdot/pyactr</a> — a Python implementation of ACT-R with declarative and procedural memory modules; useful for running cognitive models without the original Lisp environment.</li>
+<li><strong>MemGPT</strong> — <a href="https://github.com/cpacker/MemGPT">https://github.com/cpacker/MemGPT</a> — the official implementation of the two-tier virtual memory system for LLM agents; demonstrates the paging architecture described in the Key algorithms section.</li>
+<li><strong>Reflexion</strong> — <a href="https://github.com/noahshinn/reflexion">https://github.com/noahshinn/reflexion</a> — official implementation of verbal self-reflection as a lightweight meta-cognitive loop; runnable on standard OpenAI API.</li>
+<li><strong>AutoGen (Microsoft Research)</strong> — <a href="https://github.com/microsoft/autogen">https://github.com/microsoft/autogen</a> — multi-agent conversation framework with per-agent state management; the closest production-ready approximation of distributed working memory.</li>
+<li><strong>LangGraph</strong> — <a href="https://github.com/langchain-ai/langgraph">https://github.com/langchain-ai/langgraph</a> — graph-based agent orchestration with explicit state nodes; the engineering primitive most commonly used to implement recognize-act cycles in Python production systems.</li>
+</ul>
+<hr />
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Understanding cognitive architectures makes the design choices in LLM agent frameworks legible — what looks like arbitrary engineering in LangGraph or AutoGen is often an implicit implementation of a classical cognitive architecture component.</p>
+<ul>
+<li><a href="./agent-systems.md">Agent Systems</a> — agent frameworks are the engineering layer where cognitive architecture principles are instantiated; understanding the theory makes the framework design choices non-arbitrary.</li>
+<li><a href="./knowledge-representation.md">Knowledge Representation</a> — the working memory element ontology and production rule syntax are instances of knowledge representation formalisms; the choice of representation determines what the architecture can and cannot express.</li>
+<li><a href="../05-reinforcement-learning/reinforcement-learning.md">Reinforcement Learning</a> — the utility learning in ACT-R's conflict resolution is a form of model-free RL; understanding RL makes the learning dynamics of production-system architectures precise.</li>
+</ul>
+<hr />
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../01-ai/classical-planning/">Classical Planning</a> — Classical planning provides the goal-directed reasoning foundations for symbolic cognitive architectures.</li>
+<li><a href="../../07-attention-memory-reasoning/transformer/">Transformer Architecture</a> — Transformers serve as the core reasoning and memory engine in modern connectionist cognitive architectures.</li>
+<li><a href="../../05-statistical-probabilistic-ml/bayesian-inference/">Bayesian Inference</a> — Bayesian inference models probabilistic reasoning and belief updating within computational cognitive architectures.</li>
+<li><a href="../../06-reinforcement-learning/rlhf/">Reinforcement Learning from Human Feedback (RLHF)</a> — RLHF aligns the decision-making processes of cognitive architectures with human preferences.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>de Wynter (2025) — "Is In-Context Learning Learning?" — [https://arxiv.org/abs/2509.10414] — provides the formal argument for why pure next-token prediction cannot substitute for the algorithmic learning that symbolic production systems perform, grounding the hybrid architecture motivation in learning theory.</li>
+<li>Yang et al. (2024) — "In-Context Learning with Representations: Contextual Generalization of Trained Transformers" — [https://arxiv.org/abs/2408.10147] — proves the representation-learning basis for transformer generalization, clarifying what the neural component of a hybrid system actually computes and where its generalization guarantees hold.</li>
+<li>Sumers et al. (2023) — "Cognitive Architectures for Language Agents" — [https://arxiv.org/abs/2309.02427] — the most systematic mapping of classical cognitive architecture components onto LLM agent design patterns; essential for practitioners designing hybrid systems.</li>
+<li>Lake et al. (2017) — "Building Machines That Learn and Think Like People" — [https://arxiv.org/abs/1604.00289] — the canonical statement of what compositionality, causality, and model-based reasoning contribute that pure neural systems lack; the theoretical foundation for the hybrid agenda.</li>
+<li>Lilian Weng — "LLM-powered Autonomous Agents" (lil'log, 2023) — [https://lilianweng.github.io/posts/2023-06-23-agent/] — a comprehensive survey of memory, planning, and tool-use components in LLM agent systems, organized around the same functional decomposition as classical cognitive architectures.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

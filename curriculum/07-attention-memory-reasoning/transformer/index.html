@@ -1,0 +1,4543 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/07-attention-memory-reasoning/transformer/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../state-space-models/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Transformer - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#transformer-architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Transformer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<div class="highlight"><pre><span></span><code><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Transformer Architecture</span>
+<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">07-attention-memory-reasoning</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">transformer</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">self-attention</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">multi-head-attention</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">positional-encoding</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">hybrid-architecture</span><span class="p p-Indicator">]</span>
+<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intermediate</span>
+<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">self-attention</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">backpropagation</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">linear-algebra</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">layer-normalization</span><span class="p p-Indicator">]</span>
+<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-06-10</span>
+<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nn">---</span>
+</code></pre></div>
+<h1 id="transformer-architecture">Transformer Architecture<a class="headerlink" href="#transformer-architecture" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> The transformer replaced sequential recurrence with parallel token-to-token routing via self-attention — now the universal backbone for language, vision, and multimodal AI, and the subject of active research into whether its quadratic inference cost can be eliminated without sacrificing its expressive power.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>Start here</th>
+<th>Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Build a hybrid Mamba-Transformer block and train it on text</td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+<td>Understand why transformers displaced every prior architecture</td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+<td>Derive multi-head attention and understand the residual stream</td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+<td>Know where attention is being challenged and why</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine translating a novel where the only tool available is a single sticky note passed from word to word. Each word reads the note, scribbles an update, and hands it forward. By chapter three, the note is a smeared palimpsest — the opening sentence has been overwritten so many times it is unrecognizable. This is the fundamental bottleneck of LSTMs and GRUs: a fixed-size hidden state that must compress the entire history of a sequence into a single vector, then pass it forward one step at a time. The further apart two relevant tokens are, the more that signal degrades. The transformer shattered this constraint by giving every token a direct, high-bandwidth connection to every other token simultaneously — not a telephone game, but a conference call where every participant can hear every other participant at once, regardless of how far apart they are seated.</p>
+<p>The mechanism that enables this is self-attention. For each token, the model computes three vectors — a query, a key, and a value — by projecting the token's embedding through learned weight matrices. The query of one token is compared against the keys of all other tokens to produce attention weights, which then determine how much of each token's value vector to mix into the output. Because this comparison happens in parallel across all token pairs, the entire operation reduces to a matrix multiplication — fast on modern accelerators, and free of the sequential dependency that made RNNs slow to train. Stack this attention mechanism with a position-wise feedforward network, wrap both in residual connections and layer normalization, and repeat the block N times: that is a transformer.</p>
+<p>What makes the transformer more than an engineering convenience is that it reframes sequence modeling as a spatial routing problem. Rather than asking "what happened before this token?", it asks "which tokens are most relevant to this token, and by how much?" The feedforward sublayer then acts as a per-token memory lookup — research by Geva et al. (2021) showed that FFN layers function as key-value stores, retrieving factual associations independently of position. Together, the attention and feedforward sublayers form a residual stream: a shared information highway that each layer reads from and writes to, accumulating increasingly abstract representations as depth increases.</p>
+<hr />
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>The transformer's dominance is not accidental — it is a consequence of hardware alignment. Self-attention and feedforward projections are dense matrix multiplications, which map almost perfectly onto the parallelism of modern GPUs and TPUs. This alignment allowed transformers to scale in ways that RNNs structurally could not: more data, more parameters, more compute, reliably producing better models. The scaling laws documented by Kaplan et al. (2020) and later refined by Hoffmann et al. (2022) are transformer-specific observations, and they have driven every major lab's infrastructure investment for the past five years. GPT-4, Gemini Ultra, Claude 3, and Llama 3 are all transformer-based, and the engineering ecosystems — vLLM, FlashAttention, tensor parallelism — are built around the transformer's computational profile.</p>
+<p>The frontier tension is now the quadratic cost of attention. As context windows grow from 4K to 128K to 1M tokens, the memory and compute required for full self-attention scales as <span class="arithmatex">\(O(n^2)\)</span> in sequence length, making long-context inference increasingly expensive. This has made the transformer's own success a pressure point: the architecture that enabled scaling is now the bottleneck to further scaling. The response from frontier labs has been a wave of hybrid architectures — Mamba, RWKV, RetNet, and most recently NVIDIA's Nemotron-H — that interleave attention layers with linear-time state-space or recurrent layers, preserving the reasoning capability of attention while reducing its cost at long contexts. Whether these hybrids can match pure transformers on all tasks, or whether some capability is intrinsically tied to full quadratic attention, is the central open question driving architecture research in 2025.</p>
+<hr />
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Token embedding</strong> — a learned mapping from discrete vocabulary indices to dense vectors in <span class="arithmatex">\(\mathbb{R}^d\)</span>, where <span class="arithmatex">\(d\)</span> is the model dimension; the input representation before any attention is applied.</li>
+<li><strong>Query, Key, Value (QKV) projections</strong> — three learned linear transformations applied to each token's embedding to produce the vectors used in attention score computation.</li>
+<li><strong>Scaled dot-product attention</strong> — the core operation: dot-product similarity between queries and keys, scaled by <span class="arithmatex">\(\sqrt{d_k}\)</span>, softmaxed to produce weights, then applied to values.</li>
+<li><strong>Multi-head attention</strong> — running <span class="arithmatex">\(h\)</span> independent attention operations in parallel on lower-dimensional projections, then concatenating and projecting the results; allows the model to attend to different aspects of the sequence simultaneously.</li>
+<li><strong>Positional encoding</strong> — information injected into token embeddings (or attention scores) to give the model awareness of token order, since self-attention is permutation-invariant by default.</li>
+<li><strong>Residual stream</strong> — the shared vector that flows through the network; each sublayer (attention, FFN) reads from it and adds its output back to it, enabling gradient flow and interpretable layer-wise decomposition.</li>
+<li><strong>Feedforward sublayer</strong> — a two-layer MLP applied independently to each token position after attention; functions as a position-wise memory lookup with a typical expansion ratio of 4×.</li>
+<li><strong>Causal masking</strong> — in decoder-only models, a mask applied to attention weights that prevents each token from attending to future tokens, enforcing autoregressive generation.</li>
+</ul>
+<hr />
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>The core attention operation for a single head is:</p>
+<div class="arithmatex">\[
+\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+\]</div>
+<p>where <span class="arithmatex">\(Q \in \mathbb{R}^{n \times d_k}\)</span> is the matrix of query vectors for all <span class="arithmatex">\(n\)</span> tokens, <span class="arithmatex">\(K \in \mathbb{R}^{n \times d_k}\)</span> is the matrix of key vectors, <span class="arithmatex">\(V \in \mathbb{R}^{n \times d_v}\)</span> is the matrix of value vectors, and <span class="arithmatex">\(d_k\)</span> is the dimension of the key vectors used for scaling. The scaling by <span class="arithmatex">\(\sqrt{d_k}\)</span> prevents the dot products from growing large in magnitude as <span class="arithmatex">\(d_k\)</span> increases, which would push the softmax into regions of near-zero gradient.</p>
+<p>Multi-head attention concatenates <span class="arithmatex">\(h\)</span> such operations run on separate linear projections:</p>
+<div class="arithmatex">\[
+\text{MultiHead}(X) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\,W^O
+\]</div>
+<div class="arithmatex">\[
+\text{head}_i = \text{Attention}(XW_i^Q,\; XW_i^K,\; XW_i^V)
+\]</div>
+<p>where <span class="arithmatex">\(X \in \mathbb{R}^{n \times d}\)</span> is the input sequence, <span class="arithmatex">\(W_i^Q, W_i^K \in \mathbb{R}^{d \times d_k}\)</span> and <span class="arithmatex">\(W_i^V \in \mathbb{R}^{d \times d_v}\)</span> are the per-head projection matrices, and <span class="arithmatex">\(W^O \in \mathbb{R}^{hd_v \times d}\)</span> is the output projection that maps the concatenated heads back to the model dimension. This equation says that each head learns a different subspace in which to measure token relevance, and the output projection mixes those subspace-specific signals back into a single representation.</p>
+<p>Shaw et al. (2018) extended the attention score to incorporate relative position information:</p>
+<div class="arithmatex">\[
+e_{ij} = \frac{(x_i W^Q)(x_j W^K + a_{ij}^K)^\top}{\sqrt{d_k}}
+\]</div>
+<p>where <span class="arithmatex">\(x_i, x_j \in \mathbb{R}^d\)</span> are the input embeddings at positions <span class="arithmatex">\(i\)</span> and <span class="arithmatex">\(j\)</span>, <span class="arithmatex">\(W^Q\)</span> and <span class="arithmatex">\(W^K\)</span> are the query and key projection matrices, <span class="arithmatex">\(a_{ij}^K \in \mathbb{R}^{d_k}\)</span> is a learned relative position representation (a parameter vector) encoding the directed distance from position <span class="arithmatex">\(i\)</span> to position <span class="arithmatex">\(j\)</span>, and <span class="arithmatex">\(d_k\)</span> is the key dimension. This equation says that the relevance between two tokens depends not only on their content but on how far apart they are and in which direction — injecting sequence order dynamically into the attention score rather than adding a fixed offset to the input embedding.</p>
+<p>The full transformer block update for layer <span class="arithmatex">\(\ell\)</span> is:</p>
+<p>[
+x' = x + \text{MultiHead}(\text{LN}(x))
+]
+[
+x^{\ell+1} = x' + \text{FFN}(\text{LN}(x'))
+]</p>
+<p>where <span class="arithmatex">\(x \in \mathbb{R}^{n \times d}\)</span> is the residual stream entering the block, <span class="arithmatex">\(\text{LN}\)</span> denotes layer normalization (pre-norm formulation), <span class="arithmatex">\(\text{MultiHead}\)</span> is the multi-head attention sublayer, and <span class="arithmatex">\(\text{FFN}\)</span> is the position-wise feedforward sublayer. The additive residual structure means each layer's output is a correction to the previous representation rather than a full rewrite, which stabilizes gradient flow and allows the residual stream to be interpreted as a shared information bus.</p>
+<hr />
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Scaled dot-product attention (Vaswani et al., 2017)</strong> — the foundational QKV mechanism; computes pairwise token relevance via dot products scaled by <span class="arithmatex">\(\sqrt{d_k}\)</span>, enabling parallel sequence processing.</li>
+<li><strong>Multi-head attention (Vaswani et al., 2017)</strong> — runs <span class="arithmatex">\(h\)</span> attention heads in parallel on projected subspaces, then concatenates; allows simultaneous attention to syntactic, semantic, and positional patterns.</li>
+<li><strong>Relative position representations (Shaw et al., 2018)</strong> — replaces fixed sinusoidal position embeddings with learned per-distance vectors added directly to attention logits, making position encoding dynamic and generalizable to unseen lengths.</li>
+<li><strong>Rotary Position Embedding / RoPE (Su et al., 2021)</strong> — encodes position by rotating query and key vectors in complex space; preserves relative position information through the dot product and has become the default in most modern LLMs including Llama and Mistral.</li>
+<li><strong>FlashAttention (Dao et al., 2022; v2 2023)</strong> — a hardware-aware exact attention algorithm that tiles the computation to avoid materializing the full <span class="arithmatex">\(n \times n\)</span> attention matrix in HBM, reducing memory from <span class="arithmatex">\(O(n^2)\)</span> to <span class="arithmatex">\(O(n)\)</span> and achieving 2–4× wall-clock speedup.</li>
+<li><strong>Grouped Query Attention / GQA (Ainslie et al., 2023)</strong> — shares key and value heads across groups of query heads, reducing KV cache memory at inference by a factor of <span class="arithmatex">\(h/g\)</span> where <span class="arithmatex">\(g\)</span> is the number of groups; used in Llama 3 and Mistral.</li>
+<li><strong>Sliding window attention (Beltagy et al., 2020; Longformer)</strong> — restricts each token to attend only to a local window of size <span class="arithmatex">\(w\)</span>, reducing complexity to <span class="arithmatex">\(O(nw)\)</span>; used in combination with global attention tokens for long-document tasks.</li>
+<li><strong>Hybrid attention + SSM layers (Gu &amp; Dao, 2023; NVIDIA, 2025)</strong> — interleaves full self-attention layers with Mamba state-space layers that process tokens in <span class="arithmatex">\(O(n)\)</span> time, achieving near-transformer quality at a fraction of the inference cost for long sequences.</li>
+</ul>
+<hr />
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Attention Is All You Need"</td>
+<td>2017</td>
+<td>Vaswani et al.</td>
+<td>Introduces the full transformer architecture: QKV attention, multi-head attention, positional encodings, encoder-decoder structure</td>
+</tr>
+<tr>
+<td>"Self-Attention with Relative Position Representations"</td>
+<td>2018</td>
+<td>Shaw et al.</td>
+<td>Shows how to inject sequence order dynamically into attention scores rather than as a fixed input offset — the conceptual basis for RoPE and ALiBi</td>
+</tr>
+<tr>
+<td>"Nemotron-H: A Family of Accurate and Efficient Hybrid Mamba-Transformer Models"</td>
+<td>2025</td>
+<td>NVIDIA</td>
+<td>Demonstrates that replacing most attention layers with Mamba layers achieves competitive quality with dramatically lower inference cost — the clearest current case for hybrid architectures</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Attention Is All You Need" (Vaswani et al.)</td>
+<td>2017</td>
+<td>Established the transformer as a complete sequence model without recurrence or convolution; introduced scaled dot-product and multi-head attention</td>
+</tr>
+<tr>
+<td>"BERT: Pre-training of Deep Bidirectional Transformers" (Devlin et al.)</td>
+<td>2018</td>
+<td>Showed that bidirectional transformer pre-training on masked language modeling transfers to virtually every NLP task via fine-tuning</td>
+</tr>
+<tr>
+<td>"Language Models are Few-Shot Learners" (Brown et al.)</td>
+<td>2020</td>
+<td>Demonstrated that scaling decoder-only transformers to 175B parameters produces emergent in-context learning without any gradient updates</td>
+</tr>
+<tr>
+<td>"Scaling Laws for Neural Language Models" (Kaplan et al.)</td>
+<td>2020</td>
+<td>Established power-law relationships between model size, data, compute, and loss — the empirical foundation for every subsequent scaling decision</td>
+</tr>
+<tr>
+<td>"Training Compute-Optimal Large Language Models" (Hoffmann et al.)</td>
+<td>2022</td>
+<td>Revised Kaplan's scaling laws to show data and model size should scale equally; produced Chinchilla, which matched GPT-3 at 4× fewer parameters</td>
+</tr>
+<tr>
+<td>"FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness" (Dao et al.)</td>
+<td>2022</td>
+<td>Made long-context transformers practical by eliminating the memory bottleneck of materializing the attention matrix; now standard in every production training stack</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>As of mid-2025, the strongest publicly benchmarked language models remain transformer-based or transformer-hybrid. Meta's Llama 3.1 405B achieves 88.6 on MMLU and 73.0 on HumanEval. Google's Gemini 1.5 Pro extends the context window to 1M tokens using a mixture of full and sliding-window attention layers, achieving state-of-the-art on long-document retrieval benchmarks. NVIDIA's Nemotron-H 56B, a hybrid model with roughly 90% Mamba layers and 10% attention layers, matches or exceeds comparably-sized pure-transformer models on standard benchmarks while reducing inference-time KV cache memory by over 40% at 128K context length — the most concrete demonstration to date that hybrid architectures can close the quality gap.</p>
+<hr />
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The dominant research question is no longer how to make transformers better in isolation, but how to replace or augment attention with sub-quadratic alternatives without losing capability. Mamba 2 (Dao &amp; Gu, 2024) unified state-space models with linear attention under a single structured state-space duality framework, providing theoretical grounding for why SSMs can approximate attention in many settings. RWKV-6 and RetNet have similarly shown that linear-recurrent architectures can match transformer perplexity on language modeling at moderate context lengths. The open question is whether any of these alternatives preserve the full in-context learning and multi-step reasoning capabilities that emerge in large transformers — capabilities that may depend on the quadratic all-pairs interaction that linear methods approximate away.</p>
+<p><strong>Engineering and systems.</strong> The engineering response to the quadratic bottleneck has been aggressive. FlashAttention-3 (2024) exploits NVIDIA H100 tensor core asynchrony to achieve near-theoretical peak utilization on attention, reducing the practical cost of full attention at long contexts. Speculative decoding, now deployed in production at Google and Meta, uses a small draft model to propose token sequences that the large transformer verifies in parallel, achieving 2–3× throughput improvements without changing model quality. KV cache quantization (INT8 and INT4 keys/values) has become standard practice for long-context serving, reducing memory pressure at the cost of minor quality degradation that is acceptable in most production settings. The vLLM project's PagedAttention manages KV cache memory with OS-style virtual paging, enabling high-throughput batched inference that was previously impossible due to memory fragmentation.</p>
+<p><strong>Open problems.</strong> The central unresolved question is precise and consequential: <em>What is the mathematically optimal ratio and interleaving pattern of self-attention layers to state-space layers that preserves full Turing-complete reasoning while minimizing quadratic inference costs?</em> Nemotron-H uses a roughly 10% attention / 90% Mamba ratio chosen empirically, but there is no theoretical framework for predicting which tasks require full attention and how many attention layers are sufficient. A related open problem is whether positional encoding is a fundamental limitation: current long-context models degrade significantly beyond their training context length, and it is unclear whether this is a property of attention itself or of the position encoding schemes layered on top of it. Finally, the mechanistic basis for in-context learning — the ability of large transformers to implement new algorithms from examples in the prompt without gradient updates — remains poorly understood, with competing theories (gradient descent in the forward pass, Bayesian inference, associative memory retrieval) each supported by partial evidence.</p>
+<hr />
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Google</strong> — Gemini 1.5 Pro serves 1M-token context windows in Google AI Studio and the Gemini API, using a hybrid full-attention + sliding-window architecture; Google has reported processing over 1 trillion tokens per day across Gemini deployments — <a href="https://research.google">research.google</a></li>
+<li><strong>Meta</strong> — Llama 3.1 405B runs on Meta's internal inference infrastructure using tensor parallelism across 16 H100 GPUs per instance, with GQA reducing KV cache memory by 8× relative to standard multi-head attention; deployed in Meta AI across WhatsApp, Instagram, and Messenger — <a href="https://ai.meta.com/research">ai.meta.com/research</a></li>
+<li><strong>Amazon</strong> — Rufus, Amazon's AI-powered shopping assistant, runs multi-node LLM inference on AWS Trainium chips using vLLM for batched serving, scaled to production traffic across amazon.com — <a href="https://aws.amazon.com/blogs/machine-learning">aws.amazon.com/blogs/machine-learning</a></li>
+<li><strong>NVIDIA</strong> — Nemotron-H 56B is deployed via NVIDIA NIM (inference microservices) with reported 40%+ reduction in KV cache memory at 128K context versus a pure-transformer baseline of equivalent parameter count — <a href="https://developer.nvidia.com/blog">developer.nvidia.com/blog</a></li>
+<li><strong>Mistral AI</strong> — Mistral Large 2 uses sliding-window attention with RoPE and GQA, serving sub-200ms first-token latency at 32K context on their La Plateforme API through custom CUDA kernels and continuous batching — <a href="https://mistral.ai/news">mistral.ai/news</a></li>
+</ul>
+<hr />
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A single hybrid Mamba-Transformer block in PyTorch — one self-attention layer interleaved with one Mamba SSM layer — trained as a character-level language model on TinyShakespeare.</p>
+<p><strong>Why this build:</strong> This is the architecture pattern driving frontier hybrid models like Nemotron-H. Building it from scratch makes the trade-off concrete: the attention layer handles long-range dependency; the Mamba layer handles local sequential structure in <span class="arithmatex">\(O(n)\)</span> time. Seeing both in one forward pass is more instructive than reading about either in isolation.</p>
+<p><strong>Stack:</strong> Python 3.10+, PyTorch 2.2+, <code>mamba-ssm</code> 1.2.0 (requires CUDA), <code>einops</code> 0.7.0. Runs on a free Colab T4 (16GB VRAM) or any RTX 3080/3090.</p>
+<p><strong>Estimated time:</strong> 45–60 minutes end-to-end (15 min setup, 20 min training, rest for experimentation).</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># In a Colab cell or terminal</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">==</span><span class="mf">2.2.0</span> <span class="n">mamba</span><span class="o">-</span><span class="n">ssm</span><span class="o">==</span><span class="mf">1.2.0</span> <span class="n">einops</span><span class="o">==</span><span class="mf">0.7.0</span> <span class="o">--</span><span class="n">quiet</span>
+</code></pre></div>
+<ol>
+<li><strong>Download TinyShakespeare and build the character tokenizer</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span><span class="o">,</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt&quot;</span>
+<span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;input.txt&quot;</span><span class="p">)</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+<span class="n">chars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>                        <span class="c1"># 65 for TinyShakespeare</span>
+<span class="n">stoi</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+<span class="n">itos</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+<span class="n">encode</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">[</span><span class="n">stoi</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+<span class="n">decode</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">itos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">])</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="n">train_data</span><span class="p">,</span> <span class="n">val_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vocab size: </span><span class="si">{</span><span class="n">vocab_size</span><span class="si">}</span><span class="s2">, Train tokens: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Expected: Vocab size: 65, Train tokens: 1,003,854</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the hybrid block: one attention layer + one Mamba layer</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">mamba_ssm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mamba</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">CausalSelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">d_model</span> <span class="o">%</span> <span class="n">n_heads</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span> <span class="o">=</span> <span class="n">n_heads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_head</span> <span class="o">=</span> <span class="n">d_model</span> <span class="o">//</span> <span class="n">n_heads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qkv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="c1"># Causal mask: lower-triangular</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
+            <span class="s2">&quot;mask&quot;</span><span class="p">,</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">))</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qkv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="c1"># Reshape to (B, n_heads, T, d_head)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s2">&quot;b t (h d) -&gt; b h t d&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s2">&quot;b t (h d) -&gt; b h t d&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span><span class="p">)</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;b t (h d) -&gt; b h t d&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span><span class="p">)</span>
+        <span class="c1"># Scaled dot-product attention with causal mask</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_head</span> <span class="o">**</span> <span class="o">-</span><span class="mf">0.5</span>
+        <span class="n">att</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">@</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">scale</span>
+        <span class="n">att</span> <span class="o">=</span> <span class="n">att</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">T</span><span class="p">,</span> <span class="p">:</span><span class="n">T</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
+        <span class="n">att</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">att</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">att</span> <span class="o">@</span> <span class="n">v</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;b h t d -&gt; b t (h d)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HybridBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;One attention sublayer + one Mamba sublayer, each with pre-norm and residual.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">d_state</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">d_conv</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">CausalSelfAttention</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="c1"># Mamba SSM: processes the sequence in O(n) time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mamba</span> <span class="o">=</span> <span class="n">Mamba</span><span class="p">(</span>
+            <span class="n">d_model</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
+            <span class="n">d_state</span><span class="o">=</span><span class="n">d_state</span><span class="p">,</span>    <span class="c1"># SSM state expansion factor</span>
+            <span class="n">d_conv</span><span class="o">=</span><span class="n">d_conv</span><span class="p">,</span>      <span class="c1"># local convolution width</span>
+            <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span>      <span class="c1"># block expansion factor</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ln1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>   <span class="c1"># attention residual</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mamba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ln2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Mamba residual</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HybridLM</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pos_embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
+            <span class="n">HybridBlock</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">)</span>
+        <span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span> <span class="o">=</span> <span class="n">block_size</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">shape</span>
+        <span class="k">assert</span> <span class="n">T</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span>
+        <span class="n">tok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_embed</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">idx</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">tok</span> <span class="o">+</span> <span class="n">pos</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+</code></pre></div>
+<ol>
+<li><strong>Instantiate the model and verify parameter count</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">BLOCK_SIZE</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">D_MODEL</span>    <span class="o">=</span> <span class="mi">256</span>
+<span class="n">N_HEADS</span>    <span class="o">=</span> <span class="mi">8</span>
+<span class="n">N_LAYERS</span>   <span class="o">=</span> <span class="mi">4</span>   <span class="c1"># 4 hybrid blocks = 4 attention + 4 Mamba layers</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">HybridLM</span><span class="p">(</span>
+    <span class="n">vocab_size</span><span class="o">=</span><span class="n">vocab_size</span><span class="p">,</span>
+    <span class="n">d_model</span><span class="o">=</span><span class="n">D_MODEL</span><span class="p">,</span>
+    <span class="n">n_heads</span><span class="o">=</span><span class="n">N_HEADS</span><span class="p">,</span>
+    <span class="n">block_size</span><span class="o">=</span><span class="n">BLOCK_SIZE</span><span class="p">,</span>
+    <span class="n">n_layers</span><span class="o">=</span><span class="n">N_LAYERS</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="n">n_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameters: </span><span class="si">{</span><span class="n">n_params</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M&quot;</span><span class="p">)</span>
+<span class="c1"># Expected: ~6–8M parameters</span>
+
+<span class="c1"># Sanity check: one forward pass</span>
+<span class="n">dummy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">logits</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">dummy</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Unexpected shape: </span><span class="si">{</span><span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Forward pass shape check passed.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Write the training loop</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_batch</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">train_data</span> <span class="k">if</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span> <span class="k">else</span> <span class="n">val_data</span>
+    <span class="n">ix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">BLOCK_SIZE</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ix</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">BLOCK_SIZE</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ix</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CosineAnnealingLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
+
+<span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">estimate_loss</span><span class="p">(</span><span class="n">eval_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">]:</span>
+        <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iters</span><span class="p">):</span>
+            <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">split</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>
+            <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3001</span><span class="p">):</span>
+    <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="n">estimate_loss</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> | train loss </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | val loss </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Generate text from the trained model</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_new_tokens</span><span class="p">):</span>
+        <span class="n">idx_cond</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[:,</span> <span class="o">-</span><span class="n">BLOCK_SIZE</span><span class="p">:]</span>
+        <span class="n">logits</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">idx_cond</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">temperature</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">next_tok</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">idx</span><span class="p">,</span> <span class="n">next_tok</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">300</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>Training for 3000 steps on a T4 GPU takes approximately 8–12 minutes. Expected loss trajectory:</p>
+<ul>
+<li>Step 0: train loss ~4.17, val loss ~4.17 (near random for 65-class vocab: <span class="arithmatex">\(\ln 65 \approx 4.17\)</span>)</li>
+<li>Step 500: train loss ~2.0–2.2, val loss ~2.1–2.3</li>
+<li>Step 1500: train loss ~1.6–1.8, val loss ~1.7–1.9</li>
+<li>Step 3000: train loss ~1.4–1.6, val loss ~1.5–1.7</li>
+</ul>
+<p>Generated text at step 3000 will be recognizably Shakespearean in structure — consistent meter, character-name prefixes, plausible dialogue — though not semantically coherent. The key observation to make: the Mamba layers handle local character n-gram patterns efficiently, while the attention layers handle longer-range structural patterns like matching an opening speech tag to its closing line.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>ImportError: mamba_ssm not found</code></strong> → Mamba requires CUDA; run in Colab with GPU runtime enabled (Runtime → Change runtime type → T4 GPU). CPU-only environments will not work.</li>
+<li><strong><code>CUDA out of memory</code></strong> → Reduce <code>batch_size</code> from 32 to 16, or reduce <code>BLOCK_SIZE</code> from 256 to 128. The model itself is small; the batch is usually the culprit.</li>
+<li><strong>Loss stays at ~4.17 after 500 steps</strong> → Check that <code>targets</code> are shifted by one position (i.e., <code>y = data[i+1:i+BLOCK_SIZE+1]</code>); a common bug is passing <code>x == y</code> which makes the task trivial but produces no learning signal.</li>
+<li><strong><code>AssertionError</code> on forward pass shape</strong> → Ensure <code>d_model % n_heads == 0</code>; with <code>D_MODEL=256</code> and <code>N_HEADS=8</code>, each head has dimension 32, which is valid.</li>
+<li><strong>Mamba layer produces NaN after a few steps</strong> → Add gradient clipping (<code>clip_grad_norm_</code> with max norm 1.0) before <code>optimizer.step()</code>; Mamba's selective scan can produce large gradients early in training.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Original Transformer (Vaswani et al.)</strong> — Harvard NLP's annotated implementation: <a href="https://nlp.seas.harvard.edu/annotated-transformer/">https://nlp.seas.harvard.edu/annotated-transformer/</a></li>
+<li><strong>nanoGPT (Karpathy)</strong> — minimal decoder-only transformer in ~300 lines, the cleanest reference for the GPT architecture: <a href="https://github.com/karpathy/nanoGPT">https://github.com/karpathy/nanoGPT</a></li>
+<li><strong>Mamba official repository (Gu &amp; Dao)</strong> — includes <code>mamba-ssm</code> PyPI package and reference SSM kernels; find via the arXiv paper at <a href="https://arxiv.org/abs/2312.00752">https://arxiv.org/abs/2312.00752</a></li>
+<li><strong>FlashAttention (Dao et al.)</strong> — now integrated into PyTorch 2.0+ via <code>F.scaled_dot_product_attention</code>; official documentation at <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html</a></li>
+<li><strong>Hugging Face Transformers</strong> — production implementations of every major transformer variant with pretrained weights: <a href="https://huggingface.co/docs/transformers">https://huggingface.co/docs/transformers</a></li>
+<li><strong>Nemotron-H model weights</strong> — NVIDIA's hybrid Mamba-Transformer family on Hugging Face: <a href="https://huggingface.co/nvidia/Nemotron-H-56B-Base">https://huggingface.co/nvidia/Nemotron-H-56B-Base</a></li>
+</ul>
+<hr />
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Self-attention is the mechanism inside each transformer block; understanding its mathematical structure — how queries, keys, and values interact and what the attention matrix actually represents — makes the transformer's behavior interpretable rather than opaque.</p>
+<ul>
+<li>[[self-attention]] — the atomic operation inside every transformer block; understanding its geometry explains why transformers generalize across modalities.</li>
+<li>[[positional-encoding]] — the mechanism that breaks the transformer's permutation invariance; RoPE and ALiBi are the current production standards and connect directly to long-context generalization.</li>
+<li>[[state-space-models]] — the linear-time alternative to attention that Mamba implements; understanding SSMs makes the hybrid architecture in the MVB above precise rather than a black box.</li>
+</ul>
+<hr />
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[rlhf]] — RLHF is the standard procedure for aligning transformer-based large language models with human preferences after pretraining.</li>
+<li>[[diffusion-models]] — modern diffusion models increasingly adopt transformer architectures (DiT, Stable Diffusion 3) as their primary denoising backbone.</li>
+<li>[[flow-matching]] — flow matching formulations frequently utilize transformer backbones, with the same attention and feedforward structure applied to continuous generative modeling.</li>
+</ul>
+<hr />
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Vaswani et al. (2017) — "Attention Is All You Need" — <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a> — the original paper; reading the architecture section alongside the annotated implementation is the most efficient path to understanding the full model.</li>
+<li>Shaw et al. (2018) — "Self-Attention with Relative Position Representations" — <a href="https://arxiv.org/abs/1803.02155">https://arxiv.org/abs/1803.02155</a> — explains why absolute position embeddings are limiting and how relative position representations fix the problem; the conceptual ancestor of RoPE.</li>
+<li>Dao et al. (2022) — "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness" — <a href="https://arxiv.org/abs/2205.14135">https://arxiv.org/abs/2205.14135</a> — explains the hardware-level reason attention was slow and how tiling solves it; essential for anyone deploying transformers at scale.</li>
+<li>Lilian Weng — "The Transformer Family Version 2.0" (lil'log, 2023) — <a href="https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/">https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/</a> — a comprehensive survey of transformer variants through 2023, covering sparse attention, linear attention, and positional encoding schemes with consistent notation.</li>
+<li>Elhage et al. (2021) — "A Mathematical Framework for Transformer Circuits" — <a href="https://transformer-circuits.pub/2021/framework/index.html">https://transformer-circuits.pub/2021/framework/index.html</a> — introduces the residual stream perspective and shows how attention heads compose; the foundation of mechanistic interpretability research on transformers.</li>
+<li>NVIDIA (2025) — "Nemotron-H: A Family of Accurate and Efficient Hybrid Mamba-Transformer Models" — available via the Hugging Face model card at <a href="https://huggingface.co/nvidia/Nemotron-H-56B-Base">https://huggingface.co/nvidia/Nemotron-H-56B-Base</a> — the most detailed public analysis of how to optimally mix attention and SSM layers, with ablations on layer ratio, interleaving pattern, and task-specific performance.</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

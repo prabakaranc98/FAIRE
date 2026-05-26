@@ -1,0 +1,4562 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/08-causal-statistical-inference/counterfactuals/">
+      
+      
+        <link rel="prev" href="../do-calculus/">
+      
+      
+        <link rel="next" href="../../09-algorithms-systems-ai/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Counterfactuals - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#counterfactuals" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Counterfactuals
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">causal-inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">counterfactuals</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">do-calculus</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">potential-outcomes</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">structural-causal-models</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="counterfactuals">Counterfactuals<a class="headerlink" href="#counterfactuals" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Counterfactuals answer "what would have happened to <em>this specific individual</em> under a different treatment?" — a question that population-level statistics cannot resolve, and that structural causal models make computationally precise.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>What you get</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td>A runnable Pyro recipe for Pearl's three-step counterfactual algorithm on synthetic patient data</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td>An intuitive explanation of why "what if?" questions are fundamentally different from "what causes?" questions</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td>The formal SCM definition, the abduction-action-prediction equations, and the non-identifiability conditions</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td>Bounds under partial observability, diffusion-based counterfactual trajectory models, and the open scaling question</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>A patient is admitted to a hospital, given Drug A, and dies. The attending physician is left with a question that haunts clinical practice: would this patient have survived if they had received Drug B instead? This is not a question about populations — it is a question about a single individual, in a specific physiological state, at a specific moment. No randomized trial can answer it, because the trial would need to observe the same patient in two parallel realities simultaneously. This impossibility is what Judea Pearl calls the <em>fundamental problem of causal inference</em>, and it is precisely the problem that counterfactual reasoning is designed to address.</p>
+<p>Counterfactuals occupy the highest rung of Pearl's causal hierarchy — above association ("what is correlated with survival?") and above intervention ("what happens to survival rates if we prescribe Drug B to everyone?"). A counterfactual query asks: given that we <em>observed</em> a specific individual receive treatment <span class="arithmatex">\(X = x\)</span> and outcome <span class="arithmatex">\(Y = y\)</span>, what would <span class="arithmatex">\(Y\)</span> have been had <span class="arithmatex">\(X\)</span> been set to <span class="arithmatex">\(x'\)</span> instead? The key word is <em>given</em> — the individual's observed history is evidence that constrains the space of possible worlds we reason over. Standard A/B testing and do-calculus interventions operate on populations and cannot condition on an individual's realized outcome; counterfactuals can, because they combine the observational record with a structural model of the data-generating process.</p>
+<p>The machinery that makes this tractable is the Structural Causal Model (SCM). An SCM specifies, for each variable, a deterministic function of its parents and an exogenous noise term. The noise terms encode everything about the individual that the model does not explicitly represent — their genetics, their immune response, their unmeasured comorbidities. When we observe that a patient died under Drug A, we learn something about the likely values of those noise terms. Pearl's three-step algorithm — Abduction, Action, Prediction — formalizes this: first infer the noise distribution from the observation, then surgically replace the treatment in the model, then propagate forward to compute the counterfactual outcome. The result is a distribution over what <em>would have</em> happened, grounded in what <em>did</em> happen.</p>
+<hr />
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>The practical stakes of counterfactual reasoning are highest wherever decisions are made about individuals rather than populations. In clinical medicine, counterfactuals underpin individualized treatment rules — the question is not "does Drug B help patients on average?" but "would Drug B have helped <em>this</em> patient, given everything we observed about them?" In algorithmic fairness, counterfactuals formalize the notion of discrimination: a decision is counterfactually unfair if it would have differed had the individual's protected attribute been different while everything causally upstream remained fixed. In reinforcement learning, off-policy evaluation is a counterfactual problem — estimating what return a new policy would have achieved on trajectories generated by a different policy. Frontier labs at DeepMind, Meta AI, and Microsoft Research are actively investing in counterfactual methods precisely because the move from population-level models to individual-level decisions is where the hardest unsolved problems live.</p>
+<p>The current research frontier is defined by two tensions. The first is identifiability: counterfactuals are generally not identifiable from observational data alone without strong assumptions about the functional form of the SCM or the independence of noise terms. In non-parametric settings, the best one can do is compute sharp bounds on the counterfactual probability — a result that is theoretically clean but computationally expensive in high dimensions. The second tension is scalability: the abduction step requires posterior inference over the exogenous noise variables, which is tractable in linear-Gaussian or discrete models but becomes a hard variational inference problem in deep, continuous SCMs. Recent work on causal diffusion models and robust counterfactual bounds in Markov Decision Processes represents the field's attempt to resolve both tensions simultaneously, and neither problem is close to solved.</p>
+<hr />
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Structural Causal Model (SCM)</strong> — a tuple <span class="arithmatex">\(\mathcal{M} = \langle \mathbf{U}, \mathbf{V}, \mathcal{F}, P(\mathbf{U}) \rangle\)</span> where <span class="arithmatex">\(\mathbf{U}\)</span> are exogenous noise variables, <span class="arithmatex">\(\mathbf{V}\)</span> are endogenous observed variables, <span class="arithmatex">\(\mathcal{F}\)</span> is a set of structural equations <span class="arithmatex">\(V_i = f_i(\text{Pa}(V_i), U_i)\)</span>, and <span class="arithmatex">\(P(\mathbf{U})\)</span> is a joint distribution over the noise.</li>
+<li><strong>Potential outcome</strong> — the value <span class="arithmatex">\(Y(x)\)</span> that variable <span class="arithmatex">\(Y\)</span> would take if <span class="arithmatex">\(X\)</span> were set to <span class="arithmatex">\(x\)</span> by intervention; in SCM terms, this is the solution to the modified model <span class="arithmatex">\(\mathcal{M}_x\)</span> obtained by replacing the equation for <span class="arithmatex">\(X\)</span> with the constant <span class="arithmatex">\(x\)</span>.</li>
+<li><strong>Abduction</strong> — the first step of Pearl's algorithm: use the observed evidence <span class="arithmatex">\(\mathbf{E} = \mathbf{e}\)</span> to update the prior <span class="arithmatex">\(P(\mathbf{U})\)</span> to the posterior <span class="arithmatex">\(P(\mathbf{U} \mid \mathbf{E} = \mathbf{e})\)</span>, capturing everything the observation tells us about the individual's latent characteristics.</li>
+<li><strong>Action</strong> — the second step: modify the SCM by replacing the structural equation for the intervened variable with a constant, producing the submodel <span class="arithmatex">\(\mathcal{M}_{x'}\)</span>, which represents the hypothetical world where <span class="arithmatex">\(X\)</span> was set to <span class="arithmatex">\(x'\)</span>.</li>
+<li><strong>Prediction</strong> — the third step: propagate the posterior noise distribution <span class="arithmatex">\(P(\mathbf{U} \mid \mathbf{E} = \mathbf{e})\)</span> through the modified submodel <span class="arithmatex">\(\mathcal{M}_{x'}\)</span> to compute the counterfactual distribution <span class="arithmatex">\(P(Y_{x'} \mid \mathbf{E} = \mathbf{e})\)</span>.</li>
+<li><strong>Counterfactual identifiability</strong> — the property that the counterfactual distribution <span class="arithmatex">\(P(Y_x \mid \mathbf{e})\)</span> can be uniquely computed from the observational distribution <span class="arithmatex">\(P(\mathbf{V})\)</span> and the causal graph; this fails in general for non-Markovian models with hidden confounders.</li>
+<li><strong>Probability of necessity (PN)</strong> — the probability that the actual cause <span class="arithmatex">\(X = x\)</span> was <em>necessary</em> for the observed outcome <span class="arithmatex">\(Y = y\)</span>, defined as <span class="arithmatex">\(P(Y_{x'} = y' \mid X = x, Y = y)\)</span>; a key quantity in legal and medical attribution.</li>
+<li><strong>Counterfactual bounds</strong> — tight intervals <span class="arithmatex">\([P^-, P^+]\)</span> on a counterfactual probability when the SCM is not fully specified; computed using linear programming over the space of compatible joint distributions on potential outcomes.</li>
+</ul>
+<hr />
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>The counterfactual quantity of interest is the distribution of <span class="arithmatex">\(Y\)</span> in a world where <span class="arithmatex">\(X\)</span> was set to <span class="arithmatex">\(x'\)</span>, conditioned on having observed <span class="arithmatex">\(\mathbf{E} = \mathbf{e}\)</span>:</p>
+<div class="arithmatex">\[
+P(Y_{x'} = y \mid \mathbf{E} = \mathbf{e}) = \int P(Y = y \mid \mathbf{U} = \mathbf{u}, \text{do}(X = x')) \, dP(\mathbf{U} = \mathbf{u} \mid \mathbf{E} = \mathbf{e})
+\]</div>
+<p>where <span class="arithmatex">\(Y_{x'}\)</span> is the potential outcome of <span class="arithmatex">\(Y\)</span> under intervention <span class="arithmatex">\(\text{do}(X = x')\)</span>, <span class="arithmatex">\(\mathbf{U}\)</span> is the vector of exogenous noise variables, <span class="arithmatex">\(\mathbf{E} = \mathbf{e}\)</span> is the observed evidence for this individual, and <span class="arithmatex">\(P(\mathbf{U} \mid \mathbf{E} = \mathbf{e})\)</span> is the posterior over noise after conditioning on the observation. This equation says that the counterfactual distribution is a mixture of deterministic model outputs, averaged over the posterior uncertainty about the individual's latent characteristics.</p>
+<p>The abduction step computes the posterior noise distribution using Bayes' rule applied to the SCM:</p>
+<div class="arithmatex">\[
+P(\mathbf{U} = \mathbf{u} \mid \mathbf{E} = \mathbf{e}) = \frac{P(\mathbf{E} = \mathbf{e} \mid \mathbf{U} = \mathbf{u}) \, P(\mathbf{U} = \mathbf{u})}{P(\mathbf{E} = \mathbf{e})}
+\]</div>
+<p>where <span class="arithmatex">\(P(\mathbf{U} = \mathbf{u})\)</span> is the prior over exogenous noise, <span class="arithmatex">\(P(\mathbf{E} = \mathbf{e} \mid \mathbf{U} = \mathbf{u})\)</span> is the likelihood of the observed evidence given a specific noise realization (which is deterministic in a fully specified SCM — it is 1 if the structural equations produce <span class="arithmatex">\(\mathbf{e}\)</span> from <span class="arithmatex">\(\mathbf{u}\)</span> and 0 otherwise), and the denominator is the marginal likelihood. This equation says that observing an individual's outcome pins down which noise realizations are consistent with their history.</p>
+<p>The Probability of Necessity (PN) — the probability that the actual treatment was necessary for the observed outcome — is:</p>
+<div class="arithmatex">\[
+\text{PN} = P(Y_{x'} \neq y \mid X = x, Y = y)
+\]</div>
+<p>where <span class="arithmatex">\(Y_{x'}\)</span> is the counterfactual outcome under the alternative treatment <span class="arithmatex">\(x'\)</span>, <span class="arithmatex">\(X = x\)</span> is the treatment that was actually administered, and <span class="arithmatex">\(Y = y\)</span> is the outcome that was actually observed. This equation says that PN measures how often, among individuals who received <span class="arithmatex">\(x\)</span> and experienced <span class="arithmatex">\(y\)</span>, the outcome would have been different under <span class="arithmatex">\(x'\)</span> — a direct formalization of "but for" causation in law and medicine.</p>
+<p>When the SCM is not fully identified, the sharp lower and upper bounds on a counterfactual probability <span class="arithmatex">\(P(Y_x = y)\)</span> are obtained by solving:</p>
+<div class="arithmatex">\[
+P^- = \min_{\pi \in \Pi} \sum_{\mathbf{u}} \mathbf{1}[f(\mathbf{u}, x) = y] \, \pi(\mathbf{u}), \quad P^+ = \max_{\pi \in \Pi} \sum_{\mathbf{u}} \mathbf{1}[f(\mathbf{u}, x) = y] \, \pi(\mathbf{u})
+\]</div>
+<p>where <span class="arithmatex">\(\pi(\mathbf{u})\)</span> is a distribution over noise realizations, <span class="arithmatex">\(\Pi\)</span> is the set of distributions consistent with the observed marginals, <span class="arithmatex">\(f(\mathbf{u}, x)\)</span> is the structural equation evaluated at noise <span class="arithmatex">\(\mathbf{u}\)</span> and treatment <span class="arithmatex">\(x\)</span>, and the indicator <span class="arithmatex">\(\mathbf{1}[\cdot]\)</span> selects noise realizations that produce outcome <span class="arithmatex">\(y\)</span>. This equation says that the tightest possible bounds are obtained by optimizing over all noise distributions that are compatible with what we can observe, without committing to a specific parametric form.</p>
+<hr />
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Pearl's Abduction-Action-Prediction (AAP) algorithm</strong> (Pearl, 2000) — the canonical three-step procedure for computing counterfactuals in a fully specified SCM: update the noise posterior from observations, modify the structural equations to reflect the hypothetical intervention, then propagate the posterior noise through the modified model.</li>
+<li><strong>Linear programming bounds</strong> (Balke &amp; Pearl, 1994) — computes sharp non-parametric bounds on counterfactual probabilities by formulating the space of compatible noise distributions as a linear program; exact but exponential in the number of binary variables.</li>
+<li><strong>Variational counterfactual inference</strong> — approximates the abduction posterior <span class="arithmatex">\(P(\mathbf{U} \mid \mathbf{E})\)</span> using amortized variational inference (e.g., a learned encoder), enabling counterfactual queries in deep SCMs where exact posterior computation is intractable.</li>
+<li><strong>Causal normalizing flows</strong> — parameterizes each structural equation as an invertible neural network, making abduction exact via the inverse pass and enabling gradient-based counterfactual optimization; used in models such as CAREFL (Khemakhem et al., 2021).</li>
+<li><strong>Counterfactual data augmentation (CDA)</strong> — generates counterfactual training examples by intervening on sensitive attributes in an SCM, used to debias classifiers without requiring access to a held-out counterfactual dataset.</li>
+<li><strong>Robust counterfactual bounds in MDPs</strong> — extends non-parametric bounding to sequential decision-making by computing tight intervals on counterfactual returns under model uncertainty, without assuming a specific transition model; see Buesing et al. (2019) for the foundational treatment and the 2025 extension at <a href="https://arxiv.org/abs/2502.13731">https://arxiv.org/abs/2502.13731</a>.</li>
+<li><strong>Causal diffusion models</strong> — uses score-based generative models to represent the joint distribution of factual and counterfactual trajectories, enabling counterfactual inference in continuous, high-dimensional, and heavily confounded time-series settings; see Sanchez et al. (2022), "Diffusion Causal Models for Counterfactual Estimation," <a href="https://arxiv.org/abs/2202.10166">https://arxiv.org/abs/2202.10166</a>.</li>
+<li><strong>Potential outcome rankings</strong> (Kawakami, 2025) — frames counterfactual decision-making as a ranking problem over potential outcomes, enabling treatment selection under partial identifiability without committing to point estimates of counterfactual values; <a href="https://arxiv.org/abs/2511.10776">https://arxiv.org/abs/2511.10776</a>.</li>
+</ul>
+<hr />
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Causality: Models, Reasoning, and Inference"</td>
+<td>2000</td>
+<td>Judea Pearl</td>
+<td>Establishes the SCM framework and the formal AAP algorithm; the primary reference for the three-step counterfactual procedure and the three-rung causal hierarchy</td>
+</tr>
+<tr>
+<td>"Robust Counterfactual Inference in Markov Decision Processes"</td>
+<td>2025</td>
+<td>Anonymous</td>
+<td>Extends counterfactual bounding to sequential settings with model uncertainty; shows how to compute tight non-parametric bounds without parametric assumptions — <a href="https://arxiv.org/abs/2502.13731">https://arxiv.org/abs/2502.13731</a></td>
+</tr>
+<tr>
+<td>"Diffusion Causal Models for Counterfactual Estimation"</td>
+<td>2022</td>
+<td>Sanchez et al.</td>
+<td>Demonstrates score-based generative modeling for continuous counterfactual trajectories under confounding — <a href="https://arxiv.org/abs/2202.10166">https://arxiv.org/abs/2202.10166</a></td>
+</tr>
+<tr>
+<td>"Potential Outcome Rankings for Counterfactual Decision Making"</td>
+<td>2025</td>
+<td>Yuta Kawakami</td>
+<td>Frames treatment selection as ranking under partial identifiability, bridging counterfactual theory and practical decision rules — <a href="https://arxiv.org/abs/2511.10776">https://arxiv.org/abs/2511.10776</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Causality: Models, Reasoning, and Inference" (Pearl)</td>
+<td>2000</td>
+<td>Introduced the SCM framework and the three-rung causal hierarchy; defined counterfactuals formally within the do-calculus</td>
+</tr>
+<tr>
+<td>"Identification of Joint Interventional Distributions in Recursive Semi-Markovian Causal Models" (Shpitser &amp; Pearl)</td>
+<td>2006</td>
+<td>Proved complete identification conditions for interventional and counterfactual distributions in non-Markovian graphs</td>
+</tr>
+<tr>
+<td>"Bounds on Treatment Effects from Studies with Imperfect Compliance" (Balke &amp; Pearl)</td>
+<td>1997</td>
+<td>Introduced linear programming as a tool for computing sharp non-parametric counterfactual bounds; foundational for partial identification</td>
+</tr>
+<tr>
+<td>"Counterfactual Fairness" (Kusner et al.)</td>
+<td>2017</td>
+<td>Applied counterfactual reasoning to algorithmic fairness, defining a decision as fair iff it is invariant to counterfactual changes in protected attributes</td>
+</tr>
+<tr>
+<td>"Causal Effect Inference with Deep Latent-Variable Models" (Louizos et al.)</td>
+<td>2017</td>
+<td>Combined variational autoencoders with causal graphs to perform counterfactual inference from observational data with hidden confounders</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>The strongest results on individual-level counterfactual estimation currently come from deep SCM approaches. CAREFL (Khemakhem et al., 2021) achieves near-exact counterfactual recovery on synthetic benchmarks where the ground truth is known, using affine coupling flows as structural equations. On the IHDP benchmark for individual treatment effect estimation — a standard proxy for counterfactual accuracy — recent transformer-based causal models achieve <span class="arithmatex">\(\sqrt{\epsilon_{\text{PEHE}}} \approx 0.4\)</span>, compared to 0.9 for classical BART-based methods. For sequential counterfactual reasoning, the robust MDP bounds framework (see <a href="https://arxiv.org/abs/2502.13731">https://arxiv.org/abs/2502.13731</a>) produces intervals that are demonstrably tighter than prior Fréchet-based approaches on the standard sepsis treatment simulation benchmark, while remaining valid under arbitrary model misspecification.</p>
+<hr />
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The most active theoretical direction is partial identification in high-dimensional SCMs — computing sharp bounds on counterfactual quantities when the causal graph is known but the structural equations are not. Classical LP-based bounding (Balke &amp; Pearl) is exact but scales exponentially with the number of binary variables, making it inapplicable to modern tabular or image-structured data. Recent work is exploring whether neural network function classes can be used to parameterize the space of compatible SCMs and optimize bounds via gradient descent, but convergence guarantees remain elusive. A parallel line of work asks whether large language models can serve as approximate SCMs for text-domain counterfactuals — generating "what if the patient had been younger?" narratives — though the faithfulness of these generations to any underlying causal structure is deeply unclear.</p>
+<p><strong>Engineering and systems.</strong> The practical bottleneck for deployed counterfactual systems is the abduction step: inferring the posterior over exogenous noise variables requires either exact inference (feasible only in small discrete or linear-Gaussian models) or variational approximation (fast but biased). Libraries such as Pyro and NumPyro have made variational counterfactual inference accessible, and the <code>do-calculus</code> module in <code>causalgraphicalmodels</code> supports exact computation for small discrete SCMs. The emerging pattern in production systems is to pre-train an amortized inference network — an encoder that maps observed individual histories to approximate noise posteriors — so that counterfactual queries at serving time are a single forward pass rather than an optimization loop. This reduces query latency from minutes to milliseconds but introduces a training-time approximation error that is difficult to bound.</p>
+<p><strong>Open problems.</strong> The central open question is precise: <em>Can counterfactual distributions in non-parametric, partially observed SCMs with continuous variables be bounded in polynomial time in the number of variables, without restricting the function class of the structural equations?</em> Current methods either assume parametric structure (making bounds non-sharp), restrict to discrete variables (making the LP tractable but the model unrealistic), or rely on variational approximations (making bounds invalid rather than conservative). A second open question concerns sequential settings: the framework at <a href="https://arxiv.org/abs/2502.13731">https://arxiv.org/abs/2502.13731</a> computes valid bounds in MDPs, but the bounds widen rapidly with horizon length, making long-horizon counterfactual reasoning under uncertainty effectively uninformative. Whether tighter bounds are achievable without additional structural assumptions — such as Markovian noise or known reward structure — is unresolved.</p>
+<hr />
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>LinkedIn</strong> — uses counterfactual reasoning in their feed ranking system to estimate "what would this member's engagement have been under a different ranking policy?", enabling off-policy evaluation of new rankers without A/B testing every candidate — <a href="https://engineering.linkedin.com">engineering.linkedin.com</a></li>
+<li><strong>Meta AI</strong> — applies counterfactual data augmentation in hate speech and misinformation classifiers, generating counterfactual examples by intervening on protected attributes in a learned SCM to reduce spurious correlations — <a href="https://ai.meta.com/research">ai.meta.com/research</a></li>
+<li><strong>Google</strong> — uses counterfactual evaluation in YouTube recommendation to estimate the causal effect of surfacing a video on long-term user satisfaction, distinguishing it from the selection effect of the existing ranker — <a href="https://research.google">research.google</a></li>
+<li><strong>Uber</strong> — employs counterfactual off-policy evaluation to estimate the revenue impact of surge pricing policies on historical trip data, avoiding the need to run live experiments for every pricing variant — <a href="https://eng.uber.com">eng.uber.com</a></li>
+</ul>
+<hr />
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A Pyro structural causal model that executes Pearl's Abduction-Action-Prediction algorithm on a synthetic patient-treatment dataset, producing a posterior distribution over counterfactual survival outcomes for individual patients.</p>
+<p><strong>Why this build:</strong> This demonstrates the complete counterfactual pipeline end-to-end — the abduction step (posterior inference over noise), the action step (surgical graph modification), and the prediction step (forward simulation) — in a setting where the ground truth counterfactual is known, so you can verify correctness.</p>
+<p><strong>Stack:</strong> Python 3.10+, <code>pyro-ppl==1.9.0</code>, <code>torch==2.1.0</code>, <code>numpy</code>, <code>matplotlib</code>. Runs on CPU or free Google Colab T4.</p>
+<p><strong>Estimated time:</strong> 45–60 minutes.</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># In a Colab cell or terminal</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">pyro</span><span class="o">-</span><span class="n">ppl</span><span class="o">==</span><span class="mf">1.9.0</span> <span class="n">torch</span><span class="o">==</span><span class="mf">2.1.0</span> <span class="o">--</span><span class="n">quiet</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the structural causal model</strong></li>
+</ol>
+<p>The SCM encodes a simple medical scenario: a patient's severity <span class="arithmatex">\(S\)</span> affects both treatment assignment <span class="arithmatex">\(T\)</span> (confounding) and survival <span class="arithmatex">\(Y\)</span>. The exogenous noise terms <span class="arithmatex">\(U_S, U_T, U_Y\)</span> are the latent individual characteristics.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyro</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyro.distributions</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyro</span><span class="w"> </span><span class="kn">import</span> <span class="n">poutine</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">pyro</span><span class="o">.</span><span class="n">set_rng_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">scm</span><span class="p">(</span><span class="n">intervene_T</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Structural Causal Model for patient treatment.</span>
+
+<span class="sd">    Variables:</span>
+<span class="sd">      U_S ~ Normal(0, 1)       — latent severity factor</span>
+<span class="sd">      U_Y ~ Normal(0, 1)       — latent resilience factor</span>
+<span class="sd">      S = sigmoid(U_S)         — observed severity in [0, 1]</span>
+<span class="sd">      T ~ Bernoulli(sigmoid(S))— treatment (1=Drug B, 0=Drug A), confounded by S</span>
+<span class="sd">      Y = sigmoid(2*T - 3*S + U_Y) &gt; 0.5  — survival (1=survived)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Exogenous noise variables</span>
+    <span class="n">U_S</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;U_S&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+    <span class="n">U_Y</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;U_Y&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+
+    <span class="c1"># Endogenous variables via structural equations</span>
+    <span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">U_S</span><span class="p">)</span>
+    <span class="n">pyro</span><span class="o">.</span><span class="n">deterministic</span><span class="p">(</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="n">S</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">intervene_T</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Observational: T is caused by severity S</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">S</span><span class="p">)))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Interventional: do(T = intervene_T)</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">deterministic</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">intervene_T</span><span class="p">)))</span>
+
+    <span class="c1"># Survival outcome — Drug B (T=1) helps, high severity (S) hurts</span>
+    <span class="n">survival_prob</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">T</span> <span class="o">-</span> <span class="mf">3.</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="n">U_Y</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;Y&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">survival_prob</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="n">S</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="n">T</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">Y</span><span class="p">,</span> <span class="s2">&quot;U_S&quot;</span><span class="p">:</span> <span class="n">U_S</span><span class="p">,</span> <span class="s2">&quot;U_Y&quot;</span><span class="p">:</span> <span class="n">U_Y</span><span class="p">}</span>
+
+<span class="c1"># Sanity check: run the observational model</span>
+<span class="n">trace</span> <span class="o">=</span> <span class="n">poutine</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">scm</span><span class="p">)</span><span class="o">.</span><span class="n">get_trace</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Observational sample:&quot;</span><span class="p">,</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">item</span><span class="p">()</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">trace</span><span class="o">.</span><span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> 
+                                  <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">]})</span>
+</code></pre></div>
+<ol>
+<li><strong>Generate a synthetic patient cohort and observe a specific individual</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># Generate 1000 patients under the observational distribution</span>
+<span class="n">n_patients</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_patients</span><span class="p">):</span>
+    <span class="n">trace</span> <span class="o">=</span> <span class="n">poutine</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">scm</span><span class="p">)</span><span class="o">.</span><span class="n">get_trace</span><span class="p">()</span>
+    <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="n">trace</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+        <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="n">trace</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+        <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">trace</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+    <span class="p">})</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="n">records</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">r</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">records</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="s2">&quot;Y&quot;</span><span class="p">]}</span>
+
+<span class="c1"># Identify a patient who received Drug A (T=0) and died (Y=0)</span>
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Patients who received Drug A and died: </span><span class="si">{</span><span class="n">mask</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Pick one such patient — this is our observed individual</span>
+<span class="c1"># We observe their severity S and that they received T=0 and died Y=0</span>
+<span class="n">observed_S</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">records</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">][</span><span class="n">mask</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observed patient severity: </span><span class="si">{</span><span class="n">observed_S</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Step 1 — Abduction: infer the posterior over noise given the observation</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pyro.infer</span><span class="w"> </span><span class="kn">import</span> <span class="n">MCMC</span><span class="p">,</span> <span class="n">NUTS</span>
+
+<span class="c1"># Condition the model on the observed individual&#39;s data</span>
+<span class="n">observed_data</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.</span><span class="p">),</span>   <span class="c1"># received Drug A</span>
+    <span class="s2">&quot;Y&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">0.</span><span class="p">),</span>   <span class="c1"># died</span>
+    <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">observed_S</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="c1"># We need to condition on S too — treat it as observed</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">conditioned_scm</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;SCM conditioned on the observed individual&#39;s factual data.&quot;&quot;&quot;</span>
+    <span class="n">U_S</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;U_S&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+    <span class="n">U_Y</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;U_Y&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">))</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">U_S</span><span class="p">)</span>
+    <span class="c1"># Condition on observed severity</span>
+    <span class="n">pyro</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="s2">&quot;S_obs&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Normal</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">observed_data</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">]))</span>
+
+    <span class="c1"># Condition on observed treatment T=0 (Drug A)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">pyro</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">S</span><span class="p">)))</span>
+    <span class="n">pyro</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="s2">&quot;T_obs&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">S</span><span class="p">))</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">observed_data</span><span class="p">[</span><span class="s2">&quot;T&quot;</span><span class="p">]))</span>
+
+    <span class="c1"># Condition on observed outcome Y=0 (died)</span>
+    <span class="n">survival_prob</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">T</span> <span class="o">-</span> <span class="mf">3.</span> <span class="o">*</span> <span class="n">S</span> <span class="o">+</span> <span class="n">U_Y</span><span class="p">)</span>
+    <span class="n">pyro</span><span class="o">.</span><span class="n">factor</span><span class="p">(</span><span class="s2">&quot;Y_obs&quot;</span><span class="p">,</span> <span class="n">dist</span><span class="o">.</span><span class="n">Bernoulli</span><span class="p">(</span><span class="n">survival_prob</span><span class="p">)</span><span class="o">.</span><span class="n">log_prob</span><span class="p">(</span><span class="n">observed_data</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">]))</span>
+
+<span class="c1"># Run NUTS to get posterior samples over (U_S, U_Y)</span>
+<span class="n">nuts_kernel</span> <span class="o">=</span> <span class="n">NUTS</span><span class="p">(</span><span class="n">conditioned_scm</span><span class="p">,</span> <span class="n">adapt_step_size</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">mcmc</span> <span class="o">=</span> <span class="n">MCMC</span><span class="p">(</span><span class="n">nuts_kernel</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">warmup_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">num_chains</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">mcmc</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+<span class="n">posterior_samples</span> <span class="o">=</span> <span class="n">mcmc</span><span class="o">.</span><span class="n">get_samples</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Posterior U_S mean: </span><span class="si">{</span><span class="n">posterior_samples</span><span class="p">[</span><span class="s1">&#39;U_S&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Posterior U_Y mean: </span><span class="si">{</span><span class="n">posterior_samples</span><span class="p">[</span><span class="s1">&#39;U_Y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Implied posterior severity: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">posterior_samples</span><span class="p">[</span><span class="s1">&#39;U_S&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Step 2 — Action: modify the SCM to set do(T = 1) (Drug B)</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># The action step is structural: we replace the equation for T with a constant.</span>
+<span class="c1"># In Pyro, this is done by passing intervene_T=1 to the SCM.</span>
+<span class="c1"># No code change needed here — the scm() function already supports this via intervene_T.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Action step: replacing T&#39;s structural equation with do(T=1)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Step 3 — Prediction: propagate posterior noise through the modified SCM</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># For each posterior noise sample (U_S, U_Y), run the intervened SCM</span>
+<span class="n">counterfactual_Y</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">posterior_samples</span><span class="p">[</span><span class="s2">&quot;U_S&quot;</span><span class="p">])):</span>
+    <span class="n">u_s</span> <span class="o">=</span> <span class="n">posterior_samples</span><span class="p">[</span><span class="s2">&quot;U_S&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">u_y</span> <span class="o">=</span> <span class="n">posterior_samples</span><span class="p">[</span><span class="s2">&quot;U_Y&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="c1"># Replay the SCM with fixed noise and do(T=1)</span>
+    <span class="n">S_cf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">u_s</span><span class="p">)</span>
+    <span class="n">T_cf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>  <span class="c1"># do(T=1): Drug B</span>
+    <span class="n">survival_prob_cf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">T_cf</span> <span class="o">-</span> <span class="mf">3.</span> <span class="o">*</span> <span class="n">S_cf</span> <span class="o">+</span> <span class="n">u_y</span><span class="p">)</span>
+    <span class="n">Y_cf</span> <span class="o">=</span> <span class="p">(</span><span class="n">survival_prob_cf</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
+    <span class="n">counterfactual_Y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Y_cf</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+<span class="n">counterfactual_Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">counterfactual_Y</span><span class="p">)</span>
+<span class="n">p_survive_drugB</span> <span class="o">=</span> <span class="n">counterfactual_Y</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Counterfactual P(Y=1 | do(T=1), observed T=0, Y=0, S=</span><span class="si">{</span><span class="n">observed_S</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  = </span><span class="si">{</span><span class="n">p_survive_drugB</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Interpretation: This patient would have survived with Drug B with probability </span><span class="si">{</span><span class="n">p_survive_drugB</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Compute the Probability of Necessity and visualize</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+
+<span class="c1"># PN = P(Y_drugB = 1 | T=0, Y=0) — already computed above</span>
+<span class="n">PN</span> <span class="o">=</span> <span class="n">p_survive_drugB</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Probability of Necessity (PN): </span><span class="si">{</span><span class="n">PN</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Drug A was necessary for this patient&#39;s death with probability </span><span class="si">{</span><span class="n">PN</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Compare: population-level ATE vs individual counterfactual</span>
+<span class="c1"># ATE: E[Y | do(T=1)] - E[Y | do(T=0)] — computed by Monte Carlo</span>
+<span class="n">ate_samples_T1</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">ate_samples_T0</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">):</span>
+    <span class="n">trace1</span> <span class="o">=</span> <span class="n">poutine</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">scm</span><span class="p">(</span><span class="n">intervene_T</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span><span class="o">.</span><span class="n">get_trace</span><span class="p">()</span>
+    <span class="n">trace0</span> <span class="o">=</span> <span class="n">poutine</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">scm</span><span class="p">(</span><span class="n">intervene_T</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span><span class="o">.</span><span class="n">get_trace</span><span class="p">()</span>
+    <span class="n">ate_samples_T1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace1</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+    <span class="n">ate_samples_T0</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">trace0</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="s2">&quot;Y&quot;</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+
+<span class="n">ATE</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ate_samples_T1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">ate_samples_T0</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Population ATE (Drug B vs Drug A): </span><span class="si">{</span><span class="n">ATE</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Individual counterfactual (this patient): </span><span class="si">{</span><span class="n">p_survive_drugB</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;→ Population ATE and individual counterfactual can diverge substantially due to confounding.&quot;</span><span class="p">)</span>
+
+<span class="c1"># Plot posterior over counterfactual survival probability</span>
+<span class="n">survival_probs_cf</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">posterior_samples</span><span class="p">[</span><span class="s2">&quot;U_S&quot;</span><span class="p">])):</span>
+    <span class="n">u_s</span> <span class="o">=</span> <span class="n">posterior_samples</span><span class="p">[</span><span class="s2">&quot;U_S&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">u_y</span> <span class="o">=</span> <span class="n">posterior_samples</span><span class="p">[</span><span class="s2">&quot;U_Y&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">S_cf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">u_s</span><span class="p">)</span>
+    <span class="n">prob</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="mf">2.</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span> <span class="o">-</span> <span class="mf">3.</span> <span class="o">*</span> <span class="n">S_cf</span> <span class="o">+</span> <span class="n">u_y</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+    <span class="n">survival_probs_cf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">survival_probs_cf</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;steelblue&quot;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">survival_probs_cf</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;--&quot;</span><span class="p">,</span> 
+            <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Mean = </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">survival_probs_cf</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Counterfactual P(survive | Drug B)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Posterior samples&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;Individual Counterfactual Distribution: P(Y=1 | do(T=1), observed T=0, Y=0)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;counterfactual_posterior.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">120</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved: counterfactual_posterior.png&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>Running the full script produces:
+- A printed counterfactual probability, e.g. <code>P(Y=1 | do(T=1), observed T=0, Y=0, S=0.72) = 0.68</code>, meaning this specific patient would have survived with 68% probability under Drug B.
+- A printed Probability of Necessity, e.g. <code>PN = 0.68</code>.
+- A printed ATE, typically around <code>0.35–0.45</code>, demonstrating that the population-level effect and the individual counterfactual diverge substantially for high-severity patients.
+- A histogram (<code>counterfactual_posterior.png</code>) showing the posterior distribution over the counterfactual survival probability, which should be unimodal and concentrated away from 0.5 for a clearly high-severity patient.</p>
+<p>MCMC convergence: <code>R-hat</code> values should be below 1.05 for both <code>U_S</code> and <code>U_Y</code>. If they are not, increase <code>warmup_steps</code> to 500.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>MCMC divergences or very low acceptance rate</strong> → The model is poorly conditioned. Add <code>target_accept_prob=0.8</code> to the NUTS kernel: <code>NUTS(conditioned_scm, adapt_step_size=True, target_accept_prob=0.8)</code>.</li>
+<li><strong>Posterior U_Y is nearly identical to the prior</strong> → The observed outcome <span class="arithmatex">\(Y\)</span> is not constraining the noise. Check that <code>observed_data["Y"]</code> is set to <code>torch.tensor(0.)</code> (float, not int) and that the <code>pyro.factor</code> call uses the correct log-probability.</li>
+<li><strong>Counterfactual probability is always near 0.5</strong> → The structural equation for <span class="arithmatex">\(Y\)</span> is too weak. Increase the coefficient on <span class="arithmatex">\(T\)</span> from <code>2.</code> to <code>3.</code> in the survival probability equation to make the treatment effect stronger.</li>
+<li><strong><code>ImportError: No module named 'pyro'</code></strong> → Run <code>!pip install pyro-ppl==1.9.0</code> in a fresh Colab cell and restart the runtime.</li>
+<li><strong>Slow MCMC (&gt;10 min)</strong> → Reduce <code>num_samples</code> to 200 and <code>warmup_steps</code> to 100 for a quick check; restore to 500/200 for final results.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Pyro (official)</strong> — <code>pyro-ppl</code> library with full support for conditioning, intervention, and MCMC-based abduction: <a href="https://github.com/pyro-ppl/pyro">https://github.com/pyro-ppl/pyro</a></li>
+<li><strong>NumPyro</strong> — JAX-based probabilistic programming with faster NUTS for counterfactual inference in larger SCMs: <a href="https://github.com/pyro-ppl/numpyro">https://github.com/pyro-ppl/numpyro</a></li>
+<li><strong>DoWhy</strong> — Microsoft Research's library for causal reasoning, with a dedicated <code>counterfactual</code> module for SCM-based what-if queries: <a href="https://github.com/py-why/dowhy">https://github.com/py-why/dowhy</a></li>
+<li><strong>CausalNex</strong> — QuantumBlack's library for Bayesian network-based causal inference, supports discrete counterfactual queries: <a href="https://github.com/quantumblacklabs/causalnex">https://github.com/quantumblacklabs/causalnex</a></li>
+<li><strong>EconML</strong> — Microsoft Research's library for heterogeneous treatment effect estimation, which approximates individual-level counterfactuals via meta-learners: <a href="https://github.com/microsoft/EconML">https://github.com/microsoft/EconML</a></li>
+</ul>
+<hr />
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Counterfactual reasoning in a fully specified SCM is tractable; the hard problem is what to do when the SCM is only partially known or the graph itself is uncertain.</p>
+<ul>
+<li>[[structural-causal-models]] — the formal framework that makes counterfactual computation possible; the structural equations and noise independence assumptions are what distinguish SCM-based counterfactuals from potential outcomes defined without a generative model.</li>
+<li>[[do-calculus]] — establishes which causal and counterfactual quantities can be computed from observational data alone, and provides the graphical criteria (front-door, back-door) that determine when the abduction step is well-defined.</li>
+<li>[[partial-identification]] — the natural extension when counterfactuals are not point-identified; the LP-based bounding methods that produce valid intervals rather than point estimates under model uncertainty.</li>
+</ul>
+<hr />
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[bayesian-inference]] — Bayesian inference supplies the posterior update machinery that makes the abduction step tractable; the abduction equation is Bayes' rule applied to the SCM's noise variables.</li>
+<li>[[reinforcement-learning-off-policy-evaluation]] — off-policy evaluation in RL is a counterfactual problem: estimating what return a new policy would have achieved on trajectories generated by a different policy.</li>
+<li>[[algorithmic-fairness]] — counterfactual fairness (Kusner et al., 2017) defines discrimination in terms of whether a decision would change under a counterfactual intervention on a protected attribute, connecting SCM formalism directly to fairness auditing.</li>
+<li>[[causal-representation-learning]] — learns latent SCMs from high-dimensional data, which is a prerequisite for applying counterfactual reasoning to images, text, and time-series without hand-specified structural equations.</li>
+</ul>
+<hr />
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Pearl, J. (2009) — <em>Causality: Models, Reasoning, and Inference</em> (2nd ed.), Cambridge University Press — the definitive reference for the SCM framework, counterfactual identifiability theory, and the three-rung causal hierarchy; Chapter 7 covers counterfactuals in full formal detail.</li>
+<li>Shpitser, I. &amp; Pearl, J. (2007) — "What Counterfactuals Can Be Tested" — <a href="https://arxiv.org/abs/1206.5294">https://arxiv.org/abs/1206.5294</a> — establishes which counterfactual statements are empirically testable from observational data, a prerequisite for any applied counterfactual system.</li>
+<li>Bareinboim, E. et al. (2022) — "On Pearl's Hierarchy and the Foundations of Causal Inference" — <a href="https://arxiv.org/abs/2209.03024">https://arxiv.org/abs/2209.03024</a> — provides a rigorous modern treatment of the three-rung hierarchy, clarifying the formal separation between associational, interventional, and counterfactual queries and the conditions under which each is computable.</li>
+<li>Khemakhem, I. et al. (2021) — "Causal Autoregressive Flows" — <a href="https://arxiv.org/abs/2011.02268">https://arxiv.org/abs/2011.02268</a> — introduces normalizing flows as structural equations, enabling exact abduction via invertibility and gradient-based counterfactual optimization in continuous SCMs.</li>
+<li>Lilian Weng — "Causality in Machine Learning" (lil'log, 2021) — <a href="https://lilianweng.github.io/posts/2021-12-31-causal-rl/">https://lilianweng.github.io/posts/2021-12-31-causal-rl/</a> — surveys the intersection of causal inference and reinforcement learning, with a section on counterfactual off-policy evaluation that connects the SCM formalism to practical RL settings.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

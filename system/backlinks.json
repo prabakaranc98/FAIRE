@@ -1,0 +1,629 @@
+{
+  "forward": {
+    "02-generative-modeling/diffusion-models": [
+      "02-generative-modeling/score-matching",
+      "02-generative-modeling/flow-matching",
+      "07-attention-memory-reasoning/transformer"
+    ],
+    "02-generative-modeling/flow-matching": [
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/score-matching"
+    ],
+    "02-generative-modeling/score-matching": [
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/flow-matching"
+    ],
+    "06-reinforcement-learning/rlhf": [
+      "07-attention-memory-reasoning/transformer",
+      "02-generative-modeling/diffusion-models"
+    ],
+    "07-attention-memory-reasoning/transformer": [
+      "06-reinforcement-learning/rlhf",
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/flow-matching"
+    ],
+    "01-ai/agent-architectures": [
+      "10-complexity-cognition/cognitive-architectures",
+      "01-ai/classical-planning",
+      "07-attention-memory-reasoning/transformer",
+      "06-reinforcement-learning/rlhf",
+      "05-statistical-probabilistic-ml/bayesian-inference"
+    ],
+    "04-neural-networks-dl/backpropagation": [
+      "09-algorithms-systems-ai/data-parallelism",
+      "07-attention-memory-reasoning/transformer",
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/flow-matching",
+      "02-generative-modeling/score-matching",
+      "06-reinforcement-learning/rlhf"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-inference": [
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/do-calculus",
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/score-matching"
+    ],
+    "01-ai/classical-planning": [
+      "07-attention-memory-reasoning/transformer",
+      "06-reinforcement-learning/rlhf",
+      "02-generative-modeling/diffusion-models"
+    ],
+    "10-complexity-cognition/cognitive-architectures": [
+      "01-ai/classical-planning",
+      "07-attention-memory-reasoning/transformer",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "06-reinforcement-learning/rlhf"
+    ],
+    "10-complexity-cognition/complexity-classes": [
+      "01-ai/classical-planning",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "07-attention-memory-reasoning/transformer"
+    ],
+    "03-representation-learning/contrastive-learning": [
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "02-generative-modeling/score-matching"
+    ],
+    "09-algorithms-systems-ai/data-parallelism": [
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "02-generative-modeling/diffusion-models",
+      "06-reinforcement-learning/rlhf"
+    ],
+    "08-causal-statistical-inference/counterfactuals": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "06-reinforcement-learning/rlhf",
+      "01-ai/classical-planning",
+      "01-ai/agent-architectures",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "08-causal-statistical-inference/do-calculus": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "01-ai/agent-architectures",
+      "10-complexity-cognition/cognitive-architectures",
+      "01-ai/classical-planning"
+    ],
+    "15-ml-theory-foundations/double-descent": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "07-attention-memory-reasoning/transformer",
+      "04-neural-networks-dl/backpropagation"
+    ],
+    "12-physics-scientific-ai/equivariant-networks": [
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/contrastive-learning",
+      "07-attention-memory-reasoning/transformer",
+      "09-algorithms-systems-ai/data-parallelism",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "01-ai/agent-architectures"
+    ],
+    "12-physics-scientific-ai/fno": [
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "09-algorithms-systems-ai/data-parallelism",
+      "02-generative-modeling/diffusion-models",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "10-complexity-cognition/emergent-capabilities": [
+      "10-complexity-cognition/cognitive-architectures",
+      "01-ai/agent-architectures",
+      "07-attention-memory-reasoning/transformer",
+      "06-reinforcement-learning/rlhf",
+      "01-ai/classical-planning",
+      "10-complexity-cognition/complexity-classes"
+    ],
+    "13-graph-relational-ai/equivariant-gnn": [
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/contrastive-learning",
+      "07-attention-memory-reasoning/transformer",
+      "09-algorithms-systems-ai/data-parallelism",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "11-robotics-embodied-ai/foundation-models-robotics": [
+      "01-ai/agent-architectures",
+      "06-reinforcement-learning/rlhf",
+      "02-generative-modeling/diffusion-models",
+      "07-attention-memory-reasoning/transformer",
+      "03-representation-learning/contrastive-learning",
+      "01-ai/classical-planning"
+    ],
+    "05-statistical-probabilistic-ml/gaussian-processes": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "08-causal-statistical-inference/do-calculus",
+      "08-causal-statistical-inference/counterfactuals",
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/score-matching"
+    ],
+    "13-graph-relational-ai/gnn-expressivity": [
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "10-complexity-cognition/complexity-classes"
+    ],
+    "11-robotics-embodied-ai/imitation-learning": [
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "06-reinforcement-learning/rlhf",
+      "01-ai/agent-architectures",
+      "01-ai/classical-planning",
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "09-algorithms-systems-ai/kv-cache": [
+      "07-attention-memory-reasoning/transformer",
+      "09-algorithms-systems-ai/data-parallelism",
+      "01-ai/agent-architectures",
+      "10-complexity-cognition/cognitive-architectures",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "13-graph-relational-ai/gnn-expressivity"
+    ],
+    "03-representation-learning/jepa": [
+      "03-representation-learning/contrastive-learning",
+      "07-attention-memory-reasoning/transformer",
+      "02-generative-modeling/diffusion-models",
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/contrastive-learning",
+      "01-ai/agent-architectures"
+    ],
+    "06-reinforcement-learning/mdp": [
+      "06-reinforcement-learning/rlhf",
+      "01-ai/agent-architectures",
+      "01-ai/classical-planning",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "04-neural-networks-dl/backpropagation",
+      "06-reinforcement-learning/rlhf"
+    ],
+    "13-graph-relational-ai/message-passing": [
+      "13-graph-relational-ai/gnn-expressivity",
+      "13-graph-relational-ai/equivariant-gnn",
+      "13-graph-relational-ai/gnn-expressivity",
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer"
+    ],
+    "15-ml-theory-foundations/ntk": [
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "15-ml-theory-foundations/double-descent",
+      "04-neural-networks-dl/backpropagation",
+      "13-graph-relational-ai/message-passing"
+    ],
+    "04-neural-networks-dl/optimization": [
+      "04-neural-networks-dl/backpropagation",
+      "06-reinforcement-learning/mdp",
+      "06-reinforcement-learning/rlhf",
+      "03-representation-learning/contrastive-learning",
+      "15-ml-theory-foundations/double-descent",
+      "07-attention-memory-reasoning/transformer"
+    ],
+    "15-ml-theory-foundations/pac-learning": [
+      "15-ml-theory-foundations/ntk",
+      "15-ml-theory-foundations/double-descent",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "04-neural-networks-dl/backpropagation",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "12-physics-scientific-ai/pinn": [
+      "12-physics-scientific-ai/fno",
+      "12-physics-scientific-ai/equivariant-networks",
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/optimization",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "15-ml-theory-foundations/ntk"
+    ],
+    "06-reinforcement-learning/ppo": [
+      "06-reinforcement-learning/mdp",
+      "06-reinforcement-learning/rlhf",
+      "01-ai/agent-architectures",
+      "11-robotics-embodied-ai/imitation-learning",
+      "04-neural-networks-dl/optimization"
+    ],
+    "14-biology-life-sciences/protein-lm": [
+      "07-attention-memory-reasoning/transformer",
+      "13-graph-relational-ai/message-passing",
+      "13-graph-relational-ai/gnn-expressivity",
+      "03-representation-learning/contrastive-learning",
+      "04-neural-networks-dl/backpropagation",
+      "09-algorithms-systems-ai/kv-cache"
+    ],
+    "04-neural-networks-dl/scaling-laws": [
+      "04-neural-networks-dl/optimization",
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "15-ml-theory-foundations/ntk",
+      "09-algorithms-systems-ai/data-parallelism",
+      "09-algorithms-systems-ai/kv-cache"
+    ],
+    "14-biology-life-sciences/protein-structure": [
+      "14-biology-life-sciences/protein-lm",
+      "13-graph-relational-ai/message-passing",
+      "13-graph-relational-ai/gnn-expressivity",
+      "13-graph-relational-ai/equivariant-gnn",
+      "12-physics-scientific-ai/fno",
+      "12-physics-scientific-ai/equivariant-networks"
+    ],
+    "09-algorithms-systems-ai/quantization": [
+      "09-algorithms-systems-ai/data-parallelism",
+      "09-algorithms-systems-ai/kv-cache",
+      "04-neural-networks-dl/optimization",
+      "04-neural-networks-dl/backpropagation",
+      "07-attention-memory-reasoning/transformer",
+      "15-ml-theory-foundations/ntk"
+    ],
+    "08-causal-statistical-inference/scm": [
+      "08-causal-statistical-inference/do-calculus",
+      "08-causal-statistical-inference/counterfactuals",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "06-reinforcement-learning/mdp"
+    ],
+    "01-ai/search-algorithms": [
+      "01-ai/classical-planning",
+      "01-ai/agent-architectures",
+      "06-reinforcement-learning/mdp",
+      "06-reinforcement-learning/ppo",
+      "06-reinforcement-learning/rlhf",
+      "10-complexity-cognition/cognitive-architectures"
+    ],
+    "03-representation-learning/self-supervised-learning": [
+      "03-representation-learning/contrastive-learning",
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/optimization",
+      "07-attention-memory-reasoning/transformer",
+      "13-graph-relational-ai/message-passing",
+      "02-generative-modeling/diffusion-models"
+    ],
+    "11-robotics-embodied-ai/sim-to-real": [
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "11-robotics-embodied-ai/imitation-learning",
+      "06-reinforcement-learning/ppo",
+      "06-reinforcement-learning/mdp",
+      "01-ai/agent-architectures",
+      "04-neural-networks-dl/optimization"
+    ],
+    "14-biology-life-sciences/single-cell": [
+      "14-biology-life-sciences/protein-structure",
+      "14-biology-life-sciences/protein-lm",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "13-graph-relational-ai/message-passing",
+      "13-graph-relational-ai/gnn-expressivity"
+    ],
+    "07-attention-memory-reasoning/state-space-models": [
+      "07-attention-memory-reasoning/transformer",
+      "02-generative-modeling/diffusion-models",
+      "09-algorithms-systems-ai/kv-cache",
+      "01-ai/agent-architectures",
+      "06-reinforcement-learning/mdp",
+      "05-statistical-probabilistic-ml/gaussian-processes"
+    ],
+    "07-attention-memory-reasoning/vision-language-models": [
+      "07-attention-memory-reasoning/transformer",
+      "03-representation-learning/self-supervised-learning",
+      "03-representation-learning/contrastive-learning",
+      "02-generative-modeling/diffusion-models",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/kv-cache"
+    ],
+    "02-generative-modeling/variational-autoencoders": [
+      "02-generative-modeling/diffusion-models",
+      "03-representation-learning/self-supervised-learning",
+      "02-generative-modeling/score-matching",
+      "04-neural-networks-dl/backpropagation",
+      "04-neural-networks-dl/optimization",
+      "03-representation-learning/contrastive-learning"
+    ],
+    "05-statistical-probabilistic-ml/variational-inference": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "02-generative-modeling/variational-autoencoders",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "04-neural-networks-dl/optimization",
+      "02-generative-modeling/diffusion-models",
+      "03-representation-learning/self-supervised-learning"
+    ]
+  },
+  "reverse": {
+    "02-generative-modeling/score-matching": [
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/flow-matching",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "03-representation-learning/contrastive-learning",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "02-generative-modeling/variational-autoencoders",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "02-generative-modeling/flow-matching": [
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/score-matching",
+      "07-attention-memory-reasoning/transformer",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference"
+    ],
+    "07-attention-memory-reasoning/transformer": [
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/flow-matching",
+      "06-reinforcement-learning/rlhf",
+      "01-ai/agent-architectures",
+      "04-neural-networks-dl/backpropagation",
+      "01-ai/classical-planning",
+      "10-complexity-cognition/cognitive-architectures",
+      "10-complexity-cognition/complexity-classes",
+      "03-representation-learning/contrastive-learning",
+      "09-algorithms-systems-ai/data-parallelism",
+      "15-ml-theory-foundations/double-descent",
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "10-complexity-cognition/emergent-capabilities",
+      "13-graph-relational-ai/equivariant-gnn",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "13-graph-relational-ai/gnn-expressivity",
+      "09-algorithms-systems-ai/kv-cache",
+      "03-representation-learning/jepa",
+      "13-graph-relational-ai/message-passing",
+      "15-ml-theory-foundations/ntk",
+      "04-neural-networks-dl/optimization",
+      "14-biology-life-sciences/protein-lm",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/quantization",
+      "03-representation-learning/self-supervised-learning",
+      "07-attention-memory-reasoning/state-space-models",
+      "07-attention-memory-reasoning/vision-language-models"
+    ],
+    "06-reinforcement-learning/rlhf": [
+      "02-generative-modeling/diffusion-models",
+      "07-attention-memory-reasoning/transformer",
+      "01-ai/agent-architectures",
+      "04-neural-networks-dl/backpropagation",
+      "01-ai/classical-planning",
+      "10-complexity-cognition/cognitive-architectures",
+      "09-algorithms-systems-ai/data-parallelism",
+      "08-causal-statistical-inference/counterfactuals",
+      "10-complexity-cognition/emergent-capabilities",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "11-robotics-embodied-ai/imitation-learning",
+      "06-reinforcement-learning/mdp",
+      "04-neural-networks-dl/optimization",
+      "06-reinforcement-learning/ppo",
+      "01-ai/search-algorithms"
+    ],
+    "02-generative-modeling/diffusion-models": [
+      "02-generative-modeling/flow-matching",
+      "02-generative-modeling/score-matching",
+      "06-reinforcement-learning/rlhf",
+      "07-attention-memory-reasoning/transformer",
+      "01-ai/agent-architectures",
+      "04-neural-networks-dl/backpropagation",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "01-ai/classical-planning",
+      "09-algorithms-systems-ai/data-parallelism",
+      "12-physics-scientific-ai/fno",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "03-representation-learning/jepa",
+      "03-representation-learning/self-supervised-learning",
+      "07-attention-memory-reasoning/state-space-models",
+      "07-attention-memory-reasoning/vision-language-models",
+      "02-generative-modeling/variational-autoencoders",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "01-ai/classical-planning": [
+      "01-ai/agent-architectures",
+      "10-complexity-cognition/cognitive-architectures",
+      "10-complexity-cognition/complexity-classes",
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/do-calculus",
+      "10-complexity-cognition/emergent-capabilities",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "11-robotics-embodied-ai/imitation-learning",
+      "06-reinforcement-learning/mdp",
+      "01-ai/search-algorithms"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-inference": [
+      "01-ai/agent-architectures",
+      "10-complexity-cognition/cognitive-architectures",
+      "10-complexity-cognition/complexity-classes",
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/do-calculus",
+      "15-ml-theory-foundations/double-descent",
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "15-ml-theory-foundations/pac-learning",
+      "08-causal-statistical-inference/scm",
+      "14-biology-life-sciences/single-cell",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "10-complexity-cognition/cognitive-architectures": [
+      "01-ai/agent-architectures",
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/do-calculus",
+      "10-complexity-cognition/emergent-capabilities",
+      "13-graph-relational-ai/equivariant-gnn",
+      "09-algorithms-systems-ai/kv-cache",
+      "01-ai/search-algorithms"
+    ],
+    "04-neural-networks-dl/backpropagation": [
+      "03-representation-learning/contrastive-learning",
+      "09-algorithms-systems-ai/data-parallelism",
+      "15-ml-theory-foundations/double-descent",
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "13-graph-relational-ai/equivariant-gnn",
+      "13-graph-relational-ai/gnn-expressivity",
+      "11-robotics-embodied-ai/imitation-learning",
+      "03-representation-learning/jepa",
+      "06-reinforcement-learning/mdp",
+      "13-graph-relational-ai/message-passing",
+      "15-ml-theory-foundations/ntk",
+      "04-neural-networks-dl/optimization",
+      "15-ml-theory-foundations/pac-learning",
+      "12-physics-scientific-ai/pinn",
+      "14-biology-life-sciences/protein-lm",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/quantization",
+      "03-representation-learning/self-supervised-learning",
+      "02-generative-modeling/variational-autoencoders"
+    ],
+    "01-ai/agent-architectures": [
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/do-calculus",
+      "12-physics-scientific-ai/equivariant-networks",
+      "10-complexity-cognition/emergent-capabilities",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "11-robotics-embodied-ai/imitation-learning",
+      "09-algorithms-systems-ai/kv-cache",
+      "03-representation-learning/jepa",
+      "06-reinforcement-learning/mdp",
+      "06-reinforcement-learning/ppo",
+      "01-ai/search-algorithms",
+      "11-robotics-embodied-ai/sim-to-real",
+      "07-attention-memory-reasoning/state-space-models"
+    ],
+    "09-algorithms-systems-ai/data-parallelism": [
+      "04-neural-networks-dl/backpropagation",
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "13-graph-relational-ai/equivariant-gnn",
+      "09-algorithms-systems-ai/kv-cache",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/quantization"
+    ],
+    "08-causal-statistical-inference/counterfactuals": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "08-causal-statistical-inference/scm"
+    ],
+    "08-causal-statistical-inference/do-calculus": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/gaussian-processes",
+      "08-causal-statistical-inference/scm"
+    ],
+    "03-representation-learning/contrastive-learning": [
+      "12-physics-scientific-ai/equivariant-networks",
+      "12-physics-scientific-ai/fno",
+      "13-graph-relational-ai/equivariant-gnn",
+      "11-robotics-embodied-ai/foundation-models-robotics",
+      "11-robotics-embodied-ai/imitation-learning",
+      "03-representation-learning/jepa",
+      "04-neural-networks-dl/optimization",
+      "15-ml-theory-foundations/pac-learning",
+      "14-biology-life-sciences/protein-lm",
+      "03-representation-learning/self-supervised-learning",
+      "07-attention-memory-reasoning/vision-language-models",
+      "02-generative-modeling/variational-autoencoders"
+    ],
+    "10-complexity-cognition/complexity-classes": [
+      "10-complexity-cognition/emergent-capabilities",
+      "13-graph-relational-ai/gnn-expressivity"
+    ],
+    "13-graph-relational-ai/equivariant-gnn": [
+      "13-graph-relational-ai/gnn-expressivity",
+      "13-graph-relational-ai/message-passing",
+      "14-biology-life-sciences/protein-structure"
+    ],
+    "12-physics-scientific-ai/equivariant-networks": [
+      "13-graph-relational-ai/gnn-expressivity",
+      "13-graph-relational-ai/message-passing",
+      "12-physics-scientific-ai/pinn",
+      "14-biology-life-sciences/protein-structure"
+    ],
+    "11-robotics-embodied-ai/foundation-models-robotics": [
+      "11-robotics-embodied-ai/imitation-learning",
+      "09-algorithms-systems-ai/kv-cache",
+      "06-reinforcement-learning/mdp",
+      "11-robotics-embodied-ai/sim-to-real"
+    ],
+    "13-graph-relational-ai/gnn-expressivity": [
+      "09-algorithms-systems-ai/kv-cache",
+      "13-graph-relational-ai/message-passing",
+      "14-biology-life-sciences/protein-lm",
+      "14-biology-life-sciences/protein-structure",
+      "14-biology-life-sciences/single-cell"
+    ],
+    "05-statistical-probabilistic-ml/gaussian-processes": [
+      "15-ml-theory-foundations/ntk",
+      "15-ml-theory-foundations/pac-learning",
+      "12-physics-scientific-ai/pinn",
+      "08-causal-statistical-inference/scm",
+      "14-biology-life-sciences/single-cell",
+      "07-attention-memory-reasoning/state-space-models",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "15-ml-theory-foundations/double-descent": [
+      "15-ml-theory-foundations/ntk",
+      "04-neural-networks-dl/optimization",
+      "15-ml-theory-foundations/pac-learning"
+    ],
+    "13-graph-relational-ai/message-passing": [
+      "15-ml-theory-foundations/ntk",
+      "14-biology-life-sciences/protein-lm",
+      "14-biology-life-sciences/protein-structure",
+      "03-representation-learning/self-supervised-learning",
+      "14-biology-life-sciences/single-cell"
+    ],
+    "06-reinforcement-learning/mdp": [
+      "04-neural-networks-dl/optimization",
+      "06-reinforcement-learning/ppo",
+      "08-causal-statistical-inference/scm",
+      "01-ai/search-algorithms",
+      "11-robotics-embodied-ai/sim-to-real",
+      "07-attention-memory-reasoning/state-space-models"
+    ],
+    "15-ml-theory-foundations/ntk": [
+      "15-ml-theory-foundations/pac-learning",
+      "12-physics-scientific-ai/pinn",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/quantization"
+    ],
+    "12-physics-scientific-ai/fno": [
+      "12-physics-scientific-ai/pinn",
+      "14-biology-life-sciences/protein-structure"
+    ],
+    "04-neural-networks-dl/optimization": [
+      "12-physics-scientific-ai/pinn",
+      "06-reinforcement-learning/ppo",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/quantization",
+      "03-representation-learning/self-supervised-learning",
+      "11-robotics-embodied-ai/sim-to-real",
+      "02-generative-modeling/variational-autoencoders",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "11-robotics-embodied-ai/imitation-learning": [
+      "06-reinforcement-learning/ppo",
+      "11-robotics-embodied-ai/sim-to-real"
+    ],
+    "09-algorithms-systems-ai/kv-cache": [
+      "14-biology-life-sciences/protein-lm",
+      "04-neural-networks-dl/scaling-laws",
+      "09-algorithms-systems-ai/quantization",
+      "07-attention-memory-reasoning/state-space-models",
+      "07-attention-memory-reasoning/vision-language-models"
+    ],
+    "14-biology-life-sciences/protein-lm": [
+      "14-biology-life-sciences/protein-structure",
+      "14-biology-life-sciences/single-cell"
+    ],
+    "06-reinforcement-learning/ppo": [
+      "01-ai/search-algorithms",
+      "11-robotics-embodied-ai/sim-to-real"
+    ],
+    "14-biology-life-sciences/protein-structure": [
+      "14-biology-life-sciences/single-cell"
+    ],
+    "03-representation-learning/self-supervised-learning": [
+      "07-attention-memory-reasoning/vision-language-models",
+      "02-generative-modeling/variational-autoencoders",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "04-neural-networks-dl/scaling-laws": [
+      "07-attention-memory-reasoning/vision-language-models"
+    ],
+    "02-generative-modeling/variational-autoencoders": [
+      "05-statistical-probabilistic-ml/variational-inference"
+    ]
+  }
+}

@@ -1,0 +1,180 @@
+/* Frontier Wiki — custom theme overrides
+   Palette: white + tomato red (#E8452A)
+
+   Root cause note: --md-primary-bg-color is the text color used ON TOP of the
+   primary-colored background. With a white header, this must be dark, not white —
+   otherwise all header icons, tab labels, and repo stats become invisible. */
+
+:root {
+  --md-primary-fg-color:        #E8452A;
+  --md-primary-fg-color--light: #FF6347;
+  --md-primary-fg-color--dark:  #C63818;
+  /* bg-color = text/icon color rendered ON the primary background.
+     Since our header is white, this must be dark. */
+  --md-primary-bg-color:        #1a1a1a;
+  --md-primary-bg-color--light: #374151;
+  --md-accent-fg-color:         #E8452A;
+  --md-accent-fg-color--transparent: rgba(232, 69, 42, 0.1);
+}
+
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+
+.md-header {
+  background-color: #FFFFFF;
+  border-bottom: 2px solid #E8452A;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  color: #1a1a1a;
+}
+
+.md-header__title {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+
+/* Header icon buttons (hamburger, search, GitHub) */
+.md-header__button {
+  color: #374151 !important;
+}
+
+.md-header__button:hover {
+  color: #E8452A !important;
+}
+
+/* ── Repo source widget (stars, forks) ───────────────────────────────────────── */
+
+.md-source {
+  color: #1a1a1a !important;
+}
+
+.md-source__repository {
+  color: #1a1a1a !important;
+  font-weight: 600;
+}
+
+.md-source__facts {
+  color: #4B5563 !important;
+}
+
+.md-source__fact::before {
+  color: #374151 !important;
+  background-color: #374151 !important;
+}
+
+/* The SVG icons inside the source fact (stars, forks) */
+.md-source__fact svg {
+  fill: #374151 !important;
+}
+
+/* ── Navigation tabs ─────────────────────────────────────────────────────────── */
+
+.md-tabs {
+  background-color: #FFFFFF;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.md-tabs__link {
+  color: #374151 !important;
+  opacity: 1;
+}
+
+/* Active tab: red text + underline indicator */
+.md-tabs__link--active,
+.md-tabs__link--active:focus,
+.md-tabs__link--active:hover {
+  color: #E8452A !important;
+  border-bottom: 2px solid #E8452A;
+  font-weight: 600;
+}
+
+.md-tabs__link:hover {
+  color: #E8452A !important;
+  opacity: 1;
+}
+
+/* ── Sidebar navigation ──────────────────────────────────────────────────────── */
+
+.md-nav__link--active {
+  color: #E8452A;
+  font-weight: 600;
+}
+
+.md-nav__link:hover {
+  color: #E8452A;
+}
+
+/* ── Content links ───────────────────────────────────────────────────────────── */
+
+.md-content a {
+  color: #E8452A;
+}
+
+.md-content a:hover {
+  color: #C63818;
+}
+
+/* ── Search ──────────────────────────────────────────────────────────────────── */
+
+.md-search-result mark {
+  color: #E8452A;
+  background-color: rgba(232, 69, 42, 0.12);
+}
+
+/* ── Code blocks ─────────────────────────────────────────────────────────────── */
+
+.highlight pre {
+  border-left: 3px solid #E8452A;
+}
+
+/* ── Tables ──────────────────────────────────────────────────────────────────── */
+
+.md-typeset table:not([class]) th {
+  background-color: #fff5f3;
+  color: #1a1a1a;
+  border-bottom: 2px solid #E8452A;
+}
+
+/* ── Admonitions ─────────────────────────────────────────────────────────────── */
+
+.md-typeset .admonition.tip,
+.md-typeset details.tip {
+  border-color: #E8452A;
+}
+
+.md-typeset .tip > .admonition-title,
+.md-typeset .tip > summary {
+  background-color: rgba(232, 69, 42, 0.08);
+  border-left-color: #E8452A;
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────────── */
+
+.md-typeset .grid.cards > ul > li {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  border-color: #E8452A;
+  box-shadow: 0 2px 12px rgba(232, 69, 42, 0.12);
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────────── */
+
+.md-footer {
+  background-color: #1a1a1a;
+}
+
+/* ── TOC ─────────────────────────────────────────────────────────────────────── */
+
+.md-nav--secondary .md-nav__link--active {
+  color: #E8452A;
+}
+
+/* ── Back to top ─────────────────────────────────────────────────────────────── */
+
+.md-top {
+  background-color: #E8452A;
+  color: white;
+}

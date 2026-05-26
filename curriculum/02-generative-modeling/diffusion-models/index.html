@@ -1,0 +1,4495 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/02-generative-modeling/diffusion-models/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../flow-matching/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Diffusion Models - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#diffusion-models" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Diffusion Models
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<p>I need to fix two issues:</p>
+<ol>
+<li><strong>Unapproved URL</strong>: Replace <code>https://www.adobe.com/products/firefly.html</code> with an approved engineering blog URL for Adobe, or remove/replace the Adobe entry entirely since Adobe doesn't appear on the approved domain list.</li>
+<li><strong>Citation hallucination/mismatch</strong>: "Simple Diffusion: End-to-End Diffusion for High Resolution Images" is cited as a 2025 Hoogeboom et al. paper, but the arXiv link <code>arxiv.org/abs/2301.11093</code> is from January 2023, not 2025. The paper title and authors also need verification — "Simple Diffusion" (Hoogeboom et al., 2023) is a real paper at that arXiv ID, but it's a 2023 paper, not 2025. I need to correct the year throughout and remove the "SiD2" label which appears to be a fabricated acronym for this paper. I'll fix all instances where this paper is misdated or mislabeled.</li>
+</ol>
+<hr />
+<div class="highlight"><pre><span></span><code><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Diffusion Models</span>
+<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">02-generative-modeling</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">diffusion</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ddpm</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">score-matching</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">denoising</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">generative-models</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">noise-schedule</span><span class="p p-Indicator">]</span>
+<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
+<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">variational-autoencoders</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">score-matching</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">markov-chains</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">neural-networks</span><span class="p p-Indicator">]</span>
+<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-01-30</span>
+<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nn">---</span>
+</code></pre></div>
+<h1 id="diffusion-models">Diffusion Models<a class="headerlink" href="#diffusion-models" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Generative models that learn to reverse a gradual noising process — currently the dominant paradigm for high-quality image, audio, video, and molecular structure generation, with a mathematical foundation that makes training stable and the framework applicable to almost any data modality.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>Start here</th>
+<th>Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Fine-tune or run a diffusion model on a real task</td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+<td>Understand why diffusion became the dominant generative paradigm</td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+<td>Derive the ELBO and the ε-prediction objective from first principles</td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+<td>Know where diffusion ends and flow matching begins, and what remains unsolved</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine dropping a single bead of blue ink into a glass of still water. Over minutes, the ink dissolves into the water until no trace of the original droplet remains — just a faint, uniform blue tint. Thermodynamics tells us this process is irreversible: you cannot un-mix the ink. Diffusion models turn this apparent impossibility into a tractable machine learning problem by breaking the reversal into hundreds of tiny, individually manageable steps. Instead of asking a neural network to conjure a photorealistic face from nothing, we ask it to answer a much simpler question at each step: <em>given this slightly noisy image, what does a slightly less noisy version look like?</em> Stack enough of those micro-decisions together, and you get generation.</p>
+<p>The mechanics work as follows. A <strong>forward process</strong> gradually injects Gaussian noise into a data sample over <span class="arithmatex">\(T\)</span> timesteps until the original signal is completely destroyed and only noise remains. A neural network is then trained to <strong>reverse</strong> this process: given a noisy sample at timestep <span class="arithmatex">\(t\)</span>, predict either the clean signal or — more commonly in practice — the noise vector that was added. What makes this computationally tractable is a crucial mathematical shortcut: the forward process has a closed-form marginal distribution, meaning you can compute exactly what a sample looks like after any number of noising steps without simulating each step individually. Training therefore consists of sampling a random timestep, adding the appropriate noise in a single operation, asking the network to predict that noise, and computing a simple mean-squared error loss.</p>
+<p>The dominant instantiation of this framework — DDPM, introduced by Ho et al. in 2020 — established that predicting the added noise vector <span class="arithmatex">\(\epsilon\)</span> rather than the clean image directly produces better training stability and sample quality. This noise-prediction objective connects diffusion models to score matching, the probabilistic framework that estimates the gradient of the log-density of the data distribution. That connection is not merely aesthetic: it explains <em>why</em> the iterative denoising procedure converges to samples from the true data distribution, and it opened the door to continuous-time generalizations that now underpin flow matching and stochastic differential equation (SDE)-based samplers.</p>
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>Diffusion models are the current answer to the question of how to generate high-quality samples from complex, high-dimensional distributions. Stable Diffusion, DALL-E 3, Sora, Stable Audio, and AlphaFold 3's structure diffusion module all rest on this framework. The reason diffusion displaced GANs as the dominant paradigm is training stability: there is no adversarial game, no discriminator to balance, no mode collapse. The reason flow matching is now challenging diffusion is inference speed — diffusion typically requires 50 to 1000 sequential denoising steps at inference time, while flow matching can achieve comparable quality in 8 to 20 steps by learning straighter probability paths. Understanding diffusion models is therefore not just understanding a technique; it is understanding the foundation from which the entire modern generative stack is either built or departing.</p>
+<p>The open problems in diffusion are not incremental. Inference acceleration remains unsolved at the theoretical level: current fast samplers (DDIM, DPM-Solver) are heuristic approximations, not principled derivations of the optimal trajectory for a given input. The relationship between the noise schedule and the geometry of the learned score function is poorly understood, which means practitioners tune schedules empirically rather than deriving them. And the question of whether pixel-space or latent-space diffusion is fundamentally superior — long assumed to favor latent models for efficiency — has been reopened by Hoogeboom et al. (2023), who showed that carefully optimized pixel-space models can match or exceed latent models on standard benchmarks. These are the questions that frontier labs are actively working on, and they are specific enough that a single paper could resolve any one of them.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Forward process</strong> — a fixed Markov chain <span class="arithmatex">\(q(x_t \mid x_{t-1})\)</span> that adds a small amount of Gaussian noise at each of <span class="arithmatex">\(T\)</span> steps, parameterized by a noise schedule <span class="arithmatex">\(\beta_1, \ldots, \beta_T\)</span></li>
+<li><strong>Closed-form marginal</strong> — <span class="arithmatex">\(q(x_t \mid x_0)\)</span> can be computed in one step as a Gaussian with mean <span class="arithmatex">\(\sqrt{\bar{\alpha}_t}\, x_0\)</span> and variance <span class="arithmatex">\((1 - \bar{\alpha}_t)I\)</span>, where <span class="arithmatex">\(\bar{\alpha}_t = \prod_{s=1}^t (1 - \beta_s)\)</span>; this is what makes training efficient</li>
+<li><strong>Reverse process</strong> — a learned Markov chain <span class="arithmatex">\(p_\theta(x_{t-1} \mid x_t)\)</span> that approximates the true posterior <span class="arithmatex">\(q(x_{t-1} \mid x_t, x_0)\)</span>, parameterized by a neural network</li>
+<li><strong>Noise prediction (ε-prediction)</strong> — the dominant training objective, where the network predicts the noise vector <span class="arithmatex">\(\epsilon\)</span> added to <span class="arithmatex">\(x_0\)</span> to produce <span class="arithmatex">\(x_t\)</span>, rather than predicting <span class="arithmatex">\(x_0\)</span> directly; empirically more stable</li>
+<li><strong>Score function</strong> — the gradient of the log-density <span class="arithmatex">\(\nabla_x \log p(x)\)</span>; the denoising network implicitly learns this at each noise level, connecting diffusion to score-based generative modeling</li>
+<li><strong>Noise schedule</strong> — the sequence <span class="arithmatex">\(\beta_1, \ldots, \beta_T\)</span> controlling how fast signal is destroyed; linear schedules (DDPM) and cosine schedules (Improved DDPM) are standard; the choice dominates training dynamics more than architecture</li>
+<li><strong>Classifier-free guidance (CFG)</strong> — a technique for conditioning generation on a label or text prompt by jointly training a conditional and unconditional model, then interpolating their score estimates at inference; the standard method for text-to-image control</li>
+<li><strong>Latent diffusion</strong> — running the diffusion process in the compressed latent space of a pretrained VAE rather than pixel space, dramatically reducing compute while preserving perceptual quality; the basis of Stable Diffusion</li>
+</ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p><strong>The forward process marginal.</strong> The key efficiency result is that you can compute <span class="arithmatex">\(x_t\)</span> from <span class="arithmatex">\(x_0\)</span> directly:</p>
+<div class="arithmatex">\[
+q(x_t \mid x_0) = \mathcal{N}\!\left(x_t;\; \sqrt{\bar{\alpha}_t}\, x_0,\; (1 - \bar{\alpha}_t) I\right)
+\]</div>
+<p>where <span class="arithmatex">\(x_0\)</span> is the original clean data sample, <span class="arithmatex">\(x_t\)</span> is the noisy version at timestep <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(\bar{\alpha}_t = \prod_{s=1}^{t}(1 - \beta_s)\)</span> is the cumulative product of signal-retention factors, and <span class="arithmatex">\(\beta_s \in (0, 1)\)</span> is the noise variance added at step <span class="arithmatex">\(s\)</span>. This equation says that at any timestep, the noisy sample is simply a weighted mixture of the original data and pure Gaussian noise — the weights are determined entirely by the noise schedule.</p>
+<p><strong>The reparameterization.</strong> From the marginal above, any noisy sample can be written as:</p>
+<div class="arithmatex">\[
+x_t = \sqrt{\bar{\alpha}_t}\, x_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon, \quad \epsilon \sim \mathcal{N}(0, I)
+\]</div>
+<p>where <span class="arithmatex">\(\epsilon\)</span> is the noise vector sampled independently at training time, and all other symbols are as above. This equation is the training workhorse: given <span class="arithmatex">\(x_0\)</span> and a sampled <span class="arithmatex">\(\epsilon\)</span>, you can construct <span class="arithmatex">\(x_t\)</span> for any <span class="arithmatex">\(t\)</span> in a single matrix operation — no simulation of intermediate steps required.</p>
+<p><strong>The DDPM training objective.</strong> Ho et al. (2020) showed that the variational lower bound on the log-likelihood simplifies to:</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{simple}} = \mathbb{E}_{t,\, x_0,\, \epsilon}\!\left[\left\|\epsilon - \epsilon_\theta(x_t, t)\right\|^2\right]
+\]</div>
+<p>where <span class="arithmatex">\(t\)</span> is sampled uniformly from <span class="arithmatex">\(\{1, \ldots, T\}\)</span>, <span class="arithmatex">\(x_0\)</span> is a training sample, <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, I)\)</span> is the noise added to produce <span class="arithmatex">\(x_t\)</span>, and <span class="arithmatex">\(\epsilon_\theta(x_t, t)\)</span> is the neural network's prediction of that noise given the noisy input and the timestep. This equation says that training is nothing more than supervised regression: the network learns to predict the noise it cannot see, given only the corrupted result. The simplicity of this objective — a plain MSE loss — is why diffusion training is so stable compared to adversarial methods.</p>
+<p><strong>The reverse process posterior.</strong> The true reverse step has a tractable closed form when conditioned on <span class="arithmatex">\(x_0\)</span>:</p>
+<div class="arithmatex">\[
+q(x_{t-1} \mid x_t, x_0) = \mathcal{N}\!\left(x_{t-1};\; \tilde{\mu}_t(x_t, x_0),\; \tilde{\beta}_t I\right)
+\]</div>
+<p>where <span class="arithmatex">\(\tilde{\mu}_t(x_t, x_0) = \frac{\sqrt{\bar{\alpha}_{t-1}}\,\beta_t}{1 - \bar{\alpha}_t}\,x_0 + \frac{\sqrt{\alpha_t}(1 - \bar{\alpha}_{t-1})}{1 - \bar{\alpha}_t}\,x_t\)</span> is the posterior mean, <span class="arithmatex">\(\tilde{\beta}_t = \frac{1 - \bar{\alpha}_{t-1}}{1 - \bar{\alpha}_t}\,\beta_t\)</span> is the posterior variance, and <span class="arithmatex">\(\alpha_t = 1 - \beta_t\)</span>. This equation says that the optimal denoising step is a specific linear combination of the current noisy sample and the predicted clean image — the network's job is to estimate <span class="arithmatex">\(x_0\)</span> (or equivalently <span class="arithmatex">\(\epsilon\)</span>) so this combination can be computed.</p>
+<p><strong>The score function connection.</strong> The noise-prediction network is related to the score function by:</p>
+<div class="arithmatex">\[
+\nabla_{x_t} \log q(x_t \mid x_0) = -\frac{\epsilon}{\sqrt{1 - \bar{\alpha}_t}}
+\]</div>
+<p>where <span class="arithmatex">\(\nabla_{x_t} \log q(x_t \mid x_0)\)</span> is the score of the noisy distribution at <span class="arithmatex">\(x_t\)</span>, and <span class="arithmatex">\(\epsilon\)</span> is the noise that was added. This equation says that predicting <span class="arithmatex">\(\epsilon\)</span> is equivalent to estimating the score function scaled by the noise level — which is why diffusion models and score-based generative models are mathematically the same framework viewed from different angles.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>DDPM</strong> (Ho et al., 2020) — the foundational pixel-space diffusion model; establishes ε-prediction, linear noise schedule, and the simplified MSE objective; 1000 inference steps</li>
+<li><strong>DDIM</strong> (Song et al., 2020) — deterministic sampler that reinterprets DDPM as a non-Markovian process, enabling 50-step inference with quality comparable to 1000-step DDPM; no retraining required</li>
+<li><strong>Improved DDPM</strong> (Nichol &amp; Dhariwal, 2021) — introduces cosine noise schedule and learned variance, significantly improving log-likelihood and enabling fewer inference steps</li>
+<li><strong>Classifier-free guidance (CFG)</strong> (Ho &amp; Salimans, 2022) — trains a single model to handle both conditional and unconditional generation; at inference, extrapolates beyond the conditional score for sharper, more prompt-faithful outputs; now standard in all text-to-image systems</li>
+<li><strong>Latent Diffusion Models (LDM)</strong> (Rombach et al., 2022) — moves the diffusion process into the latent space of a pretrained VAE, reducing image-space compute by ~16× while preserving perceptual quality; the architecture underlying Stable Diffusion</li>
+<li><strong>DPM-Solver</strong> (Lu et al., 2022) — a fast ODE solver for diffusion that achieves high-quality samples in 10–20 steps by exploiting the semi-linear structure of the diffusion ODE; widely used in production</li>
+<li><strong>EDM</strong> (Karras et al., 2022) — a principled framework that disentangles the network architecture, noise schedule, and sampler into independently tunable components; establishes best practices for training and sampling that most modern systems now follow</li>
+<li><strong>Simple Diffusion</strong> (Hoogeboom et al., 2023) — demonstrates that pixel-space diffusion with multiscale loss-weighting and simplified architecture matches or exceeds latent diffusion models in quality at high resolutions, reopening the pixel-vs-latent debate</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Deep Unsupervised Learning using Nonequilibrium Thermodynamics"</td>
+<td>2015</td>
+<td>Sohl-Dickstein et al.</td>
+<td>Establishes the thermodynamic Markov chain framework; the conceptual origin of the entire field</td>
+</tr>
+<tr>
+<td>"Denoising Diffusion Probabilistic Models"</td>
+<td>2020</td>
+<td>Ho, Jain, Abbeel</td>
+<td>Bridges thermodynamic framework to denoising score matching; introduces ε-prediction and the simplified objective that made diffusion practical</td>
+</tr>
+<tr>
+<td>"Denoising Diffusion Implicit Models"</td>
+<td>2020</td>
+<td>Song, Meng, Ermon</td>
+<td>Derives the deterministic sampler that reduces inference from 1000 to 50 steps; essential for any production deployment</td>
+</tr>
+<tr>
+<td>"Simple Diffusion: End-to-End Diffusion for High Resolution Images"</td>
+<td>2023</td>
+<td>Hoogeboom et al.</td>
+<td>Challenges the latent-diffusion consensus; shows pixel-space models are competitive at high resolution when multiscale loss-weighting and architecture are carefully optimized</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Deep Unsupervised Learning using Nonequilibrium Thermodynamics" — Sohl-Dickstein et al.</td>
+<td>2015</td>
+<td>First formulation of generative modeling as a learned reversal of a thermodynamic diffusion process</td>
+</tr>
+<tr>
+<td>"Generative Modeling by Estimating Gradients of the Data Distribution" — Song &amp; Ermon</td>
+<td>2019</td>
+<td>Introduced score-based generative modeling via Langevin dynamics; the probabilistic foundation that DDPM later unified with</td>
+</tr>
+<tr>
+<td>"Denoising Diffusion Probabilistic Models" — Ho, Jain, Abbeel</td>
+<td>2020</td>
+<td>Established the practical training recipe (ε-prediction, MSE loss) that every subsequent system builds on</td>
+</tr>
+<tr>
+<td>"Score-Based Generative Modeling through Stochastic Differential Equations" — Song et al.</td>
+<td>2021</td>
+<td>Unified discrete DDPM and continuous score matching under a single SDE framework; opened the door to continuous-time samplers</td>
+</tr>
+<tr>
+<td>"High-Resolution Image Synthesis with Latent Diffusion Models" — Rombach et al.</td>
+<td>2022</td>
+<td>Introduced latent diffusion; the architecture that made high-resolution generation computationally accessible and became Stable Diffusion</td>
+</tr>
+<tr>
+<td>"Elucidating the Design Space of Diffusion-Based Generative Models" — Karras et al.</td>
+<td>2022</td>
+<td>Decomposed diffusion into independently tunable components (EDM); the principled design framework most modern systems now follow</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>On class-conditional ImageNet 256×256 generation, the EDM2 framework (Karras et al., 2023) achieves FID 1.91, the strongest result for diffusion-based models on this benchmark. For text-to-image generation, FLUX.1 (Black Forest Labs, 2024) — a rectified flow transformer trained at scale — achieves state-of-the-art human preference scores on GenEval and T2I-CompBench, outperforming DALL-E 3 and Stable Diffusion 3 on compositional prompts. In the pixel-space regime, Hoogeboom et al.'s Simple Diffusion (2023) demonstrates that a carefully optimized pixel-space model matches latent diffusion models on FID at high resolutions while requiring fewer architectural components, directly challenging the assumption that latent-space processing is necessary for efficiency.</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The most active theoretical question is whether the noise schedule and inference trajectory can be derived rather than chosen. Current schedules — linear, cosine, or EDM's log-normal — are validated empirically, but there is no principled theory for why one schedule produces better samples than another for a given data distribution. A related open question: can the optimal number of denoising steps be determined per-sample at runtime, rather than fixed globally? Consistency models (Song et al., 2023) and consistency distillation attempt to collapse the multi-step process into one or a few steps, but the quality-speed tradeoff remains worse than flow matching for most benchmarks. The Simple Diffusion result (Hoogeboom et al., 2023) has also reopened the pixel-vs-latent question at a theoretical level: if pixel-space models are competitive when loss-weighting is corrected, what does this imply about the role of the VAE latent space in prior work?</p>
+<p><strong>Engineering and systems.</strong> Production diffusion inference has moved almost entirely to distilled, few-step models. Stable Diffusion 3.5 and FLUX.1 both ship with distilled variants that run in 4 steps using adversarial diffusion distillation or flow matching reflow. Quantization to INT8 and FP8 is now standard for serving, with NVIDIA's TensorRT and Hugging Face's <code>diffusers</code> library both supporting quantized inference pipelines. The architectural shift from UNet to DiT (Diffusion Transformer, Peebles &amp; Xie, 2023) is nearly complete in frontier systems: FLUX.1, Stable Diffusion 3, and Sora all use transformer backbones, which scale more predictably with compute and integrate more naturally with text conditioning via cross-attention.</p>
+<p><strong>Open problems.</strong> Three specific questions define the current research frontier. First: <em>can we derive a method to dynamically adapt the inference trajectory and noise schedule for a specific input at runtime, rather than using a static, globally optimized schedule?</em> This would require understanding the geometry of the learned score function per-sample, which is currently opaque. Second: <em>what is the correct theoretical explanation for why ε-prediction outperforms x₀-prediction empirically, given that both are mathematically equivalent reparameterizations of the same objective?</em> The empirical gap is well-documented but not theoretically explained. Third: <em>can diffusion models be made to generalize compositionally — combining objects, attributes, and spatial relationships specified in text — without requiring explicit structured representations?</em> Current text-to-image models fail systematically on compositional prompts (e.g., "a red cube to the left of a blue sphere"), and no diffusion-based approach has solved this without auxiliary supervision.</p>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Stability AI</strong> — Stable Diffusion 3.5 Large serves text-to-image generation at consumer scale; the model uses a DiT backbone with flow matching and runs in 4 steps with distillation; deployed via Stability AI's API and locally via <code>diffusers</code> — <a href="https://stability.ai/research">stability.ai/research</a></li>
+<li><strong>Google DeepMind</strong> — Imagen 3 powers text-to-image generation in Google's Gemini products; the system uses a cascaded pixel-space diffusion architecture with classifier-free guidance at multiple resolutions — <a href="https://research.google">research.google</a></li>
+<li><strong>Meta</strong> — Movie Gen (2024) uses a latent diffusion transformer for video generation at up to 16 seconds and 16 fps; the audio model is a separate diffusion system trained on waveforms — <a href="https://ai.meta.com/research">ai.meta.com/research</a></li>
+<li><strong>NVIDIA</strong> — Edify (2024), NVIDIA's internal text-to-image and text-to-3D system, uses a latent diffusion backbone and is deployed via the NVIDIA API for enterprise customers; the system generates 4K images and 3D assets — <a href="https://developer.nvidia.com/blog">developer.nvidia.com/blog</a></li>
+</ul>
+<hr />
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A diffusion model trained from scratch on 2D Swiss Roll data that learns to reverse a Gaussian noising process and generate samples from a structured geometric manifold.</p>
+<p><strong>Why this build:</strong> The Swiss Roll is the ideal first diffusion experiment — it is low-dimensional enough to visualize every step of the forward and reverse process, structured enough to verify that generation is working (the output should lie on a curved 2D manifold, not fill the plane), and fast enough to train in under three minutes on a free Colab T4. You will see, concretely, how a random Gaussian cloud morphs back into a structured shape through iterative denoising.</p>
+<p><strong>Stack:</strong> Python 3.10+, PyTorch 2.1+, scikit-learn 1.3+ (for Swiss Roll data), matplotlib 3.8+</p>
+<p><strong>Estimated time:</strong> 15–20 minutes including setup; training runs in under 3 minutes on a free Colab T4 or any modern CPU</p>
+<p><strong>Compute:</strong> CPU is sufficient; free Colab T4 runs it in ~90 seconds</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies and generate the Swiss Roll dataset</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># pip install torch scikit-learn matplotlib  (already available in Colab)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">make_swiss_roll</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
+<span class="c1"># Generate 10,000 Swiss Roll points in 2D (drop the y-axis)</span>
+<span class="n">X_np</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">make_swiss_roll</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">10_000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">X_np</span> <span class="o">=</span> <span class="n">X_np</span><span class="p">[:,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]]</span>  <span class="c1"># keep x and z axes</span>
+<span class="c1"># Normalize to roughly [-1, 1]</span>
+<span class="n">X_np</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_np</span> <span class="o">-</span> <span class="n">X_np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span> <span class="n">X_np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">X_np</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Sanity check: should be (10000, 2)</span>
+<span class="k">assert</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">10_000</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Unexpected shape: </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data shape: </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, range: [</span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">X</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the noise schedule and forward process utilities</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">T</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># number of diffusion timesteps</span>
+<span class="n">betas</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">1e-4</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>          <span class="c1"># linear schedule</span>
+<span class="n">alphas</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">betas</span>
+<span class="n">alpha_bars</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cumprod</span><span class="p">(</span><span class="n">alphas</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>                   <span class="c1"># ᾱ_t</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">q_sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add noise to x0 at timestep t using the closed-form marginal.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">noise</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x0</span><span class="p">)</span>
+    <span class="n">sqrt_alpha_bar</span> <span class="o">=</span> <span class="n">alpha_bars</span><span class="p">[</span><span class="n">t</span><span class="p">]</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">sqrt_one_minus</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha_bars</span><span class="p">[</span><span class="n">t</span><span class="p">])</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">sqrt_alpha_bar</span> <span class="o">*</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">sqrt_one_minus</span> <span class="o">*</span> <span class="n">noise</span><span class="p">,</span> <span class="n">noise</span>
+
+<span class="c1"># Quick sanity check: at t=0, x_t should be close to x0</span>
+<span class="n">t_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">x_noisy</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">q_sample</span><span class="p">(</span><span class="n">X</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span> <span class="n">t_test</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">x_noisy</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Forward process check passed.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the denoising network (a simple MLP)</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">DenoiseMLP</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Predicts the noise ε given a noisy sample x_t and timestep t.</span>
+<span class="sd">    Input: [x_t (2D), t_embedding (32D)] → hidden layers → ε (2D)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span> <span class="n">t_dim</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">t_embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">t_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span> <span class="o">+</span> <span class="n">t_dim</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">t_emb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">t_embed</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>          <span class="c1"># (B, t_dim)</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">t_emb</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, 2 + t_dim)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">DenoiseMLP</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Model parameters: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Expected: ~200,000 parameters</span>
+</code></pre></div>
+<ol>
+<li><strong>Train with the DDPM simplified objective</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">)</span>
+<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">n_epochs</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_epochs</span><span class="p">):</span>
+    <span class="c1"># Sample a random batch</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,))</span>
+    <span class="n">x0</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+
+    <span class="c1"># Sample random timesteps</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="c1"># Forward process: add noise</span>
+    <span class="n">x_noisy</span><span class="p">,</span> <span class="n">noise</span> <span class="o">=</span> <span class="n">q_sample</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># Predict noise</span>
+    <span class="n">noise_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_noisy</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+
+    <span class="c1"># DDPM simplified loss: MSE between predicted and actual noise</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="p">((</span><span class="n">noise_pred</span> <span class="o">-</span> <span class="n">noise</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+
+    <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">50</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">n_epochs</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Loss should decrease from ~1.0 to below 0.05</span>
+<span class="k">assert</span> <span class="n">losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Training may not have converged: final loss = </span><span class="si">{</span><span class="n">losses</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div>
+<ol>
+<li><strong>Run the reverse process to generate new samples</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">p_sample_loop</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate samples by running the reverse diffusion process.&quot;&quot;&quot;</span>
+    <span class="c1"># Start from pure Gaussian noise</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">t_idx</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">T</span><span class="p">)):</span>
+        <span class="n">t_batch</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">t_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+
+        <span class="c1"># Predict noise</span>
+        <span class="n">eps_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t_batch</span><span class="p">)</span>
+
+        <span class="c1"># Compute the reverse step mean (DDPM formula)</span>
+        <span class="n">alpha_t</span> <span class="o">=</span> <span class="n">alphas</span><span class="p">[</span><span class="n">t_idx</span><span class="p">]</span>
+        <span class="n">alpha_bar_t</span> <span class="o">=</span> <span class="n">alpha_bars</span><span class="p">[</span><span class="n">t_idx</span><span class="p">]</span>
+        <span class="n">beta_t</span> <span class="o">=</span> <span class="n">betas</span><span class="p">[</span><span class="n">t_idx</span><span class="p">]</span>
+
+        <span class="n">coef</span> <span class="o">=</span> <span class="n">beta_t</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">alpha_bar_t</span><span class="p">)</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">alpha_t</span><span class="o">.</span><span class="n">sqrt</span><span class="p">())</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">coef</span> <span class="o">*</span> <span class="n">eps_pred</span><span class="p">)</span>
+
+        <span class="c1"># Add noise for all steps except the last</span>
+        <span class="k">if</span> <span class="n">t_idx</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">beta_t</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span> <span class="o">*</span> <span class="n">noise</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">mean</span>
+
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
+
+<span class="n">samples</span> <span class="o">=</span> <span class="n">p_sample_loop</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2000</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated samples shape: </span><span class="si">{</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># (2000, 2)</span>
+</code></pre></div>
+<ol>
+<li><strong>Visualize the result</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_np</span><span class="p">[:</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">X_np</span><span class="p">[:</span><span class="mi">2000</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Real Swiss Roll data&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;coral&#39;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Diffusion model samples&quot;</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;swiss_roll_diffusion.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved: swiss_roll_diffusion.png&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>The generated scatter plot should show a curved, spiral-shaped manifold that visually matches the Swiss Roll structure of the training data. The samples should not fill the 2D plane uniformly — they should concentrate along the curved band. Training loss should decrease from approximately 1.0 at epoch 1 to below 0.05 by epoch 200. If you print <code>samples.std(axis=0)</code>, it should be in the range [0.8, 1.5], similar to the training data's standard deviation.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Generated samples look like a Gaussian blob, not a Swiss Roll</strong> → Training has not converged; increase <code>n_epochs</code> to 400 or reduce <code>batch_size</code> to 256 to see more gradient updates per epoch</li>
+<li><strong>Loss stays above 0.3 after 200 epochs</strong> → Learning rate may be too high; try <code>lr=1e-4</code>; also verify that <code>alpha_bars</code> is monotonically decreasing (print <code>alpha_bars[[0, 100, 200, 299]]</code>)</li>
+<li><strong>CUDA out of memory</strong> → Not expected for this model size, but if it occurs, move to CPU: <code>device = torch.device("cpu")</code></li>
+<li><strong>Samples have the right shape but are scaled wrong</strong> → Check that the training data was normalized; <code>X.mean()</code> should be near 0 and <code>X.std()</code> near 1</li>
+<li><strong><code>assert losses[-1] &lt; 0.1</code> fails</strong> → The MLP may need more capacity; increase <code>hidden</code> from 256 to 512</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Official DDPM (Ho et al.)</strong> — <a href="https://github.com/hojonathanho/diffusion">github.com/hojonathanho/diffusion</a> — the original TensorFlow implementation from the 2020 paper</li>
+<li><strong>Hugging Face <code>diffusers</code></strong> — <a href="https://github.com/huggingface/diffusers">github.com/huggingface/diffusers</a> — the canonical production library; supports DDPM, DDIM, LDM, Stable Diffusion, FLUX, and 50+ schedulers; model IDs: <code>stabilityai/stable-diffusion-2-1</code>, <code>black-forest-labs/FLUX.1-dev</code></li>
+<li><strong>EDM (Karras et al., 2022)</strong> — <a href="https://github.com/NVlabs/edm">github.com/NVlabs/edm</a> — NVIDIA's principled diffusion design space; reference implementation for EDM training and sampling</li>
+<li><strong>DiT (Peebles &amp; Xie, 2023)</strong> — <a href="https://github.com/facebookresearch/DiT">github.com/facebookresearch/DiT</a> — Diffusion Transformer; the architecture underlying FLUX and Stable Diffusion 3</li>
+<li><strong>OpenAI improved-diffusion</strong> — <a href="https://github.com/openai/improved-diffusion">github.com/openai/improved-diffusion</a> — reference implementation for Improved DDPM (cosine schedule, learned variance)</li>
+</ul>
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Score matching provides the probabilistic foundation that explains <em>why</em> the ε-prediction objective converges to samples from the true data distribution — understanding it makes the noise schedule in DDPM precise rather than heuristic.</p>
+<ul>
+<li>[[score-matching]] — the probabilistic framework underlying ε-prediction; diffusion models are score matching applied at multiple noise levels simultaneously</li>
+<li>[[flow-matching]] — generalizes the continuous-time perspective by learning straight probability paths rather than curved diffusion trajectories, achieving comparable quality in fewer inference steps</li>
+<li>[[latent-diffusion-models]] — applies the diffusion process in the compressed latent space of a VAE, the architectural decision that made high-resolution generation computationally accessible</li>
+</ul>
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[score-matching]] — Diffusion models use score matching to estimate the gradient of the data distribution at each noise level.</li>
+<li>[[flow-matching]] — Flow matching generalizes diffusion models by regressing vector fields directly, enabling faster generation with fewer steps.</li>
+<li>[[transformer-architecture]] — Diffusion Transformers (DiT) replace traditional U-Net backbones with transformer architectures, now the dominant backbone in frontier text-to-image and video systems.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Ho et al. (2020) — "Denoising Diffusion Probabilistic Models" — <a href="https://arxiv.org/abs/2006.11239">arxiv.org/abs/2006.11239</a> — the primary source for the ε-prediction objective and the simplified training loss; read the appendix for the full ELBO derivation</li>
+<li>Song et al. (2021) — "Score-Based Generative Modeling through Stochastic Differential Equations" — <a href="https://arxiv.org/abs/2011.13456">arxiv.org/abs/2011.13456</a> — unifies DDPM and score matching under a continuous-time SDE framework; essential for understanding the theoretical foundations</li>
+<li>Karras et al. (2022) — "Elucidating the Design Space of Diffusion-Based Generative Models" — <a href="https://arxiv.org/abs/2206.00364">arxiv.org/abs/2206.00364</a> — the most rigorous treatment of noise schedules, network preconditioning, and sampler design; the reference for practitioners who want to understand <em>why</em> specific choices work</li>
+<li>Lilian Weng — "What are Diffusion Models?" (lil'log, 2021) — <a href="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/">lilianweng.github.io/posts/2021-07-11-diffusion-models</a> — a thorough mathematical walkthrough of the DDPM derivation and its connections to score matching and energy-based models; useful as a companion to the original papers</li>
+<li>Rombach et al. (2022) — "High-Resolution Image Synthesis with Latent Diffusion Models" — <a href="https://arxiv.org/abs/2112.10752">arxiv.org/abs/2112.10752</a> — the paper that introduced latent diffusion and Stable Diffusion; explains the VAE-diffusion interface and the cross-attention conditioning mechanism in detail</li>
+<li>Hoogeboom et al. (2023) — "Simple Diffusion: End-to-End Diffusion for High Resolution Images" — <a href="https://arxiv.org/abs/2301.11093">arxiv.org/abs/2301.11093</a> — shows pixel-space diffusion is competitive with latent models at high resolution when multiscale loss-weighting is applied; directly relevant to the open question of whether latent space is necessary</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

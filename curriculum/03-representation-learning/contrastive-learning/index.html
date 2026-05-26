@@ -1,0 +1,4572 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/03-representation-learning/contrastive-learning/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../jepa/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Contrastive Learning - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#contrastive-learning" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Contrastive Learning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">CLIP</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">InfoNCE</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">contrastive-learning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">multimodal</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">representation-learning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">self-supervised-learning</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="contrastive-learning">Contrastive Learning<a class="headerlink" href="#contrastive-learning" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Contrastive learning trains encoders by pulling semantically similar pairs together and pushing dissimilar pairs apart in a shared latent space — enabling powerful, label-free representations that transfer to downstream tasks with little or no fine-tuning.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>What you get</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td>A working dual-encoder CLIP-style model trained on Flickr8k with InfoNCE loss</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td>An intuition for why comparison-based learning works better than label-based learning at scale</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td>Full InfoNCE derivation with annotated variables, alignment/uniformity decomposition</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td>Dimensional collapse, Gramian-based multi-modal alignment, scaling law results</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine teaching someone what a "guitar" is — not by handing them a dictionary definition, but by showing them an acoustic guitar and an electric guitar side by side ("these are the same kind of thing") while contrasting both against a violin ("this is different"). No labels required. The learner builds an internal model of "guitar-ness" purely from the structure of comparisons. This is the core intuition behind contrastive learning: rather than predicting absolute categories, a model learns by mapping relative semantic distances. Things that belong together should land close in the model's internal space; things that don't belong together should land far apart.</p>
+<p>The practical consequence of this framing is enormous. Supervised learning requires a human to assign a label to every training example — a bottleneck that limits scale. Contrastive learning sidesteps this by constructing its own supervision signal from the data itself. Two crops of the same image, a sentence and its translation, a photo and its caption — these are "positive pairs" that the model should map to nearby points. Everything else in the batch is a "negative" the model should push away. This self-supervised signal can be generated automatically at internet scale, which is why contrastive methods have become the dominant pre-training strategy for vision, language, and multimodal systems.</p>
+<p>What makes contrastive learning work in practice is the geometry it imposes on the learned space. A well-trained contrastive encoder doesn't just cluster positives together — it distributes representations uniformly across the hypersphere, preventing the model from collapsing to a trivial solution where everything maps to the same point. This balance between alignment (positives close) and uniformity (representations spread out) is the central tension the field has spent the last five years learning to control.</p>
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>Contrastive learning is the mechanism that made large-scale multimodal foundation models possible. CLIP (Radford et al., 2021) demonstrated that training a vision encoder and a text encoder jointly with a contrastive objective on 400 million web-scraped image-caption pairs produces visual representations that transfer to dozens of downstream tasks without any task-specific fine-tuning. That result reframed the entire question of visual pre-training: the bottleneck was never model capacity, it was the supervision signal. Contrastive learning at scale provides a supervision signal that is effectively unlimited, which is why every major vision-language model — from ALIGN to SigLIP to the vision towers inside LLaVA — uses some variant of this approach.</p>
+<p>The open problems that remain are not incremental. Contrastive learning still struggles with dimensional collapse — the tendency for representations to concentrate in a low-dimensional subspace of the embedding space, wasting capacity and degrading transfer. It also struggles with hard negatives: when a batch contains two images of different guitars, the model is penalized for treating them as dissimilar, even though they are semantically close. And as systems scale beyond two modalities (image + text + audio + depth + video), the pairwise cosine similarity that underlies InfoNCE becomes geometrically inadequate — a problem that recent work on Gramian-based alignment (2025) is beginning to address. These are the questions that determine whether contrastive representations can serve as the universal substrate for multimodal AI.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Positive pair</strong> — two views of the same underlying semantic content (e.g., two augmented crops of one image, or an image and its caption) that the model is trained to map to nearby points in embedding space.</li>
+<li><strong>Negative pair</strong> — two examples from different semantic categories that the model is trained to push apart; in practice, all other examples in the batch serve as negatives.</li>
+<li><strong>Embedding space / latent space</strong> — the high-dimensional vector space (typically <span class="arithmatex">\(\mathbb{R}^{128}\)</span> to <span class="arithmatex">\(\mathbb{R}^{1024}\)</span>) where encoders map inputs; contrastive training shapes the geometry of this space.</li>
+<li><strong>InfoNCE loss</strong> — the standard contrastive objective, derived from noise-contrastive estimation, that trains the model to identify the true positive among <span class="arithmatex">\(N-1\)</span> negatives in a batch.</li>
+<li><strong>Temperature parameter <span class="arithmatex">\(\tau\)</span></strong> — a scalar that controls the sharpness of the similarity distribution; low <span class="arithmatex">\(\tau\)</span> makes the model focus on hard negatives, high <span class="arithmatex">\(\tau\)</span> smooths the gradient signal.</li>
+<li><strong>Alignment</strong> — the property that positive pairs have high cosine similarity; a necessary condition for useful representations but not sufficient on its own.</li>
+<li><strong>Uniformity</strong> — the property that representations are spread uniformly across the unit hypersphere; prevents dimensional collapse and ensures the embedding space is used efficiently.</li>
+<li><strong>Dimensional collapse</strong> — the failure mode where representations span only a low-dimensional subspace despite the encoder having high capacity; a central unsolved problem in contrastive learning.</li>
+</ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>The core contrastive objective is the InfoNCE loss. For a batch of <span class="arithmatex">\(N\)</span> image-text pairs, the loss for a single image <span class="arithmatex">\(i\)</span> is:</p>
+<div class="arithmatex">\[
+\mathcal{L}_i = -\log \frac{\exp(\text{sim}(z_i^I, z_i^T) / \tau)}{\sum_{j=1}^{N} \exp(\text{sim}(z_i^I, z_j^T) / \tau)}
+\]</div>
+<p>where <span class="arithmatex">\(z_i^I \in \mathbb{R}^d\)</span> is the <span class="arithmatex">\(\ell_2\)</span>-normalized image embedding for example <span class="arithmatex">\(i\)</span>, <span class="arithmatex">\(z_i^T \in \mathbb{R}^d\)</span> is the <span class="arithmatex">\(\ell_2\)</span>-normalized text embedding for the same example, <span class="arithmatex">\(z_j^T\)</span> ranges over all <span class="arithmatex">\(N\)</span> text embeddings in the batch (including the true positive at <span class="arithmatex">\(j = i\)</span>), <span class="arithmatex">\(\text{sim}(\cdot, \cdot)\)</span> is cosine similarity, and <span class="arithmatex">\(\tau &gt; 0\)</span> is the temperature hyperparameter. This equation says that the model is solving an <span class="arithmatex">\(N\)</span>-way classification problem: given image <span class="arithmatex">\(i\)</span>, identify which of the <span class="arithmatex">\(N\)</span> text embeddings is its true match. The loss is minimized when the true positive scores higher than all negatives.</p>
+<p>The full symmetric CLIP loss averages the image-to-text and text-to-image directions:</p>
+<div class="arithmatex">\[
+\mathcal{L} = \frac{1}{2N} \sum_{i=1}^{N} \left( \mathcal{L}_i^{I \to T} + \mathcal{L}_i^{T \to I} \right)
+\]</div>
+<p>where <span class="arithmatex">\(\mathcal{L}_i^{I \to T}\)</span> is the per-example loss for identifying the correct text given image <span class="arithmatex">\(i\)</span> — computed as the InfoNCE expression above — and <span class="arithmatex">\(\mathcal{L}_i^{T \to I}\)</span> is the symmetric counterpart: the loss for identifying the correct image given text <span class="arithmatex">\(i\)</span>, computed by transposing the similarity matrix and applying the same softmax-cross-entropy. The factor <span class="arithmatex">\(\frac{1}{2N}\)</span> averages over both directions and all examples in the batch. This symmetry ensures that both encoders receive gradient signal from both directions simultaneously.</p>
+<p>Wang and Isola (2020) decomposed the contrastive objective into two interpretable terms. The alignment loss is:</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{align}} = \mathbb{E}_{(x, x^+) \sim p_{\text{pos}}} \left[ \| f(x) - f(x^+) \|^2 \right]
+\]</div>
+<p>where <span class="arithmatex">\(f(x) \in \mathbb{R}^d\)</span> is the <span class="arithmatex">\(\ell_2\)</span>-normalized embedding of input <span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(x^+\)</span> is a positive view drawn from the positive pair distribution <span class="arithmatex">\(p_{\text{pos}}\)</span>, and <span class="arithmatex">\(\|\cdot\|^2\)</span> is squared Euclidean distance on the unit hypersphere. This term says that the model should minimize the distance between positive pairs — it measures how well the encoder aligns semantically equivalent inputs.</p>
+<p>The uniformity loss is:</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{uniform}} = \log \mathbb{E}_{x, y \overset{\text{i.i.d.}}{\sim} p_{\text{data}}} \left[ e^{-2\|f(x) - f(y)\|^2} \right]
+\]</div>
+<p>where <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(y\)</span> are two independently sampled data points from the marginal data distribution <span class="arithmatex">\(p_{\text{data}}\)</span>, and <span class="arithmatex">\(f(\cdot)\)</span> is again the <span class="arithmatex">\(\ell_2\)</span>-normalized encoder. This term is minimized when representations are maximally spread across the unit hypersphere — it penalizes representations that cluster together regardless of semantics. The tension between these two terms is the fundamental trade-off contrastive learning must navigate: perfect alignment would collapse all positives to a single point, while perfect uniformity would push all points apart regardless of semantics.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>SimCLR (Chen et al., 2020)</strong> — trains a single vision encoder using two random augmentations of each image as positives; introduced the projection head (a small MLP applied before the loss) and showed that large batch sizes (4096+) are critical for performance.</li>
+<li><strong>MoCo / MoCo v2 / MoCo v3 (He et al., 2020; Chen et al., 2020, 2021)</strong> — uses a momentum encoder (an exponential moving average of the online encoder) and a memory queue to decouple batch size from the number of negatives, enabling contrastive training on single-GPU hardware.</li>
+<li><strong>CLIP (Radford et al., 2021)</strong> — trains a vision encoder and a text encoder jointly with symmetric InfoNCE on 400M web-scraped image-caption pairs; the resulting embeddings enable zero-shot classification by comparing image embeddings to text embeddings of class names.</li>
+<li><strong>ALIGN (Jia et al., 2021)</strong> — scales CLIP-style training to 1.8 billion noisy image-text pairs without aggressive data cleaning, showing that scale compensates for noise.</li>
+<li><strong>BYOL (Grill et al., 2020)</strong> — eliminates explicit negatives entirely by using an online/target network asymmetry with a stop-gradient operation; demonstrated that uniformity can be maintained without negative pairs, challenging the assumption that negatives are necessary.</li>
+<li><strong>SimSiam (Chen &amp; He, 2021)</strong> — further simplified BYOL by removing the momentum encoder, showing that stop-gradient alone prevents collapse; provided theoretical grounding for why asymmetric architectures avoid trivial solutions.</li>
+<li><strong>SigLIP (Zhai et al., 2023)</strong> — replaces the softmax-based InfoNCE with a sigmoid loss that treats each pair independently, removing the dependency on large batch sizes and enabling more stable training at scale.</li>
+<li><strong>GRAM (2025)</strong> — extends contrastive alignment beyond pairwise cosine similarity to <span class="arithmatex">\(k &gt; 2\)</span> modalities using Gramian volume as the alignment metric, enabling geometrically principled multi-modal pre-training.</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Learning Transferable Visual Models From Natural Language Supervision"</td>
+<td>2021</td>
+<td>Radford et al.</td>
+<td>Establishes CLIP; the foundational reference for contrastive multimodal pre-training at scale</td>
+</tr>
+<tr>
+<td>"Scaling Up Visual and Vision-Language Representation Learning With Noisy Text Supervision"</td>
+<td>2021</td>
+<td>Jia et al.</td>
+<td>Demonstrates that scale and noise tolerance matter more than data curation; establishes ALIGN</td>
+</tr>
+<tr>
+<td>"A Simple Framework for Contrastive Learning of Visual Representations"</td>
+<td>2020</td>
+<td>Chen et al.</td>
+<td>Establishes SimCLR; the clearest exposition of the core contrastive recipe for vision</td>
+</tr>
+<tr>
+<td>"Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere"</td>
+<td>2020</td>
+<td>Wang &amp; Isola</td>
+<td>Provides the theoretical decomposition of InfoNCE into alignment and uniformity terms</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Representation Learning with Contrastive Predictive Coding" (Oord et al.)</td>
+<td>2018</td>
+<td>Introduced CPC and the InfoNCE bound; established the theoretical connection between contrastive objectives and mutual information maximization</td>
+</tr>
+<tr>
+<td>"Momentum Contrast for Unsupervised Visual Representation Learning" (He et al.)</td>
+<td>2020</td>
+<td>Introduced the momentum encoder and memory queue, decoupling negative count from batch size and making contrastive learning practical on limited hardware</td>
+</tr>
+<tr>
+<td>"Bootstrap Your Own Latent" (Grill et al.)</td>
+<td>2020</td>
+<td>Showed that explicit negatives are not necessary for contrastive learning; forced the field to rethink why collapse is avoided</td>
+</tr>
+<tr>
+<td>"Learning Transferable Visual Models From Natural Language Supervision" (Radford et al.)</td>
+<td>2021</td>
+<td>Proved that contrastive pre-training on web-scale noisy data produces zero-shot transferable representations; redefined the standard for visual pre-training</td>
+</tr>
+<tr>
+<td>"Sigmoid Loss for Language Image Pre-Training" (Zhai et al.)</td>
+<td>2023</td>
+<td>Replaced softmax InfoNCE with per-pair sigmoid loss, removing the large-batch requirement and improving training stability at scale</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>OpenCLIP's largest ViT-G/14 model trained on LAION-2B achieves 80.1% zero-shot top-1 accuracy on ImageNet (Cherti et al., 2022). SigLIP-So400m achieves 83.2% zero-shot ImageNet accuracy while training stably at smaller batch sizes than softmax CLIP (Zhai et al., 2023). On cross-modal retrieval, the EVA-CLIP-18B model (Sun et al., 2023) achieves 83.8% zero-shot ImageNet top-1 and sets state-of-the-art on Flickr30k image-text retrieval at R@1 = 97.4%, representing the current ceiling for pure contrastive pre-training before instruction tuning is applied.</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The most active theoretical question is dimensional collapse: contrastive encoders routinely use only a small fraction of their nominal embedding dimension, concentrating representations in a low-dimensional subspace. This wastes capacity and degrades transfer to tasks that require fine-grained distinctions. Recent work has approached this through spectral regularization (penalizing the condition number of the embedding covariance matrix) and through feature decorrelation objectives borrowed from Barlow Twins (Zbontar et al., 2021). The deeper question — how to mathematically guarantee full-rank representations without relying on massive batch sizes or heuristic negative mining — remains open and is the subject of active work at DeepMind, Meta AI, and several academic groups. A precise formulation: can we derive a closed-form condition on the encoder architecture and loss that is both necessary and sufficient to prevent dimensional collapse for arbitrary data distributions?</p>
+<p><strong>Engineering and systems.</strong> The engineering challenge in contrastive learning at scale is the all-pairs similarity matrix. For a batch of <span class="arithmatex">\(N\)</span> examples, computing the <span class="arithmatex">\(N \times N\)</span> similarity matrix requires <span class="arithmatex">\(O(N^2)\)</span> memory, which becomes prohibitive at <span class="arithmatex">\(N &gt; 32{,}768\)</span>. SigLIP's per-pair sigmoid loss partially addresses this by enabling chunked computation, but the fundamental quadratic scaling remains. Distributed contrastive training across hundreds of GPUs requires careful all-gather operations to share embeddings across devices — a pattern implemented in OpenCLIP's <code>gather_features</code> utility and in Google's JAX-based training infrastructure. The practical consequence is that state-of-the-art contrastive training still requires TPU pods or multi-node GPU clusters, and reducing this compute requirement without sacrificing representation quality is an active engineering priority.</p>
+<p><strong>Open problems.</strong> Three specific questions define the frontier. First: how do we construct hard negatives automatically and at scale without introducing false negatives (two semantically similar examples incorrectly treated as dissimilar)? Current approaches use nearest-neighbor mining or curriculum strategies, but none have a principled solution to the false-negative problem. Second: can contrastive objectives be extended to more than two modalities without the combinatorial explosion of pairwise losses? The GRAM framework (2025) proposes Gramian volume as a <span class="arithmatex">\(k\)</span>-way alignment metric, but its scaling properties and gradient behavior at large <span class="arithmatex">\(k\)</span> are not yet well understood. Third: what is the right inductive bias for the projection head — the MLP applied before the contrastive loss — and why does removing it after training improve downstream performance? This gap between the representation that minimizes the contrastive loss and the representation that transfers best remains theoretically unexplained.</p>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Google</strong> — uses CLIP-style contrastive pre-training as the vision backbone for Google Lens, processing over 12 billion visual searches per month; the SigLIP architecture (Zhai et al., 2023) is the current production vision encoder — https://research.google/blog/</li>
+<li><strong>Meta AI</strong> — deploys contrastive image-text embeddings in Instagram's visual search and content recommendation systems, operating at billions of daily active users; the ImageBind model (Girdhar et al., 2023) extends contrastive alignment to six modalities in production — https://ai.meta.com/research/</li>
+<li><strong>OpenAI</strong> — CLIP embeddings power the image understanding components of GPT-4V and the DALL-E 3 safety classifiers; the original ViT-L/14 CLIP model processes millions of images daily in content moderation pipelines — https://openai.com/research/</li>
+<li><strong>Stability AI</strong> — uses CLIP text encoders as the conditioning signal in Stable Diffusion; the text encoder's contrastive pre-training is the mechanism by which text prompts are mapped to the latent space that guides image generation — https://stability.ai/research</li>
+<li><strong>LinkedIn</strong> — uses dual-encoder contrastive models for job-candidate matching and skills embedding, with the embedding space trained on implicit positive pairs derived from user engagement signals at hundreds of millions of members — https://engineering.linkedin.com/</li>
+</ul>
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A dual-encoder CLIP-style model trained on Flickr8k that maps images and captions into a shared 256-dimensional embedding space using InfoNCE loss.</p>
+<p><strong>Why this build:</strong> This demonstrates the complete contrastive learning loop — positive pair construction, symmetric InfoNCE computation, and the emergence of a joint embedding space where you can retrieve images from text queries and vice versa.</p>
+<p><strong>Stack:</strong> Python 3.10, PyTorch 2.1, torchvision 0.16, transformers 4.38 (HuggingFace), <code>openai/clip-vit-base-patch32</code> as the frozen text encoder backbone, Flickr8k dataset (~1GB, free download).</p>
+<p><strong>Estimated time:</strong> 2–3 hours on a free Colab T4 GPU (16GB VRAM). Runs comfortably within the free tier.</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Install dependencies and download Flickr8k</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># In Colab: run this cell first</span>
+<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">torch</span> <span class="n">torchvision</span> <span class="n">transformers</span> <span class="n">datasets</span> <span class="n">Pillow</span>
+
+<span class="c1"># Download Flickr8k via HuggingFace datasets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;nlphuji/flickr8k&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>  <span class="c1"># ~8k image-caption pairs</span>
+<span class="c1"># Flickr8k has 5 captions per image; we&#39;ll use the first caption only</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> examples&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  <span class="c1"># should show: image, caption, sentids, split, img_id</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the dual-encoder architecture</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CLIPTokenizer</span><span class="p">,</span> <span class="n">CLIPTextModel</span>
+
+<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ImageEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;ResNet-50 backbone with a linear projection head.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="n">backbone</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet50</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ResNet50_Weights</span><span class="o">.</span><span class="n">IMAGENET1K_V1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">backbone</span><span class="o">.</span><span class="n">children</span><span class="p">())[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># remove final FC</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2048</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, 2048)</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, embed_dim)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TextEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen CLIP text encoder with a linear projection head.&quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">CLIPTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">CLIPTextModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span><span class="p">)</span>
+        <span class="c1"># Freeze the CLIP text encoder — we only train the projection</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
+            <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">captions</span><span class="p">):</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
+            <span class="n">captions</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="mi">77</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+            <span class="n">text_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="o">**</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">pooler_output</span>  <span class="c1"># (B, 512)</span>
+        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">text_features</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, embed_dim)</span>
+
+
+<span class="n">image_encoder</span> <span class="o">=</span> <span class="n">ImageEncoder</span><span class="p">(</span><span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">text_encoder</span> <span class="o">=</span> <span class="n">TextEncoder</span><span class="p">(</span><span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+
+<span class="c1"># Sanity check: verify output shapes</span>
+<span class="n">dummy_img</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+<span class="n">dummy_txt</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a dog on a beach&quot;</span><span class="p">,</span> <span class="s2">&quot;a cat on a sofa&quot;</span><span class="p">,</span> <span class="s2">&quot;a bird in a tree&quot;</span><span class="p">,</span> <span class="s2">&quot;a car on a road&quot;</span><span class="p">]</span>
+<span class="n">img_emb</span> <span class="o">=</span> <span class="n">image_encoder</span><span class="p">(</span><span class="n">dummy_img</span><span class="p">)</span>
+<span class="n">txt_emb</span> <span class="o">=</span> <span class="n">text_encoder</span><span class="p">(</span><span class="n">dummy_txt</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">img_emb</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Expected (4, 256), got </span><span class="si">{</span><span class="n">img_emb</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="k">assert</span> <span class="n">txt_emb</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Expected (4, 256), got </span><span class="si">{</span><span class="n">txt_emb</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape check passed:&quot;</span><span class="p">,</span> <span class="n">img_emb</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">txt_emb</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Implement the symmetric InfoNCE loss</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">InfoNCELoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.07</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_embeddings</span><span class="p">,</span> <span class="n">text_embeddings</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        image_embeddings: (B, D) — L2-normalized image vectors</span>
+<span class="sd">        text_embeddings:  (B, D) — L2-normalized text vectors</span>
+<span class="sd">        Returns: scalar loss (symmetric InfoNCE)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">image_embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Compute (B, B) similarity matrix</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">image_embeddings</span><span class="p">,</span> <span class="n">text_embeddings</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
+        <span class="c1"># Ground truth: diagonal entries are the true positives</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+        <span class="c1"># Symmetric loss: image→text and text→image</span>
+        <span class="n">loss_i2t</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="n">loss_t2i</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">loss_i2t</span> <span class="o">+</span> <span class="n">loss_t2i</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+<span class="n">criterion</span> <span class="o">=</span> <span class="n">InfoNCELoss</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
+
+<span class="c1"># Sanity check: loss on random embeddings should be close to log(B)</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="n">dummy_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">img_emb</span><span class="p">,</span> <span class="n">txt_emb</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Random-init loss: </span><span class="si">{</span><span class="n">dummy_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> (expected ~</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Build the DataLoader</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+
+<span class="n">image_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
+    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
+<span class="p">])</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">Flickr8kDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hf_dataset</span><span class="p">,</span> <span class="n">transform</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">hf_dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
+        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+        <span class="n">image</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+        <span class="c1"># Flickr8k has a list of captions; take the first one</span>
+        <span class="n">caption</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;caption&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;caption&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;caption&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="n">caption</span>
+
+<span class="n">flickr_dataset</span> <span class="o">=</span> <span class="n">Flickr8kDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">image_transform</span><span class="p">)</span>
+<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">flickr_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batches per epoch: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Train for 10 epochs</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span>
+    <span class="nb">list</span><span class="p">(</span><span class="n">image_encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">text_encoder</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span>
+    <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">1e-4</span>
+<span class="p">)</span>
+<span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CosineAnnealingLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">image_encoder</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">text_encoder</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+    <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">captions</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">img_emb</span> <span class="o">=</span> <span class="n">image_encoder</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+        <span class="n">txt_emb</span> <span class="o">=</span> <span class="n">text_encoder</span><span class="p">(</span><span class="n">captions</span><span class="p">)</span>
+
+        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">img_emb</span><span class="p">,</span> <span class="n">txt_emb</span><span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+        <span class="c1"># Gradient clipping prevents instability at low temperature</span>
+        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">image_encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">text_encoder</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span>
+            <span class="n">max_norm</span><span class="o">=</span><span class="mf">1.0</span>
+        <span class="p">)</span>
+        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+        <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+
+    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | LR: </span><span class="si">{</span><span class="n">scheduler</span><span class="o">.</span><span class="n">get_last_lr</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Evaluate with text-to-image retrieval (Recall@1)</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">image_encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">text_encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="n">all_img_embs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">all_txt_embs</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">captions</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="n">all_img_embs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_encoder</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
+        <span class="n">all_txt_embs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_encoder</span><span class="p">(</span><span class="n">captions</span><span class="p">))</span>
+
+<span class="n">all_img_embs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_img_embs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (N, 256)</span>
+<span class="n">all_txt_embs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_txt_embs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (N, 256)</span>
+
+<span class="c1"># Text-to-image retrieval: for each text, find the closest image</span>
+<span class="n">similarity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">all_txt_embs</span><span class="p">,</span> <span class="n">all_img_embs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>  <span class="c1"># (N, N)</span>
+<span class="n">top1_preds</span> <span class="o">=</span> <span class="n">similarity</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (N,)</span>
+<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_img_embs</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
+<span class="n">recall_at_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">top1_preds</span> <span class="o">==</span> <span class="n">ground_truth</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Text→Image Recall@1: </span><span class="si">{</span><span class="n">recall_at_1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
+<span class="c1"># A random baseline would be ~0.01% for 8k examples</span>
+<span class="c1"># After 10 epochs you should see 15–30% Recall@1 on this small dataset</span>
+</code></pre></div>
+<ol>
+<li><strong>Save the checkpoint</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span>
+    <span class="s2">&quot;image_encoder&quot;</span><span class="p">:</span> <span class="n">image_encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+    <span class="s2">&quot;text_projection&quot;</span><span class="p">:</span> <span class="n">text_encoder</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
+    <span class="s2">&quot;embed_dim&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
+    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.07</span><span class="p">,</span>
+<span class="p">},</span> <span class="s2">&quot;flickr8k_clip_checkpoint.pt&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checkpoint saved: flickr8k_clip_checkpoint.pt&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>After 10 epochs on a Colab T4 (~45 minutes), you should see:
+- Training loss dropping from ~4.15 (random init, ≈ log(64)) to ~2.8–3.2
+- Text→Image Recall@1 of 15–30% on the full Flickr8k test split (random baseline: ~0.01%)
+- A saved checkpoint <code>flickr8k_clip_checkpoint.pt</code> (~100MB) containing the image encoder and text projection weights</p>
+<p>The embedding space can be visualized with UMAP: images of dogs, cats, and outdoor scenes should form loose clusters, with their corresponding captions landing nearby.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Loss stays at log(batch_size) and doesn't decrease</strong> → The image encoder's gradients are not flowing; check that <code>image_encoder.parameters()</code> is included in the optimizer and that <code>requires_grad=True</code> for the ResNet backbone layers.</li>
+<li><strong>CUDA out of memory on T4</strong> → Reduce batch size from 64 to 32; the loss will be noisier but training will converge.</li>
+<li><strong>Recall@1 stays below 5% after 10 epochs</strong> → Temperature is too low (try 0.1–0.2); very low temperatures make gradients vanish for all but the hardest negatives, which is counterproductive on small datasets.</li>
+<li><strong><code>KeyError: 'caption'</code> when loading Flickr8k</strong> → The HuggingFace dataset field name may vary by split; inspect <code>dataset[0].keys()</code> and adjust the field name in <code>Flickr8kDataset.__getitem__</code>.</li>
+<li><strong>Text encoder projection not training</strong> → Verify that <code>text_encoder.projection.parameters()</code> (not <code>text_encoder.parameters()</code>) is passed to the optimizer; the CLIP backbone is intentionally frozen.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>OpenCLIP</strong> (LAION-AI) — the reference open-source implementation of CLIP training, including SigLIP, CoCa, and scaling experiments: https://github.com/mlfoundations/open_clip</li>
+<li><strong>CLIP (OpenAI)</strong> — the original CLIP model weights and inference code, with ViT-B/32 through ViT-L/14@336px: https://github.com/openai/CLIP</li>
+<li><strong>SimCLR (Google Research)</strong> — the original SimCLR implementation in TensorFlow with the full augmentation pipeline: https://github.com/google-research/simclr</li>
+<li><strong>MoCo v3 (Facebook Research)</strong> — the MoCo v3 implementation with ViT backbone support: https://github.com/facebookresearch/moco-v3</li>
+<li><strong>HuggingFace CLIP model hub</strong> — pre-trained CLIP variants including <code>openai/clip-vit-base-patch32</code>, <code>openai/clip-vit-large-patch14</code>, and <code>laion/CLIP-ViT-H-14-laion2B-s32B-b79K</code>: https://huggingface.co/models?other=clip</li>
+</ul>
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Understanding contrastive learning's geometry makes the design choices in self-supervised vision transformers precise rather than heuristic — the alignment/uniformity trade-off directly explains why DINO's centering operation prevents collapse.</p>
+<ul>
+<li>[[self-supervised-learning]] — contrastive learning is one family within self-supervised learning; the broader landscape includes masked autoencoders and predictive methods that don't use explicit negatives.</li>
+<li>[[multimodal-representation-learning]] — CLIP-style contrastive pre-training is the foundation of multimodal systems; joint embedding spaces are used for retrieval, generation, and grounding.</li>
+<li>[[disentangled-representations]] — contrastive objectives shape the global geometry of embedding spaces but don't enforce factorization of semantic factors; disentanglement methods address what contrastive learning leaves unstructured.</li>
+</ul>
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[backpropagation]] — contrastive learning relies on backpropagation to optimize representation alignments using gradient descent.</li>
+<li>[[transformer-architecture]] — transformer architectures are frequently pre-trained using self-supervised contrastive learning objectives.</li>
+<li>[[score-matching]] — noise-contrastive estimation shares theoretical foundations with score matching for energy-based model estimation.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Radford et al. (2021) — "Learning Transferable Visual Models From Natural Language Supervision" — https://arxiv.org/abs/2103.00020 — the CLIP paper; essential for understanding how contrastive objectives scale to web data and enable zero-shot transfer.</li>
+<li>Oord et al. (2018) — "Representation Learning with Contrastive Predictive Coding" — https://arxiv.org/abs/1807.03748 — derives the InfoNCE bound from first principles and establishes the connection between contrastive objectives and mutual information maximization.</li>
+<li>Wang &amp; Isola (2020) — "Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere" — https://arxiv.org/abs/2005.10242 — provides the alignment/uniformity decomposition that gives geometric meaning to what InfoNCE is actually optimizing.</li>
+<li>Lilian Weng (2021) — "Contrastive Representation Learning" — https://lilianweng.github.io/posts/2021-05-31-contrastive/ — a comprehensive survey covering SimCLR, MoCo, BYOL, and CLIP with unified notation; useful for seeing how the methods relate to each other.</li>
+<li>Cherti et al. (2022) — "Reproducible Scaling Laws for Contrastive Language-Image Learning" — https://arxiv.org/abs/2212.07143 — empirically derives the scaling laws for CLIP-style training, showing the precise relationship between compute budget, dataset size, and downstream zero-shot performance.</li>
+<li>Zbontar et al. (2021) — "Barlow Twins: Self-Supervised Learning via Redundancy Reduction" — https://arxiv.org/abs/2103.03230 — introduces a cross-correlation-based objective that directly targets dimensional collapse, offering a complementary perspective on why uniformity matters and how to enforce it without negatives.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

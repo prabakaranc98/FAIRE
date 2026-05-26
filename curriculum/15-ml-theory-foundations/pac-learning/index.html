@@ -1,0 +1,3950 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/15-ml-theory-foundations/pac-learning/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../double-descent/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>PAC Learning - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PAC Learning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/classical-planning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../01-ai/search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>PAC Learning</h1>
+
+<div class="highlight"><pre><span></span><code><span class="nn">---</span>
+<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PAC Learning</span>
+<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15-ml-theory-foundations</span>
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">PAC learning</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">generalization</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">sample complexity</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">machine learning theory</span><span class="p p-Indicator">]</span>
+<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foundational</span>
+<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">statistical-learning-theory</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">bias-variance-decomposition</span><span class="p p-Indicator">]</span>
+<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-11-02</span>
+<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+<span class="nn">---</span>
+<span class="c1"># PAC Learning</span>
+<span class="p p-Indicator">&gt;</span><span class="err"> **TL;DR:** PAC (Probably Approximately Correct) learning provides a formal framework for understanding the sample complexity required to learn a concept from data, guaranteeing generalization performance with high probability.</span>
+
+<span class="nn">---</span>
+
+<span class="c1">## For your reader type</span>
+
+<span class="p p-Indicator">|</span><span class="err"> I am... | Start here | Goal |</span>
+<span class="p p-Indicator">|</span><span class="err">---|---|---|</span>
+<span class="p p-Indicator">|</span><span class="err"> MS/applied practitioner | [Key algorithms](</span><span class="c1">#key-algorithms--techniques) → [Code &amp; implementations](#code--implementations) | Build something that works |</span>
+<span class="p p-Indicator">|</span><span class="err"> Curious generalist | [What it is](</span><span class="c1">#what-it-is) → [Why it matters](#why-it-matters-at-the-frontier) | Build intuition |</span>
+<span class="p p-Indicator">|</span><span class="err"> Math/theory student | [Core concepts](</span><span class="c1">#core-concepts) → [Mathematical foundations](#mathematical-foundations) | Understand the mechanics |</span>
+<span class="p p-Indicator">|</span><span class="err"> Researcher / frontier | [Current SotA](</span><span class="c1">#current-sota) → [Seminal papers](#seminal-papers--test-of-time) | Know where the open problems are |</span>
+
+<span class="nn">---</span>
+
+<span class="c1">## What it is</span>
+<span class="l l-Scalar l-Scalar-Plain">Imagine you&#39;re teaching a computer to recognize handwritten digits. You show it thousands of examples, hoping it will learn to distinguish a &quot;3&quot; from an &quot;8.&quot; But what if some of your examples are mislabeled, or the data is inherently noisy? PAC learning provides a framework for understanding how well a machine can learn, even when the data isn&#39;t perfect. It helps us understand the sample complexity of learning.</span>
+
+<span class="l l-Scalar l-Scalar-Plain">PAC learning, short for Probably Approximately Correct learning, is a mathematical framework for analyzing the sample complexity of machine learning algorithms. It addresses the fundamental question</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">how many training examples are needed to ensure that a learning algorithm will, with high probability, produce a hypothesis that is approximately correct? This framework provides theoretical guarantees on the generalization performance of learning algorithms, even in the presence of noisy data.</span>
+
+<span class="l l-Scalar l-Scalar-Plain">The core idea behind PAC learning is to quantify the trade-off between the desired accuracy (\(\epsilon\)) and the confidence level (\(\delta\)). A PAC-learnable concept class is one for which a learning algorithm can, with probability at least \(1 - \delta\), find a hypothesis with error at most \(\epsilon\), given a sufficiently large training set. This framework is essential for understanding the limits of learning and for designing algorithms that can learn effectively from finite data.</span>
+
+<span class="c1">## Why it matters at the frontier</span>
+<span class="l l-Scalar l-Scalar-Plain">PAC learning provides a theoretical foundation for understanding the generalization capabilities of machine learning models, which is crucial for addressing open problems in the field. For instance, understanding the sample complexity of learning hierarchical functions is essential for designing deep learning architectures that can generalize well from limited data. Furthermore, PAC learning frameworks are being extended to analyze the learning dynamics of complex systems like autoregressive models, providing insights into the behavior of large language models.</span>
+
+<span class="l l-Scalar l-Scalar-Plain">Frontier labs are actively researching tighter generalization bounds and more efficient learning algorithms within the PAC learning framework. For example, researchers are exploring how interpolation techniques can lead to tighter bounds on generalization error. Additionally, there is ongoing work to develop computationally efficient learners that can achieve optimal error rates in agnostic PAC learning, pushing the boundaries of what is theoretically possible. The ultimate goal is to develop a comprehensive theory that can explain and predict the performance of machine learning models in real-world scenarios.</span>
+
+<span class="c1">## Core concepts</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Concept</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Class (\(\mathcal{C}\))** — A set of possible target functions that the learner is trying to learn.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Hypothesis</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Class (\(\mathcal{H}\))** — The set of functions that the learning algorithm can choose from to approximate the target function.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Sample</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Complexity** — The number of training examples required to achieve a desired level of accuracy and confidence.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Error</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(\(\epsilon\))** — The maximum allowable difference between the hypothesis and the true target function.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Confidence</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">(\(\delta\))** — The probability that the learning algorithm will produce a hypothesis with error at most \(\epsilon\).</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*PAC-Learnable</span><span class="err">**</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">— A concept class is PAC-learnable if there exists an algorithm that can, with high probability, find a hypothesis with low error, given a sufficiently large training set.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Agnostic</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Learning** — A learning setting where no assumptions are made about the true target function or the data distribution.</span>
+
+<span class="c1">## Mathematical foundations</span>
+<span class="l l-Scalar l-Scalar-Plain">In PAC learning, we aim to find a hypothesis \(h \in \mathcal{H}\) that approximates the target concept \(c \in \mathcal{C}\) with high probability. The error of a hypothesis \(h\) is defined as</span><span class="p p-Indicator">:</span>
+<span class="l l-Scalar l-Scalar-Plain">\[</span>
+<span class="l l-Scalar l-Scalar-Plain">\text{err}(h) = \mathbb{P}_{x \sim D}(h(x) \neq c(x))</span>
+<span class="l l-Scalar l-Scalar-Plain">\]</span>
+<span class="l l-Scalar l-Scalar-Plain">where \(D\) is the data distribution, \(x\) is a data point, \(h(x)\) is the prediction of the hypothesis, and \(c(x)\) is the true label. This equation defines the probability that the hypothesis \(h\) makes an incorrect prediction on a randomly drawn example \(x\) from the distribution \(D\).</span>
+
+<span class="l l-Scalar l-Scalar-Plain">The goal of PAC learning is to ensure that, with probability at least \(1 - \delta\), the error of the chosen hypothesis \(h\) is at most \(\epsilon\)</span><span class="p p-Indicator">:</span>
+<span class="l l-Scalar l-Scalar-Plain">\[</span>
+<span class="l l-Scalar l-Scalar-Plain">\mathbb{P}(\text{err}(h) \leq \epsilon) \geq 1 - \delta</span>
+<span class="l l-Scalar l-Scalar-Plain">\]</span>
+<span class="l l-Scalar l-Scalar-Plain">where \(\epsilon\) is the desired accuracy and \(\delta\) is the confidence level. This inequality states that the probability of the error of the hypothesis \(h\) being less than or equal to \(\epsilon\) is greater than or equal to \(1 - \delta\), ensuring that the hypothesis is approximately correct with high probability.</span>
+
+<span class="l l-Scalar l-Scalar-Plain">For a finite hypothesis class \(\mathcal{H}\), the sample complexity \(m\) can be bounded using the following inequality</span><span class="p p-Indicator">:</span>
+<span class="l l-Scalar l-Scalar-Plain">\[</span>
+<span class="l l-Scalar l-Scalar-Plain">m \geq \frac{1}{\epsilon} \left( \log(|\mathcal{H}|) + \log\left(\frac{1}{\delta}\right) \right)</span>
+<span class="l l-Scalar l-Scalar-Plain">\]</span>
+<span class="l l-Scalar l-Scalar-Plain">where \(m\) is the number of training examples, \(\epsilon\) is the desired accuracy, \(\delta\) is the confidence level, and \(|\mathcal{H}|\) is the size of the hypothesis class. This inequality provides a lower bound on the number of training examples needed to PAC-learn a concept class, showing that the sample complexity grows logarithmically with the size of the hypothesis class and inversely with the desired accuracy and confidence.</span>
+
+<span class="c1">## Key algorithms / techniques</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Empirical</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Risk Minimization (ERM)** — A principle where the learning algorithm selects the hypothesis that minimizes the error on the training data.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="err">*</span><span class="nv">*Occam</span><span class="s">&#39;s</span><span class="nv"> </span><span class="s">Razor**</span><span class="nv"> </span><span class="s">—</span><span class="nv"> </span><span class="s">The</span><span class="nv"> </span><span class="s">principle</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">preferring</span><span class="nv"> </span><span class="s">simpler</span><span class="nv"> </span><span class="s">hypotheses,</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">often</span><span class="nv"> </span><span class="s">generalize</span><span class="nv"> </span><span class="s">better</span><span class="nv"> </span><span class="s">than</span><span class="nv"> </span><span class="s">more</span><span class="nv"> </span><span class="s">complex</span><span class="nv"> </span><span class="s">ones.</span>
+<span class="s">-</span><span class="nv"> </span><span class="s">**VC</span><span class="nv"> </span><span class="s">Dimension**</span><span class="nv"> </span><span class="s">—</span><span class="nv"> </span><span class="s">A</span><span class="nv"> </span><span class="s">measure</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">hypothesis</span><span class="nv"> </span><span class="s">class,</span><span class="nv"> </span><span class="s">defined</span><span class="nv"> </span><span class="s">as</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">maximum</span><span class="nv"> </span><span class="s">number</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">points</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">can</span><span class="nv"> </span><span class="s">be</span><span class="nv"> </span><span class="s">shattered</span><span class="nv"> </span><span class="s">by</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">class.</span>
+<span class="s">-</span><span class="nv"> </span><span class="s">**Rademacher</span><span class="nv"> </span><span class="s">Complexity**</span><span class="nv"> </span><span class="s">—</span><span class="nv"> </span><span class="s">A</span><span class="nv"> </span><span class="s">measure</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">ability</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">hypothesis</span><span class="nv"> </span><span class="s">class</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">fit</span><span class="nv"> </span><span class="s">random</span><span class="nv"> </span><span class="s">noise,</span><span class="nv"> </span><span class="s">used</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">bound</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">generalization</span><span class="nv"> </span><span class="s">error.</span>
+<span class="s">-</span><span class="nv"> </span><span class="s">**Structural</span><span class="nv"> </span><span class="s">Risk</span><span class="nv"> </span><span class="s">Minimization</span><span class="nv"> </span><span class="s">(SRM)**</span><span class="nv"> </span><span class="s">—</span><span class="nv"> </span><span class="s">A</span><span class="nv"> </span><span class="s">technique</span><span class="nv"> </span><span class="s">that</span><span class="nv"> </span><span class="s">balances</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">empirical</span><span class="nv"> </span><span class="s">risk</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">penalty</span><span class="nv"> </span><span class="s">to</span><span class="nv"> </span><span class="s">prevent</span><span class="nv"> </span><span class="s">overfitting.</span>
+
+<span class="s">##</span><span class="nv"> </span><span class="s">Essential</span><span class="nv"> </span><span class="s">reading</span>
+
+<span class="s">|</span><span class="nv"> </span><span class="s">Paper</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Year</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Authors</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Why</span><span class="nv"> </span><span class="s">essential</span><span class="nv"> </span><span class="s">|</span>
+<span class="s">|---|---|---|---|</span>
+<span class="s">|</span><span class="nv"> </span><span class="s">Revisiting</span><span class="nv"> </span><span class="s">Agnostic</span><span class="nv"> </span><span class="s">PAC</span><span class="nv"> </span><span class="s">Learning</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">2024</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Hanneke</span><span class="nv"> </span><span class="s">et</span><span class="nv"> </span><span class="s">al.</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Addresses</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">shortcomings</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">ERM</span><span class="nv"> </span><span class="s">learners</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">agnostic</span><span class="nv"> </span><span class="s">case,</span><span class="nv"> </span><span class="s">providing</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">more</span><span class="nv"> </span><span class="s">fine-grained</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">demonstrating</span><span class="nv"> </span><span class="s">tightness</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">error</span><span class="nv"> </span><span class="s">lower</span><span class="nv"> </span><span class="s">bound.</span><span class="nv"> </span><span class="s">|</span>
+<span class="s">|</span><span class="nv"> </span><span class="s">Sample</span><span class="nv"> </span><span class="s">Complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">Autoregressive</span><span class="nv"> </span><span class="s">Reasoning:</span><span class="nv"> </span><span class="s">Chain-of-Thought</span><span class="nv"> </span><span class="s">vs.</span><span class="nv"> </span><span class="s">End-to-End</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">2025</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Joshi</span><span class="nv"> </span><span class="s">et</span><span class="nv"> </span><span class="s">al.</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Introduces</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">PAC-learning</span><span class="nv"> </span><span class="s">framework</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">next-token</span><span class="nv"> </span><span class="s">generators,</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">primitive</span><span class="nv"> </span><span class="s">underlying</span><span class="nv"> </span><span class="s">autoregressive</span><span class="nv"> </span><span class="s">models,</span><span class="nv"> </span><span class="s">which</span><span class="nv"> </span><span class="s">is</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">very</span><span class="nv"> </span><span class="s">relevant</span><span class="nv"> </span><span class="s">application</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">PAC</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">current</span><span class="nv"> </span><span class="s">landscape.</span><span class="nv"> </span><span class="s">|</span>
+<span class="s">|</span><span class="nv"> </span><span class="s">Noise</span><span class="nv"> </span><span class="s">Sensitivity</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">Learning</span><span class="nv"> </span><span class="s">Lower</span><span class="nv"> </span><span class="s">Bounds</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">Hierarchical</span><span class="nv"> </span><span class="s">Functions</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">2025</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Li</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Explores</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">functions</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">hierarchical</span><span class="nv"> </span><span class="s">structure,</span><span class="nv"> </span><span class="s">providing</span><span class="nv"> </span><span class="s">applications</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">agnostic</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">statistical</span><span class="nv"> </span><span class="s">query</span><span class="nv"> </span><span class="s">lower</span><span class="nv"> </span><span class="s">bounds.</span><span class="nv"> </span><span class="s">|</span>
+
+<span class="s">##</span><span class="nv"> </span><span class="s">Seminal</span><span class="nv"> </span><span class="s">papers</span><span class="nv"> </span><span class="s">&amp;</span><span class="nv"> </span><span class="s">test-of-time</span>
+
+<span class="s">|</span><span class="nv"> </span><span class="s">Paper</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Year</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Key</span><span class="nv"> </span><span class="s">contribution</span><span class="nv"> </span><span class="s">|</span>
+<span class="s">|---|---|---|</span>
+<span class="s">|</span><span class="nv"> </span><span class="s">Revisiting</span><span class="nv"> </span><span class="s">Agnostic</span><span class="nv"> </span><span class="s">PAC</span><span class="nv"> </span><span class="s">Learning</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">1984</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Introduced</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">PAC</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">framework,</span><span class="nv"> </span><span class="s">providing</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">formal</span><span class="nv"> </span><span class="s">model</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">understanding</span><span class="nv"> </span><span class="s">learnability</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">generalization.</span><span class="nv"> </span><span class="s">|</span>
+<span class="s">|</span><span class="nv"> </span><span class="s">Sample</span><span class="nv"> </span><span class="s">Complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">Autoregressive</span><span class="nv"> </span><span class="s">Reasoning:</span><span class="nv"> </span><span class="s">Chain-of-Thought</span><span class="nv"> </span><span class="s">vs.</span><span class="nv"> </span><span class="s">End-to-End</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">1998</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Introduced</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">VC</span><span class="nv"> </span><span class="s">dimension,</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">key</span><span class="nv"> </span><span class="s">measure</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">hypothesis</span><span class="nv"> </span><span class="s">class.</span><span class="nv"> </span><span class="s">|</span>
+<span class="s">|</span><span class="nv"> </span><span class="s">Noise</span><span class="nv"> </span><span class="s">Sensitivity</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">Learning</span><span class="nv"> </span><span class="s">Lower</span><span class="nv"> </span><span class="s">Bounds</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">Hierarchical</span><span class="nv"> </span><span class="s">Functions</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">2002</span><span class="nv"> </span><span class="s">|</span><span class="nv"> </span><span class="s">Developed</span><span class="nv"> </span><span class="s">Rademacher</span><span class="nv"> </span><span class="s">complexity,</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">powerful</span><span class="nv"> </span><span class="s">tool</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">bounding</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">generalization</span><span class="nv"> </span><span class="s">error</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">algorithms.</span><span class="nv"> </span><span class="s">|</span>
+
+<span class="s">##</span><span class="nv"> </span><span class="s">Current</span><span class="nv"> </span><span class="s">SotA</span>
+<span class="s">Cohen</span><span class="nv"> </span><span class="s">et</span><span class="nv"> </span><span class="s">al.</span><span class="nv"> </span><span class="s">(2025)</span><span class="nv"> </span><span class="s">provides</span><span class="nv"> </span><span class="s">tight</span><span class="nv"> </span><span class="s">bounds</span><span class="nv"> </span><span class="s">on</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">sample</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">agnostic</span><span class="nv"> </span><span class="s">multiclass</span><span class="nv"> </span><span class="s">classification.</span><span class="nv"> </span><span class="s">Li</span><span class="nv"> </span><span class="s">(2025)</span><span class="nv"> </span><span class="s">explores</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">functions</span><span class="nv"> </span><span class="s">with</span><span class="nv"> </span><span class="s">hierarchical</span><span class="nv"> </span><span class="s">structure,</span><span class="nv"> </span><span class="s">providing</span><span class="nv"> </span><span class="s">applications</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">agnostic</span><span class="nv"> </span><span class="s">learning</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">statistical</span><span class="nv"> </span><span class="s">query</span><span class="nv"> </span><span class="s">lower</span><span class="nv"> </span><span class="s">bounds.</span><span class="nv"> </span><span class="s">Joshi</span><span class="nv"> </span><span class="s">et</span><span class="nv"> </span><span class="s">al.</span><span class="nv"> </span><span class="s">(2025)</span><span class="nv"> </span><span class="s">introduces</span><span class="nv"> </span><span class="s">a</span><span class="nv"> </span><span class="s">PAC-learning</span><span class="nv"> </span><span class="s">framework</span><span class="nv"> </span><span class="s">for</span><span class="nv"> </span><span class="s">next-token</span><span class="nv"> </span><span class="s">generators,</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">primitive</span><span class="nv"> </span><span class="s">underlying</span><span class="nv"> </span><span class="s">autoregressive</span><span class="nv"> </span><span class="s">models,</span><span class="nv"> </span><span class="s">and</span><span class="nv"> </span><span class="s">studies</span><span class="nv"> </span><span class="s">the</span><span class="nv"> </span><span class="s">sample</span><span class="nv"> </span><span class="s">complexity</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">such</span><span class="nv"> </span><span class="s">systems.</span>
+
+<span class="s">##</span><span class="nv"> </span><span class="s">What&#39;</span><span class="l l-Scalar l-Scalar-Plain">s happening now</span>
+<span class="l l-Scalar l-Scalar-Plain">Research frontiers are focused on developing tighter generalization bounds that can better capture the performance of modern machine learning models. Viallard et al. (2024) explores tighter generalization bounds via interpolation. The development of new theoretical tools and techniques is essential for understanding the behavior of complex models in high-dimensional spaces.</span>
+
+<span class="l l-Scalar l-Scalar-Plain">Engineering and systems efforts are aimed at designing more efficient learning algorithms that can achieve PAC guarantees with limited computational resources. This includes developing algorithms that can learn from streaming data and algorithms that can handle noisy or incomplete data. The goal is to make PAC learning more practical and applicable to real-world problems.</span>
+
+<span class="nt">An open problem in PAC learning is</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Can we develop a computationally efficient learner that achieves an error rate of \(c \cdot \tau + O\left(\sqrt{\frac{\tau(d + \log(1 / \delta))}{m}} + \frac{d + \log(1 / \delta)}{m} \right)\) for agnostic learning, with a constant \(c\) of 1, thereby completely settling the complexity of agnostic learning?</span>
+
+<span class="c1">## In production</span>
+<span class="l l-Scalar l-Scalar-Plain">While specific production deployments directly citing &quot;PAC learning&quot; are difficult to source, the principles of generalization and sample complexity are fundamental to how machine learning models are developed and deployed at scale. These principles guide decisions about data collection, model selection, and evaluation in various applications.</span>
+
+<span class="c1">## Minimum Valuable Build</span>
+<span class="l l-Scalar l-Scalar-Plain">For a hands-on build with this concept, see the MVB on [[model-selection]].</span>
+
+<span class="c1">## Code &amp; implementations</span>
+<span class="err">*</span><span class="w">   </span><span class="err">*</span><span class="nv">*scikit-learn</span><span class="err">**</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">— [https://scikit-learn.org/stable/](https://scikit-learn.org/stable/) — A comprehensive library for machine learning in Python, including implementations of various learning algorithms and tools for model selection and evaluation.</span>
+<span class="err">*</span><span class="w">   </span><span class="err">*</span><span class="nv">*TensorFlow</span><span class="err">**</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">— [https://www.tensorflow.org/](https://www.tensorflow.org/) — An open-source machine learning framework developed by Google, providing a flexible platform for building and training machine learning models.</span>
+<span class="err">*</span><span class="w">   </span><span class="err">*</span><span class="nv">*PyTorch</span><span class="err">**</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">— [https://pytorch.org/](https://pytorch.org/) — An open-source machine learning framework developed by Facebook, known for its dynamic computation graph and ease of use.</span>
+
+<span class="c1">## What comes next</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">statistical-learning-theory</span><span class="p p-Indicator">]]</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">— provides a broader context for understanding the theoretical foundations of machine learning.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[[</span><span class="nv">regularization</span><span class="p p-Indicator">]]</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">— applies PAC learning principles to improve the generalization performance of machine learning models by preventing overfitting.</span>
+
+<span class="c1">## Connected topics</span>
+
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Neural Tangent Kernel (NTK)</span><span class="p p-Indicator">]</span><span class="l l-Scalar l-Scalar-Plain">(./ntk.md) — NTK is related to understanding the generalization properties of learning algorithms.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Double Descent</span><span class="p p-Indicator">]</span><span class="l l-Scalar l-Scalar-Plain">(./double-descent.md) — Double descent explores how model performance changes with increasing model complexity.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Bayesian Inference</span><span class="p p-Indicator">]</span><span class="l l-Scalar l-Scalar-Plain">(../05-statistical-probabilistic-ml/bayesian-inference.md) — Bayesian methods offer an alternative approach to learning with uncertainty.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Gaussian Processes</span><span class="p p-Indicator">]</span><span class="l l-Scalar l-Scalar-Plain">(../05-statistical-probabilistic-ml/gaussian-processes.md) — Gaussian processes provide a probabilistic framework for learning and prediction.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Backpropagation</span><span class="p p-Indicator">]</span><span class="l l-Scalar l-Scalar-Plain">(../04-neural-networks-dl/backpropagation.md) — Backpropagation is a core algorithm used for training neural networks.</span>
+<span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">Contrastive Learning</span><span class="p p-Indicator">]</span><span class="l l-Scalar l-Scalar-Plain">(../03-representation-learning/contrastive-learning.md) — Contrastive learning focuses on learning representations that capture similarities and differences.</span>
+
+
+<span class="c1">## Further reading</span>
+<span class="err">*</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">Hanneke et al. (2024) — &quot;Revisiting Agnostic PAC Learning&quot; — [https://arxiv.org/pdf/2407.19777] — This paper provides a comprehensive overview of PAC learning, covering the key concepts, algorithms, and theoretical results.</span>
+<span class="err">*</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">Dandi (2025) — &quot;The Computational Advantage of Depth</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Learning High-Dimensional Hierarchical Functions with Gradient Descent&quot; — [https://arxiv.org/abs/2502.13961v4] — This paper explores the learning complexity of functions with hierarchical structure, providing applications for agnostic learning and statistical query lower bounds.</span>
+<span class="err">*</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">Joshi et al. (2025) — &quot;Sample Complexity of Autoregressive Reasoning</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Chain-of-Thought vs. End-to-End&quot; — [https://arxiv.org/abs/2604.12013v1] — This paper introduces a PAC-learning framework for next-token generators, the primitive underlying autoregressive models, and studies the sample complexity of such systems.</span>
+<span class="err">*</span><span class="w">   </span><span class="l l-Scalar l-Scalar-Plain">Viallard et al. (2024) — &quot;Tighter Generalisation Bounds via Interpolation&quot; — [https://arxiv.org/pdf/2402.05101] — This paper explores tighter generalization bounds.</span>
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

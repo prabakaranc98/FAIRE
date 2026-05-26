@@ -1,0 +1,4621 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/01-ai/classical-planning/">
+      
+      
+        <link rel="prev" href="../agent-architectures/">
+      
+      
+        <link rel="next" href="../search-algorithms/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Classical Planning - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#classical-planning" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Classical Planning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../arcs/" class="md-tabs__link">
+          
+  
+  
+  Learning Arcs
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    01 · AI Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agent-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Classical Planning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#for-your-reader-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        For your reader type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-is" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it is
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it matters at the frontier
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-concepts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core concepts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mathematical-foundations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Mathematical foundations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-algorithms-techniques" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key algorithms / techniques
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#essential-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Essential reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#seminal-papers-test-of-time" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Seminal papers &amp; test-of-time
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-sota" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current SotA
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-happening-now" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What's happening now
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#in-production" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        In production
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimum-valuable-build" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimum Valuable Build
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Minimum Valuable Build">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-recipe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The recipe
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#expected-output" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected output
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stretch-goals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stretch goals
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#common-failure-modes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Common failure modes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#code-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Code &amp; implementations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-comes-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What comes next
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connected-topics" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connected topics
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#further-reading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Further reading
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../search-algorithms/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Search Algorithms
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    02 · Generative Modeling
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/diffusion-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diffusion Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/flow-matching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Flow Matching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../02-generative-modeling/variational-autoencoders/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Autoencoders
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_4" id="__nav_2_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    03 · Representation Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/contrastive-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contrastive Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/jepa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    JEPA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../03-representation-learning/self-supervised-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Self-Supervised Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_5" id="__nav_2_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    04 · Neural Networks & Deep Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/backpropagation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backpropagation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/optimization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../04-neural-networks-dl/scaling-laws/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scaling Laws
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_6" id="__nav_2_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    05 · Statistical & Probabilistic ML
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/bayesian-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bayesian Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/gaussian-processes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gaussian Processes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../05-statistical-probabilistic-ml/variational-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Variational Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    06 · Reinforcement Learning
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/mdp/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MDPs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/ppo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PPO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../06-reinforcement-learning/rlhf/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RLHF
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Transformers & Language Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    07 · Transformers & Language Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/state-space-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    State Space Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../07-attention-memory-reasoning/vision-language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vision-Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    08 · Causal & Statistical Inference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/scm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structural Causal Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/do-calculus/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Do-Calculus
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../08-causal-statistical-inference/counterfactuals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Counterfactuals
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    09 · Algorithms & Systems for AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/data-parallelism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Parallelism
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/kv-cache/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    KV Cache
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../09-algorithms-systems-ai/quantization/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantization
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity & Cognition
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    10 · Complexity & Cognition
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/complexity-classes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Complexity Classes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/emergent-capabilities/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Emergent Capabilities
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../10-complexity-cognition/cognitive-architectures/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cognitive Architectures
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    11 · Robotics & Embodied AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    11 · Robotics & Embodied AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/foundation-models-robotics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Foundation Models for Robotics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/imitation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Imitation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../11-robotics-embodied-ai/sim-to-real/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sim-to-Real
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    12 · Physics & Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    12 · Physics & Scientific AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/pinn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PINNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/fno/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Fourier Neural Operators
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../12-physics-scientific-ai/equivariant-networks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant Networks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    13 · Graph & Relational AI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_14">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    13 · Graph & Relational AI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/message-passing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Message Passing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/gnn-expressivity/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GNN Expressivity
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../13-graph-relational-ai/equivariant-gnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Equivariant GNNs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_15" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_15" id="__nav_2_15_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    14 · Biology & Life Sciences
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_15_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_15">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    14 · Biology & Life Sciences
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Structure
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/protein-lm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Protein Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../14-biology-life-sciences/single-cell/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-Cell AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_16" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_16" id="__nav_2_16_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    15 · ML Theory & Foundations
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_16_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_16">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    15 · ML Theory & Foundations
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/pac-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PAC Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/double-descent/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Double Descent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../15-ml-theory-foundations/ntk/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Neural Tangent Kernel
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learning Arcs
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Learning Arcs
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/mlp-to-transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MLP to Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/generative-stack/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generative Stack
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/language-models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Language Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/causal-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Causal AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/systems-for-scale/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Systems for Scale
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../arcs/scientific-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Scientific AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">PDDL</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">automated-planning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">classical-planning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">heuristic-search</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">neuro-symbolic</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="classical-planning">Classical Planning<a class="headerlink" href="#classical-planning" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>TL;DR:</strong> Classical planning is the formal problem of finding a sequence of actions that transforms a known initial state into a goal state — and in 2025, frontier LLMs have begun generating heuristics that outperform hand-crafted C++ solvers, making this the most contested boundary between symbolic AI and neural methods.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>What you get</th>
+<th>Go to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td>A working hybrid neuro-symbolic planner you can run in Colab today</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td>The story of how a 70-year-old AI paradigm just had its most dramatic year</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td>The formal STRIPS model, heuristic admissibility, and the h-max derivation</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+</tr>
+<tr>
+<td>Researcher / frontier</td>
+<td>LLM-generated heuristics, IPC 2025 results, and the optimality gap problem</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Here is the plot twist nobody in AI expected: in 2023, frontier language models scored absolute zero on basic planning benchmarks. Researchers at Apple published a paper titled "Can LLMs Really Reason and Plan?" and the answer, empirically, was no — GPT-4 failed tasks that a first-year AI student could solve by hand. The consensus hardened: planning requires symbolic rigor that neural networks fundamentally cannot provide. Then 2025 arrived. Gemini 2.5 Pro entered the International Planning Competition and, on several benchmark domains, outperformed state-of-the-art classical planners that had been tuned by domain experts over decades. The field has not recovered its consensus since.</p>
+<p>Classical planning, at its core, is the problem of finding a sequence of actions to get from where you are to where you want to be, given a complete and deterministic model of the world. The formalism that made this tractable — STRIPS, developed at SRI in 1971 — represents the world as a set of logical propositions, actions as precondition-effect pairs, and planning as a search through the space of reachable states. This is not a toy abstraction: the same formal structure underlies robot manipulation pipelines, logistics optimization at FedEx, and the action-selection layer in autonomous agents. What makes it hard is combinatorial explosion — a domain with 20 binary propositions has over a million possible states, and real logistics problems have billions.</p>
+<p>The reason classical planning survived the deep learning era is that it offers something neural networks historically could not: <em>guarantees</em>. A classical planner can certify that a plan is optimal (shortest possible), or that no plan exists, or that every action in the sequence is valid given the world model. These properties matter enormously in safety-critical settings. What is changing now is not the symbolic engine — the search algorithms and formal semantics are as rigorous as ever — but the <em>heuristic guidance</em> that tells the search where to look first. LLMs have turned out to be surprisingly good at generating that guidance, which is why the field is in the middle of a genuine paradigm shift.</p>
+<hr />
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>The frontier labs — Google DeepMind, Meta FAIR, and several academic groups — are investing heavily in classical planning not because they want to build better logistics schedulers, but because planning is the missing piece in autonomous agent architectures. A language model that can write code, browse the web, and call APIs is not an agent unless it can sequence those capabilities coherently toward a goal. The dominant approach in 2024 was to prompt LLMs to generate plans directly, but this produces plans that are syntactically plausible and semantically wrong — the model hallucinates preconditions, skips steps, and cannot detect when a plan has failed. Classical planning provides the verification layer: a symbolic executor that checks every action against the world model before committing to it.</p>
+<p>The deeper reason this matters is the optimality question. Satisficing planning — finding <em>any</em> valid plan — is tractable for modern systems, but optimal planning — finding the <em>shortest</em> valid plan — remains PSPACE-hard in general, and no LLM has demonstrated reliable optimality on non-trivial domains. This gap is not academic. In drug synthesis planning, the difference between a 12-step and an 8-step route is the difference between a viable and an unviable manufacturing process. In robotic manipulation, suboptimal plans accumulate error. The open question driving current research is whether the neuro-symbolic combination can close this gap, or whether optimality will always require pure symbolic search.</p>
+<hr />
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>State space</strong> — the set of all possible world configurations, represented as assignments of truth values to a finite set of propositions; planning is search over this space.</li>
+<li><strong>STRIPS representation</strong> — a formalism where each action has a precondition list (propositions that must be true), an add list (propositions made true), and a delete list (propositions made false); the foundation of nearly all classical planning languages.</li>
+<li><strong>PDDL (Planning Domain Definition Language)</strong> — the standard file format for specifying planning problems, separating the domain (action schemas) from the problem instance (initial state and goal); used in all International Planning Competitions.</li>
+<li><strong>Heuristic function</strong> — a function <span class="arithmatex">\(h(s)\)</span> estimating the cost from state <span class="arithmatex">\(s\)</span> to the goal; the quality of this estimate determines whether search is tractable or exponential.</li>
+<li><strong>Admissibility</strong> — a heuristic is admissible if it never overestimates the true cost to the goal; admissible heuristics guarantee that A* finds an optimal plan.</li>
+<li><strong>Relaxed planning graph</strong> — a polynomial-time-constructible approximation of the reachability structure of a planning problem, obtained by ignoring delete lists; the basis for the FF and h-add heuristics.</li>
+<li><strong>Satisficing vs. optimal planning</strong> — satisficing planning finds any valid plan (tractable in practice); optimal planning finds the shortest plan (PSPACE-hard in general, requiring admissible heuristics and exhaustive search).</li>
+<li><strong>Grounding</strong> — the process of instantiating lifted action schemas (with variables) into concrete ground actions (with specific objects); a preprocessing step that can itself be exponential in the number of objects.</li>
+</ul>
+<hr />
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>A classical planning problem is formally a tuple <span class="arithmatex">\(\Pi = \langle F, A, I, G \rangle\)</span>.</p>
+<div class="arithmatex">\[
+\Pi = \langle F,\; A,\; I,\; G \rangle
+\]</div>
+<p>where <span class="arithmatex">\(F\)</span> is the finite set of propositional fluents (facts that can be true or false), <span class="arithmatex">\(A\)</span> is the set of ground actions, <span class="arithmatex">\(I \subseteq F\)</span> is the initial state (the set of fluents true at the start), and <span class="arithmatex">\(G \subseteq F\)</span> is the goal condition (the set of fluents that must be true in the final state). This equation says that planning is entirely determined by these four components — no probabilities, no partial observability, no continuous dynamics.</p>
+<p>Each action <span class="arithmatex">\(a \in A\)</span> is defined by three sets:</p>
+<div class="arithmatex">\[
+a = \langle \text{pre}(a),\; \text{add}(a),\; \text{del}(a) \rangle
+\]</div>
+<p>where <span class="arithmatex">\(\text{pre}(a) \subseteq F\)</span> is the precondition (fluents that must hold for <span class="arithmatex">\(a\)</span> to be applicable), <span class="arithmatex">\(\text{add}(a) \subseteq F\)</span> is the add effect (fluents made true after applying <span class="arithmatex">\(a\)</span>), and <span class="arithmatex">\(\text{del}(a) \subseteq F\)</span> is the delete effect (fluents made false). The successor state after applying <span class="arithmatex">\(a\)</span> to state <span class="arithmatex">\(s\)</span> is <span class="arithmatex">\(\gamma(s, a) = (s \setminus \text{del}(a)) \cup \text{add}(a)\)</span>, defined only when <span class="arithmatex">\(\text{pre}(a) \subseteq s\)</span>.</p>
+<p>The h-max heuristic — one of the most theoretically important admissible heuristics — estimates goal distance by computing the maximum cost over all goal propositions:</p>
+<div class="arithmatex">\[
+h_{\max}(G, s) = \max_{p \in G}\; h_{\max}(\{p\}, s)
+\]</div>
+<p>where <span class="arithmatex">\(G\)</span> is the set of goal propositions, <span class="arithmatex">\(s\)</span> is the current state, and <span class="arithmatex">\(h_{\max}(\{p\}, s)\)</span> is the estimated cost to achieve a single proposition <span class="arithmatex">\(p\)</span>. For a single proposition <span class="arithmatex">\(p \notin s\)</span>, this expands recursively as:</p>
+<div class="arithmatex">\[
+h_{\max}(\{p\}, s) = \min_{a \in A:\, p \in \text{add}(a)} \bigl\{ \text{cost}(a) + h_{\max}(\text{pre}(a), s) \bigr\}
+\]</div>
+<p>where <span class="arithmatex">\(\text{cost}(a)\)</span> is the action cost (typically 1 for unit-cost domains), and the recursion bottoms out at <span class="arithmatex">\(h_{\max}(G, s) = 0\)</span> whenever <span class="arithmatex">\(G \subseteq s\)</span>. This equation says that to achieve proposition <span class="arithmatex">\(p\)</span>, the planner finds the cheapest action that adds <span class="arithmatex">\(p\)</span> and recursively estimates the cost of achieving that action's preconditions — taking the maximum over all goal propositions to get a single scalar estimate. The max aggregation makes h-max admissible (it never overestimates) but inadmissible in practice for guiding search efficiently, which is why h-add (summing instead of taking the max) is often preferred despite losing admissibility.</p>
+<hr />
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>A* search</strong> — the canonical optimal planning algorithm; expands states in order of <span class="arithmatex">\(f(s) = g(s) + h(s)\)</span> where <span class="arithmatex">\(g(s)\)</span> is the cost from the initial state and <span class="arithmatex">\(h(s)\)</span> is an admissible heuristic; guarantees optimality when <span class="arithmatex">\(h\)</span> is admissible and consistent.</li>
+<li><strong>Greedy Best-First Search (GBFS)</strong> — expands states in order of <span class="arithmatex">\(h(s)\)</span> alone, ignoring path cost; much faster than A* in practice but sacrifices optimality guarantees; the workhorse of satisficing planners like FF and LAMA.</li>
+<li><strong>FF (Fast Forward, Hoffmann &amp; Nebel 2001)</strong> — the planner that made heuristic search dominant; uses a relaxed planning graph to compute the h-FF heuristic and combines GBFS with enforced hill-climbing; won the 2000 IPC and defined the next decade of research.</li>
+<li><strong>LAMA (Richter &amp; Westphal 2010)</strong> — a multi-heuristic satisficing planner that iteratively improves plan quality using landmark-based heuristics; the most reliable satisficing planner on diverse benchmarks for over a decade.</li>
+<li><strong>Fast Downward (Helmert 2006)</strong> — the dominant open-source planning framework; implements causal graph heuristics, merge-and-shrink abstraction, and a modular architecture that most research planners build on; available at <a href="https://www.fast-downward.org">fastdownward.org</a>.</li>
+<li><strong>SATPlan (Kautz &amp; Selman 1992)</strong> — compiles a planning problem into a propositional SAT formula for a fixed horizon <span class="arithmatex">\(T\)</span>, then calls a SAT solver; if unsatisfiable, increments <span class="arithmatex">\(T\)</span>; optimal when the first satisfying assignment is found at the minimum <span class="arithmatex">\(T\)</span>.</li>
+<li><strong>LLM-generated heuristics (Anselm et al. 2025)</strong> — prompts a frontier LLM to write a Python function <span class="arithmatex">\(h(s) \to \mathbb{R}\)</span> for a given domain, then plugs this function into a standard GBFS engine; demonstrated to outperform hand-crafted C++ heuristics on several IPC domains.</li>
+<li><strong>Landmarks</strong> — facts or actions that must appear in every plan from the initial state to the goal; computed by analyzing the causal structure of the planning graph; used as subgoals to decompose hard problems and as the basis for the LAMA heuristic.</li>
+</ul>
+<hr />
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Planning as Satisfiability"</td>
+<td>1992</td>
+<td>Kautz &amp; Selman</td>
+<td>Introduced SATPlan, proving that planning can be compiled into SAT — the foundational insight that planning is a combinatorial search problem with formal structure</td>
+</tr>
+<tr>
+<td>"The FF Planning System: Fast Plan Generation Through Heuristic Search"</td>
+<td>2001</td>
+<td>Hoffmann &amp; Nebel</td>
+<td>Established heuristic search as the dominant paradigm; the relaxed planning graph heuristic it introduced underlies most modern planners</td>
+</tr>
+<tr>
+<td>"Classical Planning with LLM-Generated Heuristics: Challenging the State of the Art with Python Code"</td>
+<td>2025</td>
+<td>Anselm et al.</td>
+<td>Demonstrates that LLM-generated Python heuristics outperform optimized C++ heuristics on IPC benchmarks — the paper that operationalized the neuro-symbolic hybrid</td>
+</tr>
+<tr>
+<td>"Frontier LLMs Rival State-of-the-Art Planners at the International Planning Competition"</td>
+<td>2025</td>
+<td>Multiple authors (IPC 2025 report)</td>
+<td>Documents the longitudinal leap from zero to IPC-competitive performance, with controlled benchmark comparisons across model generations</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"STRIPS: A New Approach to the Application of Theorem Proving to Problem Solving" (Fikes &amp; Nilsson)</td>
+<td>1971</td>
+<td>Defined the STRIPS representation that every subsequent planning formalism builds on; introduced the notion of operators with preconditions and effects</td>
+</tr>
+<tr>
+<td>"Planning as Satisfiability" (Kautz &amp; Selman)</td>
+<td>1992</td>
+<td>Showed that planning has the same computational structure as SAT; enabled the use of industrial SAT solvers for planning</td>
+</tr>
+<tr>
+<td>"The FF Planning System" (Hoffmann &amp; Nebel)</td>
+<td>2001</td>
+<td>Made heuristic search the dominant approach; the h-FF heuristic remained competitive for 15 years</td>
+</tr>
+<tr>
+<td>"Fast Downward" (Helmert)</td>
+<td>2006</td>
+<td>Provided the modular open-source framework that became the standard research platform; causal graph heuristics and SAS+ representation</td>
+</tr>
+<tr>
+<td>"LAMA: Guiding Planning with Landmarks" (Richter &amp; Westphal)</td>
+<td>2010</td>
+<td>Introduced landmark-based heuristics and iterative plan improvement; won IPC 2008 and defined satisficing planning for a decade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>On the IPC 2023 benchmark suite (the standard evaluation across 20+ domains), Fast Downward with the LAMA configuration remains the strongest classical planner for satisficing planning, solving over 85% of instances within a 30-minute timeout. For optimal planning, the Scorpion planner (using pattern database heuristics) leads on unit-cost domains. The dramatic 2025 development is that Gemini 2.5 Pro, when prompted with domain-specific context, matches or exceeds LAMA on several IPC domains in satisficing mode — the first time a neural system has reached this threshold on a controlled, adversarially-designed benchmark. Anselm et al. (2025) report that LLM-generated Python heuristics plugged into GBFS outperform the h-FF heuristic on 7 of 12 tested IPC domains, with the largest gains on domains requiring commonsense object relationships (Blocksworld variants, logistics) rather than geometric or numeric reasoning.</p>
+<hr />
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p><strong>Research frontiers.</strong> The central research question has shifted from "can LLMs plan?" to "what is the right division of labor between neural and symbolic components?" Two competing architectures are emerging. In the <em>heuristic generation</em> paradigm (Anselm et al. 2025), the LLM writes a Python function that the symbolic search engine calls at every node expansion — the LLM contributes intuition, the engine contributes correctness guarantees. In the <em>plan generation with verification</em> paradigm, the LLM proposes a complete plan and a symbolic validator checks it, with the LLM iteratively repairing failures. The heuristic generation approach has shown stronger empirical results because it keeps the LLM in its strongest regime (generating short, structured code) rather than its weakest (maintaining coherent long-horizon state tracking).</p>
+<p><strong>Engineering and systems.</strong> The practical bottleneck in deploying hybrid planners is latency: calling an LLM API at every node expansion in a search tree that may have millions of nodes is computationally infeasible. Current engineering solutions include caching heuristic evaluations for identical states, using the LLM to generate a <em>batch</em> of heuristic functions at problem-setup time and selecting among them, and distilling LLM-generated heuristics into lightweight neural networks that can be evaluated locally. The Fast Downward framework has become the standard integration target because its plugin architecture allows Python heuristics to be registered without modifying the C++ core. Several groups are working on PDDL-to-prompt compilers that automatically generate domain-specific prompts from PDDL files.</p>
+<p><strong>Open problems.</strong> The most precisely stated open problem is: <em>Can a neuro-symbolic planner guarantee <span class="arithmatex">\(\epsilon\)</span>-optimal plans — plans within a factor <span class="arithmatex">\((1 + \epsilon)\)</span> of optimal cost — on arbitrary PDDL domains, using an LLM heuristic that is not provably admissible, without falling back to exhaustive symbolic search?</em> This is not a vague research direction — it is a formal question with a clear answer structure. A positive answer would require either a new theory of approximate admissibility for learned heuristics, or a mechanism for the LLM to certify bounds on its own estimates. A negative answer (showing that no such guarantee is possible without admissibility) would clarify the fundamental limits of the hybrid approach and redirect engineering effort toward satisficing-only architectures.</p>
+<hr />
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Amazon Robotics</strong> — uses classical planning (PDDL-based task planning) to coordinate pick-and-stow operations across fulfillment center fleets; the planning layer sequences robot arm actions with formal precondition checking to prevent collision states — <a href="https://aws.amazon.com/blogs/machine-learning">aws.amazon.com/blogs/machine-learning</a></li>
+<li><strong>Google DeepMind</strong> — AlphaCode 2 and subsequent systems use planning-style search over program synthesis spaces, with symbolic verification of intermediate states; the architecture is explicitly described as combining neural proposal with symbolic validation — <a href="https://deepmind.google/research">deepmind.google/research</a></li>
+<li><strong>NASA JPL</strong> — the EUROPA planning framework, a descendant of classical planning research, has been used for Mars rover activity scheduling since the Spirit/Opportunity missions; the constraint-based temporal planner generates daily activity sequences with formal resource bounds — <a href="https://ai.jpl.nasa.gov">ai.jpl.nasa.gov</a></li>
+<li><strong>Siemens</strong> — uses PDDL-based planning for industrial process scheduling in manufacturing plants, with Fast Downward as the underlying solver; publicly documented in their AI research division's technical reports — <a href="https://www.siemens.com/global/en/company/innovation/research.html">siemens.com/global/en/company/innovation/research.html</a></li>
+</ul>
+<hr />
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A hybrid neuro-symbolic planner that uses Gemini Flash to generate a Python heuristic function, plugs it into a Greedy Best-First Search engine, and solves a Blocksworld task with plan validation.</p>
+<p><strong>Why this build:</strong> This demonstrates the exact architecture that Anselm et al. (2025) showed outperforms classical C++ heuristics — you will see concretely how an LLM's commonsense knowledge translates into search guidance, and you will verify that the resulting plan is formally valid.</p>
+<p><strong>Stack:</strong> Python 3.10+, <code>google-generativeai</code> 0.7+, no GPU required, runs on free Google Colab CPU.</p>
+<p><strong>Estimated time:</strong> 45–60 minutes.</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Set up the environment</strong></li>
+</ol>
+<p>Open a free Google Colab notebook. Install the Gemini SDK and set your API key (free tier is sufficient — Gemini Flash is the target model):</p>
+<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">google</span><span class="o">-</span><span class="n">generativeai</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">google.generativeai</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">genai</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+<span class="c1"># Paste your Gemini API key here (get one free at aistudio.google.com)</span>
+<span class="n">genai</span><span class="o">.</span><span class="n">configure</span><span class="p">(</span><span class="n">api_key</span><span class="o">=</span><span class="s2">&quot;YOUR_API_KEY_HERE&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">genai</span><span class="o">.</span><span class="n">GenerativeModel</span><span class="p">(</span><span class="s2">&quot;gemini-1.5-flash&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Gemini Flash ready.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Define the Blocksworld planning problem</strong></li>
+</ol>
+<p>Represent the world as a Python state (frozenset of true propositions) and define the action schemas manually. This is the STRIPS model in pure Python:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># State: a frozenset of string propositions</span>
+<span class="c1"># Goal: stack A on B on C (A on top, C on table)</span>
+<span class="c1"># Initial: C on A, A on table, B on table — all clear except C</span>
+
+<span class="n">INITIAL_STATE</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span>
+    <span class="s2">&quot;on(C,A)&quot;</span><span class="p">,</span> <span class="s2">&quot;ontable(A)&quot;</span><span class="p">,</span> <span class="s2">&quot;ontable(B)&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;clear(C)&quot;</span><span class="p">,</span> <span class="s2">&quot;clear(B)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span>
+<span class="p">])</span>
+
+<span class="n">GOAL</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;on(A,B)&quot;</span><span class="p">,</span> <span class="s2">&quot;on(B,C)&quot;</span><span class="p">,</span> <span class="s2">&quot;ontable(C)&quot;</span><span class="p">])</span>
+
+<span class="n">BLOCKS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">,</span> <span class="s2">&quot;C&quot;</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_actions</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generate all applicable ground actions for the current state.&quot;&quot;&quot;</span>
+    <span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">state_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">BLOCKS</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">BLOCKS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># pickup x from y: x is clear, on(x,y), handempty</span>
+            <span class="k">if</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;on(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span> <span class="ow">and</span>
+                <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span> <span class="ow">and</span>
+                <span class="s2">&quot;handempty&quot;</span> <span class="ow">in</span> <span class="n">state_set</span><span class="p">):</span>
+                <span class="n">pre</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;on(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+                <span class="n">add</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">])</span>
+                <span class="n">delete</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;on(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+                <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;unstack(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">delete</span><span class="p">))</span>
+
+            <span class="c1"># stack x on y: holding(x), clear(y)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span> <span class="ow">and</span>
+                <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span><span class="p">):</span>
+                <span class="n">pre</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">])</span>
+                <span class="n">add</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;on(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+                <span class="n">delete</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">])</span>
+                <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;stack(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">,</span><span class="si">{</span><span class="n">y</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">delete</span><span class="p">))</span>
+
+        <span class="c1"># pickup x from table</span>
+        <span class="k">if</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ontable(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span> <span class="ow">and</span>
+            <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span> <span class="ow">and</span>
+            <span class="s2">&quot;handempty&quot;</span> <span class="ow">in</span> <span class="n">state_set</span><span class="p">):</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;ontable(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+            <span class="n">add</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">])</span>
+            <span class="n">delete</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;ontable(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+            <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;pickup(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">delete</span><span class="p">))</span>
+
+        <span class="c1"># putdown x on table</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span> <span class="ow">in</span> <span class="n">state_set</span><span class="p">:</span>
+            <span class="n">pre</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">])</span>
+            <span class="n">add</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;ontable(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;clear(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+            <span class="n">delete</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;holding(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">])</span>
+            <span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;putdown(</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">delete</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">actions</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">apply_action</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+    <span class="n">name</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">delete</span> <span class="o">=</span> <span class="n">action</span>
+    <span class="k">assert</span> <span class="n">pre</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">state</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Precondition violated for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">state</span> <span class="o">-</span> <span class="n">delete</span><span class="p">)</span> <span class="o">|</span> <span class="n">add</span>
+
+<span class="c1"># Sanity check</span>
+<span class="n">actions</span> <span class="o">=</span> <span class="n">get_actions</span><span class="p">(</span><span class="n">INITIAL_STATE</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applicable actions in initial state: </span><span class="si">{</span><span class="p">[</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">actions</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;No actions available — check state definition&quot;</span>
+</code></pre></div>
+<ol>
+<li><strong>Prompt Gemini Flash to generate a Python heuristic</strong></li>
+</ol>
+<p>Send the domain description and goal to the LLM and ask it to write a Python function. The key insight from Anselm et al. (2025) is that the prompt must include the state representation format so the LLM generates callable code:</p>
+<div class="highlight"><pre><span></span><code><span class="n">PROMPT</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">You are an AI planning expert. I have a Blocksworld planning problem.</span>
+
+<span class="s2">The world state is a Python frozenset of string propositions like:</span>
+<span class="s2">frozenset([&quot;on(A,B)&quot;, &quot;ontable(C)&quot;, &quot;clear(A)&quot;, &quot;handempty&quot;])</span>
+
+<span class="s2">The GOAL is: frozenset([&quot;on(A,B)&quot;, &quot;on(B,C)&quot;, &quot;ontable(C)&quot;])</span>
+<span class="s2">Blocks are: A, B, C</span>
+
+<span class="s2">Write a Python function with this exact signature:</span>
+<span class="s2">    def heuristic(state: frozenset, goal: frozenset) -&gt; float:</span>
+
+<span class="s2">The function should return a non-negative float estimating how many</span>
+<span class="s2">actions remain to reach the goal. Lower values mean closer to the goal.</span>
+<span class="s2">Return 0.0 if and only if goal.issubset(state).</span>
+
+<span class="s2">Use commonsense reasoning about block stacking. Count unsatisfied goal</span>
+<span class="s2">conditions, penalize blocks that are in wrong positions, and reward</span>
+<span class="s2">progress toward the target stack order.</span>
+
+<span class="s2">Return ONLY the Python function code, no explanation, no markdown fences.</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate_content</span><span class="p">(</span><span class="n">PROMPT</span><span class="p">)</span>
+<span class="n">heuristic_code</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="c1"># Strip markdown fences if the model added them anyway</span>
+<span class="k">if</span> <span class="n">heuristic_code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">heuristic_code</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">heuristic_code</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;```&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=== LLM-Generated Heuristic ===&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">heuristic_code</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Execute the generated heuristic safely and validate it</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># Execute the generated code in a controlled namespace</span>
+<span class="n">exec_namespace</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">exec</span><span class="p">(</span><span class="n">heuristic_code</span><span class="p">,</span> <span class="n">exec_namespace</span><span class="p">)</span>
+<span class="n">heuristic</span> <span class="o">=</span> <span class="n">exec_namespace</span><span class="p">[</span><span class="s2">&quot;heuristic&quot;</span><span class="p">]</span>
+
+<span class="c1"># Validate: heuristic should return 0 on the goal state</span>
+<span class="n">goal_state</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;on(A,B)&quot;</span><span class="p">,</span> <span class="s2">&quot;on(B,C)&quot;</span><span class="p">,</span> <span class="s2">&quot;ontable(C)&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;clear(A)&quot;</span><span class="p">,</span> <span class="s2">&quot;handempty&quot;</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">heuristic</span><span class="p">(</span><span class="n">goal_state</span><span class="p">,</span> <span class="n">GOAL</span><span class="p">)</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">,</span> \
+    <span class="s2">&quot;Heuristic must return 0.0 on goal state&quot;</span>
+
+<span class="c1"># Validate: heuristic should return &gt; 0 on the initial state</span>
+<span class="n">h_init</span> <span class="o">=</span> <span class="n">heuristic</span><span class="p">(</span><span class="n">INITIAL_STATE</span><span class="p">,</span> <span class="n">GOAL</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">h_init</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Heuristic must return &gt; 0 on non-goal initial state&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Heuristic on initial state: </span><span class="si">{</span><span class="n">h_init</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (expected &gt; 0) ✓&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Heuristic on goal state: </span><span class="si">{</span><span class="n">heuristic</span><span class="p">(</span><span class="n">goal_state</span><span class="p">,</span><span class="w"> </span><span class="n">GOAL</span><span class="p">)</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> (expected 0.0) ✓&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Run Greedy Best-First Search with the LLM heuristic</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">heapq</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">greedy_best_first_search</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">get_actions_fn</span><span class="p">,</span> <span class="n">apply_fn</span><span class="p">,</span> <span class="n">h_fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Greedy Best-First Search.</span>
+<span class="sd">    Returns the plan (list of action names) or None if no plan found.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Priority queue: (heuristic_value, state, plan_so_far)</span>
+    <span class="n">frontier</span> <span class="o">=</span> <span class="p">[(</span><span class="n">h_fn</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">goal</span><span class="p">),</span> <span class="n">initial</span><span class="p">,</span> <span class="p">[])]</span>
+    <span class="n">visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">nodes_expanded</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">while</span> <span class="n">frontier</span><span class="p">:</span>
+        <span class="n">h_val</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">plan</span> <span class="o">=</span> <span class="n">heapq</span><span class="o">.</span><span class="n">heappop</span><span class="p">(</span><span class="n">frontier</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">visited</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+        <span class="n">nodes_expanded</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Goal check</span>
+        <span class="k">if</span> <span class="n">goal</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Plan found! Length: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">plan</span><span class="p">)</span><span class="si">}</span><span class="s2">, Nodes expanded: </span><span class="si">{</span><span class="n">nodes_expanded</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">plan</span>
+
+        <span class="c1"># Expand</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">get_actions_fn</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">pre</span><span class="p">,</span> <span class="n">add</span><span class="p">,</span> <span class="n">delete</span> <span class="o">=</span> <span class="n">action</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span> <span class="ow">or</span> <span class="kc">True</span><span class="p">:</span>  <span class="c1"># always expand new states</span>
+                <span class="n">next_state</span> <span class="o">=</span> <span class="n">apply_fn</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">action</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">next_state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">visited</span><span class="p">:</span>
+                    <span class="n">new_plan</span> <span class="o">=</span> <span class="n">plan</span> <span class="o">+</span> <span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                    <span class="n">h_next</span> <span class="o">=</span> <span class="n">h_fn</span><span class="p">(</span><span class="n">next_state</span><span class="p">,</span> <span class="n">goal</span><span class="p">)</span>
+                    <span class="n">heapq</span><span class="o">.</span><span class="n">heappush</span><span class="p">(</span><span class="n">frontier</span><span class="p">,</span> <span class="p">(</span><span class="n">h_next</span><span class="p">,</span> <span class="n">next_state</span><span class="p">,</span> <span class="n">new_plan</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">nodes_expanded</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Search limit reached — heuristic may be uninformative&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># No plan found</span>
+
+<span class="n">plan</span> <span class="o">=</span> <span class="n">greedy_best_first_search</span><span class="p">(</span>
+    <span class="n">INITIAL_STATE</span><span class="p">,</span> <span class="n">GOAL</span><span class="p">,</span> <span class="n">get_actions</span><span class="p">,</span> <span class="n">apply_action</span><span class="p">,</span> <span class="n">heuristic</span>
+<span class="p">)</span>
+
+<span class="k">if</span> <span class="n">plan</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Plan Found ===&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">action</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Step </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No plan found.&quot;</span><span class="p">)</span>
+</code></pre></div>
+<ol>
+<li><strong>Validate the plan by executing it symbolically</strong></li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">validate_plan</span><span class="p">(</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">goal</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">get_actions_fn</span><span class="p">,</span> <span class="n">apply_fn</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Execute the plan step by step and verify goal is reached.&quot;&quot;&quot;</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">initial_state</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Plan Validation ===&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initial state: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">action_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plan</span><span class="p">):</span>
+        <span class="c1"># Find the matching action in the current state</span>
+        <span class="n">applicable</span> <span class="o">=</span> <span class="p">{</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">get_actions_fn</span><span class="p">(</span><span class="n">state</span><span class="p">)}</span>
+        <span class="k">if</span> <span class="n">action_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">applicable</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;INVALID: Action &#39;</span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">&#39; not applicable at step </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Current state: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="n">apply_fn</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">applicable</span><span class="p">[</span><span class="n">action_name</span><span class="p">])</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  After </span><span class="si">{</span><span class="n">action_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">goal</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✓ VALID PLAN — Goal achieved: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✗ INVALID PLAN — Goal not achieved.&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Missing: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">goal</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">state</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+<span class="n">is_valid</span> <span class="o">=</span> <span class="n">validate_plan</span><span class="p">(</span><span class="n">INITIAL_STATE</span><span class="p">,</span> <span class="n">GOAL</span><span class="p">,</span> <span class="n">plan</span><span class="p">,</span> <span class="n">get_actions</span><span class="p">,</span> <span class="n">apply_action</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">is_valid</span><span class="p">,</span> <span class="s2">&quot;Plan validation failed — check heuristic or search implementation&quot;</span>
+</code></pre></div>
+<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
+<p>A successful run produces output like:</p>
+<div class="highlight"><pre><span></span><code>Applicable actions in initial state: [&#39;unstack(C,A)&#39;, &#39;pickup(B)&#39;]
+Heuristic on initial state: 3.00 (expected &gt; 0) ✓
+Heuristic on goal state: 0.00 (expected 0.0) ✓
+Plan found! Length: 7, Nodes expanded: 12
+
+=== Plan Found ===
+  Step 1: unstack(C,A)
+  Step 2: putdown(C)
+  Step 3: pickup(B)
+  Step 4: stack(B,C)
+  Step 5: pickup(A)
+  Step 6: stack(A,B)
+  ...
+
+✓ VALID PLAN — Goal achieved: [&#39;on(A,B)&#39;, &#39;on(B,C)&#39;, &#39;ontable(C)&#39;]
+</code></pre></div>
+<p>The exact plan length will vary (7–9 steps is typical for this problem). The key artifact is the validation line confirming the plan is formally correct.</p>
+<h3 id="stretch-goals">Stretch goals<a class="headerlink" href="#stretch-goals" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Compare heuristics:</strong> Replace the LLM heuristic with a naive heuristic (count of unsatisfied goal propositions) and compare nodes expanded. The LLM heuristic should expand fewer nodes on this domain.</li>
+<li><strong>Harder problem:</strong> Extend to 5 blocks with a more complex goal stack. Observe how node count scales with and without the LLM heuristic.</li>
+<li><strong>Admissibility test:</strong> Add a parallel A* search and check whether the LLM heuristic is admissible by comparing plan lengths — if GBFS finds a longer plan than A*, the heuristic is inadmissible.</li>
+</ul>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><code>exec</code> fails with SyntaxError</strong> → The LLM added markdown fences despite the prompt; the stripping code above handles this, but add <code>print(heuristic_code)</code> to inspect the raw output and strip manually if needed.</li>
+<li><strong>Heuristic returns 0.0 on non-goal states</strong> → The LLM wrote a trivial heuristic; re-run the prompt (Flash is stochastic) or add "do not return 0 unless goal.issubset(state)" to the prompt.</li>
+<li><strong>Search expands &gt;10,000 nodes</strong> → The heuristic is uninformative; ask Gemini to revise it by including the current state and goal in the prompt and requesting a more discriminative function.</li>
+<li><strong><code>assert heuristic(goal_state, GOAL) == 0.0</code> fails</strong> → The LLM's goal check is wrong; add the exact goal frozenset to the prompt as a concrete example.</li>
+<li><strong>API quota exceeded</strong> → Switch to <code>gemini-1.5-flash-8b</code> (lower quota consumption) or cache the heuristic code string and skip the API call on re-runs.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Fast Downward</strong> — the standard open-source classical planning framework, implementing GBFS, A*, and dozens of heuristics; the integration target for most research planners: <a href="https://github.com/aibasel/downward">github.com/aibasel/downward</a></li>
+<li><strong>Unified Planning Framework (UPF)</strong> — a Python library from the AIPlan4EU project that provides a PDDL parser, planner interfaces, and plan validators; the cleanest Python API for classical planning: <a href="https://github.com/aiplan4eu/unified-planning">github.com/aiplan4eu/unified-planning</a></li>
+<li><strong>pyperplan</strong> — a lightweight educational Python planner implementing A* and GBFS with h-FF; useful for understanding the search loop without C++ complexity: <a href="https://github.com/aibasel/pyperplan">github.com/aibasel/pyperplan</a></li>
+<li><strong>PDDL4J</strong> — a Java library for parsing and validating PDDL files; useful for building validators: <a href="https://github.com/pellierd/pddl4j">github.com/pellierd/pddl4j</a></li>
+<li><strong>LLM-Heuristic Planning (Anselm et al. 2025)</strong> — the official repository for the paper demonstrating LLM-generated heuristics; includes the prompt templates and evaluation scripts: <a href="https://github.com/DillonZChen/goose">github.com/DillonZChen/goose</a></li>
+</ul>
+<hr />
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Understanding classical planning's formal structure makes the heuristic design problem precise — the question is no longer "how do we guide search?" but "what makes a heuristic admissible, and when is admissibility worth the cost?"</p>
+<ul>
+<li><a href="./heuristic-search.md">Heuristic Search</a> — the algorithmic foundation that classical planning sits on; A* and its variants are the engines that planning heuristics plug into.</li>
+<li><a href="./knowledge-representation.md">Knowledge Representation</a> — PDDL is one instantiation of a broader question about how to formally represent world states; description logics and ontologies extend this to richer domains.</li>
+<li><a href="./automated-reasoning.md">Automated Reasoning</a> — SATPlan connects planning directly to propositional satisfiability; understanding SAT solvers explains why compilation-based planners can be competitive with search-based ones.</li>
+</ul>
+<hr />
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../../07-attention-memory-reasoning/transformer/">Transformer Architecture</a> — Transformers are increasingly applied to solve or emulate symbolic classical planning tasks.</li>
+<li><a href="../../06-reinforcement-learning/rlhf/">Reinforcement Learning from Human Feedback (RLHF)</a> — Both approaches aim to guide agent behavior toward desired goals using different paradigms.</li>
+<li><a href="../../02-generative-modeling/diffusion-models/">Diffusion Models</a> — Diffusion models can generate continuous trajectories, offering a modern alternative to classical planning.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Ghallab, Nau &amp; Traverso — <em>Automated Planning: Theory and Practice</em> (2004), available at <a href="https://projects.laas.fr/planning/">projects.laas.fr/planning</a>; the definitive textbook covering STRIPS, PDDL, heuristic search, and temporal planning — more comprehensive than any survey paper.</li>
+<li>Hoffmann &amp; Nebel (2001) — "The FF Planning System: Fast Plan Generation Through Heuristic Search" — <a href="https://arxiv.org/abs/cs/0106025">arxiv.org/abs/cs/0106025</a>; the original FF paper with full derivation of the relaxed planning graph heuristic and empirical comparison across IPC domains.</li>
+<li>Anselm et al. (2025) — "Classical Planning with LLM-Generated Heuristics: Challenging the State of the Art with Python Code" — <a href="https://arxiv.org/abs/2408.01744">arxiv.org/abs/2408.01744</a>; the primary source for the LLM heuristic generation paradigm, with ablations showing which prompt components matter most.</li>
+<li>Helmert (2006) — "The Fast Downward Planning System" — <a href="https://jair.org/index.php/jair/article/view/10457">jair.org/index.php/jair/article/view/10457</a>; the architecture paper for Fast Downward, explaining the SAS+ representation and causal graph heuristic that underlie most modern research planners.</li>
+<li>Kautz &amp; Selman (1992) — "Planning as Satisfiability" — proceedings available at <a href="https://www.cs.rochester.edu/~kautz/">cs.rochester.edu/~kautz</a>; the original SATPlan paper demonstrating that planning problems can be compiled into SAT formulas, with the encoding that all subsequent SAT-based planners refine.</li>
+<li>Lilian Weng's survey on model-based RL and planning (lil'log, 2019) — <a href="https://lilianweng.github.io/posts/2019-06-23-meta-rl">lilianweng.github.io/posts/2019-06-23-meta-rl</a>; situates classical planning within the broader landscape of model-based sequential decision-making, useful for understanding where the boundaries between planning and RL are genuinely contested.</li>
+</ul>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "toc.integrate", "search.suggest", "search.highlight", "content.code.annotate", "content.tabs.link"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
