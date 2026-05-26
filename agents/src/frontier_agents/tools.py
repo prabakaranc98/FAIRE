@@ -535,6 +535,213 @@ def verify_mvb_stack(model_id: str = "", dataset_id: str = "",
     }
 
 
+# ── URL trust scoring ────────────────────────────────────────────────────────
+#
+# Replaces the binary include_domains whitelist with a multi-signal trust score.
+# The whitelist remains a fast positive (membership = +0.4), but additional
+# signals are checked so the system can recognize a legitimate frontier-lab
+# blog or a new university domain without requiring a code-side allow-list
+# update. Negative-list domains (Medium, Substack, Wikipedia, etc.) override
+# all positives.
+#
+# Scores are scalar 0.0–1.0. Default threshold for "trustworthy" is 0.5.
+# Per-URL scores are cached in agents/runs/url_trust_cache.json so we don't
+# re-query Exa for the same domain across runs.
+
+_TRUST_NEGATIVE_DOMAINS = {
+    "medium.com", "towardsdatascience.com", "substack.com",
+    "wikipedia.org", "en.wikipedia.org",
+    "reddit.com", "twitter.com", "x.com", "youtube.com", "youtu.be",
+    "quora.com", "stackoverflow.com",  # SO is fine for "how do I" but not a citation source
+}
+
+# Known frontier-lab and research domains beyond the basic allow-list.
+# These contribute a "lab/university" positive signal even when not in
+# APPROVED_RESEARCH_DOMAINS.
+_TRUST_LAB_DOMAINS = {
+    # Frontier labs (broader than APPROVED_ENGINEERING_BLOGS — these are research orgs)
+    "anthropic.com", "openai.com", "deepmind.google", "deepmind.com",
+    "research.google", "ai.meta.com", "research.facebook.com",
+    "ai.googleblog.com", "blog.research.google",
+    "research.microsoft.com", "research.nvidia.com",
+    "allenai.org", "research.ibm.com",
+    "research.character.ai", "research.cohere.com", "research.runwayml.com",
+    "stability.ai", "blog.eleuther.ai", "eleuther.ai",
+    "huggingface.co",
+    # Distinguished research blogs (peer-reviewed or equivalent rigor)
+    "distill.pub",
+    "lilianweng.github.io",  # Lil'Log — generally rigorous research surveys
+    # Top labs' standard publication mirrors
+    "transformer-circuits.pub",  # Anthropic interpretability
+}
+
+_TRUST_CACHE_PATH = Path(__file__).parent.parent.parent / "runs" / "url_trust_cache.json"
+
+
+def _load_trust_cache() -> dict:
+    if _TRUST_CACHE_PATH.exists():
+        try:
+            return json.loads(_TRUST_CACHE_PATH.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def _save_trust_cache(cache: dict) -> None:
+    try:
+        _TRUST_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _TRUST_CACHE_PATH.write_text(json.dumps(cache, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def verify_source_trust(url: str, section: str = "default") -> dict:
+    """Score a URL on a 0.0–1.0 trust scale using multiple signals.
+
+    Replaces binary whitelist membership for the IA and source-policy critics.
+    Sections like "in_production" and "further_reading" relax some checks.
+
+    Signals (sum → clamp to [0, 1]):
+      + 0.40  Domain in APPROVED_RESEARCH_DOMAINS
+      + 0.30  Domain is a known frontier-lab / research org (_TRUST_LAB_DOMAINS)
+      + 0.30  Domain is .edu
+      + 0.30  URL is arxiv.org/abs/ or arxiv.org/pdf/ (a paper, not a homepage)
+      + 0.15  Domain is huggingface.co/{user}/{model_or_dataset}
+                (cite a model card or dataset card, not the front page)
+      + 0.10  URL is a GitHub repo from an approved org (huggingface, openai,
+                facebookresearch, pytorch, google-research, deepmind, etc.)
+              [section-specific: only in "code_implementations"]
+      + 0.10  In APPROVED_ENGINEERING_BLOGS AND section == "in_production"
+      − 1.00  Domain in _TRUST_NEGATIVE_DOMAINS (overrides every positive)
+
+    Args:
+        url:     the URL to score
+        section: which wiki section the URL appears in. Recognized values:
+                 "default" / "further_reading" / "in_production" /
+                 "code_implementations". Affects which bonuses apply.
+
+    Returns:
+        {
+          "score": float in [0, 1],
+          "trusted": bool (score >= 0.5),
+          "domain": str,
+          "signals": list[str] (which signals fired with sign),
+          "section": str,
+          "reason": str (one-sentence summary)
+        }
+    """
+    import re as _re
+
+    if not url or not isinstance(url, str):
+        return {"score": 0.0, "trusted": False, "domain": "", "signals": [],
+                "section": section, "reason": "empty or invalid URL"}
+
+    cache = _load_trust_cache()
+    cache_key = f"{section}::{url}"
+    if cache_key in cache:
+        return cache[cache_key]
+
+    domain = _extract_domain(url).lower()
+    # Strip leading "www." for matching
+    domain_canon = domain[4:] if domain.startswith("www.") else domain
+
+    signals: list[str] = []
+    score = 0.0
+
+    # NEGATIVE list — terminal
+    for neg in _TRUST_NEGATIVE_DOMAINS:
+        if domain_canon == neg or domain_canon.endswith("." + neg):
+            signals.append(f"-1.00 negative-list ({neg})")
+            result = {
+                "score": 0.0, "trusted": False, "domain": domain_canon,
+                "signals": signals, "section": section,
+                "reason": f"{neg} is on the negative-list (Medium/Substack/Wikipedia/social-media)",
+            }
+            cache[cache_key] = result
+            _save_trust_cache(cache)
+            return result
+
+    # +0.40 — in research allow-list (basic positive)
+    research_match = any(
+        domain_canon == d.lstrip(".") or domain_canon.endswith("." + d.lstrip("."))
+        for d in APPROVED_RESEARCH_DOMAINS
+    )
+    if research_match:
+        score += 0.40
+        signals.append("+0.40 approved-research-domain")
+
+    # +0.50 — known lab/research org (these are vetted publication venues —
+    #         e.g., transformer-circuits.pub, distill.pub, lilianweng.github.io)
+    if domain_canon in _TRUST_LAB_DOMAINS or any(
+        domain_canon.endswith("." + d) for d in _TRUST_LAB_DOMAINS
+    ):
+        score += 0.50
+        signals.append("+0.50 known-lab-domain")
+
+    # +0.30 — .edu (university content; lecture notes, faculty pages, etc.)
+    if domain_canon.endswith(".edu"):
+        score += 0.30
+        signals.append("+0.30 .edu")
+
+    # +0.30 — arxiv paper (not just arxiv.org homepage)
+    if _re.search(r"arxiv\.org/(abs|pdf)/", url, _re.IGNORECASE):
+        score += 0.30
+        signals.append("+0.30 arxiv-paper")
+
+    # +0.20 — huggingface model/dataset card (not just hf homepage)
+    if _re.search(r"huggingface\.co/[A-Za-z0-9_\-]+/[A-Za-z0-9_\-.]+", url):
+        score += 0.20
+        signals.append("+0.20 huggingface-card")
+
+    # +0.50 — official frontier-lab engineering blog ONLY in "In production"
+    #         (the In Production section is exactly where these belong)
+    if section == "in_production":
+        eng_blog = any(
+            domain_canon == d.lstrip(".") or domain_canon.endswith("." + d.lstrip("."))
+            for d in APPROVED_ENGINEERING_BLOGS
+        )
+        if eng_blog:
+            score += 0.50
+            signals.append("+0.50 engineering-blog (in_production)")
+
+    # +0.50 — github repo from an approved org in "Code & implementations"
+    #         (an official organization's reference repo is a primary source)
+    if section == "code_implementations":
+        gh = _re.search(r"github\.com/([^/]+)/", url)
+        if gh:
+            org = gh.group(1).lower()
+            approved_orgs = {
+                "huggingface", "openai", "facebookresearch", "pytorch",
+                "google-research", "google-deepmind", "deepmind",
+                "tensorflow", "jax-ml", "nvidia", "allenai", "nvlabs",
+                "eleutherai", "anthropics", "stability-ai", "stabilityai",
+                "lucidrains",  # widely-cited unofficial-but-canonical implementations
+                "rwightman", "huggingface-projects",
+            }
+            if org in approved_orgs:
+                score += 0.50
+                signals.append(f"+0.50 github-approved-org ({org})")
+
+    score = max(0.0, min(1.0, score))
+    trusted = score >= 0.5
+    reason = (
+        "trusted: " + ", ".join(s.split(" ", 1)[1] for s in signals)
+        if trusted else
+        f"low trust ({score:.2f}): " + (", ".join(signals) if signals else "no positive signals matched")
+    )
+    result = {
+        "score": round(score, 2),
+        "trusted": trusted,
+        "domain": domain_canon,
+        "signals": signals,
+        "section": section,
+        "reason": reason,
+    }
+    cache[cache_key] = result
+    _save_trust_cache(cache)
+    return result
+
+
 def read_stub(path: str) -> str:
     """Read an existing wiki page stub or return empty string if not found."""
     p = Path(path)

@@ -56,11 +56,55 @@ only apply to one page type; flagging the wrong type is a false positive.
 | Declared `prev_artifact` doesn't match the previous step's declared artifact | **arc-step only** | −0.20 (compounding chain broken) |
 | Arc-index missing "Build menu" section listing all step MVBs | **arc-index only** | −0.15 |
 
-## Approved external domains (full list — DO NOT flag these)
+## How URL trust is scored (multi-signal, not binary)
 
-The source-of-truth lists live in `agents/src/frontier_agents/tools.py` as
-`APPROVED_RESEARCH_DOMAINS` and `APPROVED_ENGINEERING_BLOGS`. Reproduce them
-here so you can recognize approved links without flagging false positives:
+The system uses `agents/src/frontier_agents/tools.py::verify_source_trust(url, section)`
+to score every external link on a 0.0–1.0 scale. The score combines several
+positive signals and one terminal-negative list. URLs with `score >= 0.5` are
+trusted; below that, deduct.
+
+**Positive signals** (sum, capped at 1.0):
+
+| Signal | When it fires | Weight |
+|---|---|---|
+| Domain in `APPROVED_RESEARCH_DOMAINS` | arxiv / .edu / huggingface / pytorch / etc. | +0.40 |
+| Known lab/research domain | transformer-circuits.pub, distill.pub, lilianweng.github.io, anthropic.com, openai.com, deepmind.google, etc. | +0.50 |
+| `.edu` university domain | any *.edu | +0.30 |
+| arXiv paper (abs/pdf URL) | url matches `arxiv.org/(abs|pdf)/` | +0.30 |
+| HuggingFace model/dataset card | url matches `huggingface.co/{org}/{name}` | +0.20 |
+| Engineering blog | only in "In production" section, and only for `APPROVED_ENGINEERING_BLOGS` | +0.50 |
+| Approved-org GitHub repo | only in "Code & implementations" section (e.g. huggingface/diffusers, openai/improved-diffusion, facebookresearch/DiT, NVlabs/edm) | +0.50 |
+
+**Terminal negatives** (override everything else, score = 0):
+
+- `medium.com`, `towardsdatascience.com`, `substack.com`
+- `wikipedia.org`
+- `reddit.com`, `twitter.com`, `x.com`, `youtube.com`, `quora.com`
+- random personal `*.github.io` pages (other than the known curated ones)
+
+**Section-aware**: pass `section="in_production"` when scoring URLs in the "In production"
+list, `section="code_implementations"` for code repos, `section="further_reading"` for
+the Further Reading list, and `section="default"` everywhere else. Some bonuses only
+fire in the matching section.
+
+**Caching**: per-URL scores are cached in `agents/runs/url_trust_cache.json` so we don't
+re-query Exa for the same domain every cycle.
+
+### How to use this critic skill
+
+Don't reproduce the trust table inline in your scoring. The critic skill says:
+
+> For each external URL the page cites:
+>   if `verify_source_trust(url, section).trusted` is False → −0.10 (capped at −0.30)
+>   else → no deduction.
+
+In practice the LLM reviewer reasons through the same signals (`is this arxiv?` →
+yes, ok; `is this medium?` → yes, negative-list). When in doubt, the LLM should
+err toward trusting any of: arxiv.org, *.edu, huggingface.co, the named labs
+above, the named engineering blogs above (when in the right section).
+
+For reference — the explicit lists from `tools.py` (kept here so the model
+recognizes them):
 
 **Approved for ALL sections (research / theory / further reading):**
 - `arxiv.org` — papers and preprints
