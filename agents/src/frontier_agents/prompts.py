@@ -84,64 +84,111 @@ Draw from the most recent SotA results and the writing plan.
 """
 
 
-# ── Writing chunk instructions ─────────────────────────────────────────────────
+# ── Full-page write instructions ──────────────────────────────────────────────
 
-CHUNK1_INSTRUCTIONS = """Write CHUNK 1 of the page — the foundation.
+WRITE_INSTRUCTIONS = """Write the complete wiki page in a single pass.
 
-Sections to write (in order):
-1. Frontmatter block (---yaml---): title, track, tags, depth, prereqs, updated, has_mvb
-2. # Page Title
-3. > **TL;DR:** one sentence — what this is and why it matters at the frontier
-4. ## For your reader type  (4-row table routing to sections)
-5. ## What it is  (2–3 paragraphs of prose — open with the scenario from scratch pad)
-6. ## Why it matters at the frontier  (2 paragraphs — connect to open problems + lab priorities)
+Write ALL sections in order. The model has full context — do not hold back or
+abbreviate. Every section must be substantive. Do not truncate.
 
-Rules for this chunk:
-- "What it is" MUST open with the opening scenario from the scratch pad, NOT a definition
-- Both prose sections must be narrative paragraphs, zero nested lists
-- The reader-type table should route to specific section anchors
-- End at the closing of "Why it matters" — do not start the next section
-"""
+SECTION ORDER (use EXACTLY these heading names):
 
-CHUNK2_INSTRUCTIONS = """Write CHUNK 2 of the page — the technical depth and reference material.
+1.  Frontmatter (YAML block between ---):
+      title: [Topic Name]
+      track: [track-slug]
+      tags: [list of 4–6 keywords]
+      depth: [foundational | intermediate | advanced]
+      prereqs: [list of 2–4 prerequisite topic slugs]
+      updated: [today's date YYYY-MM-DD]
+      has_mvb: [true | false]
 
-Sections to write (in order):
-7. ## Core concepts  (flat bullet list — 5–8 key ideas, each defined precisely in one sentence)
-8. ## Mathematical foundations  (LaTeX equations from scratch pad — annotate EVERY variable)
-9. ## Key algorithms / techniques  (flat list — named methods, 1–2 sentences each)
-10. ## Essential reading  (table — 2–4 papers from scratch pad verified citations only)
-11. ## Seminal papers & test-of-time  (table — papers that moved the field)
-12. ## Current SotA  (2–3 sentences — named systems + specific benchmark numbers)
-13. ## What's happening now  (3 prose paragraphs: Research / Engineering & Systems / Open problems)
-14. ## In production  (production examples from scratch pad — company + system + scale + URL)
+2.  # [Page Title]
 
-Rules for this chunk:
-- Use ONLY the citations listed in the scratch pad — do not invent paper titles
-- Every equation must use the exact annotation format from the scratch pad
-- "What's happening now" must be prose paragraphs, not bullets
-- "In production" must have specific scale numbers — not "large companies use this"
-- End at the closing of "In production" — do not start MVB
-"""
+3.  > **TL;DR:** [one sentence — what this is and why it matters at the frontier]
 
-CHUNK3_INSTRUCTIONS = """Write CHUNK 3 of the page — the build and connections.
+4.  ## For your reader type
+    (4-row table: Reader type | What you get | Go to)
 
-Sections to write (in order):
-15. ## Minimum Valuable Build  (if has_mvb=true — use exact stack from scratch pad)
-    OR  (if has_mvb=false) — skip this section; add a one-line pointer to the parent page's MVB
-16. GitHub star CTA (exactly: > *If this build worked for you — a ⭐ on [GitHub](...) is the only signal we collect.*)
-    [only if MVB was written]
-17. ## Code & implementations  (official repos + HuggingFace links — no tutorials)
-18. ## What comes next  ← USE EXACTLY THIS HEADING  (natural wiki links — one sentence each on the relationship, not sequence)
-19. ## Connected topics  ← USE EXACTLY THIS HEADING  (real relative markdown links to existing pages — one-sentence relationship, not navigation framing)
-20. ## Further reading  (arXiv/edu/distill.pub/lil'log — one sentence per item on what it adds)
+5.  ## What it is
+    2–3 prose paragraphs. MUST open with the opening scenario from the scratch pad,
+    NOT a definition. No nested lists.
 
-Rules for this chunk:
-- Section headings 18 and 19 MUST be exactly "## What comes next" and "## Connected topics" — the reviewer checks these names literally
-- If MVB: use the exact model ID, dataset ID, compute spec from the scratch pad
-- MVB recipe steps must be specific enough to follow without googling
-- "What comes next" and "Connected topics" must feel like encyclopedia links, not a roadmap
-- No "this track covers / in this arc / your learning journey" language anywhere
-- No source-policy banner ("arXiv · .edu only") in the footer
+6.  ## Why it matters at the frontier
+    2 prose paragraphs connecting to open problems and lab priorities.
+
+7.  ## Core concepts
+    Flat bullet list — 5–8 key ideas, each defined in one precise sentence.
+
+8.  ## Mathematical foundations
+    3–5 equations from scratch pad. After EVERY equation, write:
+    "where \(symbol\) is ..., \(symbol\) is ..." — annotate EVERY symbol.
+    Then one sentence of intuition: "This equation says that..."
+
+9.  ## Key algorithms / techniques
+    Flat list — named methods, 1–2 sentences each (name, year, what it does).
+
+10. ## Essential reading
+    Table: Paper | Year | Authors | Why essential
+    Use ONLY verified citations from the scratch pad. 2–4 papers.
+
+11. ## Seminal papers & test-of-time
+    Table: Paper | Year | Key contribution
+    Papers that durably changed the field — not just recent SotA.
+
+12. ## Current SotA
+    2–3 sentences. Named systems + specific benchmark numbers + years.
+    Format: "[Model] achieves [metric] on [benchmark] ([year])."
+
+13. ## What's happening now
+    3 prose paragraphs (one each): Research frontiers / Engineering & Systems / Open problems.
+    State open problems as specific research questions, not vague directions.
+
+14. ## In production
+    3–5 bullet points. Each: Company — System — Scale number — Source URL.
+    Sources must be from approved engineering blogs (ai.meta.com, research.google, etc.).
+
+15. ## Minimum Valuable Build     ← include if has_mvb=true
+    (if has_mvb=false: one sentence pointing to the arc or parent page that has the build)
+    Structure:
+      **What you're building:** [one-sentence artifact]
+      **Why this build:** [what it demonstrates]
+      **Stack:** [libraries + versions + HuggingFace model IDs]
+      **Estimated time:** [realistic estimate]
+      ### The recipe
+      Numbered steps. Each step does one thing.
+      ### Expected output
+      Specific — shapes, numbers, or qualitative description.
+      ### Common failure modes
+      - [Failure] → [Fix]
+
+16. > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+    (include only if MVB was written)
+
+17. ## Code & implementations
+    Official repos + HuggingFace links. No tutorials. Real GitHub URLs.
+
+18. ## What comes next
+    ← USE EXACTLY THIS HEADING — the reviewer checks this name literally
+    2–3 links to related pages in this wiki. Real relative markdown paths.
+    One sentence per link: the relationship, not "next in sequence".
+
+19. ## Connected topics
+    ← USE EXACTLY THIS HEADING — the reviewer checks this name literally
+    3–5 cross-track connections. Real relative paths to pages that exist.
+    One sentence per link: shared structure or concept, not "also related to".
+
+20. ## Further reading
+    4–6 items: arXiv, *.edu, distill.pub, or lilianweng.github.io only.
+    One sentence per item on what it adds beyond what's in the page.
+
+HARD RULES (violations cause the reviewer to reject):
+- URLs: only arxiv.org, *.edu, huggingface.co, pytorch.org, distill.pub, lilianweng.github.io,
+  official engineering blogs (ai.meta.com, research.google, openai.com/research, stability.ai/research)
+- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com
+- Math: ONLY \\[...\\] for display, \\(...\\) for inline. NEVER $...$ or $$...$$
+- No nested lists anywhere (bullet inside bullet = fail)
+- No roadmap language: "step 1", "next you'll", "your learning journey", "continue to"
+- No source-policy footer banner
 """
 
 

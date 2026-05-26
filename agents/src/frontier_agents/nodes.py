@@ -26,13 +26,11 @@ from pydantic import BaseModel, Field
 
 from .llm import get_llm
 from .prompts import (
-    CHUNK1_INSTRUCTIONS,
-    CHUNK2_INSTRUCTIONS,
-    CHUNK3_INSTRUCTIONS,
     MVB_SYSTEM,
     PLAN_SYSTEM,
     REVIEWER_SYSTEM,
     SCRATCH_SYSTEM,
+    WRITE_INSTRUCTIONS,
     WRITER_SYSTEM,
 )
 from .skills import context_tokens_from_state, format_skills_block, load_skills, select_skills
@@ -287,21 +285,12 @@ HUGGINGFACE (for MVB):
 
 
 def write_draft_node(state: WikiPageState) -> WikiPageState:
-    """Write the full wiki page in three sequential chunks.
+    """Write the complete wiki page in a single LLM call.
 
-    Each chunk is a separate LLM call. Every call receives:
-      - The WRITER_SYSTEM persona + rules
-      - The writing plan (strategy)
-      - The scratch pad (verified facts, equations, citations, MVB stack)
-      - All previously written chunks (for coherence)
-
-    This avoids token-limit truncation and ensures each section can reference
-    what came before — the same way a human writer works draft by draft.
-
-    Chunks:
-      1 — Foundation: frontmatter + TL;DR + reader table + What it is + Why it matters
-      2 — Depth:      Core concepts + Math + Algorithms + Reading + SotA + In production
-      3 — Action:     MVB + Code + What comes next + Connected topics + Further reading
+    The model has 200K context — a full page (~7500 tokens) plus research context
+    fits comfortably in one call. Single-pass writing produces coherent output:
+    the model maintains the full narrative arc, avoids repetition, and can cross-
+    reference earlier sections naturally.
     """
     writer = get_llm("writer", temperature=0.3)
     schema = _load_schema()
@@ -331,8 +320,14 @@ def write_draft_node(state: WikiPageState) -> WikiPageState:
            if "frontier" in depth_emphasis else "")
     )
 
-    # Shared context block — passed to every chunk call
-    context_header = f"""Topic: **{topic}** | Track: {track} | Page type: {page_type}
+    existing = state.get("existing_stub", "")
+    improve_note = (
+        "\n⚠ IMPROVE MODE — existing content below. Keep what's good, rewrite what's weak:\n"
+        + existing[:3000]
+        if existing.strip() and "🚧" not in existing else ""
+    )
+
+    user = f"""Topic: **{topic}** | Track: {track} | Page type: {page_type}
 {depth_note}
 
 ════════════════════════════════════
@@ -344,55 +339,16 @@ WRITING PLAN
 WORKING MEMORY (verified facts — use ONLY these citations, equations, examples)
 ════════════════════════════════════
 {scratch_pad}
+{improve_note}
+
+{WRITE_INSTRUCTIONS}
 """
 
-    existing = state.get("existing_stub", "")
-    improve_note = (
-        "\n⚠ IMPROVE MODE — existing content below. Keep what's good, rewrite what's weak:\n"
-        + existing[:2000]
-        if existing.strip() and "🚧" not in existing else ""
-    )
-
-    chunks: list[str] = []
-
-    # ── Chunk 1: Foundation ──────────────────────────────────────────────────
-    r1 = writer.invoke([
+    response = writer.invoke([
         SystemMessage(content=system),
-        HumanMessage(content=f"""{context_header}{improve_note}
-
-{CHUNK1_INSTRUCTIONS}
-"""),
+        HumanMessage(content=user),
     ])
-    chunks.append(r1.content.strip())
-
-    # ── Chunk 2: Depth + Reference ───────────────────────────────────────────
-    r2 = writer.invoke([
-        SystemMessage(content=system),
-        HumanMessage(content=f"""{context_header}
-
-Already written (CHUNK 1 — do not repeat these sections):
-{chunks[0]}
-
-{CHUNK2_INSTRUCTIONS}
-"""),
-    ])
-    chunks.append(r2.content.strip())
-
-    # ── Chunk 3: Build + Connections ─────────────────────────────────────────
-    r3 = writer.invoke([
-        SystemMessage(content=system),
-        HumanMessage(content=f"""{context_header}
-
-Already written (CHUNKS 1 & 2 — do not repeat these sections):
-{chunks[0][-1000:]}   ← end of chunk 1
-{chunks[1][-1500:]}   ← end of chunk 2
-
-{CHUNK3_INSTRUCTIONS}
-"""),
-    ])
-    chunks.append(r3.content.strip())
-
-    draft = "\n\n".join(chunks)
+    draft = response.content.strip()
     return {**state, "draft": draft}
 
 

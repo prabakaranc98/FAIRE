@@ -90,13 +90,12 @@ class TestResearchNode:
 
 class TestWriteDraftNode:
     def test_sets_draft_in_state(self, base_state):
-        # write_draft_node makes 3 sequential chunk calls — mock returns same content each time
+        # write_draft_node makes a single LLM call (single-pass, not chunked)
         mock_llm = _make_mock_llm("# Diffusion Models\nFull page content here.")
         with patch("frontier_agents.nodes.get_llm", return_value=mock_llm):
             result = write_draft_node(base_state)
-        # Draft is 3 chunks joined — all have the same mock content
         assert "# Diffusion Models" in result["draft"]
-        assert mock_llm.invoke.call_count == 3  # one call per chunk
+        assert mock_llm.invoke.call_count == 1  # single pass
 
     def test_includes_existing_stub_in_prompt(self, base_state):
         state = {
