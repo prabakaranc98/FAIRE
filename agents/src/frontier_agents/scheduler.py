@@ -69,6 +69,9 @@ def _parse_sprint_item(item: str, section: str) -> dict | None:
     Format:  topic | track | page_type | depth_emphasis [| arc:id pos:N prev:x next:y]
     Example: score-matching | 02-generative-modeling | core-concept | theoretical | arc:generative-stack pos:4 prev:ddpm next:flow-matching
     """
+    # Strip HTML comments before parsing (e.g. "applied frontier  <!-- reason -->")
+    item = re.sub(r"<!--.*?-->", "", item).strip()
+
     parts = [p.strip() for p in item.split("|")]
     if len(parts) < 2:
         return None
@@ -77,7 +80,10 @@ def _parse_sprint_item(item: str, section: str) -> dict | None:
     track = parts[1] if len(parts) > 1 else ""
     page_type = parts[2] if len(parts) > 2 else "core-concept"
     depth_str = parts[3] if len(parts) > 3 else "applied"
-    depth_emphasis = [d.strip() for d in depth_str.split(",")]
+    # Normalize depth: split on comma or space, drop empty tokens
+    depth_emphasis = [d.strip() for d in re.split(r"[,\s]+", depth_str) if d.strip()]
+    if not depth_emphasis:
+        depth_emphasis = ["applied"]
 
     arc_context: dict = {}
     if len(parts) > 4:

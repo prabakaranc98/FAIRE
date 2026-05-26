@@ -442,11 +442,15 @@ def serve(host, port, interval, dry_run, run_now):
     scheduler.start()
     _scheduler = scheduler
 
-    # Step 3: Optionally run a full cycle immediately
+    # Step 3: Optionally run a full cycle immediately (in background so HTTP starts first)
     if run_now:
-        click.echo("Running initial full cycle now (supervisor → audit → sprint → changelog)...")
-        full_cycle_job(dry_run=dry_run)
-        click.echo("Initial cycle complete.")
+        click.echo("Scheduling immediate cycle (HTTP server starts first)...")
+        run_now_thread = threading.Thread(
+            target=_run_cycle_background,
+            daemon=True,
+            name="run-now-cycle",
+        )
+        run_now_thread.start()
 
     click.echo(
         f"\nFrontier Wiki agent server running — http://{host}:{port}\n"

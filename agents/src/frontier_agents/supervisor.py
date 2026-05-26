@@ -206,10 +206,14 @@ def run_supervisor(
     )
 
     # 4. QUEUE — write sprint if not dry run
+    # Cap: take all priority-1/2 (critical), then fill up to 50 total with priority-3+
+    # This ensures all stubs get queued in a full-regeneration pass while keeping
+    # critical fixes always at the top.
+    sprint_cap = int(os.environ.get("SPRINT_CAP", "50"))
     if not dry_run and actions:
-        _update_sprint(actions[:15], sprints_path, now)
+        _update_sprint(actions[:sprint_cap], sprints_path, now)
         if verbose:
-            print(f"[supervisor] Updated sprint with {min(len(actions), 15)} items")
+            print(f"[supervisor] Updated sprint with {min(len(actions), sprint_cap)} items")
 
     # 5. REPORT — write to docs/system/supervisor.md
     _write_report(report, docs_path)

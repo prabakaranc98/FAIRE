@@ -482,7 +482,7 @@ def review_node(state: WikiPageState) -> WikiPageState:
 
 ---
 PAGE TO REVIEW:
-{draft[:15000]}
+{draft}
 """
 
     try:
@@ -493,6 +493,7 @@ PAGE TO REVIEW:
                 f"PASS: {result.passed}\nConfidence: {result.confidence}\n"
                 f"Issues: {result.issues}\nSuggestions: {result.suggestions}"
             ),
+            "review_issues": result.issues,
             "review_pass": result.passed,
             "review_confidence": result.confidence,
             "approved": result.passed and result.confidence >= float(

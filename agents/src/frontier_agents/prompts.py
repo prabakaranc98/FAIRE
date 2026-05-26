@@ -131,11 +131,12 @@ Sections to write (in order):
 16. GitHub star CTA (exactly: > *If this build worked for you — a ⭐ on [GitHub](...) is the only signal we collect.*)
     [only if MVB was written]
 17. ## Code & implementations  (official repos + HuggingFace links — no tutorials)
-18. ## What comes next  (natural wiki links — one sentence each on the relationship, not sequence)
-19. ## Connected topics  ([[wikilink]] — relationship description, not navigation framing)
+18. ## What comes next  ← USE EXACTLY THIS HEADING  (natural wiki links — one sentence each on the relationship, not sequence)
+19. ## Connected topics  ← USE EXACTLY THIS HEADING  (real relative markdown links to existing pages — one-sentence relationship, not navigation framing)
 20. ## Further reading  (arXiv/edu/distill.pub/lil'log — one sentence per item on what it adds)
 
 Rules for this chunk:
+- Section headings 18 and 19 MUST be exactly "## What comes next" and "## Connected topics" — the reviewer checks these names literally
 - If MVB: use the exact model ID, dataset ID, compute spec from the scratch pad
 - MVB recipe steps must be specific enough to follow without googling
 - "What comes next" and "Connected topics" must feel like encyclopedia links, not a roadmap

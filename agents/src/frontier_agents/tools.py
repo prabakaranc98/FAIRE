@@ -425,6 +425,8 @@ def log_run(state: dict, runs_dir: str = "runs") -> None:
         "has_mvb": state.get("mvb_decision", False),
         "committed": state.get("committed", False),
         "error": state.get("error", ""),
+        "review_issues": state.get("review_issues", []),
+        "review_feedback": state.get("review_feedback", "")[:500],  # first 500 chars for debug
     }
 
     # Append to JSONL (machine log, never rewritten)
