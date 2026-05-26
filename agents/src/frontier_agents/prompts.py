@@ -100,192 +100,179 @@ List 1–3 arc step pages that USE this concept. For each:
 
 # ── Full-page write instructions ──────────────────────────────────────────────
 
-WRITE_INSTRUCTIONS = """Write the complete CURRICULUM REFERENCE page in a single pass.
+WRITE_INSTRUCTIONS = """Write the complete CURRICULUM CONCEPT page in ONE PASS using the v2
+NARRATIVE WALK-THROUGH template. The reviewer rejects pages on the old list-heavy
+template — there is no fallback. Do NOT add "What it is", "Core concepts", "Essential
+reading", "Current SotA", "What's happening now", "In production", "Connected topics",
+"Further reading", or "What comes next" headings. The v2 template has 7 sections, no
+more. Do not pad with extra headings.
 
-Curriculum pages are REFERENCE WIKI ARTICLES. They serve the seven reader personas
-(see faire-sense skill) by routing each one to their entry section and giving each
-their own MVB variant. The deep builds live in the arc step pages; curriculum pages
-have a compact 6-variant MVB block that nudges each persona toward a build shaped
-for their day.
+You write ONE essay, not a stack of sections. Every section opens with a prose
+lead-in; none start with a bullet list or table. The page reads like an Olah /
+Distill / Karpathy article you'd sit down with for 20 minutes — not like a Wikipedia
+stub or an org-mode outline.
 
-CRITICAL: Write every section in order. Do NOT stop before ## Further reading.
-Every section must be substantive. Do not truncate.
+═══════════════════════════════════════════════
+THE 7 v2 SECTIONS — EXACT HEADINGS, EXACT ORDER
+═══════════════════════════════════════════════
 
-SECTION ORDER (use EXACTLY these heading names — the reviewer checks every heading):
-
-1.  Frontmatter (YAML block between ---):
+1.  Frontmatter (YAML between ---):
       title: [Concept Name]
-      track: [track-slug]
-      tags: [4–6 keywords]
-      depth: foundational | intermediate | advanced
-      prereqs: [2–4 prerequisite topic slugs]
-      arc_refs: []
-      updated: [today's date YYYY-MM-DD]
-      has_mvb: true            ← curriculum pages now carry a multi-persona MVB block
+      slug: [kebab-case]
+      layer: core
+      subject: [subject-slug, e.g. 02-generative-modeling]
+      page_type: concept
+      state: drafted
+      authors_anchored: [4-6 kebab-case lastnames]
+      feeds_de_pillar: []
+      mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
+      prereqs: [2-4 prerequisite concept slugs]
+      tags: [4-6 keywords]
+      updated: [YYYY-MM-DD]
+      has_mvb: true
 
 2.  # [Title]
 
-3.  > **TL;DR:** [one sentence: what this is + why frontier researchers care]
+3.  HOOK (no heading — ~150 words of prose IMMEDIATELY after the # H1).
+    Open with a question, a misconception, a striking observation, or a metaphor.
+    Frame why this matters and what the reader will be able to think about by the
+    end. NEVER open with a definition. The forbidden first sentence is
+    "[Topic] is a method that...". The required opening is something like
+    "Imagine you could..." or "Here's a puzzle:..." or "Most explanations of
+    [topic] start with the equations. They miss the question that motivated them
+    in the first place: ...".
 
-4.  ## Who this page is for
-    Table with 7 rows, 3 columns (persona × section routing — see faire-sense skill):
-    | Persona | What you get | Jump to |
-    |---|---|---|
-    | Curious learner | Plain-English intuition, why this matters | [§What it is](#what-it-is) |
-    | CS student / tinkerer | Laptop-GPU build with a target metric | [§Minimum Valuable Builds — CS student](#mvb-cs-student) |
-    | Applied engineer | Production framing + latency-shaped build | [§In production](#in-production), [§MVB — Applied engineer](#mvb-applied-engineer) |
-    | Applied researcher | Hypothesis + ablation build | [§What's happening now](#whats-happening-now), [§MVB — Applied researcher](#mvb-applied-researcher) |
-    | Theory student | Derivations + numerical verification | [§Mathematical foundations](#mathematical-foundations) |
-    | Frontier researcher | Open problems + falsifiers | [§Open questions](#open-questions), [§MVB — Frontier researcher](#mvb-frontier-researcher) |
-    | PM / decision-maker | "Why it matters" + SotA synthesis (no MVB) | [§Why it matters](#why-it-matters), [§Current SotA](#current-sota) |
-    (Adjust anchor slugs as needed for the actual headings on this page.)
+4.  ## The territory  (~300 words)
+    Where this concept sits in the field. What problem it answers. The shape of
+    the answer. What family of techniques it belongs to (and which adjacent family
+    it borrows from). End with a transition sentence: "How does it actually work?"
+    or "The mechanism is best understood by starting from..." or similar.
 
-5.  ## What it is
-    3 prose paragraphs. The FIRST sentence states the human problem or a surprising fact
-    that makes the reader immediately feel WHY this concept exists. NEVER opens with a
-    definition ("X is a..."). Paragraphs are causally connected: each flows from the prior.
-    Use connectives: "This is why...", "The consequence is...", "That led directly to..."
+5.  ## How it works  (~800-1500 words — THIS IS WHERE THE PAGE EARNS ITS WEIGHT)
+    Narrate the mechanism. Math is EMBEDDED IN PROSE — never in a separate
+    "Mathematical foundations" section. Write equations like this:
 
-6.  ## Why it matters
-    2 paragraphs. Connect to frontier open problems, active lab priorities, and the
-    adjacent concepts that depend on this one. Every claim uses causal connectives.
+      "The key idea is to rewrite the objective as
+      \\[ L(\\theta) = \\mathbb{E}_{x_0, t, \\epsilon}\\big[\\|\\epsilon - \\epsilon_\\theta(x_t, t)\\|^2\\big] \\]
+      where \\(x_0\\) is a clean sample, \\(t\\) is a timestep drawn uniformly from
+      \\(\\{1, \\dots, T\\}\\), \\(\\epsilon \\sim \\mathcal{N}(0, I)\\) is the noise we added
+      at training time, and \\(\\epsilon_\\theta\\) is the network we're learning. The
+      term on the left captures …; the term on the right makes training tractable
+      because …"
 
-7.  ## Core concepts
-    Flat bullet list. 5–8 items. Each: **term** — one precise definition sentence.
+    Math rule: ONLY \\[...\\] for display, \\(...\\) for inline. NEVER $...$ or $$...$$
+    Every variable annotated in the same sentence or the one immediately after.
 
-8.  ## Mathematical foundations
-    3–5 equations. After EACH equation block, write:
-    "where \(symbol\) is ..., \(symbol\) is ..." — annotate EVERY symbol.
-    Then one intuition sentence: "This equation says that..."
-    Use \\[...\\] for display math, \\(...\\) for inline. NEVER $...$ or $$...$$
+    Sub-headings (### Level 3) are allowed if the mechanism has natural stages
+    (e.g., "### Forward process", "### Reverse process", "### Training objective").
+    EACH sub-section opens with a transition sentence, NOT a bullet list. Worked
+    examples and intuitions live inside the prose. Named algorithms (DDPM, DDIM,
+    LDM, …) appear inline in sentences explaining WHY each was introduced — never
+    as a "Key algorithms" bulleted list.
 
-9.  ## Key algorithms / techniques
-    Flat list: **Name** (Year) — 2 sentences: what it does, when to use it over alternatives.
+6.  ## Where the field is now  (~400 words)
+    Current SotA in NARRATIVE form. Name papers in prose:
+      "DDPM (Ho et al. 2020) [arxiv:2006.11239](https://arxiv.org/abs/2006.11239)
+       showed that the simple noise-prediction objective could match GAN quality
+       at 32×32. Three years later, Latent Diffusion (Rombach et al. 2022) pushed
+       this to 1024×1024 by training in a learned latent space, and SDXL (Podell
+       et al. 2023) became the open-source production baseline. The frontier
+       moved again in 2024 with Flow Matching (Lipman et al.) which …"
 
-10. ## Essential reading
-    Table: | Paper | Year | Authors | Why essential |
-    2–4 papers. Only verified arXiv/edu URLs from scratch pad.
-    Each entry answers: what does reading this teach that nothing else does?
+    A small comparison table MAY appear here as evidence for a paragraph's claim
+    — never as the section's spine. Include one research frontier (paper) and
+    one engineering frontier (system at scale, with a real company name).
 
-11. ## Seminal papers & test-of-time
-    Table: | Paper | Year | Key contribution |
-    Papers that reshaped the field AND held up. Cite with arXiv URL.
+7.  ## What's still open  (~250 words)
+    2–4 specific, publishable-level open questions. Each is a QUESTION, not a
+    direction. Bad: "More work is needed on sampling efficiency." Good: "Can
+    consistency models reach DDPM-quality FID in a single function evaluation
+    without distillation, or is the multi-step structure load-bearing?"
 
-12. ## Current SotA
-    2–3 sentences. Named systems + specific benchmark numbers + years.
-    Format: "[Model] achieves [metric] on [benchmark] ([year])."
+8.  ## Where to read next  (ONE paragraph, ~80–150 words)
+    NOT a bullet list. NOT a bibliography. One paragraph with 2–4 inline
+    [[wikilinks]], each introduced by a relationship phrase:
+      "If you want the probabilistic foundation, → [[score-matching]] gives the
+       likelihood-free training perspective that DDPM compiles down to. The
+       engineering counterpart is → [[flash-attention]] explaining how the U-Net
+       is made fast enough to be trained at this scale. For the next paradigm,
+       → [[flow-matching]] generalizes the noising process to arbitrary continuous
+       paths."
 
-13. ## What's happening now
-    3 prose paragraphs: Research frontiers / Engineering & Systems / Open problems.
-    EVERY factual claim names a paper inline: "Author et al. (YEAR) showed [CLAIM] ([arXiv URL])."
-    Vague language without a citation ("recent work suggests", "some approaches",
-    "it has been shown") is a reviewer violation — name the paper or cut the claim.
+9.  ## Build it  (only if has_mvb: true — for most concept pages, YES)
+    THIS is the one section where list form is correct. Open with a one-paragraph
+    framing of what the build proves about the concept, then:
 
-14. ## In production
-    3–5 bullets: Company — System — Scale (real number) — [Source](URL)
-    Source must be an approved engineering blog. No Wikipedia, no Medium.
+    **What you're building:** [one-sentence project — specific artifact]
+    **Why this is valuable:** [the build's contact with the hard part of the concept]
+    **Stack:**
+    - **Model:** [exact HuggingFace model ID](https://huggingface.co/...) — downloads count
+    - **Dataset:** [exact HuggingFace dataset ID](https://huggingface.co/datasets/...) — well-known
+    - **Framework:** [specific library + version]
+    - **Compute:** [VRAM + estimated time]
 
-15. ## Minimum Valuable Builds — by persona
-    SIX sub-sections, one per persona (skip a variant only if the topic genuinely
-    has no fit for that persona — pure theory may skip the production engineer).
+    **The recipe:**
+    1. [Install + load — exact packages]
+    2. [Data — specific preprocessing]
+    3. [Train/fine-tune — hyperparameters + expected loss curve]
+    4. [Evaluate — specific metric + expected number]
+    5. [What you now have — the artifact]
 
-    ### 1. For the curious learner (30 min · free tier) {{ #mvb-curious-learner }}
-    **Build:** [one sentence — what they will see in a notebook or interactive demo]
-    **Artifact:** [the named output — e.g., "a Colab notebook visualizing the forward diffusion process"]
-    **Success:** [observable signal — e.g., "the Gaussian collapses to N(0, I) by step 1000"]
-    **Stack:** [link or HF model/dataset ID]
+    **Expected outcome:** [the named artifact]
 
-    ### 2. For the CS student / tinkerer (1 day · RTX 4070 / M-series) {{ #mvb-cs-student }}
-    **Build:** [a small training run]
-    **Artifact:** [a checkpoint + a plot]
-    **Success:** [a specific number — e.g., "FID ≤ 20 on MNIST 32×32"]
-    **Stack:** [verified HuggingFace IDs and library versions]
+    **Variants per persona** (one short paragraph per active mvb_persona,
+    not a sub-heading explosion):
 
-    ### 3. For the applied / production engineer (1 week · A10 / L4 / cloud) {{ #mvb-applied-engineer }}
-    **Build:** [shipping-shaped — quantization, serving, latency target]
-    **Artifact:** [e.g., "a vLLM endpoint serving model X at p50 < 1.5s on A10"]
-    **Success:** [latency, throughput, or cost number]
-    **Stack:** [HF model ID + serving framework + version]
+    - **CS student:** [one-line tweak — what to do differently on free Colab / RTX 4070]
+    - **Applied engineer:** [the production variant — quantization, vLLM serving, latency target]
+    - **Applied researcher:** [the ablation/hypothesis variant — what's being tested]
+    - **Frontier researcher:** [the falsifier-driven extension — a named open question from §What's still open]
 
-    ### 4. For the applied researcher (3 days · A100) {{ #mvb-applied-researcher }}
-    **Build:** [stated hypothesis + ablation]
-    **Artifact:** [a comparison table or curve]
-    **Success:** [evidence that confirms or falsifies the hypothesis]
-    **Stack:** [setup details]
+    Close with:
 
-    ### 5. For the theory student (1 day · CPU) {{ #mvb-theory-student }}
-    **Build:** [a derivation followed by numerical verification]
-    **Artifact:** [a plot or table showing theory matches simulation]
-    **Success:** [residual below threshold, or correct closed-form match]
-    **Stack:** [paper section referenced + minimal Python]
+    ---
 
-    ### 6. For the frontier researcher (1 week+ · A100 cluster) {{ #mvb-frontier-researcher }}
-    **Build:** [probe of a named open problem from the "Open questions" section]
-    **Artifact:** [evidence the proposed answer holds or fails]
-    **Success:** [a falsification criterion — what would change your mind]
-    **Stack:** [cluster + framework]
+    > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
 
-    HARD RULES for this section:
-    - All six variants share the same underlying mechanism — only artifact, scale, and metric diverge.
-    - Each variant: 3–5 lines, no more. The full section is ~25 lines, not 100.
-    - Named artifacts only. "Train a model" is wrong; "Train a 4M-param UNet DDPM on MNIST 32×32, hit FID ≤ 20" is right.
-    - Real HuggingFace IDs — no abbreviations.
-    - No code blocks unless they name a config — link to the library's quick-start instead.
-    - If a variant truly does not fit (pure theory page has no production engineer build), SKIP that
-      sub-section and add one explanatory line: "*No production engineer variant for this topic — see [related page].*"
+═══════════════════════════════════════════════
+HARD RULES (reviewer rejects on any of these)
+═══════════════════════════════════════════════
 
-16. ## Open questions
-    THREE admonition blocks — one per persona:
-    ```
-    !!! researcher "For researchers"
-        [Theoretical or mathematical question no paper has cleanly answered.
-         Specific enough to design a study around.]
+- Word count >= 1500 (narrative form can't fit below this; pages under 1500
+  are skeletons).
+- NO old-template headings. The reviewer scans for and rejects any of:
+  ## What it is, ## Why it matters, ## Core concepts, ## Mathematical foundations,
+  ## Key algorithms, ## Essential reading, ## Seminal papers, ## Current SotA,
+  ## What's happening now, ## In production, ## Connected topics, ## Further
+  reading, ## What comes next, ## Open questions, ## This concept appears in.
+- NO bullet lists outside the Build it section. Connected concepts go inline in
+  prose. Definitions go inline in prose. Algorithms named in §How it works go
+  inline in prose.
+- NO nested lists anywhere (no bullet under bullet).
+- Hook MUST come before any heading. The first heading is "## The territory".
+- Citations live INSIDE prose: "Author et al. (YEAR) [arxiv:YYYY.NNNNN](URL) showed…".
+  Vague language ("recent work suggests", "some approaches", "it has been shown")
+  is a fail unless the next clause names the paper.
+- "Where to read next" MUST be one paragraph with inline [[wikilinks]]. A bulleted
+  list there is a fail.
+- Build it variants: ONE short paragraph per persona, not deep sub-headings.
+- URLs: arxiv.org, *.edu, huggingface.co, pytorch.org, jax.readthedocs.io,
+  distill.pub, lilianweng.github.io, and approved frontier-lab eng blogs
+  (ai.meta.com/research, research.google, openai.com/research, developer.nvidia.com/blog)
+  for §Where the field is now ONLY.
+- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com, youtube.com.
+- No motivational language ("you'll learn", "let's explore", "your journey", "feel free to").
+- Hook does NOT start with "[Topic] is a..." or "[Topic] are a class of...".
 
-    !!! engineer "For engineers"
-        [Practical experiment or ablation no one has published.
-         Should be runnable in under a day on a consumer GPU or free Colab.]
+═══════════════════════════════════════════════
+THE READING TEST (this is the bar)
+═══════════════════════════════════════════════
 
-    !!! open "Think about this"
-        [Conceptual puzzle that makes you question something assumed obvious.
-         Phrased as a question, not a direction.]
-    ```
-
-16. ## This concept appears in
-    Flat list: arc step pages that use this concept. Use information from scratch pad
-    "Arc connections" section. If no arc steps are known yet, write:
-    "Arc step pages for this concept are being generated."
-    Format: `- [Step N — Title](../../arcs/{arc}/step-NN-{topic}.md) — one sentence on the connection`
-
-17. ## Connected topics
-    3–5 cross-curriculum links. Each with ONE sentence on the mechanistic relationship —
-    what specific concept, equation, or structure they share. Not "also related to".
-
-18. ## Further reading
-    4–6 items: arXiv, *.edu, distill.pub, lilianweng.github.io only.
-    One sentence per item on what it adds beyond this page.
-
-HARD RULES (violations cause the reviewer to reject):
-- has_mvb: true in frontmatter — curriculum pages carry the 6-persona MVB block.
-- The "Minimum Valuable Builds — by persona" section is REQUIRED. Each present variant
-  must pass the SENSIBLE · VALUABLE · FEASIBLE quality bar (see mvb-recipe skill):
-    SENSIBLE: build matches persona's compute/time/build-type (curious learner = browser;
-              frontier researcher = cluster; applied researcher = ablation not train).
-    VALUABLE: success metric distinguishes right behavior from wrong (FID ≤ 20, not "loss decreases");
-              build forces contact with the concept's hard part, not just an API call.
-    FEASIBLE: hardware fits the named model in memory; time realistic for compute;
-              model/dataset/library versions all real and compatible; metric measurable.
-- An MVB variant that fails any gate is worse than no variant — drop it before emitting.
-- "What it is" must NOT open with a definition. Fail test: does it start "[Topic] is a..."?
-- Every prose section must use causal connectives per paragraph.
-- Tables may not be nested inside other tables.
-- Bullet lists may not be nested (no bullet inside a bullet in explanatory sections).
-- Math: ONLY \\[...\\] for display, \\(...\\) for inline. NEVER $...$ or $$...$$
-- URLs: arxiv.org, *.edu, huggingface.co, pytorch.org, distill.pub, lilianweng.github.io,
-  approved engineering blogs (ai.meta.com, research.google, openai.com/research) only.
-- NEVER: medium.com, towardsdatascience.com, wikipedia.org, substack.com, youtube.com
-- No motivational language: "you'll learn", "let's explore", "your journey", "feel free to"
-- ## This concept appears in section is required — at least one link or placeholder.
-- Academic voice: write for a researcher who reads papers. State facts, cite papers, explain mechanism.
+Before emitting the page, read it aloud in your head. Does it sound like an
+essay guiding a reader through the field, or like a slide deck someone forgot
+to talk over? If the latter, restructure before emitting. A 3000-word page that
+reads as bullets-under-headings fails. A 2500-word page that reads as connected
+prose succeeds.
 """
 
 
@@ -1045,21 +1032,31 @@ Scoring:
   0.0 — page is a stub or missing entirely
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DIMENSION 2 — SOURCE POLICY (source_score)
+DIMENSION 2 — SOURCE POLICY (source_score) — v2
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Approved everywhere: arxiv.org, *.edu, huggingface.co, pytorch.org, jax.readthedocs.io,
-  lilianweng.github.io, distill.pub
-Approved in ## In production only: engineering.linkedin.com, ai.meta.com, research.google,
-  developer.nvidia.com/blog, openai.com/research, aws.amazon.com/blogs/machine-learning,
-  stability.ai/research, github.com (official repos only)
+Approved EVERYWHERE: arxiv.org, *.edu, huggingface.co, pytorch.org, jax.readthedocs.io,
+  lilianweng.github.io, distill.pub, docs.anthropic.com, docs.openai.com
+Approved in ## Where the field is now (frontier-lab engineering blogs):
+  engineering.linkedin.com, ai.meta.com, research.google, developer.nvidia.com/blog,
+  openai.com/research, aws.amazon.com/blogs/machine-learning, stability.ai/research,
+  stability.ai/blog, anthropic.com/research, deepmind.google/research,
+  techblog.netflix.com, databricks.com/blog
+Approved in ## Build it (Code & artifacts):
+  github.com (official repos for the libraries/models in the build),
+  github.com/prabakaranc98/FAIRE (the GitHub-star CTA — REQUIRED ending per SCHEMA.md)
 NEVER approved: medium.com, towardsdatascience.com, substack.com, wikipedia.org,
-  youtube.com, reddit.com, nature.com, personal .github.io (except lilianweng)
+  youtube.com, reddit.com, twitter.com, personal .github.io (except lilianweng)
 
 Scoring:
   1.0 — all URLs approved; citations look real (title + author + year plausible)
-  0.8 — 1 non-critical URL from a soft-banned domain (e.g., nature.com for a real paper)
-  0.5 — 1 clearly banned URL (medium.com, wikipedia.org)
-  0.0 — multiple banned URLs OR likely hallucinated arXiv IDs (format not YYYY.NNNNN)
+  0.85 — 1 non-critical URL from a soft-banned domain (e.g., nature.com for a real paper)
+  0.6  — 1 clearly banned URL (medium.com, wikipedia.org)
+  0.0  — multiple banned URLs OR likely hallucinated arXiv IDs (format not YYYY.NNNNN)
+
+IMPORTANT: the GitHub-star CTA `[GitHub](https://github.com/prabakaranc98/FAIRE)` at
+the end of ## Build it is REQUIRED per SCHEMA.md — never flag this as a banned URL.
+Lab engineering blogs (stability.ai, ai.meta.com, etc.) belong in ## Where the field
+is now (the v2 successor to v1's ## In production) — never flag them there.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DIMENSION 3 — NARRATIVE FORM (prose_score) — THE LOAD-BEARING CHECK
@@ -1136,23 +1133,42 @@ Check "## Where to read next" — the connective tissue.
          journey", "next step")
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-OVERALL CONFIDENCE AND PASSED
+OVERALL CONFIDENCE AND PASSED — PERMISSIVE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+This is a LEARNING BLOG / WIKI ESSAY. The goal is cohesive, readable, well-linked
+prose grounded in real online sources. Do NOT police minor source-policy nuance,
+heading variants, or stylistic drift. Trust the writer's grounded research.
+
 confidence = weighted average:
-  0.25×schema + 0.25×prose + 0.15×source + 0.12×mvb + 0.13×frontier_citation
-  + 0.05×open_questions + 0.05×backlink
+  0.35×prose (cohesiveness, narrative flow, readability)
+  + 0.25×schema (the page has the major v2 sections — minor drift OK)
+  + 0.15×frontier_citation (claims have papers behind them)
+  + 0.15×mvb (build is concrete and runnable)
+  + 0.05×source + 0.025×open_questions + 0.025×backlink
 
-passed = True only if:
-  - schema_score >= 0.8 (v2 sections present, no old-schema headings)
-  - prose_score   >= 0.7 (narrative form, not bullet dump)
-  - source_score  >= 0.8 (no clearly banned URLs)
-  Otherwise passed = False regardless of overall confidence.
+passed = True if:
+  - confidence >= 0.6, AND
+  - The page has at least 4 of the 5 v2 main sections (territory, how-it-works,
+    where-field-now, what's-still-open, where-to-read-next), AND
+  - The page is at least ~1200 words of substantive prose
 
-IMPORTANT: A page on the OLD list-heavy template fails schema (because old
-headings appear, and v2 headings are missing). Do not "be kind" to such pages
-— they must be rewritten on the v2 narrative template.
+passed = False ONLY if the page is clearly broken: stub-only, < 800 words, no
+sections, or so heavily on the OLD template that the narrative is unrecoverable.
 
-Return issues as specific, actionable strings that the writer can fix in one pass.
+DO NOT REJECT for:
+  - One or two old-template heading names slipping in (just note as a suggestion)
+  - Minor source-policy quibbles (e.g., a lab blog cited in §How it works
+    instead of §Where the field is now — note as suggestion)
+  - The GitHub-star CTA at end of Build it (this is REQUIRED, not a violation)
+  - Author-year citations without arXiv URL (note as a soft suggestion)
+  - Approximate compute/runtime claims in Build it (these are estimates)
+
+The bar: would a curious learner reading this end-to-end come away with real
+understanding and a concrete next step (the MVB)? If yes → pass. If no → fail
+and say specifically why.
+
+Return issues as specific, actionable strings — but prioritize cohesiveness and
+connectedness over heading-name perfection.
 """
 
 

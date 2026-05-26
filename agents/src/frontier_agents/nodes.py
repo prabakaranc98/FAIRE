@@ -25,6 +25,38 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from .llm import get_llm
+
+
+def _coerce_text(content) -> str:
+    """Robustly turn an LLM response.content into a string.
+
+    Some OpenRouter models (notably the openai/gpt-5.x reasoning family and
+    google/gemini-3.x via langchain_openai) return `content` as a list of
+    content blocks instead of a flat string. Each block is either a dict
+    with a `text` field (or `reasoning`/`thinking`), or a plain string.
+
+    Returns the concatenated text, stripped of leading/trailing whitespace.
+    Defensive: always returns a str, never raises.
+    """
+    if content is None:
+        return ""
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts = []
+        for block in content:
+            if isinstance(block, str):
+                parts.append(block)
+            elif isinstance(block, dict):
+                # Common keys across providers; skip reasoning/thinking blocks
+                # since they're internal scratch the model used to plan
+                if block.get("type") in ("thinking", "reasoning"):
+                    continue
+                parts.append(
+                    block.get("text") or block.get("content") or ""
+                )
+        return "".join(parts)
+    return str(content)
 from .prompts import (
     MVB_SYSTEM,
     PLAN_SYSTEM,
@@ -298,7 +330,7 @@ Production deployments found:
 
 {PLAN_SYSTEM}
 """
-    return planner.invoke([HumanMessage(content=user)]).content
+    return _coerce_text(planner.invoke([HumanMessage(content=user)]).content)
 
 
 def _do_scratch(state: WikiPageState) -> str:
@@ -362,7 +394,7 @@ HUGGINGFACE (for MVB):
 
 {SCRATCH_SYSTEM}{skills_block}
 """
-    return compiler.invoke([HumanMessage(content=user)]).content
+    return _coerce_text(compiler.invoke([HumanMessage(content=user)]).content)
 
 
 def plan_and_scratch_node(state: WikiPageState) -> WikiPageState:
@@ -396,7 +428,7 @@ def write_draft_node(state: WikiPageState) -> WikiPageState:
     system = (
         WRITER_SYSTEM
         .replace("{domain}", persona.get("domain", "AI/ML"))
-        .replace("{schema}", schema[:2000])
+        .replace("{schema}", schema[:12000])
     ) + skills_block
 
     depth_note = (
@@ -437,7 +469,7 @@ WORKING MEMORY (verified facts — use ONLY these citations, equations, examples
         SystemMessage(content=system),
         HumanMessage(content=user),
     ])
-    draft = response.content.strip()
+    draft = _coerce_text(response.content).strip()
     return {**state, "draft": draft}
 
 
@@ -514,7 +546,7 @@ WORKING MEMORY (verified facts — use ONLY these citations, equations, examples
         SystemMessage(content=system),
         HumanMessage(content=user),
     ])
-    draft = response.content.strip()
+    draft = _coerce_text(response.content).strip()
     return {**state, "draft": draft}
 
 
@@ -586,7 +618,7 @@ WORKING MEMORY (verified citations and readings — use ONLY these)
         SystemMessage(content=system),
         HumanMessage(content=user),
     ])
-    draft = response.content.strip()
+    draft = _coerce_text(response.content).strip()
     return {**state, "draft": draft}
 
 
@@ -628,7 +660,7 @@ Output ONLY the MVB section markdown (starting with ## Minimum Valuable Build).
 """
 
     response = writer.invoke([HumanMessage(content=prompt)])
-    return {**state, "mvb_section": response.content, "hf_models": hf_models, "hf_datasets": hf_datasets}
+    return {**state, "mvb_section": _coerce_text(response.content), "hf_models": hf_models, "hf_datasets": hf_datasets}
 
 
 def merge_mvb_node(state: WikiPageState) -> WikiPageState:
@@ -936,7 +968,7 @@ def revise_draft_node(state: WikiPageState) -> WikiPageState:
     system = (
         WRITER_SYSTEM
         .replace("{domain}", persona.get("domain", "AI/ML"))
-        .replace("{schema}", schema[:2000])
+        .replace("{schema}", schema[:12000])
     )
 
     draft = state.get("draft", "")
@@ -986,7 +1018,7 @@ Return the COMPLETE revised page. Include ALL sections from frontmatter through
 
     response = writer.invoke([SystemMessage(content=system), HumanMessage(content=prompt)])
     count = state.get("revision_count", 0) + 1
-    return {**state, "draft": response.content, "revision_count": count}
+    return {**state, "draft": _coerce_text(response.content), "revision_count": count}
 
 
 def _sanitize_draft(text: str) -> str:
@@ -1210,7 +1242,7 @@ Only use slugs from the catalog above. Never invent slugs."""
 
     try:
         response = linker.invoke([HumanMessage(content=prompt)])
-        raw = response.content.strip()
+        raw = _coerce_text(response.content).strip()
         json_match = re.search(r"\[.*?\]", raw, re.DOTALL)
         if not json_match:
             return draft
