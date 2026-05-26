@@ -18,12 +18,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 
-# Required sections — kept lenient during v2 transition.
-# These match the OLD list-heavy template; the v2 narrative template is being
-# rolled out in writer prompts. Once writer prompts are fully v2, update these.
+# Required sections — v2 narrative template (see agents/SCHEMA.md).
+# These are the section headings the writer must produce. The audit emits a
+# warning per missing section. The LLM reviewer enforces the deeper checks
+# (narrative form, embedded math, hook quality).
 REQUIRED_SECTIONS = [
-    "## What it is",
-    "## Essential reading",
+    "## The territory",
+    "## How it works",
+    "## Where the field is now",
+    "## What's still open",
+    "## Where to read next",
 ]
 
 BANNED_DOMAINS = [

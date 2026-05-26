@@ -261,7 +261,13 @@ def _assess_wiki(docs_path: Path, runs_path: Path) -> WikiHealth:
         for p in all_pages:
             content = p.read_text(encoding="utf-8", errors="ignore")
             if "🚧" not in content and "Agent-generated content pending" not in content:
-                track = p.parent.name
+                # v2 path-aware track derivation
+                parts = p.parent.parts
+                if "core" in parts:
+                    ci = parts.index("core")
+                    track = parts[ci + 1] if ci + 1 < len(parts) else p.parent.name
+                else:
+                    track = p.parent.name
                 tracks_with_content.add(track)
         h.tracks_covered = len(tracks_with_content)
 
@@ -379,7 +385,16 @@ def _build_action_list(
                 content = page.read_text(encoding="utf-8", errors="ignore")
                 if "🚧" in content or "Agent-generated content pending" in content:
                     topic_slug = page.stem
-                    track = page.parent.name
+                    # v2 layout: docs/curriculum/core/<track>/concepts/<slug>.md
+                    # The parent is "concepts" (or authors/arcs/builds); the
+                    # grandparent is the track. Walk up until we find a track-like name.
+                    parts = page.parent.parts
+                    if "core" in parts:
+                        ci = parts.index("core")
+                        track = parts[ci + 1] if ci + 1 < len(parts) else page.parent.name
+                    else:
+                        # Legacy layout fallback: track is parent
+                        track = page.parent.name
                     if topic_slug not in attempted_topics:
                         reason = "Stub page — not yet generated"
                         if budget_mode == "reduced":

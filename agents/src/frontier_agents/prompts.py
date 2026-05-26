@@ -782,28 +782,51 @@ If depth_emphasis includes "frontier":
   - Open problems must be specific enough that a researcher could write a paper on each one
 
 ═══════════════════════════════════════════════
-STRUCTURE (follow the schema exactly)
+STRUCTURE (v2 narrative walk-through — follow the schema exactly)
 ═══════════════════════════════════════════════
 
-  1. Frontmatter (title, track, tags, depth, has_mvb, updated)
-  2. TL;DR line — one sentence: what this is and why it matters
-  3. "For your reader type" table — 4 rows routing readers to sections
-  4. What it is — 2-3 paragraphs of PROSE, generalist-first, analogy before math
-  5. Why it matters at the frontier — prose connecting to open problems and lab priorities
-  6. Core concepts — flat bullet list of 5-8 key ideas, one sentence each, precise definitions
-  7. Mathematical foundations — annotated LaTeX (EVERY variable explained on the next line)
-  8. Key algorithms / techniques — flat list: named methods, 1-2 sentences each
-  9. Essential reading — table: 2-4 papers, minimum to understand the topic
-  10. Seminal papers & test-of-time — table: papers that moved the field and held up
-  11. Current SotA — where is the frontier TODAY, named systems + benchmarks
-  12. What's happening now — 3 prose paragraphs: Research / Engineering & Systems / Open problems
-  13. In production — real companies, real scale, official blog sources
-  14. Minimum Valuable Build (if has_mvb: true) — specific, runnable recipe
-  15. [After MVB] → separator → GitHub star CTA → separator
-  16. Code & implementations — official repos, not tutorials
-  17. What comes next — natural wiki links, no course/roadmap language
-  18. Connected topics — [[wikilinks]] with relationship description
-  19. Further reading — primary sources only (arXiv/edu/distill.pub/lil'log)
+The page is a 7-section narrative essay, NOT a 15-section listicle.
+Tables and bullets are enrichment, never the spine.
+
+  0. Frontmatter (v2 — see SCHEMA.md)
+     title, slug, layer, subject, page_type, state, authors_anchored,
+     feeds_de_pillar, mvb_personas, prereqs, tags, updated, has_mvb
+
+  1. # [Topic Name]
+  2. HOOK (no heading, ~150 words) — open with a question, a misconception,
+     a striking observation, or a metaphor. Frame why this matters and what
+     the reader will be able to think about by the end. NEVER open with
+     "Topic X is a method that..."
+  3. ## The territory (~300 words) — where this sits in the field, what
+     problem it answers, the shape of the answer. End with a transition
+     into the mechanism.
+  4. ## How it works (~800-1500 words — this is where the page earns its
+     weight) — the mechanism, narrated. Math embedded in prose with every
+     variable annotated inline. Sub-headings (### Level 3) allowed if the
+     mechanism has natural stages, but each sub-section opens with a
+     transition sentence, NOT a bullet list. Worked examples, intuitions,
+     and failure modes live here.
+  5. ## Where the field is now (~400 words) — current SotA in narrative form.
+     Name papers in prose ("DAPO (Yu et al. 2025) achieves 50 pts on AIME
+     2024…"). A table may appear AS EVIDENCE for a paragraph claim, never
+     as the section spine. Include one research frontier and one engineering
+     frontier. Be specific: benchmark numbers, named models, named labs.
+  6. ## What's still open (~250 words) — the honest frontier. What's broken,
+     contested, or unknown. Specific enough that a researcher could write a
+     paper on each open question.
+  7. ## Where to read next — ONE paragraph, NOT a bibliography. Inline
+     [[wikilinks]] embedded in prose: "If you want the engineering side,
+     → [[related-concept]] explains how this scales in production."
+     This is the page's connective tissue to the rest of the wiki.
+  8. ## Build it (only if has_mvb: true) — the MVB recipe. Numbered steps
+     here are CORRECT — this is the one section where list form is the
+     right shape. Followed by per-persona variants (one short line per
+     active mvb_persona). Closes with the GitHub star CTA separator.
+
+THERE IS NO "What it is", NO "Core concepts" bullet list, NO "Essential
+reading" table, NO "Connected topics" section, NO "Further reading"
+bibliography. Citations live inline in the prose ("DDPM (Ho et al. 2020)
+[arxiv:2006.11239](...) showed that…"). The prose IS the bibliography.
 
 ═══════════════════════════════════════════════
 MATH RULES
@@ -860,50 +883,58 @@ After stretch goals, add exactly:
 ---
 
 ═══════════════════════════════════════════════
-CONNECTED CONCEPTS — NATURAL WIKI LINKS
+"WHERE TO READ NEXT" — NATURAL WIKI LINKS, EMBEDDED IN PROSE
 ═══════════════════════════════════════════════
 
-After "Code & implementations", add a section that feels like natural hyperlinks — not a roadmap,
-not a course syllabus. This is a wiki: the reader is already here; they don't need selling.
+After "What's still open", a single paragraph titled "## Where to read next"
+acts as the page's connective tissue. NOT a bullet list. NOT a bibliography.
+One paragraph. Inline [[wikilinks]] embedded in sentences.
 
-TONE RULES FOR THIS SECTION:
+This is a wiki: the reader is already here; they don't need selling. No
+course/roadmap language ("continue your journey", "next step in this arc").
+
+  ✗ BAD: A bulleted list of related concepts
   ✗ BAD: "This track covers X, Y, Z — continue your learning journey by..."
   ✗ BAD: "In this arc, the next step is..."
   ✗ BAD: "You'll want to learn X before moving on to Y"
-  ✓ GOOD: Links with one-sentence descriptions of *relationship*, not *sequence*
-  ✓ GOOD: "Score matching provides the probabilistic foundation — DDPM is the discrete
-    training procedure built on top of it."
-  ✓ GOOD: Natural cross-references, like an encyclopedia entry that points outward
+  ✓ GOOD: One paragraph with 2-4 inline [[links]] phrased as relationships:
+    "If you want the engineering side, → [[flash-attention]] explains how
+    this scales to context windows in the millions. If you want the theory,
+    → [[score-matching]] gives the probabilistic foundation underneath."
+  ✓ GOOD: Natural cross-references like an encyclopedia entry pointing outward.
 
 FORMAT:
 
-## What comes next
+## Where to read next
 
-[1 sentence on what this concept unlocks — stated as a fact, not a direction.
- E.g. "Understanding score matching makes the noise schedule in DDPM precise rather than heuristic."]
-
-- [[related-concept]] — [one sentence on the relationship, not the sequence]
-- [[applied-topic]] — [one sentence on how this feeds into something larger]
-- [[deeper-concept]] — [one sentence on the extension or generalization]
+[One paragraph, ~80-150 words. 2-4 inline [[wikilinks]] each introduced
+ by a relationship phrase like "If you want… →" or "The engineering
+ counterpart is →" or "The theoretical foundation lives in →".]
 
 ═══════════════════════════════════════════════
 ANTI-PATTERNS (the reviewer will flag these)
 ═══════════════════════════════════════════════
 
-  ✗ Nested lists anywhere in explanatory sections
-  ✗ Opening "What it is" with a formal definition before an analogy
+  ✗ Nested lists anywhere
+  ✗ Bullet lists outside Build it (no "Core concepts" or "Essential reading" bullets)
+  ✗ Opening with "## What it is" or any heading before the hook
+  ✗ Opening the hook with a formal definition before an analogy/question/scenario
+  ✗ "## Mathematical foundations" as a section (math embeds in How it works)
+  ✗ Tables used as section spines (tables only as evidence inside paragraphs)
+  ✗ "## Essential reading" or "## Further reading" sections (citations live inline)
+  ✗ "## Connected topics" bullet list (use "Where to read next" paragraph)
   ✗ Vague production examples without named companies and scale numbers
-  ✗ LaTeX equations without variable annotations on the following line
+  ✗ LaTeX equations without variable annotations on the same or following line
   ✗ "Recent work has shown..." without citing the actual paper (author-year format)
   ✗ Open problems described as "directions for future work" not specific questions
   ✗ MVB that requires >16GB VRAM or paid cloud compute
   ✗ Any URL from medium.com, towardsdatascience.com, wikipedia.org
   ✗ Paper titles that look plausible but aren't real (hallucinated citations)
-  ✗ "In production" without specific company + specific system + specific scale number
   ✗ "This track covers..." or "In this arc..." — course/roadmap language has no place in a wiki
   ✗ "Continue your learning journey" or any navigation framing that sells sequence
   ✗ Source-policy banners on the page ("arXiv · .edu · HuggingFace sources only")
   ✗ Copying explanations from lil'log or Distill — cite them, don't reproduce them
+  ✗ Page < 1500 words (narrative form can't fit; the page is a skeleton)
 
 SCHEMA (from SCHEMA.md):
 {schema}
@@ -977,28 +1008,41 @@ You must return structured output with: passed (bool), confidence (float 0-1), i
 RUBRIC — score each dimension independently (0.0–1.0), then set overall confidence.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DIMENSION 1 — SCHEMA (schema_score)
+DIMENSION 1 — SCHEMA (schema_score) — v2 NARRATIVE SECTIONS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Required headings (exact names):
-  ## What it is
-  ## Why it matters at the frontier
-  ## Core concepts
-  ## Mathematical foundations
-  ## Key algorithms / techniques
-  ## Essential reading
-  ## Seminal papers & test-of-time
-  ## Current SotA
-  ## What's happening now
-  ## In production
-  ## What comes next
-  ## Connected topics
+Required v2 sections (exact names; ordered):
+  [HOOK — no heading, ~150 words after the # H1]
+  ## The territory
+  ## How it works
+  ## Where the field is now
+  ## What's still open
+  ## Where to read next
+  ## Build it           [only if frontmatter has_mvb: true]
+
+There MUST NOT be any of these OLD-schema headings (their presence is a
+template-mismatch failure):
+  ✗ ## What it is
+  ✗ ## Why it matters
+  ✗ ## Core concepts
+  ✗ ## Mathematical foundations
+  ✗ ## Key algorithms / techniques
+  ✗ ## Essential reading
+  ✗ ## Seminal papers
+  ✗ ## Current SotA
+  ✗ ## What's happening now
+  ✗ ## In production
+  ✗ ## Connected topics
+  ✗ ## Further reading
+  ✗ ## What comes next
 
 Scoring:
-  1.0 — all 12 headings present, all well-populated (>2 sentences each)
-  0.8 — 11/12 present, or 1 heading is very thin (1 sentence)
-  0.6 — 10/12 present, or 2 are thin
-  <0.6 — 3+ missing headings or page cuts off before ## Connected topics
-  0.0 — page is entirely missing (stub only)
+  1.0 — all 5 required sections present (Territory, How it works, Where field is now,
+        What's still open, Where to read next) + Build it if has_mvb. Hook is prose
+        before any heading. NO old-schema headings present.
+  0.8 — 4/5 required sections, OR Build it heading missing when has_mvb: true
+  0.6 — 3/5 required, OR one old-schema heading slipped in
+  <0.4 — page is on the OLD template (multiple old-schema headings present)
+  0.0 — page is a stub or missing entirely
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DIMENSION 2 — SOURCE POLICY (source_score)
@@ -1018,15 +1062,25 @@ Scoring:
   0.0 — multiple banned URLs OR likely hallucinated arXiv IDs (format not YYYY.NNNNN)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DIMENSION 3 — PROSE QUALITY (prose_score)
+DIMENSION 3 — NARRATIVE FORM (prose_score) — THE LOAD-BEARING CHECK
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Check: ## What it is, ## Why it matters, ## What's happening now
+The page must READ as a guided essay, not as a stack of bulleted sections.
+Check: the hook, "## The territory", "## How it works".
 
-  1.0 — opens with scenario/analogy (not "X is a..."), no nested lists, no roadmap language,
-         LaTeX variables annotated on line immediately after each equation
-  0.8 — minor issues: 1 nested list, or 1 equation missing annotation
-  0.6 — "What it is" opens with definition; OR 2+ nested lists; OR roadmap language present
-  <0.4 — the page is mostly bullet dumps with no prose connecting them
+  1.0 — Hook opens with question/scenario/observation (not "X is a..."). The territory
+         and How it works are prose with paragraph-to-paragraph transitions. NO bullet
+         lists outside Build it. Math equations have variables annotated inline.
+         Word count >= 1500.
+  0.8 — Strong narrative but 1 issue: a stray bullet list, OR 1 equation missing
+         annotation, OR length 1300-1500 words.
+  0.6 — Narrative is mostly there but several sections open with bullets or tables;
+         OR hook reads as a definition; OR length 1000-1300 words.
+  <0.4 — Page is bullet dumps with weak prose connecting them; OR length <1000;
+         OR hook absent (page opens directly with a heading).
+
+This dimension is load-bearing: a page can have all sections present and still
+fail if it reads as a shopping list. Score with the test: "would a motivated
+reader sit down and read this end-to-end?"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DIMENSION 4 — MVB QUALITY (mvb_score)
@@ -1044,13 +1098,13 @@ If has_mvb: false or no frontmatter:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DIMENSION 5 — FRONTIER CITATION QUALITY (frontier_citation_score)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Check ## What's happening now and ## Current SotA for citation discipline.
+Check "## Where the field is now" for citation discipline.
 
   1.0 — every empirical claim names a paper: "Author et al. (YEAR) showed X (arXiv URL)"
   0.8 — most claims cited; 1-2 minor vague phrases but no sweeping uncited assertions
   0.5 — several claims use anonymous hedging ("recent work suggests", "some approaches",
          "it has been shown") without naming any paper
-  0.2 — the entire What's happening now section makes claims with zero named papers
+  0.2 — the entire section makes claims with zero named papers
   0.0 — frontier sections are entirely vague or copy generic descriptions with no citations
 
 Flag specific vague phrases as issues: quote the phrase and note it needs a paper citation.
@@ -1058,68 +1112,65 @@ Flag specific vague phrases as issues: quote the phrase and note it needs a pape
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 DIMENSION 6 — OPEN QUESTIONS (open_questions_score)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Check ## Open questions section for THREE admonition blocks (researcher, engineer, open):
+Check "## What's still open" for specific, non-trivial open questions.
 
-  1.0 — all three blocks present; each contains a specific, non-trivial question;
-         researcher question is publishable-level specific; engineer question is
-         runnable on consumer hardware; "Think about this" is phrased as a question
-  0.7 — two blocks present; questions are genuine but could be more specific
-  0.4 — one block; OR questions are vague ("more research is needed in this area")
+  1.0 — section contains 2-4 specific, publishable-level open questions;
+         each is phrased AS a question, not a direction
+  0.7 — questions present but could be more specific
+  0.4 — section present but questions are vague ("more research is needed")
   0.0 — section absent OR contains only vague directions, not questions
 
 Flag: any question phrased as a direction ("investigate X", "explore Y") not a question.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-DIMENSION 7 — ARC BACKLINKS (backlink_score)
+DIMENSION 7 — WHERE TO READ NEXT (backlink_score)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-For CURRICULUM pages: check ## This concept appears in section.
-For ARC STEP pages: check ## Go deeper section.
+Check "## Where to read next" — the connective tissue.
 
-For curriculum pages:
-  1.0 — at least 1 arc step link with context sentence; link path looks like
-         ../../arcs/{arc}/step-NN-{topic}.md OR placeholder text is present
-  0.7 — section present but no context sentence
-  0.3 — section absent but arc connections exist in Connected topics
-  0.0 — no arc backlinks and no arc context signals anywhere in the page
-
-For arc step pages:
-  1.0 — at least 1 curriculum page link with context sentence; path matches
-         ../../curriculum/{track}/{slug}.md format
-  0.7 — link present but no context sentence
-  0.3 — section present but link paths look wrong
-  0.0 — ## Go deeper section absent
+  1.0 — ONE paragraph with 2-4 inline [[wikilinks]], each phrased as a
+         RELATIONSHIP not a sequence ("If you want the engineering side, →
+         [[link]] explains…"). NOT a bullet list. NOT a bibliography.
+  0.7 — paragraph present but links lack relationship phrasing
+  0.4 — section is a bullet list instead of a paragraph (old-schema slip)
+  0.0 — section absent OR uses banned course/roadmap language ("continue your
+         journey", "next step")
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 OVERALL CONFIDENCE AND PASSED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 confidence = weighted average:
-  0.25×schema + 0.20×source + 0.18×prose + 0.12×mvb + 0.13×frontier_citation
-  + 0.07×open_questions + 0.05×backlink
+  0.25×schema + 0.25×prose + 0.15×source + 0.12×mvb + 0.13×frontier_citation
+  + 0.05×open_questions + 0.05×backlink
 
 passed = True only if:
-  - schema_score >= 0.8 (all main sections present)
-  - source_score >= 0.8 (no clearly banned URLs)
-  - open_questions_score >= 0.4 (open questions section exists with real questions)
+  - schema_score >= 0.8 (v2 sections present, no old-schema headings)
+  - prose_score   >= 0.7 (narrative form, not bullet dump)
+  - source_score  >= 0.8 (no clearly banned URLs)
   Otherwise passed = False regardless of overall confidence.
 
-IMPORTANT: A page with good content but one heading typo should score schema≥0.8.
-Do NOT penalize schema for minor prose issues — keep the dimensions independent.
+IMPORTANT: A page on the OLD list-heavy template fails schema (because old
+headings appear, and v2 headings are missing). Do not "be kind" to such pages
+— they must be rewritten on the v2 narrative template.
+
 Return issues as specific, actionable strings that the writer can fix in one pass.
 """
 
 
 # ── Specialized reviewer prompts (review panel) ───────────────────────────────
 
-REVIEWER_NARRATIVE = """You are reviewing the NARRATIVE QUALITY of a Frontier Wiki page.
+REVIEWER_NARRATIVE = """You are reviewing the NARRATIVE QUALITY of a Frontier Wiki page (v2 template).
 Focus only on writing quality and reader experience. Ignore schema, sources, and math.
 
 Check:
-1. Does "What it is" open with an analogy or concrete scenario (not a definition)?
-2. Are explanatory sections written as prose (not bullet dumps)?
-3. Are there any nested lists in explanatory text?
+1. Does the page open with a HOOK (~150 words of prose before any heading), and does
+   the hook open with a question/scenario/observation — not a definition?
+2. Does "## The territory" open with prose orienting the reader (not bullets)?
+3. Does "## How it works" carry the bulk of the page (>40% of word count) as
+   connected prose, with math embedded in sentences (not in a separate section)?
 4. Do paragraphs connect causally ("this is why...", "the consequence is...")?
-5. Is the writing empathetic — does it treat the reader as smart but new to this topic?
-6. Is the language clear, direct, and specific (not vague or hedged)?
+5. Is the writing empathetic — smart-but-new reader, not condescending?
+6. Are bullets confined to the Build it section?
+7. Is "## Where to read next" a single paragraph with inline [[wikilinks]] (not a list)?
 
 Return: passed (bool), confidence (0-1), issues (list of specific prose problems), suggestions (list).
 """
