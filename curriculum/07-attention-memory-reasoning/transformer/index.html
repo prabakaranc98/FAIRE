@@ -27,7 +27,7 @@
     
     
       
-        <title>Transformer - Frontier Wiki</title>
+        <title>Transformer Architecture - Frontier Wiki</title>
       
     
     
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Transformer
+              Transformer Architecture
             
           </span>
         </div>
@@ -1798,45 +1798,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1851,10 +1812,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
+  <a href="#what-can-you-build-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What comes next
+        What can you build next?
       
     </span>
   </a>
@@ -3932,7 +3893,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3975,24 +3936,53 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">encoder-decoder</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">multi-head-attention</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">positional-encoding</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">self-attention</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">transformer</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<div class="highlight"><pre><span></span><code><span class="nn">---</span>
-<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Transformer Architecture</span>
-<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">07-attention-memory-reasoning</span>
-<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">transformer</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">self-attention</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">multi-head-attention</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">positional-encoding</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">hybrid-architecture</span><span class="p p-Indicator">]</span>
-<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intermediate</span>
-<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">self-attention</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">backpropagation</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">linear-algebra</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">layer-normalization</span><span class="p p-Indicator">]</span>
-<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-06-10</span>
-<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nn">---</span>
-</code></pre></div>
 <h1 id="transformer-architecture">Transformer Architecture<a class="headerlink" href="#transformer-architecture" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> The transformer replaced sequential recurrence with parallel token-to-token routing via self-attention — now the universal backbone for language, vision, and multimodal AI, and the subject of active research into whether its quadratic inference cost can be eliminated without sacrificing its expressive power.</p>
+<p><strong>TL;DR:</strong> The architecture that replaced RNNs for sequence modeling — multi-head self-attention stacked with feedforward blocks — now the universal backbone for language, vision, audio, protein structure, and multimodal AI.</p>
 </blockquote>
 <hr />
 <h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
@@ -4007,13 +3997,13 @@
 <tbody>
 <tr>
 <td>MS/applied practitioner</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-<td>Build a hybrid Mamba-Transformer block and train it on text</td>
+<td><a href="#key-algorithms-techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Build and fine-tune a transformer</td>
 </tr>
 <tr>
 <td>Curious generalist</td>
 <td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-<td>Understand why transformers displaced every prior architecture</td>
+<td>Understand why transformers beat RNNs</td>
 </tr>
 <tr>
 <td>Math/theory student</td>
@@ -4023,72 +4013,61 @@
 <tr>
 <td>Researcher / frontier</td>
 <td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-<td>Know where attention is being challenged and why</td>
+<td>Know where transformers are being challenged</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Imagine translating a novel where the only tool available is a single sticky note passed from word to word. Each word reads the note, scribbles an update, and hands it forward. By chapter three, the note is a smeared palimpsest — the opening sentence has been overwritten so many times it is unrecognizable. This is the fundamental bottleneck of LSTMs and GRUs: a fixed-size hidden state that must compress the entire history of a sequence into a single vector, then pass it forward one step at a time. The further apart two relevant tokens are, the more that signal degrades. The transformer shattered this constraint by giving every token a direct, high-bandwidth connection to every other token simultaneously — not a telephone game, but a conference call where every participant can hear every other participant at once, regardless of how far apart they are seated.</p>
-<p>The mechanism that enables this is self-attention. For each token, the model computes three vectors — a query, a key, and a value — by projecting the token's embedding through learned weight matrices. The query of one token is compared against the keys of all other tokens to produce attention weights, which then determine how much of each token's value vector to mix into the output. Because this comparison happens in parallel across all token pairs, the entire operation reduces to a matrix multiplication — fast on modern accelerators, and free of the sequential dependency that made RNNs slow to train. Stack this attention mechanism with a position-wise feedforward network, wrap both in residual connections and layer normalization, and repeat the block N times: that is a transformer.</p>
-<p>What makes the transformer more than an engineering convenience is that it reframes sequence modeling as a spatial routing problem. Rather than asking "what happened before this token?", it asks "which tokens are most relevant to this token, and by how much?" The feedforward sublayer then acts as a per-token memory lookup — research by Geva et al. (2021) showed that FFN layers function as key-value stores, retrieving factual associations independently of position. Together, the attention and feedforward sublayers form a residual stream: a shared information highway that each layer reads from and writes to, accumulating increasingly abstract representations as depth increases.</p>
-<hr />
+<p>The transformer replaces sequential recurrence with <strong>self-attention</strong>: every position in a sequence attends to every other position simultaneously, computing a weighted sum of value vectors. This parallelism is what makes transformers fast to train — unlike RNNs, there's no sequential bottleneck.</p>
+<p>The full architecture stacks two sublayers in each block: <strong>(1) Multi-head self-attention</strong> — the core mechanism; <strong>(2) Position-wise feedforward network</strong> — two linear layers with a nonlinearity between them. Both sublayers are wrapped with residual connections and layer normalization. Stack N of these blocks, and you have a transformer.</p>
+<p>The encoder-decoder structure in the original "Attention Is All You Need" paper (Vaswani et al. 2017) was designed for translation: the encoder produces representations, the decoder attends to them with cross-attention. Modern LLMs use only the <strong>decoder stack</strong> (GPT family) or only the <strong>encoder stack</strong> (BERT family), dropping the cross-attention.</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>The transformer's dominance is not accidental — it is a consequence of hardware alignment. Self-attention and feedforward projections are dense matrix multiplications, which map almost perfectly onto the parallelism of modern GPUs and TPUs. This alignment allowed transformers to scale in ways that RNNs structurally could not: more data, more parameters, more compute, reliably producing better models. The scaling laws documented by Kaplan et al. (2020) and later refined by Hoffmann et al. (2022) are transformer-specific observations, and they have driven every major lab's infrastructure investment for the past five years. GPT-4, Gemini Ultra, Claude 3, and Llama 3 are all transformer-based, and the engineering ecosystems — vLLM, FlashAttention, tensor parallelism — are built around the transformer's computational profile.</p>
-<p>The frontier tension is now the quadratic cost of attention. As context windows grow from 4K to 128K to 1M tokens, the memory and compute required for full self-attention scales as <span class="arithmatex">\(O(n^2)\)</span> in sequence length, making long-context inference increasingly expensive. This has made the transformer's own success a pressure point: the architecture that enabled scaling is now the bottleneck to further scaling. The response from frontier labs has been a wave of hybrid architectures — Mamba, RWKV, RetNet, and most recently NVIDIA's Nemotron-H — that interleave attention layers with linear-time state-space or recurrent layers, preserving the reasoning capability of attention while reducing its cost at long contexts. Whether these hybrids can match pure transformers on all tasks, or whether some capability is intrinsically tied to full quadratic attention, is the central open question driving architecture research in 2025.</p>
-<hr />
+<p>The transformer is the architecture. Every frontier AI system — GPT-4, Claude, Gemini, Llama, Stable Diffusion (DiT backbone), AlphaFold 2 (Evoformer), Sora — uses a transformer or transformer variant as its core module. Understanding the transformer is not background knowledge — it's the vocabulary every paper in the field is written in.</p>
+<p>Why did it win? Two reasons: (1) self-attention parallelizes over sequence length, enabling training on massive datasets on GPUs; (2) the architecture is flexible enough to be adapted — with small modifications — to language, vision, audio, graphs, and molecules.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Token embedding</strong> — a learned mapping from discrete vocabulary indices to dense vectors in <span class="arithmatex">\(\mathbb{R}^d\)</span>, where <span class="arithmatex">\(d\)</span> is the model dimension; the input representation before any attention is applied.</li>
-<li><strong>Query, Key, Value (QKV) projections</strong> — three learned linear transformations applied to each token's embedding to produce the vectors used in attention score computation.</li>
-<li><strong>Scaled dot-product attention</strong> — the core operation: dot-product similarity between queries and keys, scaled by <span class="arithmatex">\(\sqrt{d_k}\)</span>, softmaxed to produce weights, then applied to values.</li>
-<li><strong>Multi-head attention</strong> — running <span class="arithmatex">\(h\)</span> independent attention operations in parallel on lower-dimensional projections, then concatenating and projecting the results; allows the model to attend to different aspects of the sequence simultaneously.</li>
-<li><strong>Positional encoding</strong> — information injected into token embeddings (or attention scores) to give the model awareness of token order, since self-attention is permutation-invariant by default.</li>
-<li><strong>Residual stream</strong> — the shared vector that flows through the network; each sublayer (attention, FFN) reads from it and adds its output back to it, enabling gradient flow and interpretable layer-wise decomposition.</li>
-<li><strong>Feedforward sublayer</strong> — a two-layer MLP applied independently to each token position after attention; functions as a position-wise memory lookup with a typical expansion ratio of 4×.</li>
-<li><strong>Causal masking</strong> — in decoder-only models, a mask applied to attention weights that prevents each token from attending to future tokens, enforcing autoregressive generation.</li>
+<li><strong>Self-attention</strong> — each token attends to all others; produces contextualized representations; the mechanism that enables parallelization</li>
+<li><strong>Query, Key, Value (Q, K, V)</strong> — three learned linear projections of each token's embedding; attention score = dot product of Q with all K; output = weighted sum of V</li>
+<li><strong>Scaled dot-product attention</strong> — scale by 1/√d_k to prevent vanishing gradients from large dot products</li>
+<li><strong>Multi-head attention (MHA)</strong> — h parallel attention heads with independent Q/K/V projections; each head attends in a different representation subspace; concatenated and projected</li>
+<li><strong>Causal masking</strong> — in decoder-only models (GPT), future positions are masked out; prevents attending to positions not yet generated</li>
+<li><strong>Position-wise FFN</strong> — two linear layers (expand → compress) with activation; standard is SwiGLU in modern LLMs; this is where ~2/3 of parameters live</li>
+<li><strong>Residual connections</strong> — x + Sublayer(x); critical for gradient flow in deep stacks</li>
+<li><strong>Layer normalization</strong> — pre-norm placement (before sublayer, not after) is standard in modern LLMs; stabilizes training</li>
+<li><strong>Positional encoding</strong> — transformers have no built-in notion of order; absolute (sinusoidal), learned, or relative (RoPE, ALiBi) encodings inject position information</li>
 </ul>
-<hr />
 <h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p>The core attention operation for a single head is:</p>
-<div class="arithmatex">\[
-\text{Attention}(Q, K, V) = \text{softmax}\!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
-\]</div>
-<p>where <span class="arithmatex">\(Q \in \mathbb{R}^{n \times d_k}\)</span> is the matrix of query vectors for all <span class="arithmatex">\(n\)</span> tokens, <span class="arithmatex">\(K \in \mathbb{R}^{n \times d_k}\)</span> is the matrix of key vectors, <span class="arithmatex">\(V \in \mathbb{R}^{n \times d_v}\)</span> is the matrix of value vectors, and <span class="arithmatex">\(d_k\)</span> is the dimension of the key vectors used for scaling. The scaling by <span class="arithmatex">\(\sqrt{d_k}\)</span> prevents the dot products from growing large in magnitude as <span class="arithmatex">\(d_k\)</span> increases, which would push the softmax into regions of near-zero gradient.</p>
-<p>Multi-head attention concatenates <span class="arithmatex">\(h\)</span> such operations run on separate linear projections:</p>
-<div class="arithmatex">\[
-\text{MultiHead}(X) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\,W^O
-\]</div>
-<div class="arithmatex">\[
-\text{head}_i = \text{Attention}(XW_i^Q,\; XW_i^K,\; XW_i^V)
-\]</div>
-<p>where <span class="arithmatex">\(X \in \mathbb{R}^{n \times d}\)</span> is the input sequence, <span class="arithmatex">\(W_i^Q, W_i^K \in \mathbb{R}^{d \times d_k}\)</span> and <span class="arithmatex">\(W_i^V \in \mathbb{R}^{d \times d_v}\)</span> are the per-head projection matrices, and <span class="arithmatex">\(W^O \in \mathbb{R}^{hd_v \times d}\)</span> is the output projection that maps the concatenated heads back to the model dimension. This equation says that each head learns a different subspace in which to measure token relevance, and the output projection mixes those subspace-specific signals back into a single representation.</p>
-<p>Shaw et al. (2018) extended the attention score to incorporate relative position information:</p>
-<div class="arithmatex">\[
-e_{ij} = \frac{(x_i W^Q)(x_j W^K + a_{ij}^K)^\top}{\sqrt{d_k}}
-\]</div>
-<p>where <span class="arithmatex">\(x_i, x_j \in \mathbb{R}^d\)</span> are the input embeddings at positions <span class="arithmatex">\(i\)</span> and <span class="arithmatex">\(j\)</span>, <span class="arithmatex">\(W^Q\)</span> and <span class="arithmatex">\(W^K\)</span> are the query and key projection matrices, <span class="arithmatex">\(a_{ij}^K \in \mathbb{R}^{d_k}\)</span> is a learned relative position representation (a parameter vector) encoding the directed distance from position <span class="arithmatex">\(i\)</span> to position <span class="arithmatex">\(j\)</span>, and <span class="arithmatex">\(d_k\)</span> is the key dimension. This equation says that the relevance between two tokens depends not only on their content but on how far apart they are and in which direction — injecting sequence order dynamically into the attention score rather than adding a fixed offset to the input embedding.</p>
-<p>The full transformer block update for layer <span class="arithmatex">\(\ell\)</span> is:</p>
-<p>[
-x' = x + \text{MultiHead}(\text{LN}(x))
+<p>Scaled dot-product attention:
+[
+\text{Attention}(Q, K, V) = \text{softmax}!\left(\frac{QK^\top}{\sqrt{d_k}}\right)V
+]</p>
+<p>where Q, K ∈ ℝ^{N×d_k}, V ∈ ℝ^{N×d_v}, N is sequence length, d_k is key dimension.</p>
+<p>Multi-head attention (h heads, each of dimension d_k = d_model / h):
+[
+\text{head}_i = \text{Attention}(QW_i^Q,\; KW_i^K,\; VW_i^V)
 ]
 [
-x^{\ell+1} = x' + \text{FFN}(\text{LN}(x'))
+\text{MHA}(Q,K,V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)\, W^O
 ]</p>
-<p>where <span class="arithmatex">\(x \in \mathbb{R}^{n \times d}\)</span> is the residual stream entering the block, <span class="arithmatex">\(\text{LN}\)</span> denotes layer normalization (pre-norm formulation), <span class="arithmatex">\(\text{MultiHead}\)</span> is the multi-head attention sublayer, and <span class="arithmatex">\(\text{FFN}\)</span> is the position-wise feedforward sublayer. The additive residual structure means each layer's output is a correction to the previous representation rather than a full rewrite, which stabilizes gradient flow and allows the residual stream to be interpreted as a shared information bus.</p>
-<hr />
+<p>Full transformer block (pre-norm variant, used in GPT-2 and beyond):
+[
+x \leftarrow x + \text{MHA}(\text{LayerNorm}(x))
+]
+[
+x \leftarrow x + \text{FFN}(\text{LayerNorm}(x))
+]</p>
+<p><strong>Complexity:</strong> Self-attention is O(N²·d) in time and O(N²) in memory — the quadratic bottleneck that FlashAttention and SSMs address.</p>
 <h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Scaled dot-product attention (Vaswani et al., 2017)</strong> — the foundational QKV mechanism; computes pairwise token relevance via dot products scaled by <span class="arithmatex">\(\sqrt{d_k}\)</span>, enabling parallel sequence processing.</li>
-<li><strong>Multi-head attention (Vaswani et al., 2017)</strong> — runs <span class="arithmatex">\(h\)</span> attention heads in parallel on projected subspaces, then concatenates; allows simultaneous attention to syntactic, semantic, and positional patterns.</li>
-<li><strong>Relative position representations (Shaw et al., 2018)</strong> — replaces fixed sinusoidal position embeddings with learned per-distance vectors added directly to attention logits, making position encoding dynamic and generalizable to unseen lengths.</li>
-<li><strong>Rotary Position Embedding / RoPE (Su et al., 2021)</strong> — encodes position by rotating query and key vectors in complex space; preserves relative position information through the dot product and has become the default in most modern LLMs including Llama and Mistral.</li>
-<li><strong>FlashAttention (Dao et al., 2022; v2 2023)</strong> — a hardware-aware exact attention algorithm that tiles the computation to avoid materializing the full <span class="arithmatex">\(n \times n\)</span> attention matrix in HBM, reducing memory from <span class="arithmatex">\(O(n^2)\)</span> to <span class="arithmatex">\(O(n)\)</span> and achieving 2–4× wall-clock speedup.</li>
-<li><strong>Grouped Query Attention / GQA (Ainslie et al., 2023)</strong> — shares key and value heads across groups of query heads, reducing KV cache memory at inference by a factor of <span class="arithmatex">\(h/g\)</span> where <span class="arithmatex">\(g\)</span> is the number of groups; used in Llama 3 and Mistral.</li>
-<li><strong>Sliding window attention (Beltagy et al., 2020; Longformer)</strong> — restricts each token to attend only to a local window of size <span class="arithmatex">\(w\)</span>, reducing complexity to <span class="arithmatex">\(O(nw)\)</span>; used in combination with global attention tokens for long-document tasks.</li>
-<li><strong>Hybrid attention + SSM layers (Gu &amp; Dao, 2023; NVIDIA, 2025)</strong> — interleaves full self-attention layers with Mamba state-space layers that process tokens in <span class="arithmatex">\(O(n)\)</span> time, achieving near-transformer quality at a fraction of the inference cost for long sequences.</li>
+<li><strong>Encoder-only (BERT-style)</strong> — bidirectional context; MLM pretraining; best for classification, NER, retrieval</li>
+<li><strong>Decoder-only (GPT-style)</strong> — causal (left-to-right) attention; autoregressive generation; best for language modeling, chat, reasoning</li>
+<li><strong>Encoder-decoder (T5/BART-style)</strong> — cross-attention; best for translation, summarization, seq2seq tasks</li>
+<li><strong>FlashAttention</strong> (Dao et al. 2022) — IO-aware attention: tiles Q/K/V to avoid materializing N×N matrix; same output, 2-4× faster, O(N) memory</li>
+<li><strong>Grouped-query attention (GQA)</strong> — multiple query heads share a single key/value head; reduces KV cache memory by 8-32×; standard in Llama 3, Mistral</li>
+<li><strong>Multi-Head Latent Attention (MLA)</strong> (DeepSeek-V2) — compress K/V into a latent vector; 5-13× KV cache reduction; most memory-efficient attention variant</li>
+<li><strong>RoPE</strong> (Su et al. 2021) — rotary positional embeddings; relative position via rotation; enables length generalization; default in Llama, Mistral, DeepSeek</li>
 </ul>
-<hr />
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4101,26 +4080,31 @@ x^{\ell+1} = x' + \text{FFN}(\text{LN}(x'))
 </thead>
 <tbody>
 <tr>
-<td>"Attention Is All You Need"</td>
+<td><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></td>
 <td>2017</td>
 <td>Vaswani et al.</td>
-<td>Introduces the full transformer architecture: QKV attention, multi-head attention, positional encodings, encoder-decoder structure</td>
+<td>The transformer paper — the foundation</td>
 </tr>
 <tr>
-<td>"Self-Attention with Relative Position Representations"</td>
+<td><a href="https://arxiv.org/abs/1810.04805">BERT: Pre-training of Deep Bidirectional Transformers</a></td>
 <td>2018</td>
-<td>Shaw et al.</td>
-<td>Shows how to inject sequence order dynamically into attention scores rather than as a fixed input offset — the conceptual basis for RoPE and ALiBi</td>
+<td>Devlin et al.</td>
+<td>Encoder-only; how transformers become pretrained representations</td>
 </tr>
 <tr>
-<td>"Nemotron-H: A Family of Accurate and Efficient Hybrid Mamba-Transformer Models"</td>
-<td>2025</td>
-<td>NVIDIA</td>
-<td>Demonstrates that replacing most attention layers with Mamba layers achieves competitive quality with dramatically lower inference cost — the clearest current case for hybrid architectures</td>
+<td><a href="https://arxiv.org/abs/2005.14165">Language Models are Few-Shot Learners (GPT-3)</a></td>
+<td>2020</td>
+<td>Brown et al.</td>
+<td>Decoder-only scaling; in-context learning</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2205.14135">FlashAttention: Fast and Memory-Efficient Exact Attention</a></td>
+<td>2022</td>
+<td>Dao et al.</td>
+<td>How attention is actually computed at scale</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4132,281 +4116,70 @@ x^{\ell+1} = x' + \text{FFN}(\text{LN}(x'))
 </thead>
 <tbody>
 <tr>
-<td>"Attention Is All You Need" (Vaswani et al.)</td>
+<td><a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a></td>
 <td>2017</td>
-<td>Established the transformer as a complete sequence model without recurrence or convolution; introduced scaled dot-product and multi-head attention</td>
+<td>The transformer — ended the RNN era</td>
 </tr>
 <tr>
-<td>"BERT: Pre-training of Deep Bidirectional Transformers" (Devlin et al.)</td>
-<td>2018</td>
-<td>Showed that bidirectional transformer pre-training on masked language modeling transfers to virtually every NLP task via fine-tuning</td>
-</tr>
-<tr>
-<td>"Language Models are Few-Shot Learners" (Brown et al.)</td>
+<td><a href="https://arxiv.org/abs/2010.11929">An Image is Worth 16x16 Words (ViT)</a></td>
 <td>2020</td>
-<td>Demonstrated that scaling decoder-only transformers to 175B parameters produces emergent in-context learning without any gradient updates</td>
+<td>Transformer applied to vision without convolutions</td>
 </tr>
 <tr>
-<td>"Scaling Laws for Neural Language Models" (Kaplan et al.)</td>
+<td><a href="https://arxiv.org/abs/2001.08361">Scaling Laws for Neural Language Models</a></td>
 <td>2020</td>
-<td>Established power-law relationships between model size, data, compute, and loss — the empirical foundation for every subsequent scaling decision</td>
+<td>Why bigger transformers are predictably better</td>
 </tr>
 <tr>
-<td>"Training Compute-Optimal Large Language Models" (Hoffmann et al.)</td>
-<td>2022</td>
-<td>Revised Kaplan's scaling laws to show data and model size should scale equally; produced Chinchilla, which matched GPT-3 at 4× fewer parameters</td>
-</tr>
-<tr>
-<td>"FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness" (Dao et al.)</td>
-<td>2022</td>
-<td>Made long-context transformers practical by eliminating the memory bottleneck of materializing the attention matrix; now standard in every production training stack</td>
+<td><a href="https://arxiv.org/abs/2104.09864">RoFormer: Enhanced Transformer with Rotary Position Embedding</a></td>
+<td>2021</td>
+<td>RoPE — the default positional encoding in modern LLMs</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>As of mid-2025, the strongest publicly benchmarked language models remain transformer-based or transformer-hybrid. Meta's Llama 3.1 405B achieves 88.6 on MMLU and 73.0 on HumanEval. Google's Gemini 1.5 Pro extends the context window to 1M tokens using a mixture of full and sliding-window attention layers, achieving state-of-the-art on long-document retrieval benchmarks. NVIDIA's Nemotron-H 56B, a hybrid model with roughly 90% Mamba layers and 10% attention layers, matches or exceeds comparably-sized pure-transformer models on standard benchmarks while reducing inference-time KV cache memory by over 40% at 128K context length — the most concrete demonstration to date that hybrid architectures can close the quality gap.</p>
-<hr />
+<blockquote>
+<p><em>Updated: 2026-05-25</em></p>
+</blockquote>
+<p>All frontier LLMs are decoder-only transformers with: pre-norm, RoPE, SwiGLU activations, GQA or MLA, RMSNorm. DeepSeek-V3 (671B MoE) represents the efficiency frontier: MLA (5-13× KV compression) + Mixture-of-Experts + multi-token prediction. Mamba (Gu &amp; Dao 2023) and hybrid Mamba-attention models (Zamba, Jamba) are the main architectural challengers.</p>
 <h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The dominant research question is no longer how to make transformers better in isolation, but how to replace or augment attention with sub-quadratic alternatives without losing capability. Mamba 2 (Dao &amp; Gu, 2024) unified state-space models with linear attention under a single structured state-space duality framework, providing theoretical grounding for why SSMs can approximate attention in many settings. RWKV-6 and RetNet have similarly shown that linear-recurrent architectures can match transformer perplexity on language modeling at moderate context lengths. The open question is whether any of these alternatives preserve the full in-context learning and multi-step reasoning capabilities that emerge in large transformers — capabilities that may depend on the quadratic all-pairs interaction that linear methods approximate away.</p>
-<p><strong>Engineering and systems.</strong> The engineering response to the quadratic bottleneck has been aggressive. FlashAttention-3 (2024) exploits NVIDIA H100 tensor core asynchrony to achieve near-theoretical peak utilization on attention, reducing the practical cost of full attention at long contexts. Speculative decoding, now deployed in production at Google and Meta, uses a small draft model to propose token sequences that the large transformer verifies in parallel, achieving 2–3× throughput improvements without changing model quality. KV cache quantization (INT8 and INT4 keys/values) has become standard practice for long-context serving, reducing memory pressure at the cost of minor quality degradation that is acceptable in most production settings. The vLLM project's PagedAttention manages KV cache memory with OS-style virtual paging, enabling high-throughput batched inference that was previously impossible due to memory fragmentation.</p>
-<p><strong>Open problems.</strong> The central unresolved question is precise and consequential: <em>What is the mathematically optimal ratio and interleaving pattern of self-attention layers to state-space layers that preserves full Turing-complete reasoning while minimizing quadratic inference costs?</em> Nemotron-H uses a roughly 10% attention / 90% Mamba ratio chosen empirically, but there is no theoretical framework for predicting which tasks require full attention and how many attention layers are sufficient. A related open problem is whether positional encoding is a fundamental limitation: current long-context models degrade significantly beyond their training context length, and it is unclear whether this is a property of attention itself or of the position encoding schemes layered on top of it. Finally, the mechanistic basis for in-context learning — the ability of large transformers to implement new algorithms from examples in the prompt without gradient updates — remains poorly understood, with competing theories (gradient descent in the forward pass, Bayesian inference, associative memory retrieval) each supported by partial evidence.</p>
-<hr />
+<blockquote>
+<p><em>Research · Engineering · Systems</em></p>
+</blockquote>
+<p><strong>Research:</strong> State Space Models (Mamba) and hybrid attention-SSM architectures challenge transformers for long-context efficiency. Multi-token prediction (training to predict k tokens simultaneously) improves sample efficiency. Multi-Head Latent Attention (DeepSeek-V2) shows that compressing the KV cache 13× incurs minimal quality loss.</p>
+<p><strong>Engineering &amp; Systems:</strong> FlashAttention-3 (H100-optimized, async computation, FP8) is the production standard. PagedAttention (vLLM) manages KV cache at serving time as virtual memory pages. KV cache quantization (INT4/FP8) reduces serving memory 2-4×.</p>
+<p><strong>Open problems:</strong> Can attention scale to 10M+ token contexts efficiently? When do SSMs beat transformers, and vice versa? Is multi-token prediction a free lunch or does it trade off something?</p>
 <h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><em>How top labs and companies have deployed this at scale</em></p>
+</blockquote>
 <ul>
-<li><strong>Google</strong> — Gemini 1.5 Pro serves 1M-token context windows in Google AI Studio and the Gemini API, using a hybrid full-attention + sliding-window architecture; Google has reported processing over 1 trillion tokens per day across Gemini deployments — <a href="https://research.google">research.google</a></li>
-<li><strong>Meta</strong> — Llama 3.1 405B runs on Meta's internal inference infrastructure using tensor parallelism across 16 H100 GPUs per instance, with GQA reducing KV cache memory by 8× relative to standard multi-head attention; deployed in Meta AI across WhatsApp, Instagram, and Messenger — <a href="https://ai.meta.com/research">ai.meta.com/research</a></li>
-<li><strong>Amazon</strong> — Rufus, Amazon's AI-powered shopping assistant, runs multi-node LLM inference on AWS Trainium chips using vLLM for batched serving, scaled to production traffic across amazon.com — <a href="https://aws.amazon.com/blogs/machine-learning">aws.amazon.com/blogs/machine-learning</a></li>
-<li><strong>NVIDIA</strong> — Nemotron-H 56B is deployed via NVIDIA NIM (inference microservices) with reported 40%+ reduction in KV cache memory at 128K context versus a pure-transformer baseline of equivalent parameter count — <a href="https://developer.nvidia.com/blog">developer.nvidia.com/blog</a></li>
-<li><strong>Mistral AI</strong> — Mistral Large 2 uses sliding-window attention with RoPE and GQA, serving sub-200ms first-token latency at 32K context on their La Plateforme API through custom CUDA kernels and continuous batching — <a href="https://mistral.ai/news">mistral.ai/news</a></li>
+<li><strong>OpenAI (GPT-4, ChatGPT):</strong> Decoder-only transformer at scale; speculative decoding + continuous batching for serving. <a href="https://openai.com/research/gpt-4">openai.com/research/gpt-4</a></li>
+<li><strong>Google DeepMind (Gemini):</strong> Multi-modal transformer handling text, image, audio, video natively; Flash attention variants for long context. <a href="https://arxiv.org/abs/2312.11805">arxiv.org/abs/2312.11805</a></li>
+<li><strong>Meta AI (Llama 3):</strong> 70B-405B open-weight decoder-only transformer; GQA, RoPE, SwiGLU; the reference open model. <a href="https://arxiv.org/abs/2407.21783">arxiv.org/abs/2407.21783</a></li>
+<li><strong>DeepSeek (V3):</strong> 671B MoE transformer with MLA and multi-token prediction; trained for <span class="arithmatex">\(6M vs. GPT-4's ~\)</span>100M. <a href="https://arxiv.org/abs/2412.19437">arxiv.org/abs/2412.19437</a></li>
+<li><strong>NVIDIA (NeMo framework):</strong> Tensor parallelism + pipeline parallelism + FlashAttention for training 70B+ transformers on H100 clusters. <a href="https://developer.nvidia.com/nemo">developer.nvidia.com/nemo</a></li>
 </ul>
-<hr />
 <h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A single hybrid Mamba-Transformer block in PyTorch — one self-attention layer interleaved with one Mamba SSM layer — trained as a character-level language model on TinyShakespeare.</p>
-<p><strong>Why this build:</strong> This is the architecture pattern driving frontier hybrid models like Nemotron-H. Building it from scratch makes the trade-off concrete: the attention layer handles long-range dependency; the Mamba layer handles local sequential structure in <span class="arithmatex">\(O(n)\)</span> time. Seeing both in one forward pass is more instructive than reading about either in isolation.</p>
-<p><strong>Stack:</strong> Python 3.10+, PyTorch 2.2+, <code>mamba-ssm</code> 1.2.0 (requires CUDA), <code>einops</code> 0.7.0. Runs on a free Colab T4 (16GB VRAM) or any RTX 3080/3090.</p>
-<p><strong>Estimated time:</strong> 45–60 minutes end-to-end (15 min setup, 20 min training, rest for experimentation).</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<p><strong>What you're building:</strong> A character-level GPT (decoder-only transformer) trained on Shakespeare — generates Shakespeare-style text after 10 minutes of training on a laptop GPU.</p>
+<p><strong>Why this is valuable:</strong> Andrej Karpathy's nanoGPT is 300 lines of PyTorch and contains every key component of GPT-2. After building it, you will have implemented: multi-head causal attention, the residual stream, positional embeddings, and the autoregressive generation loop. This is the fastest path from zero to "I understand transformers."</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> Implement from scratch following <a href="https://github.com/karpathy/nanoGPT">nanoGPT</a> — ~300 lines
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/Trelis/tiny-shakespeare">tiny_shakespeare</a> or the raw text file (1MB)
+- <strong>Framework:</strong> Pure PyTorch — no abstractions beyond <code>nn.Module</code></p>
+<p><strong>The recipe:</strong></p>
 <ol>
-<li><strong>Install dependencies</strong></li>
+<li><strong>Implement the attention block:</strong> <code>CausalSelfAttention</code> — Q/K/V projections, scaled dot-product attention, causal mask, multi-head concat + output projection. ~50 lines.</li>
+<li><strong>Stack blocks:</strong> <code>TransformerBlock</code> = attention + FFN + two LayerNorms + residuals. <code>GPT</code> = embedding + N blocks + LM head.</li>
+<li><strong>Train on Shakespeare:</strong> Cross-entropy loss on next-character prediction. ~10 minutes on M1 MacBook or Google Colab.</li>
+<li><strong>Generate:</strong> Sample autoregressively with temperature and top-k — watch Shakespeare emerge.</li>
+<li><strong>Scale it:</strong> Try 6-layer vs. 12-layer. Observe loss improvement. Now you understand scaling laws in your fingers.</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># In a Colab cell or terminal</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">torch</span><span class="o">==</span><span class="mf">2.2.0</span> <span class="n">mamba</span><span class="o">-</span><span class="n">ssm</span><span class="o">==</span><span class="mf">1.2.0</span> <span class="n">einops</span><span class="o">==</span><span class="mf">0.7.0</span> <span class="o">--</span><span class="n">quiet</span>
-</code></pre></div>
-<ol>
-<li><strong>Download TinyShakespeare and build the character tokenizer</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">urllib.request</span><span class="o">,</span><span class="w"> </span><span class="nn">torch</span>
-
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt&quot;</span>
-<span class="n">urllib</span><span class="o">.</span><span class="n">request</span><span class="o">.</span><span class="n">urlretrieve</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;input.txt&quot;</span><span class="p">)</span>
-
-<span class="n">text</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;input.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-<span class="n">chars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
-<span class="n">vocab_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chars</span><span class="p">)</span>                        <span class="c1"># 65 for TinyShakespeare</span>
-<span class="n">stoi</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
-<span class="n">itos</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
-<span class="n">encode</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="p">[</span><span class="n">stoi</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
-<span class="n">decode</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">l</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">itos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">])</span>
-
-<span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">encode</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
-<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-<span class="n">train_data</span><span class="p">,</span> <span class="n">val_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vocab size: </span><span class="si">{</span><span class="n">vocab_size</span><span class="si">}</span><span class="s2">, Train tokens: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_data</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="c1"># Expected: Vocab size: 65, Train tokens: 1,003,854</span>
-</code></pre></div>
-<ol>
-<li><strong>Define the hybrid block: one attention layer + one Mamba layer</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">einops</span><span class="w"> </span><span class="kn">import</span> <span class="n">rearrange</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">mamba_ssm</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mamba</span>
-
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">CausalSelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="k">assert</span> <span class="n">d_model</span> <span class="o">%</span> <span class="n">n_heads</span> <span class="o">==</span> <span class="mi">0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span> <span class="o">=</span> <span class="n">n_heads</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">d_head</span> <span class="o">=</span> <span class="n">d_model</span> <span class="o">//</span> <span class="n">n_heads</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">qkv</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="c1"># Causal mask: lower-triangular</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span>
-            <span class="s2">&quot;mask&quot;</span><span class="p">,</span>
-            <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">))</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
-        <span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">qkv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-        <span class="c1"># Reshape to (B, n_heads, T, d_head)</span>
-        <span class="n">q</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="s2">&quot;b t (h d) -&gt; b h t d&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span><span class="p">)</span>
-        <span class="n">k</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="s2">&quot;b t (h d) -&gt; b h t d&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;b t (h d) -&gt; b h t d&quot;</span><span class="p">,</span> <span class="n">h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">n_heads</span><span class="p">)</span>
-        <span class="c1"># Scaled dot-product attention with causal mask</span>
-        <span class="n">scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">d_head</span> <span class="o">**</span> <span class="o">-</span><span class="mf">0.5</span>
-        <span class="n">att</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">@</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="n">scale</span>
-        <span class="n">att</span> <span class="o">=</span> <span class="n">att</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">T</span><span class="p">,</span> <span class="p">:</span><span class="n">T</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">))</span>
-        <span class="n">att</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">att</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">att</span> <span class="o">@</span> <span class="n">v</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="n">rearrange</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="s2">&quot;b h t d -&gt; b t (h d)&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">proj</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">HybridBlock</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;One attention sublayer + one Mamba sublayer, each with pre-norm and residual.&quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">d_state</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">d_conv</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">CausalSelfAttention</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
-        <span class="c1"># Mamba SSM: processes the sequence in O(n) time</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mamba</span> <span class="o">=</span> <span class="n">Mamba</span><span class="p">(</span>
-            <span class="n">d_model</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span>
-            <span class="n">d_state</span><span class="o">=</span><span class="n">d_state</span><span class="p">,</span>    <span class="c1"># SSM state expansion factor</span>
-            <span class="n">d_conv</span><span class="o">=</span><span class="n">d_conv</span><span class="p">,</span>      <span class="c1"># local convolution width</span>
-            <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span>      <span class="c1"># block expansion factor</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ln1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>   <span class="c1"># attention residual</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mamba</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ln2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>  <span class="c1"># Mamba residual</span>
-        <span class="k">return</span> <span class="n">x</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">HybridLM</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">,</span> <span class="n">n_layers</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pos_embed</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">block_size</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span>
-            <span class="n">HybridBlock</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">n_heads</span><span class="p">,</span> <span class="n">block_size</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">)</span>
-        <span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span> <span class="o">=</span> <span class="n">block_size</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">B</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">shape</span>
-        <span class="k">assert</span> <span class="n">T</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">block_size</span>
-        <span class="n">tok</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pos_embed</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">idx</span><span class="o">.</span><span class="n">device</span><span class="p">))</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">tok</span> <span class="o">+</span> <span class="n">pos</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
-</code></pre></div>
-<ol>
-<li><strong>Instantiate the model and verify parameter count</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">BLOCK_SIZE</span> <span class="o">=</span> <span class="mi">256</span>
-<span class="n">D_MODEL</span>    <span class="o">=</span> <span class="mi">256</span>
-<span class="n">N_HEADS</span>    <span class="o">=</span> <span class="mi">8</span>
-<span class="n">N_LAYERS</span>   <span class="o">=</span> <span class="mi">4</span>   <span class="c1"># 4 hybrid blocks = 4 attention + 4 Mamba layers</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">HybridLM</span><span class="p">(</span>
-    <span class="n">vocab_size</span><span class="o">=</span><span class="n">vocab_size</span><span class="p">,</span>
-    <span class="n">d_model</span><span class="o">=</span><span class="n">D_MODEL</span><span class="p">,</span>
-    <span class="n">n_heads</span><span class="o">=</span><span class="n">N_HEADS</span><span class="p">,</span>
-    <span class="n">block_size</span><span class="o">=</span><span class="n">BLOCK_SIZE</span><span class="p">,</span>
-    <span class="n">n_layers</span><span class="o">=</span><span class="n">N_LAYERS</span><span class="p">,</span>
-<span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-<span class="n">n_params</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameters: </span><span class="si">{</span><span class="n">n_params</span><span class="o">/</span><span class="mf">1e6</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">M&quot;</span><span class="p">)</span>
-<span class="c1"># Expected: ~6–8M parameters</span>
-
-<span class="c1"># Sanity check: one forward pass</span>
-<span class="n">dummy</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-<span class="n">logits</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">dummy</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">logits</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Unexpected shape: </span><span class="si">{</span><span class="n">logits</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Forward pass shape check passed.&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Write the training loop</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">get_batch</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">train_data</span> <span class="k">if</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span> <span class="k">else</span> <span class="n">val_data</span>
-    <span class="n">ix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">-</span> <span class="n">BLOCK_SIZE</span><span class="p">,</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,))</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">BLOCK_SIZE</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ix</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">BLOCK_SIZE</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ix</span><span class="p">])</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
-
-<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
-<span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CosineAnnealingLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
-
-<span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">estimate_loss</span><span class="p">(</span><span class="n">eval_iters</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">split</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="s2">&quot;val&quot;</span><span class="p">]:</span>
-        <span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">eval_iters</span><span class="p">):</span>
-            <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="n">split</span><span class="p">)</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>
-            <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-        <span class="n">out</span><span class="p">[</span><span class="n">split</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">losses</span><span class="p">)</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">out</span>
-
-<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3001</span><span class="p">):</span>
-    <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-    <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-
-    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">metrics</span> <span class="o">=</span> <span class="n">estimate_loss</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> | train loss </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;train&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | val loss </span><span class="si">{</span><span class="n">metrics</span><span class="p">[</span><span class="s1">&#39;val&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Generate text from the trained model</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.8</span><span class="p">):</span>
-    <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">encode</span><span class="p">(</span><span class="n">prompt</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_new_tokens</span><span class="p">):</span>
-        <span class="n">idx_cond</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[:,</span> <span class="o">-</span><span class="n">BLOCK_SIZE</span><span class="p">:]</span>
-        <span class="n">logits</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">idx_cond</span><span class="p">)</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">temperature</span>
-        <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">next_tok</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">idx</span><span class="p">,</span> <span class="n">next_tok</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">decode</span><span class="p">(</span><span class="n">idx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">prompt</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">300</span><span class="p">))</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>Training for 3000 steps on a T4 GPU takes approximately 8–12 minutes. Expected loss trajectory:</p>
-<ul>
-<li>Step 0: train loss ~4.17, val loss ~4.17 (near random for 65-class vocab: <span class="arithmatex">\(\ln 65 \approx 4.17\)</span>)</li>
-<li>Step 500: train loss ~2.0–2.2, val loss ~2.1–2.3</li>
-<li>Step 1500: train loss ~1.6–1.8, val loss ~1.7–1.9</li>
-<li>Step 3000: train loss ~1.4–1.6, val loss ~1.5–1.7</li>
-</ul>
-<p>Generated text at step 3000 will be recognizably Shakespearean in structure — consistent meter, character-name prefixes, plausible dialogue — though not semantically coherent. The key observation to make: the Mamba layers handle local character n-gram patterns efficiently, while the attention layers handle longer-range structural patterns like matching an opening speech tag to its closing line.</p>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong><code>ImportError: mamba_ssm not found</code></strong> → Mamba requires CUDA; run in Colab with GPU runtime enabled (Runtime → Change runtime type → T4 GPU). CPU-only environments will not work.</li>
-<li><strong><code>CUDA out of memory</code></strong> → Reduce <code>batch_size</code> from 32 to 16, or reduce <code>BLOCK_SIZE</code> from 256 to 128. The model itself is small; the batch is usually the culprit.</li>
-<li><strong>Loss stays at ~4.17 after 500 steps</strong> → Check that <code>targets</code> are shifted by one position (i.e., <code>y = data[i+1:i+BLOCK_SIZE+1]</code>); a common bug is passing <code>x == y</code> which makes the task trivial but produces no learning signal.</li>
-<li><strong><code>AssertionError</code> on forward pass shape</strong> → Ensure <code>d_model % n_heads == 0</code>; with <code>D_MODEL=256</code> and <code>N_HEADS=8</code>, each head has dimension 32, which is valid.</li>
-<li><strong>Mamba layer produces NaN after a few steps</strong> → Add gradient clipping (<code>clip_grad_norm_</code> with max norm 1.0) before <code>optimizer.step()</code>; Mamba's selective scan can produce large gradients early in training.</li>
-</ul>
+<p><strong>Expected outcome:</strong> A working character-level language model generating plausible Shakespeare, with full understanding of every line of the transformer code.</p>
+<p><strong>Stretch goals:</strong>
+- Fine-tune <a href="https://huggingface.co/openai-community/gpt2">gpt2</a> on a custom dataset using HuggingFace <code>Trainer</code> — understand how fine-tuning differs from pretraining
+- Add RoPE positional embeddings instead of learned absolute embeddings; see if performance changes
+- Implement Flash Attention manually for the attention block; compare throughput vs. vanilla attention</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
@@ -4414,37 +4187,34 @@ x^{\ell+1} = x' + \text{FFN}(\text{LN}(x'))
 <hr />
 <h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Original Transformer (Vaswani et al.)</strong> — Harvard NLP's annotated implementation: <a href="https://nlp.seas.harvard.edu/annotated-transformer/">https://nlp.seas.harvard.edu/annotated-transformer/</a></li>
-<li><strong>nanoGPT (Karpathy)</strong> — minimal decoder-only transformer in ~300 lines, the cleanest reference for the GPT architecture: <a href="https://github.com/karpathy/nanoGPT">https://github.com/karpathy/nanoGPT</a></li>
-<li><strong>Mamba official repository (Gu &amp; Dao)</strong> — includes <code>mamba-ssm</code> PyPI package and reference SSM kernels; find via the arXiv paper at <a href="https://arxiv.org/abs/2312.00752">https://arxiv.org/abs/2312.00752</a></li>
-<li><strong>FlashAttention (Dao et al.)</strong> — now integrated into PyTorch 2.0+ via <code>F.scaled_dot_product_attention</code>; official documentation at <a href="https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html">https://pytorch.org/docs/stable/generated/torch.nn.functional.scaled_dot_product_attention.html</a></li>
-<li><strong>Hugging Face Transformers</strong> — production implementations of every major transformer variant with pretrained weights: <a href="https://huggingface.co/docs/transformers">https://huggingface.co/docs/transformers</a></li>
-<li><strong>Nemotron-H model weights</strong> — NVIDIA's hybrid Mamba-Transformer family on Hugging Face: <a href="https://huggingface.co/nvidia/Nemotron-H-56B-Base">https://huggingface.co/nvidia/Nemotron-H-56B-Base</a></li>
+<li><a href="https://github.com/karpathy/nanoGPT">nanoGPT</a> — Karpathy's minimal GPT-2; best pedagogical resource</li>
+<li><a href="https://nlp.seas.harvard.edu/annotated-transformer/">The Annotated Transformer</a> — harvard.edu; code-annotated walkthrough of the original paper</li>
+<li><a href="https://huggingface.co/docs/transformers">huggingface/transformers</a> — production library; <code>GPT2Model</code>, <code>BertModel</code>, etc.</li>
 </ul>
-<hr />
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Self-attention is the mechanism inside each transformer block; understanding its mathematical structure — how queries, keys, and values interact and what the attention matrix actually represents — makes the transformer's behavior interpretable rather than opaque.</p>
-<ul>
-<li>[[self-attention]] — the atomic operation inside every transformer block; understanding its geometry explains why transformers generalize across modalities.</li>
-<li>[[positional-encoding]] — the mechanism that breaks the transformer's permutation invariance; RoPE and ALiBi are the current production standards and connect directly to long-context generalization.</li>
-<li>[[state-space-models]] — the linear-time alternative to attention that Mamba implements; understanding SSMs makes the hybrid architecture in the MVB above precise rather than a black box.</li>
-</ul>
-<hr />
+<h2 id="what-can-you-build-next">What can you build next?<a class="headerlink" href="#what-can-you-build-next" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><em>Your arc of work continues here.</em></p>
+</blockquote>
+<p>You built a transformer and understand attention. The natural next question is: how do you take this architecture and turn it into a model that actually follows instructions? That requires alignment — and that's RLHF.</p>
+<p><strong>Go deeper on this concept:</strong>
+→ Flash Attention — the single optimization that makes transformers viable at scale; implement it and see the memory/throughput difference directly</p>
+<p><strong>Build a system with this:</strong>
+→ <a href="../../06-reinforcement-learning/rlhf/">Reinforcement Learning from Human Feedback (RLHF)</a> — take your fine-tuned GPT-2 and run DPO on a preference dataset; that's the arc from "model that predicts tokens" to "model that follows instructions"</p>
+<p><strong>The arc this page belongs to:</strong>
+→ <a href="../../../arcs/mlp-to-transformer/">MLP → Transformer arc</a> — the transformer is the arc's culmination; the Language Models arc picks up here</p>
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[[rlhf]] — RLHF is the standard procedure for aligning transformer-based large language models with human preferences after pretraining.</li>
-<li>[[diffusion-models]] — modern diffusion models increasingly adopt transformer architectures (DiT, Stable Diffusion 3) as their primary denoising backbone.</li>
-<li>[[flow-matching]] — flow matching formulations frequently utilize transformer backbones, with the same attention and feedforward structure applied to continuous generative modeling.</li>
+<li>Self Attention — the core mechanism inside the transformer</li>
+<li><a href="../state-space-models/">State Space Models</a> — Mamba; O(N) alternative to O(N²) attention</li>
+<li>Flash Attention — IO-aware computation of attention; the reason transformers scale</li>
+<li>Lm Pretraining — how transformers are trained on tokens at scale</li>
+<li>Rotary Position Embedding — RoPE; the default positional encoding in modern LLMs</li>
 </ul>
-<hr />
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Vaswani et al. (2017) — "Attention Is All You Need" — <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a> — the original paper; reading the architecture section alongside the annotated implementation is the most efficient path to understanding the full model.</li>
-<li>Shaw et al. (2018) — "Self-Attention with Relative Position Representations" — <a href="https://arxiv.org/abs/1803.02155">https://arxiv.org/abs/1803.02155</a> — explains why absolute position embeddings are limiting and how relative position representations fix the problem; the conceptual ancestor of RoPE.</li>
-<li>Dao et al. (2022) — "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness" — <a href="https://arxiv.org/abs/2205.14135">https://arxiv.org/abs/2205.14135</a> — explains the hardware-level reason attention was slow and how tiling solves it; essential for anyone deploying transformers at scale.</li>
-<li>Lilian Weng — "The Transformer Family Version 2.0" (lil'log, 2023) — <a href="https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/">https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/</a> — a comprehensive survey of transformer variants through 2023, covering sparse attention, linear attention, and positional encoding schemes with consistent notation.</li>
-<li>Elhage et al. (2021) — "A Mathematical Framework for Transformer Circuits" — <a href="https://transformer-circuits.pub/2021/framework/index.html">https://transformer-circuits.pub/2021/framework/index.html</a> — introduces the residual stream perspective and shows how attention heads compose; the foundation of mechanistic interpretability research on transformers.</li>
-<li>NVIDIA (2025) — "Nemotron-H: A Family of Accurate and Efficient Hybrid Mamba-Transformer Models" — available via the Hugging Face model card at <a href="https://huggingface.co/nvidia/Nemotron-H-56B-Base">https://huggingface.co/nvidia/Nemotron-H-56B-Base</a> — the most detailed public analysis of how to optimally mix attention and SSM layers, with ablations on layer ratio, interleaving pattern, and task-specific performance.</li>
+<li><a href="https://arxiv.org/abs/2307.08691">FlashAttention-2: Faster Attention with Better Parallelism and Work Partitioning</a> — Dao 2023</li>
+<li><a href="https://arxiv.org/abs/2305.13245">GQA: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints</a> — Ainslie et al. 2023</li>
+<li><a href="https://arxiv.org/abs/2405.04434">DeepSeek-V2: A Strong, Economical, and Efficient MoE LLM</a> — DeepSeek AI 2024 — MLA</li>
 </ul>
 
 
@@ -4452,6 +4222,9 @@ x^{\ell+1} = x' + \text{FFN}(\text{LN}(x'))
 
 
 
+
+  
+  
 
 
 

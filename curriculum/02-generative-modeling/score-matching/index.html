@@ -23,7 +23,7 @@
     
     
       
-        <title>Score matching - Frontier Wiki</title>
+        <title>Score Matching - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Score matching
+              Score Matching
             
           </span>
         </div>
@@ -3612,7 +3612,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3655,24 +3655,53 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">density-estimation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">diffusion</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">energy-based-models</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">generative-models</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">score-matching</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<div class="highlight"><pre><span></span><code><span class="nn">---</span>
-<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Score Matching</span>
-<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">02-generative-modeling</span>
-<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">score-matching</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">generative-models</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">diffusion</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">energy-based-models</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">density-estimation</span><span class="p p-Indicator">]</span>
-<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">foundational</span>
-<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">probability-theory</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">energy-based-models</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">stochastic-calculus</span><span class="p p-Indicator">]</span>
-<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-07-14</span>
-<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-<span class="nn">---</span>
-</code></pre></div>
 <h1 id="score-matching">Score Matching<a class="headerlink" href="#score-matching" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> Score matching trains a model to predict the gradient of the log-density — the score function — rather than the density itself, eliminating the intractable normalizing constant and providing the probabilistic foundation on which every modern diffusion model is built.</p>
+<p><strong>TL;DR:</strong> Score matching learns the gradient of a log-probability density instead of the density itself, sidestepping the intractable normalizing constant and providing the mathematical foundation for modern diffusion models.</p>
 </blockquote>
 <hr />
 <h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
@@ -3687,78 +3716,91 @@
 <tbody>
 <tr>
 <td>MS/applied practitioner</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#code--implementations">Code &amp; implementations</a></td>
-<td>Understand the objective underlying every diffusion model you deploy</td>
+<td><a href="#key-algorithms-techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Implement denoising score matching on a toy density</td>
 </tr>
 <tr>
 <td>Curious generalist</td>
 <td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-<td>Understand why diffusion models work without knowing the partition function</td>
+<td>Understand why diffusion models work</td>
 </tr>
 <tr>
 <td>Math/theory student</td>
 <td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
-<td>Derive the integration-by-parts trick and the denoising equivalence</td>
+<td>Derive the integration-by-parts trick</td>
 </tr>
 <tr>
 <td>Researcher / frontier</td>
-<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-<td>Find open questions on variance reduction and unified score estimators</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#seminal-papers-test-of-time">Seminal papers</a></td>
+<td>Find open questions on error propagation</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Imagine trying to calculate the exact volume under an incredibly complex, high-dimensional probability landscape — such as the space of all possible 256×256 images — just to ensure your model's distribution integrates to one. This intractable integration is the normalizing constant, or partition function, and it makes standard maximum likelihood estimation impossible for energy-based models: you cannot evaluate the likelihood of a single data point without first solving a global integral over every conceivable input. The insight that breaks this deadlock is geometric rather than probabilistic: if you know the <em>slope</em> of the landscape at every point — the direction and steepness of the gradient — you can reconstruct the shape of the landscape without ever measuring its total volume. Score matching is the formalization of that insight. Instead of learning the density <span class="arithmatex">\(p(x)\)</span> directly, it learns the <strong>score function</strong> <span class="arithmatex">\(\nabla_x \log p(x)\)</span>, the gradient of the log-density with respect to the data, and matches it to the model's predicted score at every point in the data distribution.</p>
-<p>The computational payoff is immediate and decisive. Given an unnormalized energy-based model <span class="arithmatex">\(p_\theta(x) \propto \exp(-f_\theta(x))\)</span>, the log-density is <span class="arithmatex">\(\log p_\theta(x) = -f_\theta(x) - \log Z_\theta\)</span>, where <span class="arithmatex">\(Z_\theta\)</span> is the partition function. Because <span class="arithmatex">\(Z_\theta\)</span> is a constant with respect to <span class="arithmatex">\(x\)</span>, it vanishes under differentiation: <span class="arithmatex">\(\nabla_x \log p_\theta(x) = -\nabla_x f_\theta(x)\)</span>. A global integration problem collapses into a local differentiation problem that autograd handles in milliseconds. The remaining challenge is that the true data score <span class="arithmatex">\(\nabla_x \log p_{\text{data}}(x)\)</span> is also unknown — we only have samples. Hyvärinen (2005) resolved this with an integration-by-parts argument showing that the expected squared difference between model and data scores can be rewritten entirely in terms of quantities computable from the model alone, without ever querying the true score. Vincent (2011) then showed that this objective is equivalent to training a denoising autoencoder, making score matching scalable to the high-dimensional settings where it matters most.</p>
-<p>The consequence of these two results is that score matching is not merely a theoretical curiosity: it is the training objective that underlies every modern diffusion model. When a DDPM or a flow-matching model learns to predict noise, it is learning the score of a noise-perturbed data distribution. The architecture, the noise schedule, the sampling procedure — all of these are engineering choices layered on top of the core score-matching objective. Understanding score matching at the level of its derivation is therefore the prerequisite for understanding why any of those engineering choices work, and for knowing when they can be improved.</p>
-<hr />
+<p>Suppose someone hands you an unnormalized model of natural images — a neural network <span class="arithmatex">\(f_\theta(x)\)</span> that assigns a scalar "energy" to every <span class="arithmatex">\(1024 \times 1024\)</span> RGB image. To turn this into a proper probability distribution you would need to compute <span class="arithmatex">\(Z_\theta = \int \exp(-f_\theta(x))\, dx\)</span>, the partition function, integrated over the entire <span class="arithmatex">\(\mathbb{R}^{3{,}145{,}728}\)</span> pixel space. Even if you could evaluate <span class="arithmatex">\(f_\theta\)</span> at a trillion points per second on every GPU ever manufactured, this integral would not finish before the heat death of the universe. Maximum likelihood training is therefore not just slow on high-dimensional unnormalized models — it is computationally impossible.</p>
+<p>Score matching is the trick that escapes this trap. Instead of learning the density <span class="arithmatex">\(p(x)\)</span>, you learn its <strong>score function</strong>: the gradient of the log-density with respect to the input, <span class="arithmatex">\(s(x) = \nabla_x \log p(x)\)</span>. The crucial observation is that this gradient annihilates the partition function entirely, because <span class="arithmatex">\(\log p_\theta(x) = -f_\theta(x) - \log Z_\theta\)</span> and <span class="arithmatex">\(Z_\theta\)</span> does not depend on <span class="arithmatex">\(x\)</span>, so <span class="arithmatex">\(\nabla_x \log Z_\theta = 0\)</span>. A global integration problem has been converted into a local differentiation problem — and local differentiation is exactly what neural networks and autograd are built for.</p>
+<p>The remaining difficulty is that we do not know the true score <span class="arithmatex">\(\nabla_x \log p_{\text{data}}(x)\)</span> either; we only have samples. Hyvärinen's 2005 paper resolved this with an integration-by-parts manoeuvre that turns the intractable score-matching loss into an expectation over the trace of the model's Jacobian — quantities you can estimate from data alone. Vincent's 2011 paper then showed that if you perturb the data with Gaussian noise, the score-matching objective collapses to a clean denoising regression, which is the form used in every modern diffusion model.</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>Every major generative modeling lab — DeepMind, Google Brain, OpenAI, Stability AI — has converged on score-based or flow-based models as the foundation for their image, audio, and video generation systems. The reason is not aesthetic: it is that score matching is the only known training objective that scales to high-dimensional continuous data without requiring either an explicit likelihood (as in normalizing flows) or a discrete latent space (as in VQ-VAEs). The connection runs deep: Song et al. (2020) showed that the forward noising process of DDPM defines a stochastic differential equation whose reverse is governed by the score of the noised distribution, unifying score matching, diffusion models, and stochastic optimal control into a single framework. This unification is what makes score matching a live research topic rather than a settled one — the framework is powerful enough that improvements to the score estimator propagate directly into better generation quality, faster sampling, and more stable training.</p>
-<p>The open frontier concerns variance and efficiency. The original Hyvärinen objective requires computing the trace of the Jacobian of the score network, which costs <span class="arithmatex">\(O(d)\)</span> backward passes for <span class="arithmatex">\(d\)</span>-dimensional data — prohibitive for images. Denoising score matching sidesteps this by perturbing data and regressing to the noise, but introduces a bias that depends on the noise level. Sliced score matching (Song &amp; Ermon, 2019) uses random projections to estimate the trace cheaply, but adds its own variance. The deeper question — how to construct a score estimator that is simultaneously unbiased, low-variance, and computationally cheap across all noise scales — remains open, and its resolution would directly improve the training efficiency of every diffusion model in production today.</p>
-<hr />
+<p>Score matching is not a competitor to diffusion models — it is their mathematical engine. Every score-based generative model (SGM), every continuous-time SDE-based diffusion model, and every flow-matching variant ultimately learns a score field or a closely related vector field. When Song &amp; Ermon (2019) introduced Noise Conditional Score Networks, they fixed score matching's notorious failure on data lying near low-dimensional manifolds by adding noise at multiple scales, and that fix is precisely what made DDPM, Stable Diffusion, and the entire generative imaging stack possible. Understanding score matching makes the noise schedule in DDPM precise rather than heuristic, and it makes the choice of the reverse SDE solver a question of numerical analysis rather than empirical tuning.</p>
+<p>The open theoretical problems remain active. The most consequential question — and the one labs like Stability AI, NVIDIA, and Google DeepMind quietly run into when scaling — is how score estimation errors in low-density regions propagate through the reverse-time SDE to affect final sample quality. Existing bounds (e.g. Chen et al., 2023; Lee et al., 2023) require global Lipschitz constants on the score that are vacuously large for real image distributions, so they predict failure where models in fact succeed. Tightening these bounds without unrealistic regularity assumptions is the central theoretical question gating principled improvements to sampler design, guidance scales, and consistency-model training.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Score function</strong> — the gradient of the log-density with respect to the data, <span class="arithmatex">\(\nabla_x \log p(x)\)</span>, which points in the direction of steepest increase in log-probability at each point <span class="arithmatex">\(x\)</span>.</li>
-<li><strong>Partition function</strong> — the normalizing constant <span class="arithmatex">\(Z = \int \exp(-f(x))\, dx\)</span> that makes an energy function a valid probability density; it is intractable in high dimensions and vanishes under differentiation with respect to <span class="arithmatex">\(x\)</span>.</li>
-<li><strong>Energy-based model (EBM)</strong> — a model of the form <span class="arithmatex">\(p_\theta(x) \propto \exp(-f_\theta(x))\)</span> where <span class="arithmatex">\(f_\theta\)</span> is a neural network; the score is <span class="arithmatex">\(-\nabla_x f_\theta(x)\)</span>, computable without <span class="arithmatex">\(Z\)</span>.</li>
-<li><strong>Fisher divergence</strong> — the expected squared <span class="arithmatex">\(\ell_2\)</span> distance between the model score and the data score, <span class="arithmatex">\(\mathbb{E}_{p_{\text{data}}}\left[\|\nabla_x \log p_\theta(x) - \nabla_x \log p_{\text{data}}(x)\|^2\right]\)</span>; minimizing this is the score matching objective.</li>
-<li><strong>Integration-by-parts trick</strong> — the algebraic manipulation (Hyvärinen, 2005) that rewrites the Fisher divergence into an expectation involving only the model's score and its Jacobian diagonal, eliminating the unknown data score from the objective.</li>
-<li><strong>Denoising score matching (DSM)</strong> — the reformulation (Vincent, 2011) showing that matching the score of a noise-perturbed distribution <span class="arithmatex">\(q_\sigma(\tilde{x} \mid x)\)</span> is equivalent to training a denoising function, making the objective scalable and free of explicit Jacobian computation.</li>
-<li><strong>Sliced score matching</strong> — the approximation (Song &amp; Ermon, 2019) that estimates the Jacobian trace using random projections <span class="arithmatex">\(\mathbf{v}^\top \nabla_x s_\theta(x) \mathbf{v}\)</span>, reducing the cost from <span class="arithmatex">\(O(d)\)</span> to <span class="arithmatex">\(O(1)\)</span> backward passes per sample.</li>
-<li><strong>Noise-conditional score network (NCSN)</strong> — a score network <span class="arithmatex">\(s_\theta(x, \sigma)\)</span> trained simultaneously across a geometric sequence of noise levels <span class="arithmatex">\(\sigma_1 &gt; \sigma_2 &gt; \cdots &gt; \sigma_L\)</span>, enabling annealed Langevin dynamics sampling.</li>
+<li><strong>Score function</strong> — the gradient of the log-density with respect to the input, <span class="arithmatex">\(s(x) = \nabla_x \log p(x)\)</span>, which points in the direction of steepest density increase and is invariant to the normalizing constant.</li>
+<li><strong>Partition function</strong> — the normalizing integral <span class="arithmatex">\(Z_\theta = \int \exp(-f_\theta(x))\, dx\)</span> that makes an unnormalized energy model into a probability distribution; intractable in high dimensions and the central obstacle that score matching circumvents.</li>
+<li><strong>Explicit score matching (ESM)</strong> — the naive objective <span class="arithmatex">\(\tfrac{1}{2}\,\mathbb{E}_{p_{\text{data}}}\!\left[\lVert s_\theta(x) - \nabla_x \log p_{\text{data}}(x)\rVert^2\right]\)</span>, which is unusable because the data score is unknown.</li>
+<li><strong>Implicit score matching (ISM)</strong> — Hyvärinen's reformulation that, via integration by parts, replaces the unknown data score with the trace of the model Jacobian plus the squared model score norm.</li>
+<li><strong>Denoising score matching (DSM)</strong> — Vincent's variant: perturb data with Gaussian noise <span class="arithmatex">\(\tilde{x} = x + \sigma\epsilon\)</span> and regress the model score onto <span class="arithmatex">\(-\epsilon/\sigma\)</span>, the (tractable) score of the perturbation kernel.</li>
+<li><strong>Sliced score matching</strong> — Song et al.'s trick to avoid the <span class="arithmatex">\(O(d)\)</span> cost of computing the full Jacobian trace by projecting onto random unit vectors, restoring linear-time training.</li>
+<li><strong>Noise-conditional score network (NCSN)</strong> — a score model conditioned on noise level <span class="arithmatex">\(\sigma_t\)</span>, trained jointly across a geometric ladder of noise scales to cover both low- and high-density regions of the data manifold.</li>
+<li><strong>Langevin dynamics</strong> — the sampling procedure <span class="arithmatex">\(x_{k+1} = x_k + \tfrac{\eta}{2} s_\theta(x_k) + \sqrt{\eta}\,z_k\)</span> that uses a learned score field to produce samples from the implied density.</li>
 </ul>
 <hr />
 <h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p><strong>The score matching objective.</strong> The Fisher divergence between model and data is:</p>
+<p><strong>The unnormalized model and the partition function problem.</strong> For an energy-based model parametrized by a neural network,</p>
 <div class="arithmatex">\[
-J(\theta) = \mathbb{E}_{p_{\text{data}}(x)}\!\left[\frac{1}{2}\left\|s_\theta(x) - \nabla_x \log p_{\text{data}}(x)\right\|^2\right]
+p_\theta(x) = \frac{\exp(-f_\theta(x))}{Z_\theta}, \qquad Z_\theta = \int \exp(-f_\theta(x))\, dx
 \]</div>
-<p>where <span class="arithmatex">\(s_\theta(x)\)</span> is the model's predicted score (a neural network mapping <span class="arithmatex">\(\mathbb{R}^d \to \mathbb{R}^d\)</span>), <span class="arithmatex">\(\nabla_x \log p_{\text{data}}(x)\)</span> is the true data score (unknown), and the expectation is over data samples. Minimizing <span class="arithmatex">\(J(\theta)\)</span> forces the model's score to match the data's score in the <span class="arithmatex">\(\ell_2\)</span> sense, averaged over the data distribution.</p>
-<p><strong>The integration-by-parts reformulation</strong> (Hyvärinen, 2005) shows that <span class="arithmatex">\(J(\theta)\)</span> equals, up to a constant independent of <span class="arithmatex">\(\theta\)</span>:</p>
+<p>where <span class="arithmatex">\(x \in \mathbb{R}^d\)</span> is the data point, <span class="arithmatex">\(f_\theta : \mathbb{R}^d \to \mathbb{R}\)</span> is the learned energy function with parameters <span class="arithmatex">\(\theta\)</span>, and <span class="arithmatex">\(Z_\theta\)</span> is the partition function — a scalar that depends on <span class="arithmatex">\(\theta\)</span> but not on <span class="arithmatex">\(x\)</span>, and whose evaluation requires integrating over all of <span class="arithmatex">\(\mathbb{R}^d\)</span>.</p>
+<p><strong>The score annihilates <span class="arithmatex">\(Z\)</span>.</strong> Taking the gradient of the log-density with respect to the input,</p>
 <div class="arithmatex">\[
-J_{\text{ISM}}(\theta) = \mathbb{E}_{p_{\text{data}}(x)}\!\left[\sum_{i=1}^{d} \partial_{x_i} s_{\theta,i}(x) + \frac{1}{2}\left\|s_\theta(x)\right\|^2\right]
+s_\theta(x) := \nabla_x \log p_\theta(x) = -\nabla_x f_\theta(x) - \nabla_x \log Z_\theta = -\nabla_x f_\theta(x)
 \]</div>
-<p>where <span class="arithmatex">\(s_{\theta,i}(x)\)</span> is the <span class="arithmatex">\(i\)</span>-th component of the score network output, <span class="arithmatex">\(\partial_{x_i} s_{\theta,i}(x)\)</span> is the <span class="arithmatex">\(i\)</span>-th diagonal entry of the Jacobian of <span class="arithmatex">\(s_\theta\)</span> (requiring one backward pass per dimension), and <span class="arithmatex">\(d\)</span> is the data dimensionality. The true data score has been eliminated entirely — the objective is computable from the model alone, given only data samples. The cost is the Jacobian diagonal, which requires <span class="arithmatex">\(O(d)\)</span> backward passes and is prohibitive for image-scale data.</p>
-<p><strong>The denoising equivalence</strong> (Vincent, 2011). Define a noised sample <span class="arithmatex">\(\tilde{x} = x + \epsilon\)</span> where <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, \sigma^2 I)\)</span>. The denoising score matching objective is:</p>
+<p>where <span class="arithmatex">\(s_\theta(x) \in \mathbb{R}^d\)</span> is the model score (a vector field over input space), and the term <span class="arithmatex">\(\nabla_x \log Z_\theta = 0\)</span> vanishes because <span class="arithmatex">\(Z_\theta\)</span> has no dependence on <span class="arithmatex">\(x\)</span>. This is the core trick: a quantity we cannot compute has been removed from the problem entirely by differentiation.</p>
+<p><strong>Explicit score matching (ESM).</strong> The natural — but useless — objective is the squared distance between model and data scores,</p>
 <div class="arithmatex">\[
-J_{\text{DSM}}(\theta) = \mathbb{E}_{p_{\text{data}}(x)}\,\mathbb{E}_{\epsilon \sim \mathcal{N}(0,\sigma^2 I)}\!\left[\left\|s_\theta(\tilde{x}) - \nabla_{\tilde{x}} \log q_\sigma(\tilde{x} \mid x)\right\|^2\right]
+J_{\text{ESM}}(\theta) = \tfrac{1}{2}\, \mathbb{E}_{x \sim p_{\text{data}}}\!\left[\lVert s_\theta(x) - \nabla_x \log p_{\text{data}}(x)\rVert_2^2\right]
 \]</div>
-<p>where <span class="arithmatex">\(q_\sigma(\tilde{x} \mid x) = \mathcal{N}(\tilde{x}; x, \sigma^2 I)\)</span> is the Gaussian noise kernel, <span class="arithmatex">\(\nabla_{\tilde{x}} \log q_\sigma(\tilde{x} \mid x) = -(\tilde{x} - x)/\sigma^2\)</span> is the score of the kernel (the direction pointing from the noisy sample back to the clean sample), and <span class="arithmatex">\(\sigma\)</span> is the noise standard deviation. Training a score network to predict <span class="arithmatex">\(-(\tilde{x} - x)/\sigma^2\)</span> — equivalently, to denoise — is identical to minimizing the Fisher divergence with respect to the noised distribution, with no Jacobian computation required.</p>
-<p><strong>The multi-scale objective</strong> (Song &amp; Ermon, 2019). For a geometric sequence of noise levels <span class="arithmatex">\(\{\sigma_i\}_{i=1}^{L}\)</span> with <span class="arithmatex">\(\sigma_1 &gt; \sigma_2 &gt; \cdots &gt; \sigma_L\)</span>, the NCSN objective is:</p>
+<p>where <span class="arithmatex">\(p_{\text{data}}\)</span> is the unknown true data distribution and <span class="arithmatex">\(\nabla_x \log p_{\text{data}}(x)\)</span> is its score — which we cannot evaluate from samples.</p>
+<p><strong>Hyvärinen's integration-by-parts identity (ISM).</strong> Expanding the square and applying integration by parts under the regularity conditions <span class="arithmatex">\(p_{\text{data}}(x)\, s_\theta(x) \to 0\)</span> as <span class="arithmatex">\(\lVert x\rVert \to \infty\)</span>, the cross term simplifies and the objective becomes, up to a constant independent of <span class="arithmatex">\(\theta\)</span>,</p>
 <div class="arithmatex">\[
-\mathcal{L}(\theta) = \frac{1}{L}\sum_{i=1}^{L} \lambda(\sigma_i)\,\mathbb{E}_{p_{\text{data}}(x)}\,\mathbb{E}_{\tilde{x} \sim q_{\sigma_i}(\cdot \mid x)}\!\left[\left\|\sigma_i\, s_\theta(\tilde{x}, \sigma_i) + \frac{\tilde{x} - x}{\sigma_i}\right\|^2\right]
+J_{\text{ISM}}(\theta) = \mathbb{E}_{x \sim p_{\text{data}}}\!\left[\tfrac{1}{2}\lVert s_\theta(x)\rVert_2^2 + \operatorname{tr}\!\left(\nabla_x s_\theta(x)\right)\right]
 \]</div>
-<p>where <span class="arithmatex">\(\lambda(\sigma_i) = \sigma_i^2\)</span> is a weighting function that equalizes the magnitude of the score across noise levels, <span class="arithmatex">\(s_\theta(\tilde{x}, \sigma_i)\)</span> is the noise-conditional score network evaluated at noise level <span class="arithmatex">\(\sigma_i\)</span>, and <span class="arithmatex">\(L\)</span> is the total number of noise levels. A single network learns the score at every noise scale simultaneously, enabling annealed Langevin sampling from coarse to fine.</p>
+<p>where <span class="arithmatex">\(\nabla_x s_\theta(x) \in \mathbb{R}^{d \times d}\)</span> is the Jacobian of the score (equivalently the Hessian of <span class="arithmatex">\(\log p_\theta\)</span>), and <span class="arithmatex">\(\operatorname{tr}(\cdot)\)</span> is its trace — the sum of second partial derivatives <span class="arithmatex">\(\sum_{i=1}^d \partial s_\theta^{(i)}/\partial x^{(i)}\)</span>. The unknown <span class="arithmatex">\(\nabla_x \log p_{\text{data}}\)</span> no longer appears; everything is computable from <span class="arithmatex">\(\theta\)</span> and samples.</p>
+<p><strong>The Jacobian trace bottleneck.</strong> Computing <span class="arithmatex">\(\operatorname{tr}(\nabla_x s_\theta(x))\)</span> exactly requires <span class="arithmatex">\(d\)</span> backward passes per sample — prohibitive when <span class="arithmatex">\(d \sim 10^6\)</span> for images. Sliced score matching (Song et al., 2019) replaces this with the Hutchinson estimator,</p>
+<div class="arithmatex">\[
+\operatorname{tr}(\nabla_x s_\theta(x)) \approx \mathbb{E}_{v \sim \mathcal{N}(0,I)}\!\left[v^\top \nabla_x s_\theta(x)\, v\right]
+\]</div>
+<p>where <span class="arithmatex">\(v \in \mathbb{R}^d\)</span> is a random projection direction; the inner Jacobian-vector product <span class="arithmatex">\(\nabla_x s_\theta(x)\, v\)</span> is one backward pass, reducing per-sample cost to <span class="arithmatex">\(O(1)\)</span> in <span class="arithmatex">\(d\)</span>.</p>
+<p><strong>Vincent's denoising equivalence (DSM).</strong> Define the perturbed density <span class="arithmatex">\(q_\sigma(\tilde{x}\mid x) = \mathcal{N}(\tilde{x};\, x,\, \sigma^2 I)\)</span> and the marginal <span class="arithmatex">\(q_\sigma(\tilde{x}) = \int q_\sigma(\tilde{x}\mid x)\, p_{\text{data}}(x)\, dx\)</span>. Vincent (2011) showed that matching the score of the <em>perturbed</em> density is equivalent, up to a <span class="arithmatex">\(\theta\)</span>-independent constant, to a tractable denoising regression:</p>
+<div class="arithmatex">\[
+J_{\text{DSM}}(\theta) = \tfrac{1}{2}\, \mathbb{E}_{x \sim p_{\text{data}},\, \tilde{x} \sim q_\sigma(\cdot \mid x)}\!\left[\left\lVert s_\theta(\tilde{x}) - \nabla_{\tilde{x}} \log q_\sigma(\tilde{x} \mid x)\right\rVert_2^2\right]
+\]</div>
+<p>where the conditional score <span class="arithmatex">\(\nabla_{\tilde{x}} \log q_\sigma(\tilde{x}\mid x) = -(\tilde{x} - x)/\sigma^2 = -\epsilon/\sigma\)</span> for <span class="arithmatex">\(\tilde{x} = x + \sigma\epsilon\)</span>, <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0,I)\)</span>. The model is regressing onto the (scaled) noise direction — which is exactly the <span class="arithmatex">\(\epsilon\)</span>-prediction loss in DDPM.</p>
+<p><strong>Langevin sampling.</strong> Once <span class="arithmatex">\(s_\theta \approx \nabla_x \log p_{\text{data}}\)</span>, samples are drawn via discretized Langevin dynamics,</p>
+<div class="arithmatex">\[
+x_{k+1} = x_k + \tfrac{\eta}{2}\, s_\theta(x_k) + \sqrt{\eta}\, z_k, \qquad z_k \sim \mathcal{N}(0, I)
+\]</div>
+<p>where <span class="arithmatex">\(\eta &gt; 0\)</span> is the step size and <span class="arithmatex">\(z_k\)</span> is fresh Gaussian noise; as <span class="arithmatex">\(\eta \to 0\)</span> and <span class="arithmatex">\(k \to \infty\)</span> the chain converges to the stationary distribution <span class="arithmatex">\(p_\theta\)</span>.</p>
 <hr />
 <h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Implicit Score Matching (ISM)</strong> (Hyvärinen, 2005) — the original formulation that uses integration by parts to eliminate the data score from the objective, at the cost of computing the diagonal of the score Jacobian (<span class="arithmatex">\(O(d)\)</span> backward passes).</li>
-<li><strong>Denoising Score Matching (DSM)</strong> (Vincent, 2011) — replaces the Jacobian computation with a regression target derived from the noise kernel score, making the objective <span class="arithmatex">\(O(1)\)</span> in compute and scaling to high-dimensional data; the direct ancestor of DDPM's training objective.</li>
-<li><strong>Sliced Score Matching (SSM)</strong> (Song &amp; Ermon, 2019) — approximates the Jacobian trace using random unit vectors <span class="arithmatex">\(\mathbf{v}\)</span> via <span class="arithmatex">\(\mathbf{v}^\top (\nabla_x s_\theta(x))\mathbf{v}\)</span>, reducing cost to a small constant number of backward passes regardless of dimension.</li>
-<li><strong>Noise-Conditional Score Networks (NCSN / NCSNv2)</strong> (Song &amp; Ermon, 2019; Song et al., 2020) — trains a single score network conditioned on noise level across a geometric schedule, enabling annealed Langevin dynamics that navigate from a tractable noisy distribution to the data distribution.</li>
-<li><strong>Score-based SDE framework</strong> (Song et al., 2020) — unifies DDPM and NCSN by showing that any forward noising process defines an SDE whose reverse is governed by the score, enabling continuous-time score matching and deterministic ODE sampling.</li>
-<li><strong>Tweedie's formula</strong> — a closed-form relationship between the score and the posterior mean of the clean data given a noisy observation, <span class="arithmatex">\(\mathbb{E}[x \mid \tilde{x}] = \tilde{x} + \sigma^2 \nabla_{\tilde{x}} \log q_\sigma(\tilde{x})\)</span>, used to convert score estimates into direct denoising predictions.</li>
+<li><strong>Implicit Score Matching (ISM)</strong> — Hyvärinen's original estimator using the trace of the score Jacobian; mathematically clean but <span class="arithmatex">\(O(d)\)</span> per sample, so only practical for <span class="arithmatex">\(d \lesssim 100\)</span>.</li>
+<li><strong>Denoising Score Matching (DSM)</strong> — Vincent's noise-perturbation variant that replaces the Jacobian trace with a simple denoising MSE; the workhorse of every modern diffusion model.</li>
+<li><strong>Sliced Score Matching (SSM)</strong> — Hutchinson-trace approximation that restores <span class="arithmatex">\(O(1)\)</span> training cost while preserving the ISM form, useful when noise perturbation is undesirable (e.g. discrete data).</li>
+<li><strong>Noise Conditional Score Networks (NCSN)</strong> — train a single network <span class="arithmatex">\(s_\theta(x, \sigma)\)</span> on a geometric ladder of noise scales <span class="arithmatex">\(\sigma_1 &gt; \cdots &gt; \sigma_L\)</span>, fixing the low-density-region failure of single-scale score matching.</li>
+<li><strong>Annealed Langevin Dynamics</strong> — sample by running Langevin steps at decreasing <span class="arithmatex">\(\sigma\)</span>, using the previous scale's output as the next scale's initialization; the discrete predecessor to continuous-time SDE sampling.</li>
+<li><strong>Score SDE</strong> — Song et al. (2021) reframed score matching as learning the drift of a reverse-time SDE, unifying NCSN and DDPM under one continuous-time framework and enabling probability-flow ODE sampling.</li>
 </ul>
 <hr />
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
@@ -3766,35 +3808,30 @@ J_{\text{DSM}}(\theta) = \mathbb{E}_{p_{\text{data}}(x)}\,\mathbb{E}_{\epsilon \
 <thead>
 <tr>
 <th>Paper</th>
-<th>Year</th>
-<th>Authors</th>
-<th>Why essential</th>
+<th>Authors, Year</th>
+<th>Why it matters</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>"Estimation of Non-Normalized Statistical Models by Score Matching"</td>
-<td>2005</td>
-<td>Hyvärinen</td>
-<td>Introduces score matching and the integration-by-parts trick; the foundational paper</td>
+<td><a href="https://jmlr.csail.mit.edu/papers/volume6/hyvarinen05a/old.pdf">Estimation of Non-Normalized Statistical Models by Score Matching</a></td>
+<td>Hyvärinen, 2005</td>
+<td>The original integration-by-parts derivation that makes the entire field possible.</td>
 </tr>
 <tr>
-<td>"A Connection Between Score Matching and Denoising Autoencoders"</td>
-<td>2011</td>
-<td>Vincent</td>
-<td>Proves DSM equivalence; makes score matching scalable and connects it to denoising</td>
+<td><a href="https://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf">A Connection Between Score Matching and Denoising Autoencoders</a></td>
+<td>Vincent, 2011</td>
+<td>Proves DSM equivalence; collapses score matching into a tractable regression and unlocks high-dimensional scaling.</td>
 </tr>
 <tr>
-<td>"Generative Modeling by Estimating Gradients of the Data Distribution"</td>
-<td>2019</td>
-<td>Song &amp; Ermon</td>
-<td>Introduces NCSN and multi-scale score matching; the direct precursor to DDPM</td>
+<td><a href="https://arxiv.org/abs/1907.05600">Generative Modeling by Estimating Gradients of the Data Distribution</a></td>
+<td>Song &amp; Ermon, 2019</td>
+<td>Introduces NCSN and annealed Langevin sampling — the direct conceptual precursor to DDPM and Stable Diffusion.</td>
 </tr>
 <tr>
-<td>"Score-Based Generative Modeling through Stochastic Differential Equations"</td>
-<td>2020</td>
-<td>Song et al.</td>
-<td>Unifies all score-based methods under a continuous SDE framework; defines the modern field</td>
+<td><a href="https://arxiv.org/abs/2011.13456">Score-Based Generative Modeling through Stochastic Differential Equations</a></td>
+<td>Song et al., 2021</td>
+<td>Unifies discrete and continuous formulations and introduces probability-flow ODE sampling.</td>
 </tr>
 </tbody>
 </table>
@@ -3804,85 +3841,148 @@ J_{\text{DSM}}(\theta) = \mathbb{E}_{p_{\text{data}}(x)}\,\mathbb{E}_{\epsilon \
 <thead>
 <tr>
 <th>Paper</th>
-<th>Year</th>
-<th>Key contribution</th>
+<th>Authors, Year</th>
+<th>Lasting contribution</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Hyvärinen, "Estimation of Non-Normalized Statistical Models by Score Matching"</td>
-<td>2005</td>
-<td>Proved that Fisher divergence can be minimized without knowing the data score; enabled EBM training without MCMC</td>
+<td><a href="https://jmlr.csail.mit.edu/papers/volume6/hyvarinen05a/old.pdf">Estimation of Non-Normalized Statistical Models by Score Matching</a></td>
+<td>Hyvärinen, 2005</td>
+<td>Defines the field; the ISM identity is still cited verbatim in every modern derivation.</td>
 </tr>
 <tr>
-<td>Vincent, "A Connection Between Score Matching and Denoising Autoencoders"</td>
-<td>2011</td>
-<td>Showed denoising and score matching are the same objective; unlocked scalable score estimation</td>
+<td><a href="https://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf">A Connection Between Score Matching and Denoising Autoencoders</a></td>
+<td>Vincent, 2011</td>
+<td>DSM is the loss function inside every production diffusion model today.</td>
 </tr>
 <tr>
-<td>Song &amp; Ermon, "Generative Modeling by Estimating Gradients of the Data Distribution"</td>
-<td>2019</td>
-<td>First high-quality image generation via score matching + Langevin dynamics; introduced NCSN</td>
+<td><a href="https://arxiv.org/abs/1905.07088">Sliced Score Matching: A Scalable Approach to Density and Score Estimation</a></td>
+<td>Song et al., 2019</td>
+<td>Made ISM scalable; still the method of choice for energy-based models on discrete or non-smooth data.</td>
 </tr>
 <tr>
-<td>Ho et al., "Denoising Diffusion Probabilistic Models"</td>
-<td>2020</td>
-<td>Reframed DSM as a variational bound; achieved state-of-the-art image quality and triggered the diffusion era</td>
+<td><a href="https://arxiv.org/abs/1907.05600">Generative Modeling by Estimating Gradients of the Data Distribution</a></td>
+<td>Song &amp; Ermon, 2019</td>
+<td>NCSN diagnosed and solved the manifold-hypothesis failure mode of single-scale score matching.</td>
 </tr>
 <tr>
-<td>Song et al., "Score-Based Generative Modeling through Stochastic Differential Equations"</td>
-<td>2020</td>
-<td>Continuous-time unification of DDPM and NCSN; introduced probability flow ODEs for deterministic sampling</td>
+<td><a href="https://arxiv.org/abs/2011.13456">Score-Based Generative Modeling through SDEs</a></td>
+<td>Song et al., 2021</td>
+<td>The continuous-time SDE framework that unified DDPM, NCSN, and probability-flow ODEs.</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>Score matching as a training objective underlies the highest-performing generative models across modalities. On class-conditional ImageNet 256×256, EDM2 (Karras et al., 2024) achieves FID 1.58 using an improved score-parameterization and preconditioning scheme, surpassing the previous best of 1.79 from DiT-XL/2. On text-to-image generation, FLUX.1 (Black Forest Labs, 2024) — built on a rectified flow objective that is a continuous-time variant of score matching — achieves state-of-the-art human preference scores on the GenAI-Bench benchmark, outperforming DALL-E 3 and Stable Diffusion 3 on prompt alignment. For audio, Voicebox (Le et al., Meta, 2023) applies continuous-time score matching to speech synthesis, achieving a word error rate of 1.9% on LibriSpeech test-clean with zero-shot voice cloning.</p>
+<p>Score matching itself is a training objective rather than a benchmarkable system, but its direct descendants set the state of the art on every major generative-imaging benchmark. NVIDIA's EDM2 (Karras et al., 2024) reaches <strong>FID 1.81 on ImageNet-512</strong> using a refined DSM objective with a principled noise schedule derived from the score-SDE framework, while Stable Diffusion 3 (Esser et al., 2024) trains a rectified-flow variant of the score objective at the 8B-parameter scale and dominates human-preference benchmarks for text-to-image generation. On molecular conformer generation, score-based models such as Torsional Diffusion (Jing et al., 2022) and follow-ups now produce conformer ensembles within chemical accuracy of DFT calculations, with score matching providing the underlying gradient field over <span class="arithmatex">\(SE(3)\)</span>-equivariant manifolds.</p>
 <hr />
 <h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The most active theoretical direction is understanding the variance structure of different score estimators across noise scales. DSM is unbiased at a fixed noise level but the optimal weighting across levels — the <span class="arithmatex">\(\lambda(\sigma)\)</span> function in the NCSN objective — is not analytically known and is typically set heuristically. Karras et al. (2022, "Elucidating the Design Space of Diffusion-Based Generative Models," arXiv:2206.00364) showed that the choice of noise schedule, score parameterization, and sampler interact in non-obvious ways, and that principled choices yield large quality improvements without architectural changes. More recently, Kingma &amp; Gao (2023, "Understanding Diffusion Objectives as the ELBO with Simple Data Augmentation," arXiv:2303.00848) proved that the weighted DSM objective is equivalent to a variational lower bound with a specific data augmentation, providing a principled justification for the weighting schemes used in practice and opening the door to tighter bounds.</p>
-<p><strong>Engineering and systems.</strong> The dominant engineering challenge is reducing the number of score function evaluations required at inference time. Standard Langevin dynamics requires hundreds to thousands of steps; DDIM (Song et al., 2020) reduced this to 50 deterministic steps by treating the score network as defining a probability flow ODE. Consistency models (Song et al., 2023, arXiv:2303.01469) go further by training a network to map any noisy sample directly to the clean data in a single step, achieving FID 2.06 on CIFAR-10 with one network evaluation. The engineering question is how to train consistency models stably at scale — the distillation procedure is sensitive to the teacher score network's quality, and direct consistency training (without a pretrained teacher) remains less stable than distillation-based approaches.</p>
-<p><strong>Open problems.</strong> The central unresolved question is: <em>Can we construct a score estimator that is simultaneously unbiased, low-variance, and <span class="arithmatex">\(O(1)\)</span> in compute across all noise scales, without requiring a pretrained teacher or a fixed noise schedule?</em> ISM is unbiased but <span class="arithmatex">\(O(d)\)</span> in compute. DSM is <span class="arithmatex">\(O(1)\)</span> but introduces a noise-level-dependent bias. SSM is <span class="arithmatex">\(O(1)\)</span> but adds projection variance. A unified estimator that analytically controls the bias-variance tradeoff across scales — perhaps by combining energy-based and data-driven score components — would directly improve training efficiency for every diffusion model in production. A second open question is whether score matching can be extended to discrete or mixed continuous-discrete spaces without approximation, which would unlock score-based training for language models and structured data.</p>
+<p><strong>Research.</strong> The frontier of pure score-matching theory has shifted toward error propagation. Chen et al. (2023, "Sampling is as easy as learning the score") gave the first polynomial-time convergence guarantees for score-based samplers under bounded second-moment assumptions, but their bounds require a global Lipschitz constant on the score that is vacuously large for real image distributions. Subsequent work — Benton et al. (2024), Conforti et al. (2024) — has been chipping away at these assumptions, replacing global Lipschitzness with local or moment-based conditions, but the gap between theoretical bounds and empirical sample quality remains the central open question. A parallel research thread is consistency models (Song et al., 2023) and flow matching (Lipman et al., 2023), both of which generalize the score-matching objective to learn either the integrated trajectory directly or an arbitrary interpolant vector field, dramatically reducing sampling steps.</p>
+<p><strong>Engineering &amp; Systems.</strong> The DSM loss is now the default training objective in every major open-source diffusion library — <code>diffusers</code> from Hugging Face, NVIDIA's NeMo, and Meta's PyTorch ecosystem all expose it as the primary entry point. Practical engineering effort has moved to noise-schedule design (EDM's <span class="arithmatex">\(\sigma\)</span>-parametrization, SD3's logit-normal sampling), preconditioning (so the network always sees inputs of unit variance regardless of noise level), and mixed-precision Jacobian-vector products for sliced-score variants used in scientific applications. On the sampling side, DPM-Solver++ (Lu et al., 2023) and the recent UniPC framework reduce score-SDE sampling to 10–20 function evaluations while preserving the DSM-trained score network unchanged.</p>
+<p><strong>Open problems.</strong> The deepest unresolved question is the one stated in this page's framing: how do score estimation errors in low-density regions of the data manifold propagate through the reverse-time SDE to affect final sample quality, <em>without</em> assuming global Lipschitz continuity of the score network? Related open problems include: (i) whether sliced score matching's variance can be reduced enough to make ISM-style training competitive with DSM on images, sidestepping the noise-perturbation bias; (ii) how to do score matching on discrete or mixed discrete-continuous data without resorting to dequantization; and (iii) whether there exists a score-matching objective for which the optimal <span class="arithmatex">\(s_\theta\)</span> is provably the score of a tractable, sampleable density rather than only an approximation.</p>
 <hr />
 <h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Stability AI</strong> — Stable Diffusion 3 and SDXL use a latent diffusion model trained with a continuous-time score matching objective (EDM-style preconditioning); deployed at scale via the Stability AI API serving millions of requests per day — https://stability.ai/research/scaling-rectified-flow-transformers-high-resolution-image-synthesis</li>
-<li><strong>Black Forest Labs</strong> — FLUX.1 uses a rectified flow objective (a continuous-time score matching variant) with a transformer backbone; FLUX.1 [dev] and [schnell] are publicly available on Hugging Face and power several commercial image generation products — https://huggingface.co/black-forest-labs/FLUX.1-dev</li>
-<li><strong>Meta AI</strong> — Voicebox applies continuous-time score matching to non-autoregressive speech synthesis; achieves 1.9% WER on LibriSpeech with zero-shot voice cloning at production quality — https://ai.meta.com/blog/voicebox-generative-ai-model-speech/</li>
-<li><strong>Google DeepMind</strong> — Imagen Video and Lumiere use cascaded diffusion models trained with DSM objectives for text-to-video generation; Lumiere generates 80-frame, 5-second clips at 1024×1024 resolution — https://research.google/blog/lumiere-a-space-time-diffusion-model-for-video-generation/</li>
-<li><strong>NVIDIA</strong> — EDM2 (Karras et al., 2024) is the reference score-parameterization used in NVIDIA's generative research stack; achieves FID 1.58 on ImageNet 256×256 and is the basis for ongoing work on consistency distillation at scale — https://developer.nvidia.com/blog/elucidating-the-design-space-of-diffusion-based-generative-models/</li>
+<li><strong>Stability AI — Stable Diffusion 3 / 3.5</strong> — trained with a rectified-flow score-matching objective at the 8B-parameter scale; powers the public Stable Diffusion API and serves billions of generations across DreamStudio and downstream integrations. <a href="https://stability.ai/news/stable-diffusion-3-research-paper">Stability AI research post</a>.</li>
+<li><strong>NVIDIA — EDM2 and the Picasso platform</strong> — the EDM family of score-based models (Karras et al., 2022, 2024) is the reference implementation used inside NVIDIA's enterprise generative-imaging stack and underlies the Picasso foundry service; EDM2-XXL trains on 512×512 ImageNet to FID 1.81 with the DSM objective. <a href="https://research.nvidia.com/labs/toronto-ai/EDM2/">NVIDIA research</a>.</li>
+<li><strong>Google DeepMind — Imagen 3</strong> — uses a score-based diffusion backbone trained with denoising score matching across a learned noise schedule; deployed in Gemini and the Vertex AI image-generation endpoints handling production traffic across Google Cloud. <a href="https://arxiv.org/abs/2408.07009">Imagen 3 technical report</a>.</li>
+<li><strong>OpenAI — DALL·E 3 and Sora</strong> — both are score-based diffusion systems (transformer-parametrized score networks in Sora's case) trained with DSM-style objectives; Sora generates minute-long 1080p video clips and is integrated into ChatGPT for paying subscribers. <a href="https://openai.com/research/video-generation-models-as-world-simulators">Sora technical report</a>.</li>
+</ul>
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>Goal.</strong> Implement Denoising Score Matching (DSM) from scratch and learn the score field of a 2D Gaussian-mixture "double-well" target. By the end you will have a small MLP whose gradient field, when plotted as a quiver over <span class="arithmatex">\([-4,4]^2\)</span>, points toward the two mixture modes — and you will have done it by minimizing a single, one-line loss that never touches a partition function.</p>
+<p><strong>Compute.</strong> Free Colab T4, or any CPU. End-to-end runtime: ~90 seconds.</p>
+<p><strong>Stack.</strong> PyTorch ≥ 2.0, NumPy, Matplotlib. No external model weights, no dataset download.</p>
+<p><strong>The target distribution.</strong> A 2-component isotropic Gaussian mixture:
+[
+p_{\text{data}}(x) = \tfrac{1}{2}\mathcal{N}(x;\mu_1,\sigma^2 I) + \tfrac{1}{2}\mathcal{N}(x;\mu_2,\sigma^2 I)
+]
+with <span class="arithmatex">\(\mu_1 = (-2, 0)\)</span>, <span class="arithmatex">\(\mu_2 = (2, 0)\)</span>, <span class="arithmatex">\(\sigma = 0.5\)</span>.</p>
+<p><strong>The DSM objective.</strong> For a noise level <span class="arithmatex">\(\sigma_n\)</span>, draw <span class="arithmatex">\(x \sim p_{\text{data}}\)</span> and <span class="arithmatex">\(\tilde{x} = x + \sigma_n \epsilon\)</span> with <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, I)\)</span>. Train <span class="arithmatex">\(s_\theta(\tilde{x})\)</span> to minimize
+[
+\mathcal{L}(\theta) = \mathbb{E}<em>{x, \epsilon}\left[\left| s</em>\theta(\tilde{x}) + \frac{\epsilon}{\sigma_n} \right|^2\right]
+]
+where <span class="arithmatex">\(s_\theta : \mathbb{R}^2 \to \mathbb{R}^2\)</span> is our MLP, and the target <span class="arithmatex">\(-\epsilon/\sigma_n\)</span> is the exact closed-form score of the Gaussian-perturbed conditional <span class="arithmatex">\(p(\tilde{x} \mid x)\)</span>. No partition function appears anywhere.</p>
+<p><strong>Recipe.</strong></p>
+<ol>
+<li><strong>Build the sampler.</strong> Write <code>sample_data(n)</code> that draws <span class="arithmatex">\(n\)</span> points by flipping a fair coin between the two modes and adding <span class="arithmatex">\(\mathcal{N}(0, 0.25 I)\)</span> noise.</li>
+<li><strong>Build the network.</strong> A 4-layer MLP: <code>Linear(2,128) → SiLU → Linear(128,128) → SiLU → Linear(128,128) → SiLU → Linear(128,2)</code>. No normalization layers.</li>
+<li><strong>Set the noise level.</strong> Fix <span class="arithmatex">\(\sigma_n = 0.1\)</span> for a first pass. (Stretch goal below: condition on <span class="arithmatex">\(\sigma_n\)</span>.)</li>
+<li><strong>Training loop.</strong> For 5,000 steps: draw a batch of 512 clean points <span class="arithmatex">\(x\)</span>, sample <span class="arithmatex">\(\epsilon\)</span>, form <span class="arithmatex">\(\tilde{x} = x + \sigma_n \epsilon\)</span>, compute the loss above, step with Adam at lr <span class="arithmatex">\(= 10^{-3}\)</span>.</li>
+<li><strong>Visualize the learned score.</strong> Build a <span class="arithmatex">\(30 \times 30\)</span> grid on <span class="arithmatex">\([-4, 4]^2\)</span>, evaluate <span class="arithmatex">\(s_\theta\)</span> at every grid point, and plot the resulting vector field with <code>matplotlib.pyplot.quiver</code>. Overlay 1,000 samples from <code>sample_data</code> as a scatter.</li>
+<li><strong>Sanity check against analytic score.</strong> For the same grid, compute the closed-form score <span class="arithmatex">\(\nabla_x \log p_{\text{data}}(x)\)</span> analytically (a sum of two Gaussian gradients weighted by posterior responsibility) and plot it side-by-side. The two fields should be visually indistinguishable in the mode regions.</li>
+<li><strong>Sample from the learned score via Langevin dynamics.</strong> Starting from <span class="arithmatex">\(x_0 \sim \mathcal{N}(0, I)\)</span>, iterate <span class="arithmatex">\(x_{k+1} = x_k + \tfrac{\eta}{2} s_\theta(x_k) + \sqrt{\eta}\, z_k\)</span> with <span class="arithmatex">\(z_k \sim \mathcal{N}(0,I)\)</span>, <span class="arithmatex">\(\eta = 0.01\)</span>, for 1,000 steps. Plot the resulting samples — they should concentrate on the two modes.</li>
+</ol>
+<p><strong>Expected outcome.</strong> Two side-by-side quiver plots that are nearly identical, plus a scatter of Langevin samples that visibly bimodal. Loss should drop from ~100 to under 1.0 within 2,000 steps. Total artifact: one <code>.ipynb</code>, one PNG of the score-field comparison, one PNG of the Langevin samples.</p>
+<p><strong>Stretch goals.</strong></p>
+<ul>
+<li><strong>Multi-noise (NCSN-style) training.</strong> Sample <span class="arithmatex">\(\sigma_n\)</span> from a geometric schedule <span class="arithmatex">\(\{1.0, 0.6, 0.36, \ldots, 0.01\}\)</span>, condition the network on <span class="arithmatex">\(\sigma_n\)</span> via a sinusoidal embedding concatenated to <span class="arithmatex">\(\tilde{x}\)</span>, and weight the loss by <span class="arithmatex">\(\sigma_n^2\)</span>. This reproduces Song &amp; Ermon (2019) at toy scale and fixes mixing between the two modes in Langevin sampling.</li>
+<li><strong>Annealed Langevin dynamics.</strong> With the multi-noise model, run Langevin at decreasing <span class="arithmatex">\(\sigma_n\)</span> from large to small. Compare sample quality (mode coverage) to fixed-<span class="arithmatex">\(\sigma_n\)</span> Langevin.</li>
+<li><strong>Sliced score matching.</strong> Replace DSM with sliced score matching (Song et al., 2019) using a single random projection — no noise injection needed. Verify the learned field still matches.</li>
+<li><strong>Probability-flow ODE.</strong> Replace stochastic Langevin with the deterministic probability-flow ODE <span class="arithmatex">\(\dot{x} = -\tfrac{1}{2}\sigma_n^2 s_\theta(x)\)</span> using <code>torchdiffeq</code>. Observe that you get the same marginal distribution but deterministic trajectories.</li>
 </ul>
 <hr />
-<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>NCSNv2 (official)</strong> — Song &amp; Ermon's reference implementation of Noise-Conditional Score Networks in PyTorch: https://github.com/ermongroup/ncsnv2</li>
-<li><strong>score_sde (official)</strong> — Song et al.'s score-based SDE framework, covering VP-SDE, VE-SDE, and sub-VP-SDE with Langevin and ODE samplers: https://github.com/yang-song/score_sde_pytorch</li>
-<li><strong>EDM (NVIDIA)</strong> — Karras et al.'s elucidated diffusion model with principled score preconditioning, achieving FID 1.58 on ImageNet: https://github.com/NVlabs/edm</li>
-<li><strong>Consistency Models (official)</strong> — Song et al.'s single-step distillation of score networks: https://github.com/openai/consistency_models</li>
-<li><strong>HuggingFace Diffusers</strong> — Production-grade implementations of DDPM, DDIM, and score-based samplers with pretrained checkpoints: https://huggingface.co/docs/diffusers</li>
-</ul>
 <blockquote>
-<p><em>For a hands-on build with this concept, see the MVB on [[denoising-diffusion-probabilistic-models]].</em></p>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>
 <hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Repository</th>
+<th>What it provides</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/yang-song/score_sde_pytorch">yang-song/score_sde_pytorch</a></td>
+<td>Reference implementation of Song et al. (2021), "Score-Based Generative Modeling through SDEs." Includes VE, VP, and sub-VP SDEs with both Langevin and probability-flow ODE samplers.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/ermongroup/ncsnv2">ermongroup/ncsnv2</a></td>
+<td>Official NCSNv2 (Song &amp; Ermon, 2020) — noise-conditional score networks at CIFAR-10 / CelebA scale.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/NVlabs/edm">NVlabs/edm</a> and <a href="https://github.com/NVlabs/edm2">NVlabs/edm2</a></td>
+<td>NVIDIA's EDM and EDM2 — the cleanest modern score-matching training recipe; the EDM paper isolates the design choices (preconditioning, loss weighting, noise schedule) that matter.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/openai/consistency_models">openai/consistency_models</a></td>
+<td>Consistency models — distill a score-based teacher into a one-step student; directly built on the DSM objective.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/huggingface/diffusers">huggingface/diffusers</a></td>
+<td>Production-grade implementations of score-based and DDPM-style schedulers (<code>ScoreSdeVeScheduler</code>, <code>EulerDiscreteScheduler</code>, etc.) usable with any pretrained checkpoint.</td>
+</tr>
+</tbody>
+</table>
 <h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Score matching provides the probabilistic foundation — the training objective — that DDPM and NCSN are built on. Understanding it at the derivation level makes the noise schedule, the loss weighting, and the sampler design in those models precise rather than heuristic.</p>
+<p>Score matching is the probabilistic substrate; everything downstream is either a discretization of it, a parametrization of it, or an alternative to it.</p>
 <ul>
-<li>[[denoising-diffusion-probabilistic-models]] — DDPM is the discrete-time training procedure that operationalizes DSM at scale; the connection between the ELBO and the DSM objective is the key link.</li>
-<li>[[score-based-sde]] — the continuous-time generalization that unifies DDPM and NCSN under a single SDE framework, enabling probability flow ODE sampling and exact likelihood computation.</li>
-<li>[[energy-based-models]] — score matching was originally developed as a training method for EBMs; understanding EBMs clarifies why the partition function is intractable and what score matching is actually bypassing.</li>
-<li>[[flow-matching]] — flow matching generalizes the score-based training idea by directly regressing vector fields rather than score functions, removing the need for a fixed noise schedule entirely.</li>
+<li>Denoising Diffusion Probabilistic Models — DDPM is the discrete-time training procedure that re-derives DSM under a fixed forward Markov chain; the <span class="arithmatex">\(\epsilon\)</span>-prediction objective is exactly DSM with a specific noise-level weighting.</li>
+<li>Score Based Sde — the continuous-time generalization where the discrete noise schedule becomes a stochastic differential equation, and sampling becomes either reverse-time SDE integration or probability-flow ODE solving.</li>
+<li>Langevin Dynamics — the MCMC sampler that turns a learned score field into actual samples; the bridge from "we know <span class="arithmatex">\(\nabla_x \log p\)</span>" to "we can draw <span class="arithmatex">\(x \sim p\)</span>."</li>
+<li><a href="../flow-matching/">Flow Matching</a> — an alternative regression target (velocity fields of probability paths) that subsumes score matching as a special case and currently dominates state-of-the-art image and video generation.</li>
+<li>Consistency Models — distillation of a score-based teacher into a one- or few-step student, trading the elegant SDE structure for inference speed.</li>
 </ul>
-<hr />
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Energy Based Models — the family of unnormalized density models that motivated score matching in the first place; Hyvärinen's 2005 paper was written explicitly to fit EBMs without computing <span class="arithmatex">\(Z(\theta)\)</span>.</li>
+<li>Denoising Autoencoders — Vincent (2011) proved DAEs trained with Gaussian noise are implicitly performing score matching on the perturbed density, retroactively explaining why DAEs learned useful representations.</li>
+<li>Stein Discrepancy — a kernel-based generalization that uses the score function to test goodness-of-fit; shares the integration-by-parts trick that makes score matching tractable.</li>
+<li>Normalizing Flows — the alternative route to tractable likelihoods; flows compute <span class="arithmatex">\(\log p(x)\)</span> exactly via change-of-variables, where score-based models compute only <span class="arithmatex">\(\nabla_x \log p(x)\)</span> but scale better.</li>
+<li>Fisher Divergence — the divergence score matching actually minimizes; understanding why Fisher divergence is well-behaved where KL is not is the theoretical core of why score matching works.</li>
+</ul>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Hyvärinen, A. (2005). "Estimation of Non-Normalized Statistical Models by Score Matching." <em>Journal of Machine Learning Research</em>, 6, 695–709. https://jmlr.org/papers/v6/hyvarinen05a.html — The original paper; the integration-by-parts derivation in Section 2 is the essential read.</li>
-<li>Song, Y. &amp; Ermon, S. (2019). "Generative Modeling by Estimating Gradients of the Data Distribution." arXiv:1907.05600. https://arxiv.org/abs/1907.05600 — Introduces NCSN and annealed Langevin dynamics; the experiments section shows the first high-quality score-based image generation.</li>
-<li>Song, Y. et al. (2020). "Score-Based Generative Modeling through Stochastic Differential Equations." arXiv:2011.13456. https://arxiv.org/abs/2011.13456 — The unification paper; Appendix B contains the proof that the reverse SDE is governed by the score, which is the theoretical core of the modern diffusion literature.</li>
-<li>Karras, T. et al. (2022). "Elucidating the Design Space of Diffusion-Based Generative Models." arXiv:2206.00364. https://arxiv.org/abs/2206.00364 — A systematic empirical study of how score parameterization, noise schedule, and sampler interact; the most practically useful paper for anyone training a diffusion model.</li>
-<li>Lilian Weng, "What are Diffusion Models?" (lil'log, 2021). https://lilianweng.github.io/posts/2021-07-11-diffusion-models/ — A detailed walkthrough connecting score matching, DDPM, and NCSN with annotated equations; useful as a companion to the original papers.</li>
-<li>Kingma, D. &amp; Gao, R. (2023). "Understanding Diffusion Objectives as the ELBO with Simple Data Augmentation." arXiv:2303.00848. https://arxiv.org/abs/2303.00848 — Proves that the weighted DSM objective is a variational lower bound, providing a principled justification for loss weighting schemes used in practice.</li>
+<li>Hyvärinen, A. (2005). <a href="https://jmlr.csail.mit.edu/papers/volume6/hyvarinen05a/old.pdf">Estimation of Non-Normalized Statistical Models by Score Matching</a> — the original paper; read sections 2–3 for the integration-by-parts derivation that makes the entire field possible.</li>
+<li>Vincent, P. (2011). <a href="https://www.iro.umontreal.ca/~vincentp/Publications/smdae_techreport.pdf">A Connection Between Score Matching and Denoising Autoencoders</a> — the four-page proof that DSM is exact for Gaussian-perturbed densities; the practical foundation of every modern diffusion model.</li>
+<li>Song, Y. &amp; Ermon, S. (2019). <a href="https://arxiv.org/abs/1907.05600">Generative Modeling by Estimating Gradients of the Data Distribution</a> — introduces noise-conditional score networks and explains the manifold-hypothesis failure mode of single-noise score matching.</li>
+<li>Song, Y., Sohl-Dickstein, J., Kingma, D. P., Kumar, A., Ermon, S., &amp; Poole, B. (2021). <a href="https://arxiv.org/abs/2011.13456">Score-Based Generative Modeling through Stochastic Differential Equations</a> — the unifying SDE framework that ties score matching, DDPM, and probability-flow ODEs into one mathematical picture.</li>
+<li>Karras, T., Aittala, M., Aila, T., &amp; Laine, S. (2022). <a href="https://arxiv.org/abs/2206.00364">Elucidating the Design Space of Diffusion-Based Generative Models</a> — the EDM paper; an empirical and theoretical clean-up that identifies which design choices in score-based training actually matter.</li>
+<li>Lilian Weng, <a href="https://lilianweng.github.io/posts/2021-07-11-diffusion-models/">Generative Modeling by Estimating Gradients of the Data Distribution</a> (lil'log, 2021) — for an intuitive walkthrough of how DSM connects to the broader diffusion story; useful as a second pass after the primary papers.</li>
+<li>Chen, S., Chewi, S., Li, J., Li, Y., Salim, A., &amp; Zhang, A. R. (2023). <a href="https://arxiv.org/abs/2209.11215">Sampling is as easy as learning the score</a> — the current best convergence bounds for score-based samplers and the natural entry point for the open problem on error propagation in low-density regions.</li>
 </ul>
 
 
@@ -3890,6 +3990,9 @@ J_{\text{DSM}}(\theta) = \mathbb{E}_{p_{\text{data}}(x)}\,\mathbb{E}_{\epsilon \
 
 
 
+
+  
+  
 
 
 

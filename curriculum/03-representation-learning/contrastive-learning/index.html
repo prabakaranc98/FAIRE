@@ -969,17 +969,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#for-your-reader-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        For your reader type
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-it-is" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1024,17 +1013,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#key-algorithms-techniques" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key algorithms / techniques
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#essential-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1061,100 +1039,6 @@
     <span class="md-ellipsis">
       
         Current SotA
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-happening-now" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's happening now
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In production
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimum-valuable-build" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimum Valuable Build
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#code-implementations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Code &amp; implementations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What comes next
       
     </span>
   </a>
@@ -3932,7 +3816,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3981,20 +3865,6 @@
       
       
       
-        <span class="md-tag">CLIP</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">InfoNCE</span>
-      
-    
-      
-      
-      
-      
         <span class="md-tag">contrastive-learning</span>
       
     
@@ -4002,21 +3872,28 @@
       
       
       
-        <span class="md-tag">multimodal</span>
+        <span class="md-tag">moco</span>
       
     
       
       
       
       
-        <span class="md-tag">representation-learning</span>
+        <span class="md-tag">nt-xent</span>
       
     
       
       
       
       
-        <span class="md-tag">self-supervised-learning</span>
+        <span class="md-tag">self-supervised</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">simclr</span>
       
     
   </nav>
@@ -4028,92 +3905,27 @@
 
 <h1 id="contrastive-learning">Contrastive Learning<a class="headerlink" href="#contrastive-learning" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> Contrastive learning trains encoders by pulling semantically similar pairs together and pushing dissimilar pairs apart in a shared latent space — enabling powerful, label-free representations that transfer to downstream tasks with little or no fine-tuning.</p>
+<p><strong>TL;DR:</strong> A self-supervised objective that learns representations by pulling augmented views of the same image together and pushing different images apart — the dominant SSL paradigm that gave rise to CLIP and modern vision encoders.</p>
+<p>🚧 Agent-generated content pending. See <a href="../">track index</a> for context.</p>
 </blockquote>
-<hr />
-<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>I am...</th>
-<th>What you get</th>
-<th>Go to</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MS/applied practitioner</td>
-<td>A working dual-encoder CLIP-style model trained on Flickr8k with InfoNCE loss</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-</tr>
-<tr>
-<td>Curious generalist</td>
-<td>An intuition for why comparison-based learning works better than label-based learning at scale</td>
-<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-</tr>
-<tr>
-<td>Math/theory student</td>
-<td>Full InfoNCE derivation with annotated variables, alignment/uniformity decomposition</td>
-<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
-</tr>
-<tr>
-<td>Researcher / frontier</td>
-<td>Dimensional collapse, Gramian-based multi-modal alignment, scaling law results</td>
-<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-</tr>
-</tbody>
-</table>
-<hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Imagine teaching someone what a "guitar" is — not by handing them a dictionary definition, but by showing them an acoustic guitar and an electric guitar side by side ("these are the same kind of thing") while contrasting both against a violin ("this is different"). No labels required. The learner builds an internal model of "guitar-ness" purely from the structure of comparisons. This is the core intuition behind contrastive learning: rather than predicting absolute categories, a model learns by mapping relative semantic distances. Things that belong together should land close in the model's internal space; things that don't belong together should land far apart.</p>
-<p>The practical consequence of this framing is enormous. Supervised learning requires a human to assign a label to every training example — a bottleneck that limits scale. Contrastive learning sidesteps this by constructing its own supervision signal from the data itself. Two crops of the same image, a sentence and its translation, a photo and its caption — these are "positive pairs" that the model should map to nearby points. Everything else in the batch is a "negative" the model should push away. This self-supervised signal can be generated automatically at internet scale, which is why contrastive methods have become the dominant pre-training strategy for vision, language, and multimodal systems.</p>
-<p>What makes contrastive learning work in practice is the geometry it imposes on the learned space. A well-trained contrastive encoder doesn't just cluster positives together — it distributes representations uniformly across the hypersphere, preventing the model from collapsing to a trivial solution where everything maps to the same point. This balance between alignment (positives close) and uniformity (representations spread out) is the central tension the field has spent the last five years learning to control.</p>
+<p>Contrastive learning creates positive pairs (two views of the same sample via augmentation) and negative pairs (views from different samples). The network learns to map positives close together and negatives far apart in embedding space, developing rich representations without labels.</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>Contrastive learning is the mechanism that made large-scale multimodal foundation models possible. CLIP (Radford et al., 2021) demonstrated that training a vision encoder and a text encoder jointly with a contrastive objective on 400 million web-scraped image-caption pairs produces visual representations that transfer to dozens of downstream tasks without any task-specific fine-tuning. That result reframed the entire question of visual pre-training: the bottleneck was never model capacity, it was the supervision signal. Contrastive learning at scale provides a supervision signal that is effectively unlimited, which is why every major vision-language model — from ALIGN to SigLIP to the vision towers inside LLaVA — uses some variant of this approach.</p>
-<p>The open problems that remain are not incremental. Contrastive learning still struggles with dimensional collapse — the tendency for representations to concentrate in a low-dimensional subspace of the embedding space, wasting capacity and degrading transfer. It also struggles with hard negatives: when a batch contains two images of different guitars, the model is penalized for treating them as dissimilar, even though they are semantically close. And as systems scale beyond two modalities (image + text + audio + depth + video), the pairwise cosine similarity that underlies InfoNCE becomes geometrically inadequate — a problem that recent work on Gramian-based alignment (2025) is beginning to address. These are the questions that determine whether contrastive representations can serve as the universal substrate for multimodal AI.</p>
+<p>SimCLR and MoCo established contrastive learning as a viable path to representations competitive with supervised pretraining. CLIP extended this to vision-language pairs, producing the most widely used vision encoder in frontier AI systems.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Positive pair</strong> — two views of the same underlying semantic content (e.g., two augmented crops of one image, or an image and its caption) that the model is trained to map to nearby points in embedding space.</li>
-<li><strong>Negative pair</strong> — two examples from different semantic categories that the model is trained to push apart; in practice, all other examples in the batch serve as negatives.</li>
-<li><strong>Embedding space / latent space</strong> — the high-dimensional vector space (typically <span class="arithmatex">\(\mathbb{R}^{128}\)</span> to <span class="arithmatex">\(\mathbb{R}^{1024}\)</span>) where encoders map inputs; contrastive training shapes the geometry of this space.</li>
-<li><strong>InfoNCE loss</strong> — the standard contrastive objective, derived from noise-contrastive estimation, that trains the model to identify the true positive among <span class="arithmatex">\(N-1\)</span> negatives in a batch.</li>
-<li><strong>Temperature parameter <span class="arithmatex">\(\tau\)</span></strong> — a scalar that controls the sharpness of the similarity distribution; low <span class="arithmatex">\(\tau\)</span> makes the model focus on hard negatives, high <span class="arithmatex">\(\tau\)</span> smooths the gradient signal.</li>
-<li><strong>Alignment</strong> — the property that positive pairs have high cosine similarity; a necessary condition for useful representations but not sufficient on its own.</li>
-<li><strong>Uniformity</strong> — the property that representations are spread uniformly across the unit hypersphere; prevents dimensional collapse and ensures the embedding space is used efficiently.</li>
-<li><strong>Dimensional collapse</strong> — the failure mode where representations span only a low-dimensional subspace despite the encoder having high capacity; a central unsolved problem in contrastive learning.</li>
+<li><strong>Positive pair</strong> — two augmented views of the same sample</li>
+<li><strong>Negative pair</strong> — views from different samples in the batch</li>
+<li><strong>NT-Xent loss</strong> — normalized temperature-scaled cross entropy; the SimCLR loss</li>
+<li><strong>InfoNCE</strong> — the loss function seen as estimating mutual information</li>
+<li><strong>Momentum encoder</strong> — EMA-updated key encoder (MoCo) to stabilize training with a memory bank</li>
+<li><strong>Temperature</strong> — controls the sharpness of the distribution; critical hyperparameter</li>
 </ul>
 <h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p>The core contrastive objective is the InfoNCE loss. For a batch of <span class="arithmatex">\(N\)</span> image-text pairs, the loss for a single image <span class="arithmatex">\(i\)</span> is:</p>
-<div class="arithmatex">\[
-\mathcal{L}_i = -\log \frac{\exp(\text{sim}(z_i^I, z_i^T) / \tau)}{\sum_{j=1}^{N} \exp(\text{sim}(z_i^I, z_j^T) / \tau)}
-\]</div>
-<p>where <span class="arithmatex">\(z_i^I \in \mathbb{R}^d\)</span> is the <span class="arithmatex">\(\ell_2\)</span>-normalized image embedding for example <span class="arithmatex">\(i\)</span>, <span class="arithmatex">\(z_i^T \in \mathbb{R}^d\)</span> is the <span class="arithmatex">\(\ell_2\)</span>-normalized text embedding for the same example, <span class="arithmatex">\(z_j^T\)</span> ranges over all <span class="arithmatex">\(N\)</span> text embeddings in the batch (including the true positive at <span class="arithmatex">\(j = i\)</span>), <span class="arithmatex">\(\text{sim}(\cdot, \cdot)\)</span> is cosine similarity, and <span class="arithmatex">\(\tau &gt; 0\)</span> is the temperature hyperparameter. This equation says that the model is solving an <span class="arithmatex">\(N\)</span>-way classification problem: given image <span class="arithmatex">\(i\)</span>, identify which of the <span class="arithmatex">\(N\)</span> text embeddings is its true match. The loss is minimized when the true positive scores higher than all negatives.</p>
-<p>The full symmetric CLIP loss averages the image-to-text and text-to-image directions:</p>
-<div class="arithmatex">\[
-\mathcal{L} = \frac{1}{2N} \sum_{i=1}^{N} \left( \mathcal{L}_i^{I \to T} + \mathcal{L}_i^{T \to I} \right)
-\]</div>
-<p>where <span class="arithmatex">\(\mathcal{L}_i^{I \to T}\)</span> is the per-example loss for identifying the correct text given image <span class="arithmatex">\(i\)</span> — computed as the InfoNCE expression above — and <span class="arithmatex">\(\mathcal{L}_i^{T \to I}\)</span> is the symmetric counterpart: the loss for identifying the correct image given text <span class="arithmatex">\(i\)</span>, computed by transposing the similarity matrix and applying the same softmax-cross-entropy. The factor <span class="arithmatex">\(\frac{1}{2N}\)</span> averages over both directions and all examples in the batch. This symmetry ensures that both encoders receive gradient signal from both directions simultaneously.</p>
-<p>Wang and Isola (2020) decomposed the contrastive objective into two interpretable terms. The alignment loss is:</p>
-<div class="arithmatex">\[
-\mathcal{L}_{\text{align}} = \mathbb{E}_{(x, x^+) \sim p_{\text{pos}}} \left[ \| f(x) - f(x^+) \|^2 \right]
-\]</div>
-<p>where <span class="arithmatex">\(f(x) \in \mathbb{R}^d\)</span> is the <span class="arithmatex">\(\ell_2\)</span>-normalized embedding of input <span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(x^+\)</span> is a positive view drawn from the positive pair distribution <span class="arithmatex">\(p_{\text{pos}}\)</span>, and <span class="arithmatex">\(\|\cdot\|^2\)</span> is squared Euclidean distance on the unit hypersphere. This term says that the model should minimize the distance between positive pairs — it measures how well the encoder aligns semantically equivalent inputs.</p>
-<p>The uniformity loss is:</p>
-<div class="arithmatex">\[
-\mathcal{L}_{\text{uniform}} = \log \mathbb{E}_{x, y \overset{\text{i.i.d.}}{\sim} p_{\text{data}}} \left[ e^{-2\|f(x) - f(y)\|^2} \right]
-\]</div>
-<p>where <span class="arithmatex">\(x\)</span> and <span class="arithmatex">\(y\)</span> are two independently sampled data points from the marginal data distribution <span class="arithmatex">\(p_{\text{data}}\)</span>, and <span class="arithmatex">\(f(\cdot)\)</span> is again the <span class="arithmatex">\(\ell_2\)</span>-normalized encoder. This term is minimized when representations are maximally spread across the unit hypersphere — it penalizes representations that cluster together regardless of semantics. The tension between these two terms is the fundamental trade-off contrastive learning must navigate: perfect alignment would collapse all positives to a single point, while perfect uniformity would push all points apart regardless of semantics.</p>
-<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>SimCLR (Chen et al., 2020)</strong> — trains a single vision encoder using two random augmentations of each image as positives; introduced the projection head (a small MLP applied before the loss) and showed that large batch sizes (4096+) are critical for performance.</li>
-<li><strong>MoCo / MoCo v2 / MoCo v3 (He et al., 2020; Chen et al., 2020, 2021)</strong> — uses a momentum encoder (an exponential moving average of the online encoder) and a memory queue to decouple batch size from the number of negatives, enabling contrastive training on single-GPU hardware.</li>
-<li><strong>CLIP (Radford et al., 2021)</strong> — trains a vision encoder and a text encoder jointly with symmetric InfoNCE on 400M web-scraped image-caption pairs; the resulting embeddings enable zero-shot classification by comparing image embeddings to text embeddings of class names.</li>
-<li><strong>ALIGN (Jia et al., 2021)</strong> — scales CLIP-style training to 1.8 billion noisy image-text pairs without aggressive data cleaning, showing that scale compensates for noise.</li>
-<li><strong>BYOL (Grill et al., 2020)</strong> — eliminates explicit negatives entirely by using an online/target network asymmetry with a stop-gradient operation; demonstrated that uniformity can be maintained without negative pairs, challenging the assumption that negatives are necessary.</li>
-<li><strong>SimSiam (Chen &amp; He, 2021)</strong> — further simplified BYOL by removing the momentum encoder, showing that stop-gradient alone prevents collapse; provided theoretical grounding for why asymmetric architectures avoid trivial solutions.</li>
-<li><strong>SigLIP (Zhai et al., 2023)</strong> — replaces the softmax-based InfoNCE with a sigmoid loss that treats each pair independently, removing the dependency on large batch sizes and enabling more stable training at scale.</li>
-<li><strong>GRAM (2025)</strong> — extends contrastive alignment beyond pairwise cosine similarity to <span class="arithmatex">\(k &gt; 2\)</span> modalities using Gramian volume as the alignment metric, enabling geometrically principled multi-modal pre-training.</li>
-</ul>
+<p>NT-Xent loss for a positive pair (i, j):
+[
+\mathcal{L}<em _neq="\neq" i="i" k="k">{i,j} = -\log \frac{\exp(\text{sim}(z_i, z_j)/\tau)}{\sum</em>
+]} \exp(\text{sim}(z_i, z_k)/\tau)</p>
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4126,28 +3938,16 @@
 </thead>
 <tbody>
 <tr>
-<td>"Learning Transferable Visual Models From Natural Language Supervision"</td>
-<td>2021</td>
-<td>Radford et al.</td>
-<td>Establishes CLIP; the foundational reference for contrastive multimodal pre-training at scale</td>
-</tr>
-<tr>
-<td>"Scaling Up Visual and Vision-Language Representation Learning With Noisy Text Supervision"</td>
-<td>2021</td>
-<td>Jia et al.</td>
-<td>Demonstrates that scale and noise tolerance matter more than data curation; establishes ALIGN</td>
-</tr>
-<tr>
-<td>"A Simple Framework for Contrastive Learning of Visual Representations"</td>
+<td><a href="https://arxiv.org/abs/2002.05709">A Simple Framework for Contrastive Learning</a></td>
 <td>2020</td>
 <td>Chen et al.</td>
-<td>Establishes SimCLR; the clearest exposition of the core contrastive recipe for vision</td>
+<td>SimCLR — the clean, reproducible baseline</td>
 </tr>
 <tr>
-<td>"Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere"</td>
-<td>2020</td>
-<td>Wang &amp; Isola</td>
-<td>Provides the theoretical decomposition of InfoNCE into alignment and uniformity terms</td>
+<td><a href="https://arxiv.org/abs/1911.05722">Momentum Contrast for Unsupervised Visual Representation Learning</a></td>
+<td>2019</td>
+<td>He et al.</td>
+<td>MoCo — memory-efficient contrastive training</td>
 </tr>
 </tbody>
 </table>
@@ -4162,315 +3962,31 @@
 </thead>
 <tbody>
 <tr>
-<td>"Representation Learning with Contrastive Predictive Coding" (Oord et al.)</td>
+<td><a href="https://arxiv.org/abs/1807.03748">Representation Learning with Contrastive Predictive Coding</a></td>
 <td>2018</td>
-<td>Introduced CPC and the InfoNCE bound; established the theoretical connection between contrastive objectives and mutual information maximization</td>
+<td>Oord et al.</td>
 </tr>
 <tr>
-<td>"Momentum Contrast for Unsupervised Visual Representation Learning" (He et al.)</td>
+<td><a href="https://arxiv.org/abs/2002.05709">A Simple Framework for Contrastive Learning</a></td>
 <td>2020</td>
-<td>Introduced the momentum encoder and memory queue, decoupling negative count from batch size and making contrastive learning practical on limited hardware</td>
-</tr>
-<tr>
-<td>"Bootstrap Your Own Latent" (Grill et al.)</td>
-<td>2020</td>
-<td>Showed that explicit negatives are not necessary for contrastive learning; forced the field to rethink why collapse is avoided</td>
-</tr>
-<tr>
-<td>"Learning Transferable Visual Models From Natural Language Supervision" (Radford et al.)</td>
-<td>2021</td>
-<td>Proved that contrastive pre-training on web-scale noisy data produces zero-shot transferable representations; redefined the standard for visual pre-training</td>
-</tr>
-<tr>
-<td>"Sigmoid Loss for Language Image Pre-Training" (Zhai et al.)</td>
-<td>2023</td>
-<td>Replaced softmax InfoNCE with per-pair sigmoid loss, removing the large-batch requirement and improving training stability at scale</td>
+<td>Chen et al.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>OpenCLIP's largest ViT-G/14 model trained on LAION-2B achieves 80.1% zero-shot top-1 accuracy on ImageNet (Cherti et al., 2022). SigLIP-So400m achieves 83.2% zero-shot ImageNet accuracy while training stably at smaller batch sizes than softmax CLIP (Zhai et al., 2023). On cross-modal retrieval, the EVA-CLIP-18B model (Sun et al., 2023) achieves 83.8% zero-shot ImageNet top-1 and sets state-of-the-art on Flickr30k image-text retrieval at R@1 = 97.4%, representing the current ceiling for pure contrastive pre-training before instruction tuning is applied.</p>
-<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The most active theoretical question is dimensional collapse: contrastive encoders routinely use only a small fraction of their nominal embedding dimension, concentrating representations in a low-dimensional subspace. This wastes capacity and degrades transfer to tasks that require fine-grained distinctions. Recent work has approached this through spectral regularization (penalizing the condition number of the embedding covariance matrix) and through feature decorrelation objectives borrowed from Barlow Twins (Zbontar et al., 2021). The deeper question — how to mathematically guarantee full-rank representations without relying on massive batch sizes or heuristic negative mining — remains open and is the subject of active work at DeepMind, Meta AI, and several academic groups. A precise formulation: can we derive a closed-form condition on the encoder architecture and loss that is both necessary and sufficient to prevent dimensional collapse for arbitrary data distributions?</p>
-<p><strong>Engineering and systems.</strong> The engineering challenge in contrastive learning at scale is the all-pairs similarity matrix. For a batch of <span class="arithmatex">\(N\)</span> examples, computing the <span class="arithmatex">\(N \times N\)</span> similarity matrix requires <span class="arithmatex">\(O(N^2)\)</span> memory, which becomes prohibitive at <span class="arithmatex">\(N &gt; 32{,}768\)</span>. SigLIP's per-pair sigmoid loss partially addresses this by enabling chunked computation, but the fundamental quadratic scaling remains. Distributed contrastive training across hundreds of GPUs requires careful all-gather operations to share embeddings across devices — a pattern implemented in OpenCLIP's <code>gather_features</code> utility and in Google's JAX-based training infrastructure. The practical consequence is that state-of-the-art contrastive training still requires TPU pods or multi-node GPU clusters, and reducing this compute requirement without sacrificing representation quality is an active engineering priority.</p>
-<p><strong>Open problems.</strong> Three specific questions define the frontier. First: how do we construct hard negatives automatically and at scale without introducing false negatives (two semantically similar examples incorrectly treated as dissimilar)? Current approaches use nearest-neighbor mining or curriculum strategies, but none have a principled solution to the false-negative problem. Second: can contrastive objectives be extended to more than two modalities without the combinatorial explosion of pairwise losses? The GRAM framework (2025) proposes Gramian volume as a <span class="arithmatex">\(k\)</span>-way alignment metric, but its scaling properties and gradient behavior at large <span class="arithmatex">\(k\)</span> are not yet well understood. Third: what is the right inductive bias for the projection head — the MLP applied before the contrastive loss — and why does removing it after training improve downstream performance? This gap between the representation that minimizes the contrastive loss and the representation that transfers best remains theoretically unexplained.</p>
-<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Google</strong> — uses CLIP-style contrastive pre-training as the vision backbone for Google Lens, processing over 12 billion visual searches per month; the SigLIP architecture (Zhai et al., 2023) is the current production vision encoder — https://research.google/blog/</li>
-<li><strong>Meta AI</strong> — deploys contrastive image-text embeddings in Instagram's visual search and content recommendation systems, operating at billions of daily active users; the ImageBind model (Girdhar et al., 2023) extends contrastive alignment to six modalities in production — https://ai.meta.com/research/</li>
-<li><strong>OpenAI</strong> — CLIP embeddings power the image understanding components of GPT-4V and the DALL-E 3 safety classifiers; the original ViT-L/14 CLIP model processes millions of images daily in content moderation pipelines — https://openai.com/research/</li>
-<li><strong>Stability AI</strong> — uses CLIP text encoders as the conditioning signal in Stable Diffusion; the text encoder's contrastive pre-training is the mechanism by which text prompts are mapped to the latent space that guides image generation — https://stability.ai/research</li>
-<li><strong>LinkedIn</strong> — uses dual-encoder contrastive models for job-candidate matching and skills embedding, with the embedding space trained on implicit positive pairs derived from user engagement signals at hundreds of millions of members — https://engineering.linkedin.com/</li>
-</ul>
-<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A dual-encoder CLIP-style model trained on Flickr8k that maps images and captions into a shared 256-dimensional embedding space using InfoNCE loss.</p>
-<p><strong>Why this build:</strong> This demonstrates the complete contrastive learning loop — positive pair construction, symmetric InfoNCE computation, and the emergence of a joint embedding space where you can retrieve images from text queries and vice versa.</p>
-<p><strong>Stack:</strong> Python 3.10, PyTorch 2.1, torchvision 0.16, transformers 4.38 (HuggingFace), <code>openai/clip-vit-base-patch32</code> as the frozen text encoder backbone, Flickr8k dataset (~1GB, free download).</p>
-<p><strong>Estimated time:</strong> 2–3 hours on a free Colab T4 GPU (16GB VRAM). Runs comfortably within the free tier.</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Install dependencies and download Flickr8k</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># In Colab: run this cell first</span>
-<span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">torch</span> <span class="n">torchvision</span> <span class="n">transformers</span> <span class="n">datasets</span> <span class="n">Pillow</span>
-
-<span class="c1"># Download Flickr8k via HuggingFace datasets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;nlphuji/flickr8k&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>  <span class="c1"># ~8k image-caption pairs</span>
-<span class="c1"># Flickr8k has 5 captions per image; we&#39;ll use the first caption only</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2"> examples&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>  <span class="c1"># should show: image, caption, sentids, split, img_id</span>
-</code></pre></div>
-<ol>
-<li><strong>Define the dual-encoder architecture</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">CLIPTokenizer</span><span class="p">,</span> <span class="n">CLIPTextModel</span>
-
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">ImageEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;ResNet-50 backbone with a linear projection head.&quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="n">backbone</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">resnet50</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">models</span><span class="o">.</span><span class="n">ResNet50_Weights</span><span class="o">.</span><span class="n">IMAGENET1K_V1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="nb">list</span><span class="p">(</span><span class="n">backbone</span><span class="o">.</span><span class="n">children</span><span class="p">())[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>  <span class="c1"># remove final FC</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2048</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-        <span class="n">features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, 2048)</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">features</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, embed_dim)</span>
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">TextEncoder</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Frozen CLIP text encoder with a linear projection head.&quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">CLIPTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">CLIPTextModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;openai/clip-vit-base-patch32&quot;</span><span class="p">)</span>
-        <span class="c1"># Freeze the CLIP text encoder — we only train the projection</span>
-        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-            <span class="n">param</span><span class="o">.</span><span class="n">requires_grad</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">projection</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">512</span><span class="p">),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">embed_dim</span><span class="p">)</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">captions</span><span class="p">):</span>
-        <span class="n">tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
-            <span class="n">captions</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">max_length</span><span class="o">=</span><span class="mi">77</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-            <span class="n">text_features</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span><span class="o">**</span><span class="n">tokens</span><span class="p">)</span><span class="o">.</span><span class="n">pooler_output</span>  <span class="c1"># (B, 512)</span>
-        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">normalize</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">projection</span><span class="p">(</span><span class="n">text_features</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, embed_dim)</span>
-
-
-<span class="n">image_encoder</span> <span class="o">=</span> <span class="n">ImageEncoder</span><span class="p">(</span><span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">text_encoder</span> <span class="o">=</span> <span class="n">TextEncoder</span><span class="p">(</span><span class="n">embed_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-<span class="c1"># Sanity check: verify output shapes</span>
-<span class="n">dummy_img</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-<span class="n">dummy_txt</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;a dog on a beach&quot;</span><span class="p">,</span> <span class="s2">&quot;a cat on a sofa&quot;</span><span class="p">,</span> <span class="s2">&quot;a bird in a tree&quot;</span><span class="p">,</span> <span class="s2">&quot;a car on a road&quot;</span><span class="p">]</span>
-<span class="n">img_emb</span> <span class="o">=</span> <span class="n">image_encoder</span><span class="p">(</span><span class="n">dummy_img</span><span class="p">)</span>
-<span class="n">txt_emb</span> <span class="o">=</span> <span class="n">text_encoder</span><span class="p">(</span><span class="n">dummy_txt</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">img_emb</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Expected (4, 256), got </span><span class="si">{</span><span class="n">img_emb</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="k">assert</span> <span class="n">txt_emb</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Expected (4, 256), got </span><span class="si">{</span><span class="n">txt_emb</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape check passed:&quot;</span><span class="p">,</span> <span class="n">img_emb</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">txt_emb</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Implement the symmetric InfoNCE loss</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">InfoNCELoss</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.07</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span> <span class="o">=</span> <span class="n">temperature</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_embeddings</span><span class="p">,</span> <span class="n">text_embeddings</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        image_embeddings: (B, D) — L2-normalized image vectors</span>
-<span class="sd">        text_embeddings:  (B, D) — L2-normalized text vectors</span>
-<span class="sd">        Returns: scalar loss (symmetric InfoNCE)</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">B</span> <span class="o">=</span> <span class="n">image_embeddings</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="c1"># Compute (B, B) similarity matrix</span>
-        <span class="n">logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">image_embeddings</span><span class="p">,</span> <span class="n">text_embeddings</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">temperature</span>
-        <span class="c1"># Ground truth: diagonal entries are the true positives</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-        <span class="c1"># Symmetric loss: image→text and text→image</span>
-        <span class="n">loss_i2t</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-        <span class="n">loss_t2i</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">loss_i2t</span> <span class="o">+</span> <span class="n">loss_t2i</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
-
-<span class="n">criterion</span> <span class="o">=</span> <span class="n">InfoNCELoss</span><span class="p">(</span><span class="n">temperature</span><span class="o">=</span><span class="mf">0.07</span><span class="p">)</span>
-
-<span class="c1"># Sanity check: loss on random embeddings should be close to log(B)</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
-<span class="n">dummy_loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">img_emb</span><span class="p">,</span> <span class="n">txt_emb</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Random-init loss: </span><span class="si">{</span><span class="n">dummy_loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> (expected ~</span><span class="si">{</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Build the DataLoader</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">DataLoader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-
-<span class="n">image_transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span>
-    <span class="n">transforms</span><span class="o">.</span><span class="n">Resize</span><span class="p">((</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">)),</span>
-    <span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">(),</span>
-    <span class="n">transforms</span><span class="o">.</span><span class="n">Normalize</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="p">[</span><span class="mf">0.485</span><span class="p">,</span> <span class="mf">0.456</span><span class="p">,</span> <span class="mf">0.406</span><span class="p">],</span> <span class="n">std</span><span class="o">=</span><span class="p">[</span><span class="mf">0.229</span><span class="p">,</span> <span class="mf">0.224</span><span class="p">,</span> <span class="mf">0.225</span><span class="p">])</span>
-<span class="p">])</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">Flickr8kDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hf_dataset</span><span class="p">,</span> <span class="n">transform</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">hf_dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">transform</span> <span class="o">=</span> <span class="n">transform</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">):</span>
-        <span class="n">item</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-        <span class="n">image</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
-        <span class="c1"># Flickr8k has a list of captions; take the first one</span>
-        <span class="n">caption</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;caption&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;caption&quot;</span><span class="p">],</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;caption&quot;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">image</span><span class="p">),</span> <span class="n">caption</span>
-
-<span class="n">flickr_dataset</span> <span class="o">=</span> <span class="n">Flickr8kDataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">image_transform</span><span class="p">)</span>
-<span class="n">dataloader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">flickr_dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                        <span class="n">num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">pin_memory</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Batches per epoch: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Train for 10 epochs</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span>
-    <span class="nb">list</span><span class="p">(</span><span class="n">image_encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">text_encoder</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span>
-    <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">,</span> <span class="n">weight_decay</span><span class="o">=</span><span class="mf">1e-4</span>
-<span class="p">)</span>
-<span class="n">scheduler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">CosineAnnealingLR</span><span class="p">(</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">T_max</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">image_encoder</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-    <span class="n">text_encoder</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-    <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
-
-    <span class="k">for</span> <span class="n">batch_idx</span><span class="p">,</span> <span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="n">captions</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataloader</span><span class="p">):</span>
-        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">img_emb</span> <span class="o">=</span> <span class="n">image_encoder</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-        <span class="n">txt_emb</span> <span class="o">=</span> <span class="n">text_encoder</span><span class="p">(</span><span class="n">captions</span><span class="p">)</span>
-
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">img_emb</span><span class="p">,</span> <span class="n">txt_emb</span><span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-        <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-        <span class="c1"># Gradient clipping prevents instability at low temperature</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">clip_grad_norm_</span><span class="p">(</span>
-            <span class="nb">list</span><span class="p">(</span><span class="n">image_encoder</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">text_encoder</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">parameters</span><span class="p">()),</span>
-            <span class="n">max_norm</span><span class="o">=</span><span class="mf">1.0</span>
-        <span class="p">)</span>
-        <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-        <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-
-    <span class="n">scheduler</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-    <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | LR: </span><span class="si">{</span><span class="n">scheduler</span><span class="o">.</span><span class="n">get_last_lr</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Evaluate with text-to-image retrieval (Recall@1)</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">image_encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-<span class="n">text_encoder</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-
-<span class="n">all_img_embs</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">all_txt_embs</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-    <span class="k">for</span> <span class="n">images</span><span class="p">,</span> <span class="n">captions</span> <span class="ow">in</span> <span class="n">dataloader</span><span class="p">:</span>
-        <span class="n">images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">all_img_embs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">image_encoder</span><span class="p">(</span><span class="n">images</span><span class="p">))</span>
-        <span class="n">all_txt_embs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text_encoder</span><span class="p">(</span><span class="n">captions</span><span class="p">))</span>
-
-<span class="n">all_img_embs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_img_embs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (N, 256)</span>
-<span class="n">all_txt_embs</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">all_txt_embs</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>  <span class="c1"># (N, 256)</span>
-
-<span class="c1"># Text-to-image retrieval: for each text, find the closest image</span>
-<span class="n">similarity</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">all_txt_embs</span><span class="p">,</span> <span class="n">all_img_embs</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>  <span class="c1"># (N, N)</span>
-<span class="n">top1_preds</span> <span class="o">=</span> <span class="n">similarity</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (N,)</span>
-<span class="n">ground_truth</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_img_embs</span><span class="p">),</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">)</span>
-<span class="n">recall_at_1</span> <span class="o">=</span> <span class="p">(</span><span class="n">top1_preds</span> <span class="o">==</span> <span class="n">ground_truth</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Text→Image Recall@1: </span><span class="si">{</span><span class="n">recall_at_1</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">100</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">)</span>
-<span class="c1"># A random baseline would be ~0.01% for 8k examples</span>
-<span class="c1"># After 10 epochs you should see 15–30% Recall@1 on this small dataset</span>
-</code></pre></div>
-<ol>
-<li><strong>Save the checkpoint</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">({</span>
-    <span class="s2">&quot;image_encoder&quot;</span><span class="p">:</span> <span class="n">image_encoder</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-    <span class="s2">&quot;text_projection&quot;</span><span class="p">:</span> <span class="n">text_encoder</span><span class="o">.</span><span class="n">projection</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span>
-    <span class="s2">&quot;embed_dim&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span>
-    <span class="s2">&quot;temperature&quot;</span><span class="p">:</span> <span class="mf">0.07</span><span class="p">,</span>
-<span class="p">},</span> <span class="s2">&quot;flickr8k_clip_checkpoint.pt&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Checkpoint saved: flickr8k_clip_checkpoint.pt&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>After 10 epochs on a Colab T4 (~45 minutes), you should see:
-- Training loss dropping from ~4.15 (random init, ≈ log(64)) to ~2.8–3.2
-- Text→Image Recall@1 of 15–30% on the full Flickr8k test split (random baseline: ~0.01%)
-- A saved checkpoint <code>flickr8k_clip_checkpoint.pt</code> (~100MB) containing the image encoder and text projection weights</p>
-<p>The embedding space can be visualized with UMAP: images of dogs, cats, and outdoor scenes should form loose clusters, with their corresponding captions landing nearby.</p>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Loss stays at log(batch_size) and doesn't decrease</strong> → The image encoder's gradients are not flowing; check that <code>image_encoder.parameters()</code> is included in the optimizer and that <code>requires_grad=True</code> for the ResNet backbone layers.</li>
-<li><strong>CUDA out of memory on T4</strong> → Reduce batch size from 64 to 32; the loss will be noisier but training will converge.</li>
-<li><strong>Recall@1 stays below 5% after 10 epochs</strong> → Temperature is too low (try 0.1–0.2); very low temperatures make gradients vanish for all but the hardest negatives, which is counterproductive on small datasets.</li>
-<li><strong><code>KeyError: 'caption'</code> when loading Flickr8k</strong> → The HuggingFace dataset field name may vary by split; inspect <code>dataset[0].keys()</code> and adjust the field name in <code>Flickr8kDataset.__getitem__</code>.</li>
-<li><strong>Text encoder projection not training</strong> → Verify that <code>text_encoder.projection.parameters()</code> (not <code>text_encoder.parameters()</code>) is passed to the optimizer; the CLIP backbone is intentionally frozen.</li>
-</ul>
-<hr />
 <blockquote>
-<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+<p><em>Updated: 2026-05-25</em>
+Pure contrastive learning has been largely superseded by non-contrastive methods (BYOL, DINOv2) and masked modeling (MAE) for image features. However, contrastive vision-language pretraining (CLIP) remains the standard for zero-shot transfer and multimodal alignment. SigLIP (sigmoid loss) and DFN-CLIP are recent improvements.</p>
 </blockquote>
-<hr />
-<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>OpenCLIP</strong> (LAION-AI) — the reference open-source implementation of CLIP training, including SigLIP, CoCa, and scaling experiments: https://github.com/mlfoundations/open_clip</li>
-<li><strong>CLIP (OpenAI)</strong> — the original CLIP model weights and inference code, with ViT-B/32 through ViT-L/14@336px: https://github.com/openai/CLIP</li>
-<li><strong>SimCLR (Google Research)</strong> — the original SimCLR implementation in TensorFlow with the full augmentation pipeline: https://github.com/google-research/simclr</li>
-<li><strong>MoCo v3 (Facebook Research)</strong> — the MoCo v3 implementation with ViT backbone support: https://github.com/facebookresearch/moco-v3</li>
-<li><strong>HuggingFace CLIP model hub</strong> — pre-trained CLIP variants including <code>openai/clip-vit-base-patch32</code>, <code>openai/clip-vit-large-patch14</code>, and <code>laion/CLIP-ViT-H-14-laion2B-s32B-b79K</code>: https://huggingface.co/models?other=clip</li>
-</ul>
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Understanding contrastive learning's geometry makes the design choices in self-supervised vision transformers precise rather than heuristic — the alignment/uniformity trade-off directly explains why DINO's centering operation prevents collapse.</p>
-<ul>
-<li>[[self-supervised-learning]] — contrastive learning is one family within self-supervised learning; the broader landscape includes masked autoencoders and predictive methods that don't use explicit negatives.</li>
-<li>[[multimodal-representation-learning]] — CLIP-style contrastive pre-training is the foundation of multimodal systems; joint embedding spaces are used for retrieval, generation, and grounding.</li>
-<li>[[disentangled-representations]] — contrastive objectives shape the global geometry of embedding spaces but don't enforce factorization of semantic factors; disentanglement methods address what contrastive learning leaves unstructured.</li>
-</ul>
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[[backpropagation]] — contrastive learning relies on backpropagation to optimize representation alignments using gradient descent.</li>
-<li>[[transformer-architecture]] — transformer architectures are frequently pre-trained using self-supervised contrastive learning objectives.</li>
-<li>[[score-matching]] — noise-contrastive estimation shares theoretical foundations with score matching for energy-based model estimation.</li>
+<li><a href="../self-supervised-learning/">Self-Supervised Learning</a> — broader family; contrastive is one objective class</li>
+<li><a href="../../07-attention-memory-reasoning/vision-language-models/">Vision-Language Models</a> — CLIP as the scaling of contrastive to cross-modal pairs</li>
+<li>Bootstrapping Methods — non-contrastive alternatives (BYOL, DINOv2)</li>
 </ul>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Radford et al. (2021) — "Learning Transferable Visual Models From Natural Language Supervision" — https://arxiv.org/abs/2103.00020 — the CLIP paper; essential for understanding how contrastive objectives scale to web data and enable zero-shot transfer.</li>
-<li>Oord et al. (2018) — "Representation Learning with Contrastive Predictive Coding" — https://arxiv.org/abs/1807.03748 — derives the InfoNCE bound from first principles and establishes the connection between contrastive objectives and mutual information maximization.</li>
-<li>Wang &amp; Isola (2020) — "Understanding Contrastive Representation Learning through Alignment and Uniformity on the Hypersphere" — https://arxiv.org/abs/2005.10242 — provides the alignment/uniformity decomposition that gives geometric meaning to what InfoNCE is actually optimizing.</li>
-<li>Lilian Weng (2021) — "Contrastive Representation Learning" — https://lilianweng.github.io/posts/2021-05-31-contrastive/ — a comprehensive survey covering SimCLR, MoCo, BYOL, and CLIP with unified notation; useful for seeing how the methods relate to each other.</li>
-<li>Cherti et al. (2022) — "Reproducible Scaling Laws for Contrastive Language-Image Learning" — https://arxiv.org/abs/2212.07143 — empirically derives the scaling laws for CLIP-style training, showing the precise relationship between compute budget, dataset size, and downstream zero-shot performance.</li>
-<li>Zbontar et al. (2021) — "Barlow Twins: Self-Supervised Learning via Redundancy Reduction" — https://arxiv.org/abs/2103.03230 — introduces a cross-correlation-based objective that directly targets dimensional collapse, offering a complementary perspective on why uniformity matters and how to enforce it without negatives.</li>
+<li><a href="https://arxiv.org/abs/2011.02803">Intriguing Properties of Contrastive Losses</a> — Chen &amp; Luo 2021</li>
 </ul>
 
 

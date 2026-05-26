@@ -951,45 +951,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1004,10 +965,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
+  <a href="#what-can-you-build-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What comes next
+        What can you build next?
       
     </span>
   </a>
@@ -3932,7 +3893,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3975,24 +3936,53 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">cfm</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">continuous-normalizing-flows</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">flow-matching</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">optimal-transport</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rectified-flow</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<div class="highlight"><pre><span></span><code><span class="nn">---</span>
-<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Flow Matching</span>
-<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">02-generative-modeling</span>
-<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">flow-matching</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">continuous-normalizing-flows</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">optimal-transport</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">rectified-flow</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">cfm</span><span class="p p-Indicator">]</span>
-<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">all</span>
-<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">normalizing-flows</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">diffusion-models</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">score-matching</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">odes-and-solvers</span><span class="p p-Indicator">]</span>
-<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-01-30</span>
-<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nn">---</span>
-</code></pre></div>
 <h1 id="flow-matching">Flow Matching<a class="headerlink" href="#flow-matching" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> A simulation-free training framework for continuous normalizing flows that learns straight-line vector fields from noise to data — achieving diffusion-quality generation in 8–20 inference steps instead of 50–1000, now powering FLUX, AlphaFold 3, and Voicebox.</p>
+<p><strong>TL;DR:</strong> A training framework for continuous normalizing flows that learns straight-line paths from noise to data — faster training and fewer inference steps than diffusion, now the backbone of FLUX, AlphaFold 3, and frontier audio models.</p>
 </blockquote>
 <hr />
 <h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
@@ -4007,13 +3997,13 @@
 <tbody>
 <tr>
 <td>MS/applied practitioner</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-<td>Train a flow matching model and understand why it's faster than diffusion</td>
+<td><a href="#key-algorithms-techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Run a flow matching model and understand why it's faster</td>
 </tr>
 <tr>
 <td>Curious generalist</td>
 <td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-<td>Understand what "flow matching" means and why it displaced diffusion</td>
+<td>Understand what "flow matching" means and why it beat diffusion</td>
 </tr>
 <tr>
 <td>Math/theory student</td>
@@ -4023,60 +4013,53 @@
 <tr>
 <td>Researcher / frontier</td>
 <td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-<td>Know the open problems: path singularities, discrete flow matching, scaling</td>
+<td>Know the open problems: discrete flow matching, scaling laws</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Imagine two cities connected by a road network. A diffusion model is like navigating that network during rush hour — every particle takes a winding, congested route through high-dimensional space, doubling back, merging with other particles, and requiring hundreds of small steps to arrive at the destination. Flow matching is the highway bypass: it draws a straight line between where you start (a sample from Gaussian noise) and where you need to go (a data point), then trains a neural network to follow that line. The result is a generative model that can produce high-fidelity samples in a fraction of the steps.</p>
-<p>More precisely, flow matching trains a neural network <span class="arithmatex">\(v_\theta(x, t)\)</span> to represent a <strong>vector field</strong> — a function that, at every point in space and every moment in time, says "move in this direction." Integrating this vector field as an ordinary differential equation (ODE) from <span class="arithmatex">\(t = 0\)</span> to <span class="arithmatex">\(t = 1\)</span> transports a noise sample into a data sample. The critical insight from Lipman et al. (2022) is that training this vector field does not require simulating the ODE at all. Instead, you construct a simple, analytically tractable <em>conditional</em> vector field between individual noise-data pairs — the straight line <span class="arithmatex">\(u_t(x \mid x_0, x_1) = x_1 - x_0\)</span> — and regress against it directly. The marginal vector field that the model learns, averaged over all pairs, is provably consistent with the data distribution.</p>
-<p>This is what separates flow matching from earlier continuous normalizing flow (CNF) methods: those methods required integrating the ODE during training to compute the log-likelihood, which was computationally prohibitive. Flow matching bypasses this entirely. The training objective is a simple mean-squared error between the network's predicted vector field and the analytically computed conditional target. The consequence is that flow matching trains as cheaply as a standard diffusion model but produces straighter trajectories that require far fewer ODE steps to integrate accurately at inference time.</p>
+<p>Flow matching trains a neural network to learn a <strong>vector field</strong> v_θ(x, t) that transports samples from a source distribution p_0 (usually Gaussian noise) to a target distribution p_1 (the data). The flow is defined by an ODE: dx/dt = v_θ(x, t). Integrating this ODE from t=0 to t=1 transforms a noise sample into a data sample.</p>
+<p>The key insight is <strong>simulation-free training</strong>: instead of integrating the ODE during training (expensive), you directly regress against a conditional vector field that you can compute analytically from pairs (noise, data). The conditional flow between a single noise sample x_0 and a single data point x_1 is just the straight line: u_t(x | x_1) = x_1 − x_0. This is why flow paths are straight: the model learns to interpolate linearly between noise and data.</p>
+<p><strong>Why this beats diffusion:</strong> Diffusion models add and remove noise in curved paths through high-dimensional space. Flow matching uses straighter paths, so the vector field is easier to learn and you need fewer ODE steps (8–20 vs. 50–1000) at inference to get the same quality.</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>The practical impact of flow matching became undeniable in 2024. Black Forest Labs released FLUX.1, an open-weight image generation model built on Rectified Flow (a flow matching variant) that outperformed DALL-E 3 and Stable Diffusion 3 on human preference benchmarks while running inference in 20–28 steps. AlphaFold 3 adopted a flow matching-like diffusion module as its structure prediction head, replacing the score-based diffusion used in earlier protein structure work. Meta's Voicebox and AudioBox use flow matching for zero-shot speech synthesis and audio generation. The convergence is not coincidental: flow matching's straighter paths translate directly into fewer neural function evaluations (NFEs) at inference, which is the dominant cost in production deployment.</p>
-<p>The theoretical significance runs deeper than engineering efficiency. Flow matching, score matching, and denoising diffusion probabilistic models are all instances of the same underlying framework — learning to transport one probability distribution to another. Flow matching makes this transport explicit and geometrically interpretable: the learned vector field is a velocity field on the space of probability measures, and the quality of generation is directly tied to the curvature of the learned paths. This geometric view has opened new research directions in optimal transport, Riemannian flow matching for non-Euclidean data, and discrete flow matching for language and protein sequences. Frontier labs are actively working on all three, and the theoretical tools are maturing fast enough that practical improvements are following within months of theoretical results.</p>
+<p>Flow matching is now the preferred training paradigm at the image, audio, and molecular generation frontier. FLUX.1 (best open-weight image generator, 2024) uses Rectified Flow — a flow matching variant. AlphaFold 3 uses a flow matching-like diffusion module for all biomolecule structure prediction. Stable Audio and Voicebox use it for audio. The reason: same quality as diffusion, 4–8× faster inference, simpler training objective.</p>
+<p>The theoretical unification is also compelling: flow matching, diffusion, and score matching are all special cases of the same probabilistic transport framework. Understanding flow matching means understanding the whole generative modeling landscape.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Continuous Normalizing Flow (CNF)</strong> — a generative model defined by an ODE <span class="arithmatex">\(\dot{x} = v_\theta(x, t)\)</span> whose solution maps a simple source distribution to a complex target distribution; the flow is invertible by construction.</li>
-<li><strong>Vector field</strong> — a function <span class="arithmatex">\(v: \mathbb{R}^d \times [0,1] \to \mathbb{R}^d\)</span> that assigns a velocity to every point in space at every time; integrating it defines a trajectory (flow) through space.</li>
-<li><strong>Conditional Flow Matching (CFM)</strong> — the training objective that regresses the network against analytically computable per-sample conditional vector fields, avoiding ODE simulation during training.</li>
-<li><strong>Probability path</strong> — a time-indexed family of distributions <span class="arithmatex">\(p_t\)</span> interpolating between the source <span class="arithmatex">\(p_0\)</span> and target <span class="arithmatex">\(p_1\)</span>; the vector field generates this path by transporting mass continuously.</li>
-<li><strong>Optimal Transport (OT) coupling</strong> — a joint distribution over (noise, data) pairs that minimizes the expected squared distance <span class="arithmatex">\(\mathbb{E}[\|x_1 - x_0\|^2]\)</span>; using OT couplings instead of independent pairs straightens the learned trajectories.</li>
-<li><strong>Rectified Flow</strong> — a flow matching variant (Liu et al., 2022) that iteratively "reflows" trajectories by re-pairing noise and data using the model's own transport map, progressively straightening paths.</li>
-<li><strong>Neural Function Evaluations (NFEs)</strong> — the number of times the network <span class="arithmatex">\(v_\theta\)</span> is called during ODE integration at inference; straighter paths require fewer NFEs for the same accuracy.</li>
-<li><strong>Interpolant</strong> — the time-indexed path <span class="arithmatex">\(x_t = \alpha_t x_1 + \sigma_t x_0\)</span> connecting a noise sample <span class="arithmatex">\(x_0\)</span> and a data sample <span class="arithmatex">\(x_1\)</span>; the choice of <span class="arithmatex">\(\alpha_t\)</span> and <span class="arithmatex">\(\sigma_t\)</span> determines path geometry and is a design choice.</li>
+<li><strong>Continuous normalizing flow (CNF)</strong> — a generative model defined by an ODE: dx/dt = v_θ(x, t); integrating gives a deterministic map from noise to data</li>
+<li><strong>Vector field</strong> — v_θ(x, t): a neural network that predicts the direction to move at position x and time t</li>
+<li><strong>Conditional flow matching (CFM)</strong> — the core training trick: regress v_θ against a conditional vector field computed from individual (noise, data) pairs; avoids integrating the marginal ODE</li>
+<li><strong>OT paths (optimal transport)</strong> — straight-line paths x_t = (1−t)x_0 + tx_1 between noise and data; minimize transport cost; the simplest and most compute-efficient choice</li>
+<li><strong>Rectified Flow</strong> — a specific CFM variant: straight-line paths + reflow distillation to further straighten paths; backbone of FLUX and SD3</li>
+<li><strong>Simulation-free training</strong> — train without integrating the ODE; sample t ∈ [0,1], compute x_t on the straight path, regress v_θ against (x_1 − x_0); simple and efficient</li>
+<li><strong>Stochastic interpolants</strong> — a generalization unifying flow matching and diffusion: x_t = α(t)x_0 + β(t)x_1 + γ(t)ε with different schedules giving different models</li>
 </ul>
 <h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p>The flow matching training objective starts from the <strong>marginal flow matching loss</strong>, which is intractable directly but can be replaced by the conditional flow matching loss without changing the gradient:</p>
-<div class="arithmatex">\[
-\mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t,\, x_0 \sim p_0,\, x_1 \sim p_1} \left\| v_\theta(x_t, t) - u_t(x_t \mid x_0, x_1) \right\|^2
-\]</div>
-<p>where <span class="arithmatex">\(v_\theta(x_t, t)\)</span> is the neural network's predicted vector field evaluated at the interpolated point <span class="arithmatex">\(x_t\)</span> and time <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(u_t(x_t \mid x_0, x_1)\)</span> is the analytically known conditional target vector field for the specific pair <span class="arithmatex">\((x_0, x_1)\)</span>, <span class="arithmatex">\(x_0 \sim p_0\)</span> is a noise sample drawn from the source distribution (typically <span class="arithmatex">\(\mathcal{N}(0, I)\)</span>), <span class="arithmatex">\(x_1 \sim p_1\)</span> is a data sample drawn from the target distribution, and <span class="arithmatex">\(t \sim \mathcal{U}[0, 1]\)</span> is a time uniformly sampled from the unit interval. This equation says that training is pure regression: at each step, sample a noise-data pair, interpolate to get <span class="arithmatex">\(x_t\)</span>, compute the analytic target velocity, and minimize the squared error.</p>
-<p>The <strong>linear interpolant</strong> (the simplest and most common choice) defines the interpolated point and its conditional target velocity as:</p>
-<div class="arithmatex">\[
-x_t = (1 - t)\, x_0 + t\, x_1, \qquad u_t(x_t \mid x_0, x_1) = x_1 - x_0
-\]</div>
-<p>where <span class="arithmatex">\(x_t \in \mathbb{R}^d\)</span> is the point at time <span class="arithmatex">\(t \in [0,1]\)</span> along the straight line from <span class="arithmatex">\(x_0\)</span> to <span class="arithmatex">\(x_1\)</span>, <span class="arithmatex">\(x_0 \in \mathbb{R}^d\)</span> is the noise sample, <span class="arithmatex">\(x_1 \in \mathbb{R}^d\)</span> is the data sample, and <span class="arithmatex">\(u_t = x_1 - x_0\)</span> is the constant displacement velocity along that line — independent of <span class="arithmatex">\(t\)</span>. This equation says that the conditional target is simply the displacement vector: constant along the path, the same at every timestep. The model learns to predict this displacement, averaged over all pairs in the dataset.</p>
-<p>The <strong>OT-CFM objective</strong> replaces independent sampling of <span class="arithmatex">\((x_0, x_1)\)</span> with a minibatch OT coupling <span class="arithmatex">\(\pi^*(x_0, x_1)\)</span> that minimizes expected squared displacement:</p>
-<div class="arithmatex">\[
-\pi^* = \arg\min_{\pi \in \Pi(p_0, p_1)} \mathbb{E}_{(x_0, x_1) \sim \pi} \left[ \|x_1 - x_0\|^2 \right]
-\]</div>
-<p>where <span class="arithmatex">\(\Pi(p_0, p_1)\)</span> is the set of all joint distributions whose marginals are <span class="arithmatex">\(p_0\)</span> and <span class="arithmatex">\(p_1\)</span> respectively, <span class="arithmatex">\(\pi\)</span> is a candidate coupling (joint distribution over noise-data pairs), and <span class="arithmatex">\(\pi^*\)</span> is the optimal transport plan that pairs each noise sample with the data point it is geometrically closest to in expectation. This equation says that OT coupling minimizes the average path length, which in turn minimizes trajectory curvature and reduces the NFEs needed at inference.</p>
-<p>The <strong>continuity equation</strong> is the PDE that any valid probability path must satisfy:</p>
-<div class="arithmatex">\[
-\frac{\partial p_t}{\partial t} + \nabla \cdot (p_t\, v_t) = 0
-\]</div>
-<p>where <span class="arithmatex">\(p_t : \mathbb{R}^d \to \mathbb{R}_{\geq 0}\)</span> is the probability density at time <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(v_t : \mathbb{R}^d \to \mathbb{R}^d\)</span> is the vector field generating the flow at time <span class="arithmatex">\(t\)</span>, and <span class="arithmatex">\(\nabla \cdot\)</span> denotes the divergence operator over the spatial coordinates. This equation says that probability mass is conserved: the vector field cannot create or destroy probability, only transport it. Flow matching implicitly satisfies this constraint by construction — the learned vector field generates a valid probability path by design.</p>
+<p>Flow matching objective (marginal, intractable):
+[
+\mathcal{L}<em p_t_x_="p_t(x)" t_="t,\,">{FM} = \mathbb{E}</em>!\left[|v_\theta(x,t) - u_t(x)|^2\right]
+]</p>
+<p>Conditional flow matching (tractable — same gradient, efficiently computable):
+[
+\mathcal{L}<em p_x_1_="p(x_1)" q_x_0_="q(x_0),\," t_="t,\,">{CFM} = \mathbb{E}</em>!\left[|v_\theta(x_t, t) - u_t(x_t \mid x_1)|^2\right]
+]</p>
+<p>where on OT (straight-line) paths:
+[
+x_t = (1-t)\,x_0 + t\,x_1, \qquad u_t(x_t \mid x_1) = x_1 - x_0
+]</p>
+<p>The key theorem (Lipman et al. 2022): <strong>L_FM and L_CFM have the same gradient</strong> — so training on the tractable conditional objective exactly optimizes the marginal objective.</p>
+<p>Inference: integrate the learned ODE from t=0 to t=1 using any ODE solver (Euler, RK4, DPM-Solver):
+[
+x_1 \approx x_0 + \int_0^1 v_\theta(x_t, t)\, dt
+]</p>
 <h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Conditional Flow Matching (CFM)</strong> — Lipman et al. (2022); the foundational algorithm that replaces the intractable marginal flow matching objective with a tractable conditional regression loss, enabling simulation-free training of CNFs.</li>
-<li><strong>OT-CFM (Optimal Transport CFM)</strong> — Tong et al. (2023); augments CFM with minibatch OT couplings to straighten trajectories, reducing NFEs at inference without changing the training architecture.</li>
-<li><strong>Rectified Flow</strong> — Liu et al. (2022); independently derived flow matching with linear interpolants, plus the "reflow" procedure that iteratively re-pairs noise and data using the trained model to further straighten paths.</li>
-<li><strong>Multisample Flow Matching</strong> — Pooladian et al. (2023); uses minibatch OT couplings across multiple samples simultaneously to construct straighter flows, with theoretical guarantees on trajectory straightness.</li>
-<li><strong>Optimal Flow Matching</strong> — Kornilov et al. (2024); constructs displacement interpolants that provably minimize path curvature, achieving near-one-step generation on standard benchmarks.</li>
-<li><strong>Riemannian Flow Matching</strong> — Chen &amp; Lipman (2023); extends CFM to Riemannian manifolds (spheres, tori, SO(3)) using geodesic interpolants, enabling flow matching on protein backbone angles and other non-Euclidean data.</li>
-<li><strong>Discrete Flow Matching</strong> — Campbell et al. (2024); adapts the CFM framework to discrete state spaces (tokens, graphs) by defining flows over categorical distributions, enabling flow-based language and protein sequence generation.</li>
-<li><strong>Carré du Champ Flow Matching</strong> — Bamberger et al. (2025); introduces geometry-aware anisotropic noise schedules derived from the carré du champ operator, resolving the quality-generalization tradeoff and preventing memorization on complex data manifolds.</li>
+<li><strong>Conditional Flow Matching (CFM)</strong> (Lipman et al. 2022) — the core method; train on conditional vector fields; any path works in principle, OT paths work best</li>
+<li><strong>Rectified Flow</strong> (Liu et al. 2022) — straight-line paths + reflow: train a second model to straighten paths further; enables 1-step generation after distillation</li>
+<li><strong>OT-CFM / Minibatch OT</strong> (Tong et al. 2023) — use optimal transport coupling between mini-batch noise and data; better path quality than independent coupling</li>
+<li><strong>Stochastic Interpolants</strong> (Albergo &amp; Vanden-Eijnden 2023) — unified framework: α(t)x_0 + β(t)x_1 + γ(t)ε with different schedule choices recovering diffusion, flow matching, and DDPM</li>
+<li><strong>Discrete Flow Matching</strong> (Gat et al. 2024) — extends flow matching to categorical / token data; enables discrete generation without autoregression</li>
 </ul>
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
@@ -4090,28 +4073,28 @@ x_t = (1 - t)\, x_0 + t\, x_1, \qquad u_t(x_t \mid x_0, x_1) = x_1 - x_0
 </thead>
 <tbody>
 <tr>
-<td>Flow Matching for Generative Modeling</td>
+<td><a href="https://arxiv.org/abs/2210.02747">Flow Matching for Generative Modeling</a></td>
 <td>2022</td>
 <td>Lipman et al.</td>
-<td>Introduces CFM: the simulation-free training objective that makes flow matching practical</td>
+<td>Original CFM — the core theorem and method</td>
 </tr>
 <tr>
-<td>Multisample Flow Matching: Straightening Flows with Minibatch Couplings</td>
+<td><a href="https://arxiv.org/abs/2209.03003">Flow Straight and Fast: Rectified Flow</a></td>
+<td>2022</td>
+<td>Liu et al.</td>
+<td>Straight-line paths; reflow distillation; backbone of FLUX</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2302.00482">Improving and Generalizing Flow-Matching with Minibatch OT</a></td>
 <td>2023</td>
-<td>Pooladian et al.</td>
-<td>Shows how OT couplings straighten trajectories and provides the theoretical basis for fast inference</td>
+<td>Tong et al.</td>
+<td>OT coupling improves path quality</td>
 </tr>
 <tr>
-<td>Optimal Flow Matching: Learning Straight Trajectories in Just One Step</td>
+<td><a href="https://arxiv.org/abs/2412.06264">Flow Matching Guide and Code</a></td>
 <td>2024</td>
-<td>Kornilov et al.</td>
-<td>Demonstrates near-one-step generation via optimal displacement interpolants</td>
-</tr>
-<tr>
-<td>Carré du Champ Flow Matching</td>
-<td>2025</td>
-<td>Bamberger et al.</td>
-<td>Introduces geometry-aware anisotropic noise to resolve quality-generalization tradeoff on complex manifolds</td>
+<td>Lipman et al.</td>
+<td>Comprehensive tutorial by the original authors; best starting point</td>
 </tr>
 </tbody>
 </table>
@@ -4126,240 +4109,66 @@ x_t = (1 - t)\, x_0 + t\, x_1, \qquad u_t(x_t \mid x_0, x_1) = x_1 - x_0
 </thead>
 <tbody>
 <tr>
-<td>Neural Ordinary Differential Equations</td>
-<td>2018</td>
-<td>Chen et al. — established CNFs as a practical model class; flow matching later made training tractable</td>
-</tr>
-<tr>
-<td>Normalizing Flows for Probabilistic Modeling and Inference</td>
-<td>2021</td>
-<td>Papamakarios et al. — comprehensive survey establishing the theoretical foundations that flow matching builds on</td>
-</tr>
-<tr>
-<td>Flow Matching for Generative Modeling</td>
+<td><a href="https://arxiv.org/abs/2210.02747">Flow Matching for Generative Modeling</a></td>
 <td>2022</td>
-<td>Lipman et al. — the paper that made CNF training simulation-free; now the standard training paradigm</td>
+<td>Conditional flow matching — the foundational method</td>
 </tr>
 <tr>
-<td>Flow Straight and Fast: Learning to Generate and Transfer Data with Rectified Flow</td>
+<td><a href="https://arxiv.org/abs/2209.03003">Flow Straight and Fast: Rectified Flow</a></td>
 <td>2022</td>
-<td>Liu et al. — independently derived linear interpolant flows with the reflow procedure; basis for FLUX</td>
+<td>Straight-line paths; the basis for FLUX and SD3</td>
 </tr>
 <tr>
-<td>Building Normalizing Flows with Stochastic Interpolants</td>
-<td>2022</td>
-<td>Albergo &amp; Vanden-Eijnden — introduced the stochastic interpolant framework unifying diffusion and flow matching</td>
+<td><a href="https://arxiv.org/abs/1912.02762">Normalizing Flows for Probabilistic Modeling</a></td>
+<td>2019</td>
+<td>Papamakarios et al. — classical antecedent; flow matching solves its key limitation</td>
 </tr>
 </tbody>
 </table>
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>FLUX.1-dev (Black Forest Labs, 2024), built on Rectified Flow, achieves a human preference win rate of 69% against DALL-E 3 on the GenAI-Bench benchmark and generates 1024×1024 images in 20–28 NFEs. On the ImageNet 256×256 class-conditional generation benchmark, flow matching models reach FID scores below 2.0 with 10–20 function evaluations, compared to 50–1000 for DDPM-class models at equivalent quality. For protein structure generation, AlphaFold 3's flow matching module achieves a median TM-score of 0.85 on CAMEO blind prediction targets (2024), surpassing all prior single-sequence methods.</p>
+<blockquote>
+<p><em>Updated: 2026-05-25</em></p>
+</blockquote>
+<p><strong>Image:</strong> FLUX.1 (Black Forest Labs, 2024) — Rectified Flow + DiT backbone at 12B parameters — is the current best open-weight image generator on most benchmarks. <strong>Audio:</strong> Stable Audio (Stability AI) and Meta's Voicebox use flow matching for high-quality waveform generation. <strong>Molecular:</strong> AlphaFold 3 uses a flow-matching-like diffusion module for all biomolecule types.</p>
 <h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The most active theoretical direction is extending flow matching to non-Euclidean and discrete spaces. Riemannian Flow Matching (Chen &amp; Lipman, 2023) handles smooth manifolds like protein backbone torsion angles, but the extension to combinatorial spaces — graphs, token sequences, molecular graphs with variable topology — requires fundamentally different interpolant constructions. Discrete Flow Matching (Campbell et al., 2024) and related masked diffusion approaches are converging on a shared framework, but the theoretical guarantees available for continuous flows (path straightness, OT optimality) do not yet transfer cleanly. Bamberger et al. (2025) introduced the carré du champ operator as a tool for constructing geometry-aware noise schedules, which opens the question of whether operator-theoretic tools from stochastic analysis can systematically resolve the quality-generalization tradeoff across data modalities.</p>
-<p><strong>Engineering and systems.</strong> The dominant engineering challenge is reducing the cost of OT coupling computation at training time. Exact OT on a minibatch of size <span class="arithmatex">\(n\)</span> costs <span class="arithmatex">\(O(n^3)\)</span> with the Hungarian algorithm or <span class="arithmatex">\(O(n^2 / \epsilon)\)</span> with Sinkhorn, which becomes a bottleneck at large batch sizes. Current practice uses approximate minibatch OT with Sinkhorn regularization (<span class="arithmatex">\(\epsilon \approx 0.05\)</span>) and batch sizes of 256–1024, which is fast enough for image generation but may not scale to the trillion-token batches used in language model training. Several groups are exploring learned couplings — using a small auxiliary network to propose pairings — as a way to amortize the OT cost. On the inference side, consistency distillation applied to flow matching models (as in Stable Diffusion 3's distilled variants) can reduce NFEs to 4–8 with minimal quality loss, and this is now standard practice in production deployments.</p>
-<p><strong>Open problems.</strong> The central unresolved question is: <em>Can we mathematically guarantee and dynamically enforce that learned vector fields do not develop crossing paths or singularities when scaling to high-dimensional, hybrid discrete-continuous spaces, without incurring prohibitive OT matching costs at training time?</em> Path crossings — where two trajectories from different data points pass through the same location at the same time — are provably impossible under exact OT couplings in continuous spaces, but the guarantees break down under minibatch approximations, in discrete spaces, and when the source and target distributions have overlapping support in complex ways. A related open question is whether there exists a principled way to choose the noise schedule (the interpolant <span class="arithmatex">\(\alpha_t, \sigma_t\)</span>) for a given data modality without exhaustive empirical search — current choices (linear, cosine, learned) are largely heuristic and the sensitivity to this choice is poorly understood theoretically.</p>
+<blockquote>
+<p><em>Research · Engineering · Systems</em></p>
+</blockquote>
+<p><strong>Research:</strong> Discrete flow matching (Gat et al., ICML 2024) extends CFM to token-space, enabling flow-based language generation without autoregression. Consistency flow matching combines flow matching paths with consistency model distillation for 1-step generation.</p>
+<p><strong>Engineering &amp; Systems:</strong> Production systems (FLUX) use flow matching with DDIM-style deterministic ODE solvers and 8-step inference. HuggingFace Diffusers added flow matching schedulers; most new image generation systems default to Rectified Flow or OT-CFM.</p>
+<p><strong>Open problems:</strong> How many ODE steps are truly needed for production quality? Can flow matching generalize to video (temporally consistent flows)? How do you scale discrete flow matching to large language models?</p>
 <h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><em>How top labs and companies have deployed this at scale</em></p>
+</blockquote>
 <ul>
-<li><strong>Black Forest Labs</strong> — FLUX.1 image generation API, serving millions of requests per day via Replicate and fal.ai integrations; built on Rectified Flow with a 12B parameter transformer backbone — https://huggingface.co/black-forest-labs/FLUX.1-dev</li>
-<li><strong>Meta AI</strong> — Voicebox (2023) and AudioBox (2024), zero-shot speech synthesis and audio generation at production scale; flow matching over mel-spectrogram representations with masked conditioning — https://ai.meta.com/research/publications/voicebox-text-guided-multilingual-universal-speech-generation-at-scale/</li>
-<li><strong>Google DeepMind</strong> — AlphaFold 3 (2024), structure prediction for proteins, DNA, RNA, and small molecules; flow matching diffusion module replaces the score-based diffusion in AlphaFold 2's structure module — https://research.google/blog/alphaFold-3-predicts-the-structure-and-interactions-of-all-of-lifes-molecules/</li>
-<li><strong>Stability AI</strong> — Stable Diffusion 3 and 3.5 (2024), multimodal diffusion transformer using flow matching with a rectified flow objective; SD3-Medium (2B parameters) runs on consumer GPUs in 20 steps — https://stability.ai/research/stable-diffusion-3</li>
-<li><strong>Suno / Udio</strong> — AI music generation systems (2024) using flow matching over continuous audio latents; both report inference in under 10 NFEs for 30-second audio clips at 44kHz</li>
+<li><strong>Black Forest Labs (FLUX.1):</strong> Rectified Flow + 12B DiT architecture; current best open-weight text-to-image model; available via HuggingFace and their API. <a href="https://huggingface.co/black-forest-labs">huggingface.co/black-forest-labs</a></li>
+<li><strong>Stability AI (Stable Diffusion 3):</strong> OT-CFM-based training + multi-modal diffusion transformer; improved text rendering and composition over SD 1.5. <a href="https://arxiv.org/abs/2403.03206">arxiv.org/abs/2403.03206</a></li>
+<li><strong>Meta AI (Voicebox):</strong> Flow matching for audio generation across languages; in-context learning for speech editing. <a href="https://arxiv.org/abs/2306.15687">arxiv.org/abs/2306.15687</a></li>
+<li><strong>DeepMind (AlphaFold 3):</strong> Flow matching-style diffusion over atomic coordinates for joint protein-DNA-RNA-ligand structure prediction. <a href="https://www.nature.com/articles/s41586-024-07487-w">nature.com/articles/s41586-024-07487-w</a></li>
 </ul>
-<hr />
 <h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A from-scratch PyTorch implementation of Conditional Flow Matching with OT paths, trained on a 2D double-moon dataset, with real-time visualization of the learned vector field.</p>
-<p><strong>Why this build:</strong> The double-moon dataset makes the vector field visually interpretable — you can literally watch the network learn to draw straight lines from noise to data, and see what happens when paths are not straight. This is the fastest way to develop intuition for why OT couplings matter.</p>
-<p><strong>Stack:</strong> Python 3.10+, PyTorch 2.1+, matplotlib 3.7+, scipy 1.11+ (for OT coupling), numpy 1.24+. No GPU required — runs on free Colab CPU in under 2 minutes.</p>
-<p><strong>Estimated time:</strong> 25–35 minutes end-to-end.</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<p><strong>What you're building:</strong> A minimal flow matching image generator trained from scratch on MNIST — you'll implement the CFM training loop, the ODE sampler, and generate handwritten digits from noise in 8 ODE steps.</p>
+<p><strong>Why this is valuable:</strong> Flow matching is the new default for generative AI. Implementing it from scratch gives you the intuition that code-reading never provides: why the vector field learns, what "straightness" means in practice, and why 8 steps beats diffusion's 1000.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> Small UNet or MLP denoiser (implement from scratch — ~100 lines)
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/ylecun/mnist">mnist</a> on HuggingFace Datasets
+- <strong>Framework:</strong> PyTorch + <code>torchdiffeq</code> (for ODE solving) or manual Euler integration</p>
+<p><strong>The recipe:</strong></p>
 <ol>
-<li><strong>Install dependencies and generate the dataset</strong></li>
+<li><strong>Set up the data:</strong> Load MNIST, normalize to [−1, 1]. Each sample x_1 ∈ ℝ^784.</li>
+<li><strong>Implement CFM training loop:</strong></li>
+<li>Sample noise x_0 ~ N(0, I), data x_1, time t ~ U[0, 1]</li>
+<li>Compute x_t = (1−t)x_0 + t·x_1 (OT straight path)</li>
+<li>Compute target vector u_t = x_1 − x_0</li>
+<li>Train v_θ(x_t, t) to minimize ‖v_θ − u_t‖²</li>
+<li><strong>Implement Euler ODE sampler:</strong> 8 steps from x_0=noise to x_1=generated digit</li>
+<li><strong>Generate and evaluate:</strong> Sample 100 images; compare quality vs. a 1-step vs. 8-step vs. 50-step ODE solver</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.spatial.distance</span><span class="w"> </span><span class="kn">import</span> <span class="n">cdist</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">linear_sum_assignment</span>
-
-<span class="c1"># Generate double-moon data (target distribution p_1)</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">make_moons</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.05</span><span class="p">):</span>
-    <span class="n">n_half</span> <span class="o">=</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span>
-    <span class="n">theta0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">n_half</span><span class="p">)</span>
-    <span class="n">theta1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">n_half</span><span class="p">)</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta0</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta0</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta1</span><span class="p">),</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-    <span class="n">X</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="o">*</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise</span>
-    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
-
-<span class="n">data</span> <span class="o">=</span> <span class="n">make_moons</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">4000</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data shape: </span><span class="si">{</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># (4000, 2)</span>
-<span class="k">assert</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">4000</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Define the vector field network</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">VectorField</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;MLP that maps (x, t) -&gt; velocity in R^2.&quot;&quot;&quot;</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hidden</span><span class="o">=</span><span class="mi">256</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-        <span class="c1"># Input: 2D position + 1D time = 3 dims</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">net</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">hidden</span><span class="p">),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">SiLU</span><span class="p">(),</span>
-            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
-        <span class="c1"># x: (B, 2), t: (B,) or scalar</span>
-        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">t</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">expand</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">t_emb</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, 1)</span>
-        <span class="n">xt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x</span><span class="p">,</span> <span class="n">t_emb</span><span class="p">],</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, 3)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">net</span><span class="p">(</span><span class="n">xt</span><span class="p">)</span>
-
-<span class="n">model</span> <span class="o">=</span> <span class="n">VectorField</span><span class="p">(</span><span class="n">hidden</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameters: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Implement minibatch OT coupling</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">ot_coupling</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute optimal transport coupling between minibatches x0 and x1.</span>
-<span class="sd">    Returns reordered x0 such that (x0[i], x1[i]) are OT-paired.</span>
-<span class="sd">    Cost matrix: squared Euclidean distance.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">C</span> <span class="o">=</span> <span class="n">cdist</span><span class="p">(</span><span class="n">x0</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">x1</span><span class="o">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">metric</span><span class="o">=</span><span class="s1">&#39;sqeuclidean&#39;</span><span class="p">)</span>
-    <span class="n">row_ind</span><span class="p">,</span> <span class="n">col_ind</span> <span class="o">=</span> <span class="n">linear_sum_assignment</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">x0</span><span class="p">[</span><span class="n">row_ind</span><span class="p">],</span> <span class="n">x1</span><span class="p">[</span><span class="n">col_ind</span><span class="p">]</span>
-
-<span class="c1"># Sanity check: OT cost should be &lt;= independent pairing cost</span>
-<span class="n">x0_test</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="n">x1_test</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="mi">64</span><span class="p">]</span>
-<span class="n">x0_ot</span><span class="p">,</span> <span class="n">x1_ot</span> <span class="o">=</span> <span class="n">ot_coupling</span><span class="p">(</span><span class="n">x0_test</span><span class="p">,</span> <span class="n">x1_test</span><span class="p">)</span>
-<span class="n">cost_ot</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1_ot</span> <span class="o">-</span> <span class="n">x0_ot</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="n">cost_ind</span> <span class="o">=</span> <span class="p">((</span><span class="n">x1_test</span> <span class="o">-</span> <span class="n">x0_test</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-<span class="k">assert</span> <span class="n">cost_ot</span> <span class="o">&lt;=</span> <span class="n">cost_ind</span> <span class="o">+</span> <span class="mf">1e-4</span><span class="p">,</span> <span class="s2">&quot;OT cost should not exceed independent cost&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OT cost: </span><span class="si">{</span><span class="n">cost_ot</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> vs independent: </span><span class="si">{</span><span class="n">cost_ind</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Write the CFM training loop</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">)</span>
-<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">256</span>
-<span class="n">n_steps</span> <span class="o">=</span> <span class="mi">5000</span>
-<span class="n">losses</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-    <span class="c1"># Sample noise (source distribution p_0)</span>
-    <span class="n">x0</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-
-    <span class="c1"># Sample data (target distribution p_1)</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,))</span>
-    <span class="n">x1</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-
-    <span class="c1"># OT coupling: pair x0 with nearest x1 in transport sense</span>
-    <span class="n">x0_paired</span><span class="p">,</span> <span class="n">x1_paired</span> <span class="o">=</span> <span class="n">ot_coupling</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">x1</span><span class="p">)</span>
-
-    <span class="c1"># Sample time uniformly in [0, 1]</span>
-    <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
-
-    <span class="c1"># Linear interpolant: x_t = (1-t)*x0 + t*x1</span>
-    <span class="n">t_col</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># (B, 1) for broadcasting</span>
-    <span class="n">xt</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">t_col</span><span class="p">)</span> <span class="o">*</span> <span class="n">x0_paired</span> <span class="o">+</span> <span class="n">t_col</span> <span class="o">*</span> <span class="n">x1_paired</span>
-
-    <span class="c1"># Conditional target velocity: u_t = x1 - x0 (constant along path)</span>
-    <span class="n">ut</span> <span class="o">=</span> <span class="n">x1_paired</span> <span class="o">-</span> <span class="n">x0_paired</span>
-
-    <span class="c1"># Predict velocity and compute MSE loss</span>
-    <span class="n">vt_pred</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xt</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-    <span class="n">loss</span> <span class="o">=</span> <span class="p">((</span><span class="n">vt_pred</span> <span class="o">-</span> <span class="n">ut</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-
-    <span class="n">losses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">500</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">5d</span><span class="si">}</span><span class="s2"> | Loss: </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Training complete.&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Generate samples by integrating the learned ODE</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Euler integration of dx/dt = v_theta(x, t) from t=0 to t=1.</span>
-<span class="sd">    n_steps=20 is sufficient for well-trained flow matching models.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">dt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">n_steps</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_steps</span><span class="p">):</span>
-        <span class="n">t</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_samples</span><span class="p">,),</span> <span class="n">i</span> <span class="o">*</span> <span class="n">dt</span><span class="p">)</span>
-        <span class="n">v</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">v</span> <span class="o">*</span> <span class="n">dt</span>
-    <span class="k">return</span> <span class="n">x</span>
-
-<span class="n">samples</span> <span class="o">=</span> <span class="n">generate</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">n_steps</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated samples shape: </span><span class="si">{</span><span class="n">samples</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># (2000, 2)</span>
-</code></pre></div>
-<ol>
-<li><strong>Visualize the vector field and generated samples</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
-
-<span class="c1"># Panel 1: Training data</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Training data (double moon)&quot;</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
-
-<span class="c1"># Panel 2: Generated samples</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">samples</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">samples</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">s</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s1">&#39;coral&#39;</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Generated samples (20 Euler steps)&quot;</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
-
-<span class="c1"># Panel 3: Learned vector field at t=0.5</span>
-<span class="n">grid_x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<span class="n">grid_y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mi">20</span><span class="p">)</span>
-<span class="n">gx</span><span class="p">,</span> <span class="n">gy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">grid_x</span><span class="p">,</span> <span class="n">grid_y</span><span class="p">)</span>
-<span class="n">grid_pts</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span>
-    <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">gx</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span> <span class="n">gy</span><span class="o">.</span><span class="n">ravel</span><span class="p">()],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
-<span class="p">)</span>
-<span class="n">t_mid</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">grid_pts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],),</span> <span class="mf">0.5</span><span class="p">)</span>
-<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
-    <span class="n">vf</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">grid_pts</span><span class="p">,</span> <span class="n">t_mid</span><span class="p">)</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">quiver</span><span class="p">(</span>
-    <span class="n">grid_pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">grid_pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-    <span class="n">vf</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">vf</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span>
-    <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkgreen&#39;</span>
-<span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Learned vector field at t=0.5&quot;</span><span class="p">)</span>
-<span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">3.5</span><span class="p">);</span> <span class="n">axes</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s2">&quot;flow_matching_result.png&quot;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved: flow_matching_result.png&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>After 5000 training steps (roughly 90 seconds on CPU), the loss should drop from approximately 0.8–1.2 to below 0.05. The generated samples panel should show two clear crescent shapes matching the training data. The vector field panel at <span class="arithmatex">\(t = 0.5\)</span> should show arrows pointing roughly from the center of the noise distribution toward the two moon clusters — visibly straighter than the curved fields you would see from a score-based model. If you reduce <code>n_steps</code> in <code>generate()</code> to 5, the samples should still be recognizable as double moons, demonstrating the efficiency of straight-path flow matching.</p>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Loss plateaus above 0.2 after 2000 steps</strong> → The OT coupling on CPU with <code>linear_sum_assignment</code> is exact but slow for batch_size &gt; 256; reduce to 128 or switch to Sinkhorn with <code>scipy.sparse.csgraph.min_weight_full_bipartite_matching</code>.</li>
-<li><strong>Generated samples form a single blob, not two moons</strong> → The network is underfitting; increase hidden dimension to 512 or add a fourth hidden layer.</li>
-<li><strong><code>AssertionError</code> in OT sanity check</strong> → Floating point edge case; the tolerance <code>1e-4</code> handles this, but if it fires, check that <code>x0_test</code> and <code>x1_test</code> have the same batch size.</li>
-<li><strong>Quiver plot arrows all point the same direction</strong> → The model has not converged; run for more steps or check that <code>t</code> is being passed correctly (must be a 1D tensor of shape <code>(B,)</code>, not a scalar).</li>
-<li><strong>Samples look good at 20 steps but noisy at 5 steps</strong> → OT coupling was not used or batch size was too small; verify the <code>ot_coupling</code> function is being called in the training loop.</li>
-</ul>
+<p><strong>Expected outcome:</strong> Generated MNIST digits after ~30 minutes of training, plus intuition for how the path "straightens" as the model trains and why fewer steps work.</p>
+<p><strong>Stretch goals:</strong>
+- Run FLUX.1 via <code>diffusers</code> on a prompt, inspect the CFM scheduler, compare 4-step vs. 8-step quality
+- Implement OT-CFM: use <code>scipy.optimize.linear_sum_assignment</code> to couple mini-batches optimally; observe cleaner paths</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
@@ -4367,32 +4176,33 @@ x_t = (1 - t)\, x_0 + t\, x_1, \qquad u_t(x_t \mid x_0, x_1) = x_1 - x_0
 <hr />
 <h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>torchcfm</strong> — the reference PyTorch library for CFM, OT-CFM, and Riemannian flow matching, maintained by the authors of the OT-CFM paper: https://github.com/atong01/conditional-flow-matching</li>
-<li><strong>FLUX.1 (Black Forest Labs)</strong> — production Rectified Flow model, weights and inference code: https://huggingface.co/black-forest-labs/FLUX.1-dev</li>
-<li><strong>Stable Diffusion 3</strong> — flow matching image generation, official Stability AI implementation: https://huggingface.co/stabilityai/stable-diffusion-3-medium</li>
-<li><strong>flow-matching (Meta Research)</strong> — Meta's official flow matching research codebase, including Riemannian and discrete variants: https://github.com/facebookresearch/flow_matching</li>
-<li><strong>torchdiffeq</strong> — the standard PyTorch ODE solver library used for CNF integration at inference: https://github.com/rtqichen/torchdiffeq</li>
+<li><a href="https://huggingface.co/docs/diffusers">huggingface/diffusers</a> — includes <code>FlowMatchEulerDiscreteScheduler</code> (FLUX scheduler)</li>
+<li><a href="https://arxiv.org/abs/2412.06264">Flow Matching Guide and Code — official repo</a> — reference implementation by the original authors</li>
+<li><a href="https://huggingface.co/black-forest-labs/FLUX.1-dev">black-forest-labs/flux</a> — FLUX.1 weights and inference code</li>
 </ul>
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Score matching and flow matching are complementary views of the same transport problem — score matching estimates the gradient of the log-density, while flow matching estimates the velocity field directly; understanding both makes the connection to diffusion models precise.</p>
-<ul>
-<li>[[score-matching]] — the probabilistic foundation that flow matching generalizes; the score function <span class="arithmatex">\(\nabla_x \log p_t(x)\)</span> is recoverable from the flow matching vector field via the Fokker-Planck equation.</li>
-<li>[[diffusion-models]] — the predecessor framework that flow matching largely supersedes for new architectures; the DDPM noise schedule is a special case of the flow matching interpolant with a specific <span class="arithmatex">\(\alpha_t, \sigma_t\)</span> choice.</li>
-<li>[[normalizing-flows]] — the model class that flow matching trains; understanding the change-of-variables formula and the continuous-time limit clarifies why simulation-free training is non-trivial.</li>
-</ul>
+<h2 id="what-can-you-build-next">What can you build next?<a class="headerlink" href="#what-can-you-build-next" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><em>Your arc of work continues here.</em></p>
+</blockquote>
+<p>You now understand how to transport a distribution along straight paths. The natural next question is: can you do this in continuous time, for arbitrary distributions? That's score matching — and it's the theoretical foundation that unifies diffusion and flow matching.</p>
+<p><strong>Go deeper on this concept:</strong>
+→ <a href="../score-matching/">Score Matching</a> — derive the probability flow ODE that connects score-based models to flow matching; see why they're the same framework viewed differently</p>
+<p><strong>Build a system with this:</strong>
+→ <a href="../diffusion-models/">Diffusion Models</a> — if you came to flow matching first, go back to diffusion; train DDPM on CIFAR-10 and directly compare training stability and inference steps to your flow matching model</p>
+<p><strong>The arc this page belongs to:</strong>
+→ <a href="../../../arcs/generative-stack/">Generative Stack arc</a> — flow matching is the arc's current frontier; you're at the edge of what's deployed in production</p>
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[[diffusion-models]] — Flow matching generalizes diffusion models by training continuous-time normalizing flows with straight paths.</li>
-<li>[[score-matching]] — Flow matching is a simulation-free training method closely related to path-based score matching.</li>
+<li><a href="../diffusion-models/">Diffusion Models</a> — flow matching is the successor framework; same generation task, straighter paths</li>
+<li>Normalizing Flows — classical antecedent; flow matching solves the simulation-during-training bottleneck</li>
+<li><a href="../score-matching/">Score Matching</a> — deep connection: the probability flow ODE of a score model is a special case of flow matching</li>
+<li>Consistency Models — one-step distillation of diffusion/flow models</li>
 </ul>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Lipman et al. (2022) — "Flow Matching for Generative Modeling" — https://arxiv.org/abs/2210.02747 — the original CFM paper; the appendix contains the proof that the conditional and marginal flow matching objectives have identical gradients, which is the theoretical core of the method.</li>
-<li>Pooladian et al. (2023) — "Multisample Flow Matching: Straightening Flows with Minibatch Couplings" — https://arxiv.org/abs/2304.14772 — derives the theoretical relationship between OT coupling quality and trajectory curvature, with quantitative bounds on NFE reduction.</li>
-<li>Kornilov et al. (2024) — "Optimal Flow Matching: Learning Straight Trajectories in Just One Step" — https://arxiv.org/abs/2403.13117 — the clearest exposition of why displacement interpolants minimize curvature and how to construct them in practice.</li>
-<li>Albergo &amp; Vanden-Eijnden (2022) — "Building Normalizing Flows with Stochastic Interpolants" — https://arxiv.org/abs/2209.15571 — establishes the stochastic interpolant framework that unifies flow matching, score matching, and diffusion under a single theoretical umbrella.</li>
-<li>Lilian Weng's survey on flow-based deep generative models (lil'log, 2018, updated 2021) — https://lilianweng.github.io/posts/2018-10-13-flow-based-deep-learning/ — provides the normalizing flow background that makes the CNF connection precise; read before the Lipman et al. paper if CNFs are unfamiliar.</li>
-<li>Chen &amp; Lipman (2023) — "Riemannian Flow Matching on General Geometries" — https://arxiv.org/abs/2302.03660 — extends CFM to non-Euclidean manifolds; essential reading for anyone applying flow matching to molecular or structural biology data.</li>
+<li><a href="https://arxiv.org/abs/2412.06264">Flow Matching Guide and Code</a> — Lipman et al. 2024; definitive tutorial with proofs and code</li>
+<li><a href="https://arxiv.org/abs/2303.08797">Stochastic Interpolants: A Unifying Framework</a> — Albergo &amp; Vanden-Eijnden 2023; unifies all continuous generative models</li>
+<li><a href="https://arxiv.org/abs/2403.03206">Scaling Rectified Flow Transformers for High-Resolution Image Synthesis (SD3)</a> — Esser et al. 2024; production scaling</li>
 </ul>
 
 
@@ -4400,6 +4210,9 @@ x_t = (1 - t)\, x_0 + t\, x_1, \qquad u_t(x_t \mid x_0, x_1) = x_1 - x_0
 
 
 
+
+  
+  
 
 
 

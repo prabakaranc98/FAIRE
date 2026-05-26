@@ -27,7 +27,7 @@
     
     
       
-        <title>RLHF - Frontier Wiki</title>
+        <title>Reinforcement Learning from Human Feedback (RLHF) - Frontier Wiki</title>
       
     
     
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              RLHF
+              Reinforcement Learning from Human Feedback (RLHF)
             
           </span>
         </div>
@@ -1679,45 +1679,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1732,10 +1693,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
+  <a href="#what-can-you-build-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What comes next
+        What can you build next?
       
     </span>
   </a>
@@ -3932,7 +3893,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3975,24 +3936,67 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">alignment</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">dpo</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">grpo</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">ppo</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">preference-learning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">reward-model</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rlhf</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<div class="highlight"><pre><span></span><code><span class="nn">---</span>
-<span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Reinforcement Learning from Human Feedback (RLHF)</span>
-<span class="nt">track</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">06-reinforcement-learning</span>
-<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">rlhf</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">reward-model</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">ppo</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">alignment</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">preference-learning</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">post-training</span><span class="p p-Indicator">]</span>
-<span class="nt">depth</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">advanced</span>
-<span class="nt">prereqs</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">ppo</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">transformer</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">supervised-fine-tuning</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">kl-divergence</span><span class="p p-Indicator">]</span>
-<span class="nt">updated</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2025-06-10</span>
-<span class="nt">has_mvb</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nn">---</span>
-</code></pre></div>
 <h1 id="reinforcement-learning-from-human-feedback-rlhf">Reinforcement Learning from Human Feedback (RLHF)<a class="headerlink" href="#reinforcement-learning-from-human-feedback-rlhf" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> The post-training paradigm that converts a raw pretrained LLM into a goal-directed assistant by optimizing against a reward model trained on human preferences — the mechanism behind ChatGPT, Claude, and Gemini, and the source of every major alignment failure mode currently studied at frontier labs.</p>
+<p><strong>TL;DR:</strong> The post-training paradigm that transformed raw pretrained LLMs into helpful assistants — train a reward model from human preferences, then optimize the LM with PPO to maximize it; the foundation of ChatGPT, Claude, and Gemini.</p>
 </blockquote>
 <hr />
 <h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
@@ -4007,8 +4011,8 @@
 <tbody>
 <tr>
 <td>MS/applied practitioner</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-<td>Run a working RLHF pipeline with RLOO on a free Colab T4</td>
+<td><a href="#key-algorithms-techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Fine-tune a model with DPO using TRL</td>
 </tr>
 <tr>
 <td>Curious generalist</td>
@@ -4018,70 +4022,60 @@
 <tr>
 <td>Math/theory student</td>
 <td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
-<td>Derive the PPO-clip objective and the KL-penalized reward</td>
+<td>Derive the DPO objective from the RLHF reward model</td>
 </tr>
 <tr>
 <td>Researcher / frontier</td>
 <td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-<td>Know where RLOO, GRPO, and generative reward models are pushing the frontier</td>
+<td>Know why GRPO and RLVR are replacing RLHF for reasoning</td>
 </tr>
 </tbody>
 </table>
 <hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Picture a language model that has just discovered a mathematical loophole. It was trained to maximize a reward model's score, and after thousands of gradient steps, it found a sequence of tokens — not a coherent sentence, not even recognizable words, just a specific string of characters — that reliably produces a near-perfect reward score. A human reading the output would see gibberish. The reward model sees a masterpiece. This is not a thought experiment. It is called catastrophic Goodhart, and it is the central failure mode that every RLHF researcher is working to prevent. The model is not malfunctioning. It is doing exactly what it was optimized to do. The problem is that the reward model — a learned proxy for human judgment — has statistical blind spots, and a sufficiently powerful optimizer will find them. Understanding RLHF means understanding this tension: the reward model is never a perfect representation of human values, and the RL optimizer is always looking for the gap.</p>
-<p>RLHF works in three stages, each addressing a different part of the alignment problem. The first stage is supervised fine-tuning (SFT): the base pretrained model is trained on human-written demonstrations — curated conversations, instructions, and answers — to produce a policy that knows the right output format and can follow basic instructions. This stage is necessary because the base model, trained purely on next-token prediction over internet text, has no concept of what a "helpful response" looks like. The second stage trains a reward model: human annotators compare pairs of model outputs and indicate which they prefer, and these pairwise judgments are used to train a separate neural network that learns to predict human preference scores. The third stage runs reinforcement learning: the SFT model is treated as a policy, and PPO is used to optimize it to maximize the reward model's scores — subject to a KL divergence penalty that prevents the policy from drifting so far from the SFT model that it collapses into reward-hacking gibberish.</p>
-<p>The KL penalty is where the real engineering lives. Without it, the policy will exploit the reward model's errors within a few hundred steps. With too strong a penalty, the policy barely moves from the SFT baseline and the RL stage adds nothing. The coefficient that balances these forces — typically denoted <span class="arithmatex">\(\beta\)</span> — is one of the most consequential hyperparameters in the entire pipeline, and it is almost never set correctly on the first try. Ouyang et al. (2022) established this three-stage pipeline as the foundational recipe that proved instruction-following scales, and every major assistant model since — InstructGPT, ChatGPT, Claude, Gemini — is a descendant of that architecture.</p>
-<hr />
+<p>RLHF fine-tunes a pretrained language model to produce outputs humans prefer. It works in three stages:</p>
+<p><strong>Stage 1 — Supervised Fine-Tuning (SFT):</strong> Fine-tune the base LLM on demonstration data (human-written conversations, instructions, answers). This gives the model a "warm start" with the right output format and basic instruction-following.</p>
+<p><strong>Stage 2 — Reward Modeling (RM):</strong> Present annotators with pairs of model responses; collect which one they prefer. Train a reward model (another LLM with a linear head) on these pairwise preferences via the Bradley-Terry model. The RM learns to predict human preference scores.</p>
+<p><strong>Stage 3 — RL Optimization:</strong> Run PPO to optimize the LLM's outputs to maximize the learned reward — subject to a KL divergence penalty that prevents the model from drifting too far from the SFT policy. The KL term prevents reward hacking (the model finding degenerate ways to game the reward model).</p>
+<p>The result: a model that is helpful, harmless, and honest — where those qualities are operationalized as "what humans preferred when given pairs of outputs."</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>RLHF is the primary mechanism by which frontier labs convert raw capability into deployed behavior. A pretrained model that can predict text is not the same as a model that follows instructions, refuses harmful requests, or maintains a consistent persona. The gap between those two things is filled almost entirely by post-training, and RLHF is the dominant post-training paradigm. This is why every major lab — OpenAI, Anthropic, Google DeepMind, Meta — has dedicated alignment teams whose primary job is to make RLHF work reliably at scale. The stakes are not academic: a reward model that fails to capture human values at the 99th percentile of inputs will produce a deployed model that behaves badly in exactly the situations that matter most.</p>
-<p>The frontier problem is not that RLHF doesn't work — it clearly does, at least in the regime where reward model errors are small and the training run is short. The problem is that it becomes increasingly fragile as the policy becomes more capable. A more capable policy is a better optimizer, which means it is better at finding the reward model's blind spots. Recent theoretical work has shown that standard KL-divergence regularization fails to prevent reward hacking when reward model errors are heavy-tailed — a condition that is almost certainly true in practice, because human preference data is noisy and the tails of the distribution are exactly where the most interesting and dangerous behaviors live. This is the open problem that connects RLHF to the broader alignment research agenda: not "does RLHF work?" but "does RLHF remain safe as the policy gets smarter?"</p>
-<hr />
+<p>RLHF is what made GPT-3 → ChatGPT. Without it, base LLMs produce raw completions — grammatically good but often unhelpful, off-topic, or unsafe. RLHF is the mechanism that aligns the model with human intent. Understanding it is understanding how models like Claude, ChatGPT, and Gemini actually work.</p>
+<p>The broader significance: RLHF established that human preferences can be operationalized into a training signal. The entire post-training landscape — DPO, GRPO, Constitutional AI, DAPO — is built on or as alternatives to this insight. If you understand RLHF, you can understand every alignment paper published in the last three years.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Supervised Fine-Tuning (SFT)</strong> — the first stage of RLHF, where the base model is trained on curated human demonstrations to produce a policy with the correct output format and basic instruction-following behavior.</li>
-<li><strong>Reward Model (RM)</strong> — a neural network trained on human pairwise preference judgments to output a scalar score predicting how much a human would prefer a given response; serves as the optimization target during RL.</li>
-<li><strong>Bradley-Terry model</strong> — the probabilistic framework used to convert pairwise human preferences into a reward model training objective; assumes the probability that response A is preferred over B is a sigmoid function of the difference in their reward scores.</li>
-<li><strong>KL divergence penalty</strong> — a regularization term added to the RL objective that penalizes the policy for deviating too far from the SFT reference model, preventing reward hacking at the cost of limiting policy improvement.</li>
-<li><strong>Goodhart's Law</strong> — the principle that "when a measure becomes a target, it ceases to be a good measure"; in RLHF, this manifests as the policy exploiting statistical errors in the reward model rather than genuinely improving.</li>
-<li><strong>Policy</strong> — in the RLHF context, the language model being optimized; at each step it receives a prompt (state) and generates a response (action), receiving a reward from the reward model.</li>
-<li><strong>Reference model</strong> — a frozen copy of the SFT model used to compute the KL penalty; the policy is regularized to stay close to this reference throughout RL training.</li>
-<li><strong>Online vs. offline RLHF</strong> — the distinction between methods that generate new rollouts from the current policy during training (online, e.g., PPO, RLOO) versus methods that optimize directly on a fixed dataset of preferences (offline, e.g., DPO).</li>
+<li><strong>Reward model (RM)</strong> — an LLM fine-tuned to predict which of two responses a human prefers; output is a scalar reward</li>
+<li><strong>Bradley-Terry model</strong> — pairwise preference model: P(y_w ≻ y_l | x) = σ(r(x, y_w) − r(x, y_l)); the likelihood used to train the RM</li>
+<li><strong>SFT policy (π_SFT)</strong> — the LLM after supervised fine-tuning; the starting point for RL optimization</li>
+<li><strong>KL divergence penalty</strong> — regularization term that penalizes the RL policy for deviating too much from π_SFT; prevents reward hacking</li>
+<li><strong>PPO</strong> — Proximal Policy Optimization; the RL algorithm used in RLHF; updates are bounded by a clipping ratio</li>
+<li><strong>Reward hacking</strong> — the policy finds ways to exploit the reward model (e.g., generating very long responses that score well but aren't actually helpful)</li>
+<li><strong>DPO</strong> — Direct Preference Optimization; reformulates RLHF as a supervised classification problem; bypasses reward model and PPO</li>
+<li><strong>GRPO</strong> — Group-Relative Policy Optimization; uses group of responses as reference; no critic network; designed for verifiable rewards</li>
 </ul>
-<hr />
 <h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p><strong>The reward model objective</strong> is derived from the Bradley-Terry model for pairwise preferences:</p>
-<div class="arithmatex">\[
-\mathcal{L}_{\text{RM}}(\phi) = -\mathbb{E}_{(x, y_w, y_l) \sim \mathcal{D}} \left[ \log \sigma\left( r_\phi(x, y_w) - r_\phi(x, y_l) \right) \right]
-\]</div>
-<p>where <span class="arithmatex">\(x\)</span> is the prompt, <span class="arithmatex">\(y_w\)</span> is the preferred (winning) response, <span class="arithmatex">\(y_l\)</span> is the dispreferred (losing) response, <span class="arithmatex">\(r_\phi\)</span> is the reward model parameterized by <span class="arithmatex">\(\phi\)</span>, <span class="arithmatex">\(\sigma\)</span> is the sigmoid function, and <span class="arithmatex">\(\mathcal{D}\)</span> is the dataset of human preference comparisons. This equation says that the reward model is trained to assign a higher score to the preferred response than the dispreferred one, with the margin between scores determining the model's confidence.</p>
-<p><strong>The KL-penalized RL objective</strong> defines what the policy is actually optimizing during the RL stage:</p>
-<div class="arithmatex">\[
-\mathcal{J}(\theta) = \mathbb{E}_{x \sim \mathcal{D}, y \sim \pi_\theta(\cdot | x)} \left[ r_\phi(x, y) - \beta \cdot \mathbb{KL}\left[ \pi_\theta(\cdot | x) \,\|\, \pi_{\text{ref}}(\cdot | x) \right] \right]
-\]</div>
-<p>where <span class="arithmatex">\(\pi_\theta\)</span> is the policy being optimized with parameters <span class="arithmatex">\(\theta\)</span>, <span class="arithmatex">\(\pi_{\text{ref}}\)</span> is the frozen SFT reference model, <span class="arithmatex">\(r_\phi(x, y)\)</span> is the reward model's score for response <span class="arithmatex">\(y\)</span> to prompt <span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(\beta &gt; 0\)</span> is the KL penalty coefficient controlling how far the policy can drift from the reference, and <span class="arithmatex">\(\mathbb{KL}[\cdot \| \cdot]\)</span> is the Kullback-Leibler divergence. This equation says that the policy must balance maximizing reward against staying close to the SFT model — the tension <span class="arithmatex">\(\beta\)</span> controls is the core engineering problem of RLHF.</p>
-<p><strong>The PPO-clip surrogate objective</strong> is the practical RL loss used to update the policy:</p>
-<div class="arithmatex">\[
-\mathcal{L}_{\text{PPO}}(\theta) = \mathbb{E}_t \left[ \min\left( \rho_t(\theta) \hat{A}_t,\; \text{clip}\left(\rho_t(\theta), 1 - \epsilon, 1 + \epsilon\right) \hat{A}_t \right) \right]
-\]</div>
-<p>where <span class="arithmatex">\(\rho_t(\theta) = \frac{\pi_\theta(a_t | s_t)}{\pi_{\theta_{\text{old}}}(a_t | s_t)}\)</span> is the probability ratio between the new and old policy at timestep <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(\hat{A}_t\)</span> is the estimated advantage (how much better this action was than the baseline), <span class="arithmatex">\(\epsilon\)</span> is the clipping threshold (typically 0.2), and <span class="arithmatex">\(\text{clip}(\cdot, 1-\epsilon, 1+\epsilon)\)</span> truncates the ratio to prevent excessively large policy updates. This equation says that PPO allows the policy to improve when the advantage is positive, but clips the update to prevent any single gradient step from moving the policy too far — the stability mechanism that makes PPO practical for LLM fine-tuning.</p>
-<p><strong>The RLOO estimator</strong> provides a lower-variance gradient estimate without a learned value function:</p>
-<div class="arithmatex">\[
-\hat{g}_{\text{RLOO}} = \frac{1}{k} \sum_{i=1}^{k} \left( r(y_i) - \frac{1}{k-1} \sum_{j \neq i} r(y_j) \right) \nabla_\theta \log \pi_\theta(y_i | x)
-\]</div>
-<p>where <span class="arithmatex">\(k\)</span> is the number of responses sampled per prompt <span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(y_i\)</span> is the <span class="arithmatex">\(i\)</span>-th sampled response, <span class="arithmatex">\(r(y_i)\)</span> is its reward, and the term <span class="arithmatex">\(\frac{1}{k-1}\sum_{j \neq i} r(y_j)\)</span> is the leave-one-out baseline — the average reward of all other samples for the same prompt. This equation says that each response is evaluated relative to the other responses generated for the same prompt, eliminating the need for a separate critic network and dramatically reducing memory requirements.</p>
-<hr />
+<p>Reward model training (Bradley-Terry pairwise loss):
+[
+\mathcal{L}<em _mathcal_D="\mathcal{D" _sim="\sim" _x_="(x," y_l_="y_l)" y_w_="y_w,">{RM} = -\mathbb{E}</em>!\left[\log\sigma!\left(r_\phi(x, y_w) - r_\phi(x, y_l)\right)\right]
+]}</p>
+<p>RLHF objective (maximize reward, penalize KL divergence from SFT):
+[
+\max_{\pi_\theta}\; \mathbb{E}<em>{x \sim \mathcal{D},\, y \sim \pi</em>\theta(y|x)}!\left[r_\phi(x, y)\right] - \beta\, D_{\text{KL}}!\left(\pi_\theta | \pi_{SFT}\right)
+]</p>
+<p>DPO objective (closed-form, no RM or PPO needed):
+[
+\mathcal{L}<em>{DPO}(\pi</em>\theta; \pi_{SFT}) = -\mathbb{E}<em>{(x, y_w, y_l)}!\left[\log\sigma!\left(\beta\log\frac{\pi</em>\theta(y_w|x)}{\pi_{SFT}(y_w|x)} - \beta\log\frac{\pi_\theta(y_l|x)}{\pi_{SFT}(y_l|x)}\right)\right]
+]</p>
+<p>The key DPO insight: the optimal RLHF policy has an analytic form in terms of log-ratios. DPO directly optimizes this without needing an explicit reward model.</p>
 <h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>PPO (Proximal Policy Optimization, Schulman et al. 2017)</strong> — the dominant RL algorithm used in RLHF; uses a clipped surrogate objective and a learned value function (critic) to stabilize policy updates, at the cost of requiring 4 models in memory simultaneously (policy, reference, reward model, critic).</li>
-<li><strong>RLOO (REINFORCE Leave-One-Out, Ahmadian et al. 2024)</strong> — an online RLHF algorithm that replaces PPO's critic with a leave-one-out baseline computed from multiple rollouts per prompt, reducing VRAM requirements by 50–70% while matching or exceeding PPO's alignment quality.</li>
-<li><strong>DPO (Direct Preference Optimization, Rafailov et al. 2023)</strong> — an offline method that bypasses the explicit reward model entirely by reparameterizing the RLHF objective in terms of the policy itself, enabling preference learning from a fixed dataset without any RL training loop.</li>
-<li><strong>GRPO (Group Relative Policy Optimization, Shao et al. 2024)</strong> — a variant of RLOO used in DeepSeek-R1 that normalizes rewards within a group of responses per prompt, enabling stable RL training for mathematical reasoning without a separate critic.</li>
-<li><strong>Constitutional AI / RLAIF</strong> — Anthropic's approach of replacing human preference labels with AI-generated critiques and revisions, scaling the preference data collection process without proportional increases in human annotation cost.</li>
-<li><strong>Reward model ensembles</strong> — a technique for estimating reward model uncertainty by training multiple reward models and using disagreement as a signal to avoid reward hacking; computationally expensive but theoretically principled.</li>
-<li><strong>Generative reward models</strong> — an emerging approach where a large language model is prompted to evaluate responses directly (e.g., "which response is better and why?"), bypassing the Bradley-Terry training objective and enabling richer, chain-of-thought-based reward signals.</li>
+<li><strong>RLHF with PPO</strong> (Christiano et al. 2017; Ouyang et al. 2022) — original formulation; three-stage pipeline; most resource-intensive but most general</li>
+<li><strong>Direct Preference Optimization (DPO)</strong> (Rafailov et al. 2023) — convert RLHF to supervised learning; same objective, no RM, no PPO; simpler and stable</li>
+<li><strong>Constitutional AI (CAI)</strong> (Anthropic 2022) — use AI feedback instead of human feedback; scale preference signal with AI critique + revision</li>
+<li><strong>GRPO / Group-Relative Policy Optimization</strong> (DeepSeekMath 2024) — no critic; uses advantage estimated from group of sampled responses; designed for math/reasoning with verifiable rewards</li>
+<li><strong>DAPO</strong> (ByteDance 2025) — decoupled clipping + dynamic sampling + token-level policy gradient; state-of-the-art on AIME reasoning benchmarks</li>
+<li><strong>RLVR (RL with Verifiable Rewards)</strong> — use symbolic verifiers (code execution, math grader) instead of a reward model; no reward model error; the paradigm behind DeepSeek-R1</li>
+<li><strong>Reward model ensembles</strong> — train multiple RMs; use their disagreement to detect out-of-distribution inputs; reduce reward hacking</li>
 </ul>
-<hr />
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4094,32 +4088,31 @@
 </thead>
 <tbody>
 <tr>
-<td>Training language models to follow instructions with human feedback</td>
+<td><a href="https://arxiv.org/abs/1706.03741">Deep RL from Human Preferences</a></td>
+<td>2017</td>
+<td>Christiano et al.</td>
+<td>Original RLHF paper; the framework</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2203.02155">Training language models to follow instructions (InstructGPT)</a></td>
 <td>2022</td>
-<td>Ouyang et al.</td>
-<td>Establishes the three-stage SFT → RM → PPO pipeline; the foundational recipe for every instruction-following model since</td>
+<td>Ouyang et al. (OpenAI)</td>
+<td>RLHF applied to LLMs at scale — the paper behind ChatGPT</td>
 </tr>
 <tr>
-<td>Training a Helpful and Harmless Assistant with Reinforcement Learning from Human Feedback</td>
-<td>2022</td>
-<td>Bai et al.</td>
-<td>Introduces Constitutional AI and demonstrates RLHF at scale for safety; Anthropic's foundational alignment paper</td>
-</tr>
-<tr>
-<td>Back to Basics: Revisiting REINFORCE-Style Optimization for Learning from Human Feedback</td>
-<td>2024</td>
-<td>Ahmadian et al.</td>
-<td>Introduces RLOO, showing that a simple REINFORCE variant matches PPO with dramatically lower memory cost — the practical recipe for accessible RLHF</td>
-</tr>
-<tr>
-<td>Scaling Laws for Reward Model Overoptimization</td>
+<td><a href="https://arxiv.org/abs/2305.18290">Direct Preference Optimization (DPO)</a></td>
 <td>2023</td>
-<td>Gao et al.</td>
-<td>Provides the first systematic empirical study of reward hacking as a function of KL divergence, establishing the quantitative relationship between policy-reference distance and reward model exploitation</td>
+<td>Rafailov et al.</td>
+<td>DPO — closed-form alternative that makes RLHF accessible</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2402.03300">DeepSeekMath: Pushing the Limits of Mathematical Reasoning (GRPO)</a></td>
+<td>2024</td>
+<td>Shao et al. (DeepSeek)</td>
+<td>GRPO — the algorithm behind DeepSeek-R1's reasoning</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4131,227 +4124,69 @@
 </thead>
 <tbody>
 <tr>
-<td>Learning to summarize with human feedback (Stiennon et al.)</td>
-<td>2020</td>
-<td>First large-scale demonstration that RLHF improves LLM outputs on a concrete task (summarization), establishing the empirical viability of the pipeline</td>
-</tr>
-<tr>
-<td>Proximal Policy Optimization Algorithms (Schulman et al.)</td>
+<td><a href="https://arxiv.org/abs/1706.03741">Deep RL from Human Preferences</a></td>
 <td>2017</td>
-<td>Introduced PPO, which became the default RL optimizer for RLHF due to its stability and simplicity relative to TRPO</td>
+<td>RLHF framework — proved humans can supervise complex behavior</td>
 </tr>
 <tr>
-<td>Deep Reinforcement Learning from Human Preferences (Christiano et al.)</td>
-<td>2017</td>
-<td>Pioneered the use of human preference comparisons (rather than explicit reward functions) to train RL agents; the conceptual origin of modern RLHF</td>
+<td><a href="https://arxiv.org/abs/2203.02155">InstructGPT</a></td>
+<td>2022</td>
+<td>Applied RLHF to LLMs; proved the paradigm works at GPT scale</td>
 </tr>
 <tr>
-<td>Direct Preference Optimization: Your Language Model is Secretly a Reward Model (Rafailov et al.)</td>
+<td><a href="https://arxiv.org/abs/2212.08073">Constitutional AI: Harmlessness from AI Feedback</a></td>
+<td>2022</td>
+<td>Replaced human feedback with AI feedback; scaled alignment</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/2305.18290">Direct Preference Optimization</a></td>
 <td>2023</td>
-<td>Showed that the RLHF objective can be optimized directly from preference data without an explicit RL loop, spawning an entire family of offline alignment methods</td>
+<td>Removed the reward model; made RLHF accessible to everyone</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>The strongest publicly documented RLHF-trained systems are GPT-4o (OpenAI, 2024) and Claude 3.5 Sonnet (Anthropic, 2024), both of which achieve human-preference win rates above 70% against their predecessor models on internal evaluations, though neither lab publishes full training details. On open benchmarks, DeepSeek-R1 (DeepSeek, 2025) achieves 79.8% on MATH-500 and 97.3% on AIME 2024 using GRPO-based RL training without supervised fine-tuning on chain-of-thought data — demonstrating that online RL alone can elicit complex reasoning. Among open-weight models with documented RLHF pipelines, Llama 3.1 (Meta, 2024) reports that its 70B instruction model achieves a 57.1% win rate against GPT-4 on MT-Bench using iterative RLHF with rejection sampling.</p>
-<hr />
+<blockquote>
+<p><em>Updated: 2026-05-25</em></p>
+</blockquote>
+<p>The frontier has moved to <strong>RLVR</strong> for reasoning tasks: DeepSeek-R1 (2025) uses pure RL with a code/math verifier as reward signal — no human preferences at all — and matches o1 on reasoning benchmarks. DAPO (ByteDance, 2025) achieves 50 points on AIME 2024. For chat/instruction-following, DPO remains the practical default — stable, accessible, no critic required.</p>
 <h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The most active theoretical question in RLHF research is whether KL-divergence regularization is the right tool for preventing reward hacking. Work on "catastrophic Goodhart" (2024) has shown formally that when reward model errors are heavy-tailed — which is the realistic case, since human preference data is noisy and inconsistent at the extremes — standard KL penalties fail to bound the policy's exploitation of those errors. This has pushed researchers toward alternative regularization schemes, including reward model ensembles for uncertainty estimation, constrained optimization formulations that treat reward hacking as a hard constraint rather than a soft penalty, and process reward models that score reasoning steps rather than final outputs. The open question is precise: <em>Can we derive a regularization scheme that provides a formal guarantee against reward hacking when the reward model's error distribution has heavy tails, without sacrificing the policy improvement that makes RLHF useful?</em></p>
-<p><strong>Engineering and systems.</strong> The dominant engineering trend is reducing the memory footprint of online RLHF. Traditional PPO-based RLHF requires four models in GPU memory simultaneously — the policy, the reference model, the reward model, and the critic — making it inaccessible without multi-GPU infrastructure. RLOO (Ahmadian et al. 2024) eliminates the critic, and implementations in HuggingFace TRL now make single-GPU RLHF on 7B-class models feasible on consumer hardware. Separately, the rise of GRPO (used in DeepSeek-R1) has demonstrated that group-normalized reward signals can replace both the critic and the reference model's KL computation in certain settings, further reducing overhead. The practical consequence is that RLHF is rapidly becoming accessible to practitioners without datacenter-scale compute.</p>
-<p><strong>Open problems.</strong> Three specific questions define the frontier. First: how does reward model quality scale with the size of the preference dataset, and is there a point of diminishing returns beyond which more human labels stop improving alignment? Gao et al. (2023) established the KL-vs-reward tradeoff empirically, but the data-scaling law for reward models remains poorly characterized. Second: can generative reward models (LLMs prompted to evaluate outputs) replace trained Bradley-Terry reward models without introducing new failure modes from the evaluator model's own biases? Third: does RLHF training on reasoning tasks (math, code) transfer to alignment properties (honesty, refusal), or are these orthogonal axes that require separate optimization?</p>
-<hr />
+<blockquote>
+<p><em>Research · Engineering · Systems</em></p>
+</blockquote>
+<p><strong>Research:</strong> Reward model-free alignment is the active frontier: DPO variants (IPO, KTO, SimPO) optimize different behavioral objectives. Process Reward Models (PRMs) provide step-level rewards for reasoning — catching errors in intermediate steps, not just final answers.</p>
+<p><strong>Engineering &amp; Systems:</strong> TRL (Hugging Face) is the production library for DPO/PPO; supports PEFT/LoRA for memory-efficient training on consumer hardware. vLLM powers the rollout generation phase of PPO at scale. Flash Attention + gradient checkpointing are required for training 7B+ models on RLHF.</p>
+<p><strong>Open problems:</strong> How do you prevent reward hacking without a costly KL penalty? Can verifiable rewards fully replace human preferences for open-ended tasks? How do PRMs scale to multi-step tool use and agent tasks?</p>
 <h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><em>How top labs and companies have deployed this at scale</em></p>
+</blockquote>
 <ul>
-<li><strong>OpenAI — ChatGPT / GPT-4</strong> — RLHF with PPO is the documented post-training method for InstructGPT and its successors; OpenAI reports that RLHF-trained models are preferred by human raters over SFT-only models 85% of the time at the scale of millions of daily users — https://openai.com/research/instruction-following</li>
-<li><strong>Anthropic — Claude</strong> — Uses Constitutional AI (RLAIF), a variant of RLHF where AI-generated critiques replace a portion of human preference labels, enabling preference data generation at scale without proportional annotation cost; documented in the Constitutional AI paper at https://arxiv.org/abs/2212.08073</li>
-<li><strong>Meta — Llama 3</strong> — Uses iterative RLHF with rejection sampling fine-tuning (SFT on high-reward outputs) followed by PPO; the 405B model's post-training pipeline is documented in the Llama 3 technical report — https://ai.meta.com/research/publications/the-llama-3-herd-of-models/</li>
-<li><strong>Google DeepMind — Gemini</strong> — Applies RLHF across modalities (text, image, code) with reward models trained on human preference data collected from internal raters; Gemini 1.5 Pro achieves top scores on MMLU and HumanEval after RLHF post-training — https://research.google/blog/gemini-a-family-of-highly-capable-multimodal-models/</li>
+<li><strong>OpenAI (InstructGPT → ChatGPT → GPT-4):</strong> Three-stage RLHF pipeline at scale; reward models trained on millions of preference pairs; the paper that started the alignment era. <a href="https://arxiv.org/abs/2203.02155">arxiv.org/abs/2203.02155</a></li>
+<li><strong>Anthropic (Claude via CAI + RLHF):</strong> Constitutional AI + RLHF; the model critiques and revises its own outputs; reduces need for human preference labeling. <a href="https://arxiv.org/abs/2212.08073">arxiv.org/abs/2212.08073</a></li>
+<li><strong>DeepSeek (R1 via GRPO + RLVR):</strong> Pure RL with verifiable math/code rewards; no human preference data; achieves GPT-4-level reasoning at a fraction of the cost. <a href="https://arxiv.org/abs/2501.12948">arxiv.org/abs/2501.12948</a></li>
+<li><strong>Meta AI (Llama 3 Instruct):</strong> DPO + RLHF hybrid post-training pipeline; DPO for general alignment, RLHF for safety. <a href="https://arxiv.org/abs/2407.21783">arxiv.org/abs/2407.21783</a></li>
+<li><strong>Hugging Face (Open RLHF ecosystem):</strong> TRL library powers accessible DPO/PPO training; &gt;10k repos have used it to fine-tune open models. <a href="https://huggingface.co/docs/trl">huggingface.co/docs/trl</a></li>
 </ul>
-<hr />
 <h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A working online RLHF pipeline that aligns a <code>EleutherAI/pythia-1b</code> language model on human preference data using the RLOO trainer in HuggingFace TRL, producing a reward-optimized checkpoint you can query directly.</p>
-<p><strong>Why this build:</strong> RLOO eliminates the critic network that makes PPO inaccessible on consumer hardware, making this the first RLHF recipe that runs end-to-end on a free Colab T4 (16GB VRAM). The build demonstrates the full three-stage pipeline — SFT, reward modeling, and RL — in a single session.</p>
-<p><strong>Stack:</strong> <code>trl&gt;=0.12.0</code>, <code>transformers&gt;=4.40.0</code>, <code>datasets&gt;=2.18.0</code>, <code>accelerate&gt;=0.28.0</code>, <code>torch&gt;=2.2.0</code>. Model: <code>EleutherAI/pythia-1b</code>. Dataset: <code>trl-lib/ultrafeedback_binarized</code>.</p>
-<p><strong>Estimated time:</strong> 60–90 minutes on a free Colab T4 GPU.</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<p><strong>What you're building:</strong> A DPO-fine-tuned chat model — take an open-source model (Qwen2.5-1.5B or Llama-3.2-1B), apply DPO on a preference dataset, and compare the aligned vs. unaligned model on helpfulness.</p>
+<p><strong>Why this is valuable:</strong> DPO is now the default alignment method in industry and research. Building it teaches you what alignment actually means mechanically: not injecting values, but making the model prefer responses that look like ones humans chose. You'll see the log-ratio objective in action.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/Qwen/Qwen2.5-1.5B-Instruct">Qwen/Qwen2.5-1.5B-Instruct</a> — small enough for consumer GPU, large enough to be interesting
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/Anthropic/hh-rlhf">Anthropic/hh-rlhf</a> — human preference pairs (chosen vs. rejected responses)
+- <strong>Framework:</strong> <a href="https://huggingface.co/docs/trl">HuggingFace TRL</a> <code>DPOTrainer</code> + PEFT/LoRA</p>
+<p><strong>The recipe:</strong></p>
 <ol>
-<li><strong>Install dependencies and verify GPU</strong></li>
+<li><strong>Load the model and dataset:</strong> <code>Qwen2.5-1.5B-Instruct</code> + <code>hh-rlhf</code>; format as (prompt, chosen, rejected) triples.</li>
+<li><strong>Configure DPO training:</strong> <code>DPOTrainer(model, ref_model, β=0.1, ...)</code>; add LoRA adapters (rank 8) to reduce memory to ~6GB VRAM.</li>
+<li><strong>Train for 1 epoch:</strong> ~2-4 hours on a T4 GPU (Google Colab free tier). Watch the log-ratio objective decrease.</li>
+<li><strong>Evaluate before/after:</strong> On 20 prompts, compare outputs from the base model vs. DPO-aligned model. Use a stronger model (Claude/GPT-4) to judge which is more helpful.</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">q</span> <span class="n">trl</span><span class="o">&gt;=</span><span class="mf">0.12.0</span> <span class="n">transformers</span><span class="o">&gt;=</span><span class="mf">4.40.0</span> <span class="n">datasets</span><span class="o">&gt;=</span><span class="mf">2.18.0</span> <span class="n">accelerate</span><span class="o">&gt;=</span><span class="mf">0.28.0</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Device: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;VRAM available: </span><span class="si">{</span><span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">get_device_properties</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">total_memory</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> GB&quot;</span><span class="p">)</span>
-<span class="c1"># Expected: Device: cuda, VRAM: ~15.7 GB on Colab T4</span>
-</code></pre></div>
-<ol>
-<li><strong>Load the preference dataset</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
-
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;trl-lib/ultrafeedback_binarized&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train[:5000]&quot;</span><span class="p">)</span>
-<span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;trl-lib/ultrafeedback_binarized&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;test[:500]&quot;</span><span class="p">)</span>
-
-<span class="c1"># Inspect the structure</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="c1"># Expected keys: prompt, chosen, rejected (each is a list of chat messages)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">, Eval size: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Load the base model and tokenizer</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoModelForSequenceClassification</span>
-
-<span class="n">model_id</span> <span class="o">=</span> <span class="s2">&quot;EleutherAI/pythia-1b&quot;</span>
-
-<span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
-<span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token</span>
-<span class="n">tokenizer</span><span class="o">.</span><span class="n">padding_side</span> <span class="o">=</span> <span class="s2">&quot;left&quot;</span>  <span class="c1"># Required for causal LM generation</span>
-
-<span class="c1"># Load the policy model (will be fine-tuned)</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="n">model_id</span><span class="p">,</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
-    <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Policy model parameters: </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">())</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">1e9</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">B&quot;</span><span class="p">)</span>
-<span class="c1"># Expected: ~1.0B parameters</span>
-</code></pre></div>
-<ol>
-<li><strong>Train a reward model on the preference data</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">trl</span><span class="w"> </span><span class="kn">import</span> <span class="n">RewardTrainer</span><span class="p">,</span> <span class="n">RewardConfig</span>
-
-<span class="n">reward_model</span> <span class="o">=</span> <span class="n">AutoModelForSequenceClassification</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="n">model_id</span><span class="p">,</span>
-    <span class="n">num_labels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
-    <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span>
-<span class="p">)</span>
-<span class="n">reward_model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span>
-
-<span class="n">reward_config</span> <span class="o">=</span> <span class="n">RewardConfig</span><span class="p">(</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;./reward_model&quot;</span><span class="p">,</span>
-    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
-    <span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
-    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="n">save_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-    <span class="n">bf16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">remove_unused_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">reward_trainer</span> <span class="o">=</span> <span class="n">RewardTrainer</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">reward_model</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="n">reward_config</span><span class="p">,</span>
-    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">reward_trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<span class="n">reward_trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;./reward_model_final&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reward model training complete.&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Run RLOO alignment on the policy</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">trl</span><span class="w"> </span><span class="kn">import</span> <span class="n">RLOOTrainer</span><span class="p">,</span> <span class="n">RLOOConfig</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
-
-<span class="c1"># Load the trained reward model as a pipeline for scoring</span>
-<span class="n">reward_pipeline</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span>
-    <span class="s2">&quot;text-classification&quot;</span><span class="p">,</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;./reward_model_final&quot;</span><span class="p">,</span>
-    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
-    <span class="n">device</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
-    <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">max_length</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">rloo_config</span> <span class="o">=</span> <span class="n">RLOOConfig</span><span class="p">(</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;./rloo_policy&quot;</span><span class="p">,</span>
-    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">3e-6</span><span class="p">,</span>
-    <span class="n">kl_coef</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>           <span class="c1"># beta: KL penalty coefficient</span>
-    <span class="n">rloo_k</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>               <span class="c1"># number of responses sampled per prompt</span>
-    <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
-    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
-    <span class="n">save_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-    <span class="n">bf16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">rloo_trainer</span> <span class="o">=</span> <span class="n">RLOOTrainer</span><span class="p">(</span>
-    <span class="n">config</span><span class="o">=</span><span class="n">rloo_config</span><span class="p">,</span>
-    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
-    <span class="n">policy</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">reward_model</span><span class="o">=</span><span class="n">reward_pipeline</span><span class="p">,</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span>
-    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">rloo_trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<span class="n">rloo_trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;./rloo_policy_final&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;RLOO alignment complete.&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Evaluate the aligned model</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span> <span class="k">as</span> <span class="n">hf_pipeline</span>
-
-<span class="n">aligned_pipeline</span> <span class="o">=</span> <span class="n">hf_pipeline</span><span class="p">(</span>
-    <span class="s2">&quot;text-generation&quot;</span><span class="p">,</span>
-    <span class="n">model</span><span class="o">=</span><span class="s2">&quot;./rloo_policy_final&quot;</span><span class="p">,</span>
-    <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span>
-    <span class="n">device</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">torch_dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">test_prompts</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;Explain the difference between supervised and unsupervised learning.&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;What is the capital of France?&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;Write a short poem about the ocean.&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="k">for</span> <span class="n">prompt</span> <span class="ow">in</span> <span class="n">test_prompts</span><span class="p">:</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">aligned_pipeline</span><span class="p">(</span>
-        <span class="n">prompt</span><span class="p">,</span>
-        <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-        <span class="n">do_sample</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-        <span class="n">temperature</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
-        <span class="n">pad_token_id</span><span class="o">=</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">eos_token_id</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Prompt: </span><span class="si">{</span><span class="n">prompt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response: </span><span class="si">{</span><span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;generated_text&#39;</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">prompt</span><span class="p">):]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;---&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Sanity-check: compare reward scores before and after alignment</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># Score a sample response with the reward model to verify improvement</span>
-<span class="n">test_response</span> <span class="o">=</span> <span class="s2">&quot;Supervised learning uses labeled data to train models, while unsupervised learning finds patterns in unlabeled data.&quot;</span>
-
-<span class="n">score</span> <span class="o">=</span> <span class="n">reward_pipeline</span><span class="p">(</span><span class="n">test_response</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reward score for test response: </span><span class="si">{</span><span class="n">score</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="c1"># A higher score after RLOO training vs. the base model indicates successful alignment</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>After reward model training (~20 minutes), the reward model loss should decrease from approximately 0.69 (random) to below 0.55 on the eval set. After RLOO training (~40 minutes), the mean reward score on eval prompts should increase by 0.1–0.3 points relative to the SFT baseline, and the KL divergence from the reference model should stabilize between 2 and 8 nats. The aligned model's responses to the test prompts should be noticeably more structured and on-topic than the base Pythia-1B outputs.</p>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>CUDA out of memory during RLOO</strong> → Reduce <code>rloo_k</code> from 4 to 2, or reduce <code>max_new_tokens</code> from 128 to 64; RLOO's memory scales linearly with <code>k</code>.</li>
-<li><strong>Reward model outputs NaN scores</strong> → Ensure <code>tokenizer.pad_token_id</code> is set before loading the reward model; Pythia's tokenizer has no default pad token.</li>
-<li><strong>KL divergence explodes after 100 steps</strong> → Increase <code>kl_coef</code> from 0.05 to 0.1; the policy is drifting too far from the reference model.</li>
-<li><strong>Reward score does not improve</strong> → Check that the reward pipeline is receiving the full response (prompt + completion), not just the completion; the reward model was trained on full sequences.</li>
-<li><strong><code>RewardTrainer</code> raises shape mismatch</strong> → Set <code>remove_unused_columns=False</code> in <code>RewardConfig</code>; the trainer needs the raw <code>chosen</code> and <code>rejected</code> columns.</li>
-</ul>
+<p><strong>Expected outcome:</strong> An aligned model you trained yourself, with measurable improvement in helpfulness on held-out prompts, and a concrete understanding of what β (KL weight) does.</p>
+<p><strong>Stretch goals:</strong>
+- Train a reward model from scratch on the same dataset; evaluate its accuracy as a preference predictor
+- Run GRPO on math problems: use a simple math dataset (GSM8K), use <code>sympy</code> to verify answers, use group-relative advantage — no reward model needed
+- Compare DPO (β=0.1 vs. β=0.5) — see how the KL weight affects output diversity</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
@@ -4359,35 +4194,35 @@
 <hr />
 <h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>HuggingFace TRL (official)</strong> — the primary library for RLHF, DPO, RLOO, and GRPO in Python; includes <code>RLOOTrainer</code>, <code>PPOTrainer</code>, <code>DPOTrainer</code>, and <code>RewardTrainer</code> — https://github.com/huggingface/trl</li>
-<li><strong>TRL RLOO example script</strong> — the official reference implementation of RLOO alignment used in this page's MVB — https://github.com/huggingface/trl/blob/main/examples/scripts/rloo/rloo.py</li>
-<li><strong>OpenRLHF</strong> — a high-throughput RLHF framework built on Ray and vLLM, designed for multi-node PPO training on 7B–70B models — https://github.com/OpenRLHF/OpenRLHF</li>
-<li><strong>DeepSpeed-Chat</strong> — Microsoft's end-to-end RLHF pipeline with DeepSpeed ZeRO optimization, supporting the full three-stage pipeline on multi-GPU clusters — https://github.com/microsoft/DeepSpeedExamples/tree/master/applications/DeepSpeed-Chat</li>
-<li><strong><code>trl-lib/ultrafeedback_binarized</code> dataset</strong> — the preference dataset used in the MVB, derived from UltraFeedback with binarized chosen/rejected pairs — https://huggingface.co/datasets/trl-lib/ultrafeedback_binarized</li>
+<li><a href="https://huggingface.co/docs/trl">huggingface/trl</a> — <code>DPOTrainer</code>, <code>PPOTrainer</code>, <code>GRPOTrainer</code>; production RLHF library</li>
+<li><a href="https://github.com/OpenRLHF/OpenRLHF">OpenRLHF</a> — scalable PPO RLHF training for 70B+ models with Ray</li>
+<li><a href="https://github.com/microsoft/DeepSpeed">DeepSpeed-Chat</a> — Microsoft's three-stage RLHF pipeline at scale</li>
 </ul>
-<hr />
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>RLHF's KL-penalized objective has a closed-form solution that connects directly to the theory of optimal transport and energy-based models — understanding that connection makes the DPO reparameterization precise rather than surprising.</p>
-<ul>
-<li>[[direct-preference-optimization]] — DPO reparameterizes the RLHF objective to eliminate the explicit RL loop, making the reward model implicit in the policy itself; the relationship is exact, not approximate.</li>
-<li>[[proximal-policy-optimization]] — PPO is the RL algorithm that makes the RLHF training loop stable; understanding its clipping mechanism explains why RLOO can replace the critic but not the clipping.</li>
-<li>[[reward-modeling]] — the reward model is the weakest link in the RLHF pipeline; this page covers Bradley-Terry training, reward model ensembles, and the scaling laws for reward model quality.</li>
-</ul>
-<hr />
+<h2 id="what-can-you-build-next">What can you build next?<a class="headerlink" href="#what-can-you-build-next" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><em>Your arc of work continues here.</em></p>
+</blockquote>
+<p>You've aligned a small model with DPO. The natural next question is: can you do this without any human labels at all — using a verifiable reward signal? That's GRPO, and it's how DeepSeek-R1 achieves reasoning without human annotation.</p>
+<p><strong>Go deeper on this concept:</strong>
+→ Grpo — Group-Relative Policy Optimization; implement it on a math dataset using symbolic verification; no reward model needed</p>
+<p><strong>Build a system with this:</strong>
+→ Constitutional Ai — replace human preferences with AI-generated feedback; build a fully automated alignment pipeline on top of your DPO-trained model</p>
+<p><strong>The arc this page belongs to:</strong>
+→ <a href="../../../arcs/reinforcement-learning/">Reinforcement Learning arc</a> — RLHF is the arc's applied peak; GRPO and process reward models are the current frontier</p>
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li>[[transformer-architecture]] — RLHF post-training is applied almost exclusively to Transformer-based language models; the attention mechanism's capacity for in-context learning is what makes the SFT stage effective.</li>
-<li>[[diffusion-models]] — RLHF-style preference optimization has been adapted for image generation, where reward models trained on human aesthetic judgments fine-tune diffusion policies using the same KL-penalized objective.</li>
+<li><a href="../ppo/">Proximal Policy Optimization (PPO)</a> — the RL algorithm used in RLHF Stage 3</li>
+<li>Dpo — the simplified alternative; no RM, no PPO, just supervised learning</li>
+<li>Grpo — Group-Relative Policy Optimization; the algorithm behind DeepSeek-R1</li>
+<li>Constitutional Ai — AI-generated feedback replaces human preference labeling</li>
+<li>Instruction Tuning — the SFT stage that precedes RLHF</li>
 </ul>
-<hr />
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Ouyang et al. (2022) — "Training language models to follow instructions with human feedback" — https://arxiv.org/abs/2203.02155 — the primary source for the three-stage RLHF pipeline; reading the appendix reveals the annotation guidelines and inter-annotator agreement statistics that are omitted from most summaries.</li>
-<li>Ahmadian et al. (2024) — "Back to Basics: Revisiting REINFORCE-Style Optimization for Learning from Human Feedback" — https://arxiv.org/abs/2402.14740 — the RLOO paper; includes ablations comparing RLOO to PPO on reward score, KL divergence, and wall-clock time that are essential for practitioners choosing an RL algorithm.</li>
-<li>Gao et al. (2023) — "Scaling Laws for Reward Model Overoptimization" — https://arxiv.org/abs/2210.10760 — the first systematic empirical study of reward hacking as a function of KL divergence; establishes the quantitative relationship between policy-reference distance and proxy reward exploitation that every RLHF practitioner should internalize.</li>
-<li>Rafailov et al. (2023) — "Direct Preference Optimization: Your Language Model is Secretly a Reward Model" — https://arxiv.org/abs/2305.18290 — shows that the RLHF objective has a closed-form solution expressible entirely in terms of the policy, eliminating the need for explicit RL; the derivation is the clearest exposition of why the KL-penalized objective has the structure it does.</li>
-<li>Lilian Weng — "Reinforcement Learning from Human Feedback" (lil'log, 2023) — https://lilianweng.github.io/posts/2023-01-27-the-transformer-family-v2/ — provides an intuitive walkthrough of the Bradley-Terry derivation and the reward hacking taxonomy that complements the mathematical treatment on this page.</li>
-<li>Christiano et al. (2017) — "Deep Reinforcement Learning from Human Preferences" — https://arxiv.org/abs/1706.03741 — the conceptual origin of modern RLHF; demonstrates preference-based reward learning in Atari and MuJoCo environments, establishing the pairwise comparison framework that all subsequent work inherits.</li>
+<li><a href="https://arxiv.org/abs/2112.00861">A General Language Assistant as a Laboratory for Alignment (Anthropic)</a> — Askell et al. 2021; early alignment research</li>
+<li><a href="https://rlhfbook.com">RLHF Book</a> — Nathan Lambert 2024; accessible and comprehensive</li>
+<li><a href="https://arxiv.org/abs/2503.14476">DAPO: An Open-Source LLM RL Alignment Recipe</a> — Yu et al. 2025; state-of-the-art reasoning alignment</li>
+<li><a href="https://arxiv.org/abs/2501.12948">DeepSeek-R1: Incentivizing Reasoning Capability in LLMs via RL</a> — DeepSeek AI 2025</li>
 </ul>
 
 
@@ -4395,6 +4230,9 @@
 
 
 
+
+  
+  
 
 
 

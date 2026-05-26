@@ -27,7 +27,7 @@
     
     
       
-        <title>Data Parallelism - Frontier Wiki</title>
+        <title>Data Parallelism & Distributed Training - Frontier Wiki</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#data-parallelism" class="md-skip">
+        <a href="#data-parallelism-distributed-training" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Data Parallelism
+              Data Parallelism & Distributed Training
             
           </span>
         </div>
@@ -2019,32 +2019,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#for-your-reader-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        For your reader type
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-it-is" class="md-nav__link">
     <span class="md-ellipsis">
       
         What it is
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#why-it-matters-at-the-frontier" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why it matters at the frontier
       
     </span>
   </a>
@@ -2063,28 +2041,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mathematical-foundations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mathematical foundations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-algorithms-techniques" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key algorithms / techniques
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#essential-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2096,126 +2052,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#seminal-papers-test-of-time" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Seminal papers &amp; test-of-time
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#current-sota" class="md-nav__link">
     <span class="md-ellipsis">
       
         Current SotA
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-happening-now" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's happening now
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In production
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimum-valuable-build" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimum Valuable Build
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#stretch-goals" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Stretch goals
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#code-implementations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Code &amp; implementations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What comes next
       
     </span>
   </a>
@@ -3943,7 +3783,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3999,6 +3839,20 @@
       
       
       
+        <span class="md-tag">data-parallelism</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">ddp</span>
+      
+    
+      
+      
+      
+      
         <span class="md-tag">distributed-training</span>
       
     
@@ -4013,14 +3867,7 @@
       
       
       
-        <span class="md-tag">gradient-synchronization</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">large-scale-training</span>
+        <span class="md-tag">zero</span>
       
     
   </nav>
@@ -4030,93 +3877,21 @@
   
 
 
-<h1 id="data-parallelism">Data Parallelism<a class="headerlink" href="#data-parallelism" title="Permanent link">&para;</a></h1>
+<h1 id="data-parallelism-distributed-training">Data Parallelism &amp; Distributed Training<a class="headerlink" href="#data-parallelism-distributed-training" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> Data parallelism distributes training batches across multiple GPUs and synchronizes gradients via collective communication — but as compute throughput has outpaced network bandwidth by 3–4×, the central engineering challenge has shifted from correctness to hiding communication latency behind computation.</p>
+<p><strong>TL;DR:</strong> Training a model across multiple GPUs by splitting the data — each device holds a full model copy, processes a data shard, and synchronizes gradients — the simplest and most widely used form of distributed training.</p>
+<p>🚧 Agent-generated content pending. See <a href="../">track index</a> for context.</p>
 </blockquote>
-<hr />
-<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>I am...</th>
-<th>What you get</th>
-<th>Go to</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MS/applied practitioner</td>
-<td>A working Ring-AllReduce implementation from scratch, production patterns, FSDP configuration</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-</tr>
-<tr>
-<td>Curious generalist</td>
-<td>Why your GPU cluster sits idle half the time and what engineers do about it</td>
-<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-</tr>
-<tr>
-<td>Math/theory student</td>
-<td>The convergence proof for synchronous SGD, the AllReduce bandwidth formula, gradient compression bounds</td>
-<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
-</tr>
-<tr>
-<td>Researcher / frontier</td>
-<td>Compiler-automated overlap scheduling, FSDP2, ByteScale at 12,000 GPUs</td>
-<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-</tr>
-</tbody>
-</table>
-<hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Between NVIDIA's A100 in 2020 and the B200 in 2024, raw compute throughput grew by more than 7×. Inter-node network bandwidth, constrained by the physics of InfiniBand and Ethernet, roughly doubled over the same period. The consequence is stark: on a naively configured GPU cluster, after every backward pass, every GPU must halt and wait for all other GPUs to exchange gradients before any of them can take an optimizer step. Depending on model size and batch configuration, this synchronization barrier can consume 40–50% of total wall-clock training time. The GPUs are not slow — they are idle, waiting for packets.</p>
-<p>Data parallelism is the strategy of splitting a training batch across <span class="arithmatex">\(N\)</span> workers, each holding a complete copy of the model, computing gradients independently on their local shard, and then aggregating those gradients so every worker applies an identical parameter update. In the simplest formulation, this is embarrassingly parallel: each worker's forward and backward passes are completely independent, and only the final gradient aggregation requires coordination. The reason this works mathematically is that the gradient of a loss over a full batch is exactly the average of the gradients over each mini-batch shard — so the distributed computation is not an approximation, it is exact. This is what distinguishes data parallelism from model parallelism, where the computation itself is split and workers must exchange intermediate activations mid-forward-pass.</p>
-<p>The engineering challenge is that "aggregate the gradients" hides enormous complexity. A naive parameter-server approach — where all workers send gradients to a central node, which averages and broadcasts them back — creates a bandwidth bottleneck at the server and does not scale beyond a few dozen workers. The solution that became standard is the Ring-AllReduce algorithm, which arranges workers in a logical ring and pipelines gradient chunks around the ring in two phases, achieving near-perfect bandwidth utilization that is independent of the number of workers. Modern frameworks like PyTorch's <code>DistributedDataParallel</code> (DDP) and <code>FullyShardedDataParallel</code> (FSDP) implement this under the hood, but understanding the primitive is essential for diagnosing the performance failures that occur at scale.</p>
-<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>Every frontier language model trained in the last three years — GPT-4, Llama 3, Gemini, Mistral — was trained with data parallelism as the outermost parallelism dimension. The reason is structural: data parallelism is the only parallelism strategy that does not require modifying the model's computational graph. Tensor parallelism and pipeline parallelism both require the model to be surgically partitioned, which introduces correctness constraints and communication patterns that are tightly coupled to architecture. Data parallelism composes cleanly on top of both, which is why the standard recipe for large-scale training is a 3D parallelism configuration: data parallelism across nodes, tensor parallelism within a node, and pipeline parallelism across pipeline stages. Getting the data-parallel dimension right — specifically, getting gradient synchronization to overlap with the backward pass computation — is what determines whether a cluster runs at 40% or 70% model FLOP utilization (MFU).</p>
-<p>The frontier problem is that this overlap is currently achieved through manual developer effort: wrapping modules in DDP buckets, configuring FSDP sharding strategies, writing custom gradient hooks. As models grow more heterogeneous (mixture-of-experts, variable-length sequences, dynamic routing) and clusters grow more heterogeneous (different network topologies between nodes and within nodes), the optimal communication schedule changes dynamically during training. No existing system can synthesize this schedule automatically. This is the gap that compiler-native approaches like SimpleFSDP (2024) and ByteScale (2025) are beginning to close, and it is the central open problem in distributed training systems research.</p>
+<p>Data parallelism replicates the model across N GPUs. Each GPU processes a mini-batch shard, computes gradients, and then synchronizes gradients across all GPUs via AllReduce before updating. This scales throughput linearly (ideally) without changing the optimization dynamics. For models too large to fit on one GPU, ZeRO and FSDP extend data parallelism by sharding optimizer states, gradients, and parameters.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Data parallelism</strong> — a distributed training strategy where each worker holds a full model replica and processes a disjoint shard of the mini-batch, with gradients averaged across workers before the optimizer step.</li>
-<li><strong>Synchronous SGD (SSGD)</strong> — the variant where all workers must complete their backward pass and exchange gradients before any worker updates parameters; mathematically equivalent to single-device training with a larger effective batch size.</li>
-<li><strong>AllReduce</strong> — a collective communication primitive that takes a tensor distributed across <span class="arithmatex">\(N\)</span> workers and produces the sum (or mean) of those tensors on every worker simultaneously; the core operation in data-parallel gradient synchronization.</li>
-<li><strong>Ring-AllReduce</strong> — an implementation of AllReduce that arranges workers in a logical ring and pipelines gradient chunks in two phases (reduce-scatter then all-gather), achieving bandwidth utilization that does not degrade as <span class="arithmatex">\(N\)</span> increases.</li>
-<li><strong>Gradient bucketing</strong> — the technique of grouping parameters into fixed-size buckets and launching AllReduce on a bucket as soon as all its gradients are ready, enabling communication to overlap with the backward pass for later layers.</li>
-<li><strong>Fully Sharded Data Parallel (FSDP)</strong> — an extension of data parallelism where parameters, gradients, and optimizer states are sharded across workers rather than replicated; each worker reconstructs the full layer via AllGather only when needed, reducing per-GPU memory from <span class="arithmatex">\(O(M)\)</span> to <span class="arithmatex">\(O(M/N)\)</span>.</li>
-<li><strong>ZeRO (Zero Redundancy Optimizer)</strong> — the memory optimization framework (Rajbhandari et al., 2020) underlying FSDP, partitioned into three stages that progressively shard optimizer states, gradients, and parameters across data-parallel workers.</li>
-<li><strong>Communication-computation overlap</strong> — the scheduling technique of initiating gradient AllReduce for earlier layers while the backward pass is still computing gradients for later layers, hiding network latency behind GPU computation.</li>
-</ul>
-<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p>The fundamental identity that makes data parallelism exact is the linearity of the gradient over a batch. For a loss <span class="arithmatex">\(L\)</span> computed over a batch <span class="arithmatex">\(\mathcal{B}\)</span> of <span class="arithmatex">\(B\)</span> samples split across <span class="arithmatex">\(N\)</span> workers each holding <span class="arithmatex">\(B/N\)</span> samples:</p>
-<div class="arithmatex">\[
-\nabla_\theta L(\mathcal{B}) = \frac{1}{B} \sum_{i=1}^{B} \nabla_\theta \ell(x_i, \theta) = \frac{1}{N} \sum_{k=1}^{N} \left( \frac{1}{B/N} \sum_{i \in \mathcal{B}_k} \nabla_\theta \ell(x_i, \theta) \right)
-\]</div>
-<p>where <span class="arithmatex">\(\theta\)</span> is the parameter vector, <span class="arithmatex">\(\ell(x_i, \theta)\)</span> is the per-sample loss, <span class="arithmatex">\(\mathcal{B}_k\)</span> is the shard of the batch assigned to worker <span class="arithmatex">\(k\)</span>, and <span class="arithmatex">\(N\)</span> is the total number of workers. This equation says that the full-batch gradient is exactly the average of the per-shard gradients — no approximation is introduced by distributing the computation.</p>
-<p>The Ring-AllReduce algorithm achieves the following communication volume per worker:</p>
-<div class="arithmatex">\[
-\text{Data transferred} = 2 \cdot \frac{N-1}{N} \cdot |\mathbf{g}|
-\]</div>
-<p>where <span class="arithmatex">\(N\)</span> is the number of workers and <span class="arithmatex">\(|\mathbf{g}|\)</span> is the size of the gradient tensor in bytes. This equation says that as <span class="arithmatex">\(N \to \infty\)</span>, each worker sends and receives approximately <span class="arithmatex">\(2|\mathbf{g}|\)</span> bytes total — the communication cost per worker is bounded and does not grow with the number of workers, which is why Ring-AllReduce scales.</p>
-<p>The convergence guarantee for synchronous SGD under standard assumptions (L-smooth, bounded variance) is:</p>
-<div class="arithmatex">\[
-\frac{1}{T} \sum_{t=1}^{T} \mathbb{E}\left[\|\nabla L(\theta_t)\|^2\right] \leq \frac{2(L(\theta_0) - L^*)}{\eta T} + \eta L \sigma^2
-\]</div>
-<p>where <span class="arithmatex">\(\theta_t\)</span> is the parameter vector at step <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(T\)</span> is the total number of steps, <span class="arithmatex">\(\eta\)</span> is the learning rate, <span class="arithmatex">\(L\)</span> is the Lipschitz constant of the gradient, <span class="arithmatex">\(\sigma^2\)</span> is the variance of the stochastic gradient, and <span class="arithmatex">\(L^*\)</span> is the minimum loss value. This equation says that synchronous SGD converges at rate <span class="arithmatex">\(O(1/\sqrt{T})\)</span> — identical to single-device SGD — confirming that distributing the batch does not degrade the optimization trajectory.</p>
-<p>The memory savings from FSDP sharding are captured by the per-worker memory footprint:</p>
-<div class="arithmatex">\[
-M_{\text{FSDP}} = \frac{M_\theta + M_g + M_{\text{opt}}}{N} + M_{\text{act}}
-\]</div>
-<p>where <span class="arithmatex">\(M_\theta\)</span> is the memory for parameters, <span class="arithmatex">\(M_g\)</span> for gradients, <span class="arithmatex">\(M_{\text{opt}}\)</span> for optimizer states (e.g., Adam's first and second moments), <span class="arithmatex">\(N\)</span> is the number of sharding workers, and <span class="arithmatex">\(M_{\text{act}}\)</span> is the activation memory which is not sharded in standard FSDP. This equation says that the three largest memory consumers scale inversely with the number of workers, while activation memory — which can dominate for long sequences — remains per-worker.</p>
-<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Parameter Server (Dean et al., 2012)</strong> — the original distributed SGD architecture where workers push gradients to a central server that aggregates and broadcasts updates; simple to implement but creates a bandwidth bottleneck at the server that limits scaling beyond ~100 workers.</li>
-<li><strong>Ring-AllReduce (Baidu Research, 2017)</strong> — a decentralized collective that pipelines gradient chunks around a logical ring in two phases (reduce-scatter, all-gather), achieving <span class="arithmatex">\(O(|\mathbf{g}|)\)</span> communication per worker independent of <span class="arithmatex">\(N\)</span>; the algorithm underlying NCCL and most modern distributed training.</li>
-<li><strong>Gradient Bucketing / DDP (Li et al., 2020)</strong> — PyTorch's <code>DistributedDataParallel</code> groups parameters into buckets and fires AllReduce on each bucket as its gradients complete during the backward pass, overlapping communication with computation for subsequent layers.</li>
-<li><strong>ZeRO Stage 1/2/3 (Rajbhandari et al., 2020)</strong> — progressively shards optimizer states (Stage 1), gradients (Stage 2), and parameters (Stage 3) across data-parallel workers, reducing per-GPU memory from <span class="arithmatex">\(16\Psi\)</span> bytes (mixed precision) to <span class="arithmatex">\(16\Psi/N\)</span> bytes at Stage 3.</li>
-<li><strong>Fully Sharded Data Parallel / FSDP (Zhao et al., 2023)</strong> — PyTorch's production implementation of ZeRO Stage 3, with support for mixed precision, activation checkpointing, and CPU offloading; used to train Llama 2 and Llama 3 at Meta.</li>
-<li><strong>Gradient Compression (Lin et al., 2018 — Deep Gradient Compression)</strong> — reduces AllReduce communication volume by 99.9× by transmitting only the top-0.1% of gradient values by magnitude and accumulating the rest locally; effective for bandwidth-constrained inter-node communication.</li>
-<li><strong>SimpleFSDP (2024)</strong> — a compiler-native FSDP implementation using <code>torch.compile</code> and DTensor that automatically generates communication-computation overlap schedules, achieving up to 68.67% throughput improvement over eager FSDP without manual bucket tuning.</li>
-<li><strong>3D Parallelism (Narayanan et al., 2021)</strong> — the composition of data parallelism (across replica groups), tensor parallelism (within a node), and pipeline parallelism (across pipeline stages) used to train Megatron-LM scale models; data parallelism is the outermost dimension.</li>
+<li><strong>AllReduce</strong> — collective communication: sum gradients across all GPUs, broadcast result</li>
+<li><strong>DDP</strong> — PyTorch DistributedDataParallel; ring-AllReduce, overlaps compute and communication</li>
+<li><strong>ZeRO Stage 1/2/3</strong> — shard optimizer states / gradients / parameters across GPUs</li>
+<li><strong>FSDP</strong> — PyTorch Fully Sharded Data Parallel; production ZeRO Stage 3</li>
+<li><strong>Gradient accumulation</strong> — accumulate gradients over multiple steps before sync; increases effective batch size</li>
+<li><strong>Batch size scaling</strong> — linear scaling rule: scale LR ∝ batch size (Goyal et al.)</li>
 </ul>
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
@@ -4130,317 +3905,33 @@ M_{\text{FSDP}} = \frac{M_\theta + M_g + M_{\text{opt}}}{N} + M_{\text{act}}
 </thead>
 <tbody>
 <tr>
-<td>"PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel"</td>
-<td>2023</td>
-<td>Zhao et al.</td>
-<td>The definitive engineering account of production-scale data parallelism with sharding; covers memory math, API design, and failure modes at Meta scale</td>
+<td><a href="https://arxiv.org/abs/1910.02054">ZeRO: Memory Optimizations Toward Training Trillion Parameter Models</a></td>
+<td>2019</td>
+<td>Rajbhandari et al.</td>
+<td>ZeRO — how to actually train very large models</td>
 </tr>
 <tr>
-<td>"Efficient Large Scale Language Modeling with Mixtures of Experts" / Megatron-LM 3D parallelism</td>
-<td>2021</td>
-<td>Narayanan et al.</td>
-<td>Shows how data parallelism composes with tensor and pipeline parallelism; the blueprint for all frontier LLM training</td>
-</tr>
-<tr>
-<td>"Beyond Data and Model Parallelism for Deep Neural Networks"</td>
-<td>2018</td>
-<td>Jia et al.</td>
-<td>Formalizes the SOAP parallelization space, making precise when data parallelism is optimal and when it is not</td>
-</tr>
-<tr>
-<td>"SimpleFSDP: Simpler Fully Sharded Data Parallel with torch.compile"</td>
-<td>2024</td>
-<td>Meta Research</td>
-<td>Demonstrates compiler-automated overlap scheduling as the next evolution beyond manual DDP/FSDP configuration</td>
-</tr>
-</tbody>
-</table>
-<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Paper</th>
-<th>Year</th>
-<th>Key contribution</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>"One weird trick for parallelizing convolutional neural networks" — Krizhevsky</td>
-<td>2014</td>
-<td>First systematic analysis of hybrid data/model parallelism; established that data parallelism is optimal for compute-bound layers and model parallelism for parameter-bound layers</td>
-</tr>
-<tr>
-<td>"Beyond Data and Model Parallelism for Deep Neural Networks" — Jia et al.</td>
-<td>2018</td>
-<td>Introduced the SOAP framework formalizing all parallelization dimensions; still the canonical reference for reasoning about parallelism strategy space</td>
-</tr>
-<tr>
-<td>"PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel" — Zhao et al.</td>
-<td>2023</td>
-<td>Defined the production standard for memory-efficient data parallelism; FSDP is now the default training strategy for models that do not fit on a single GPU</td>
-</tr>
-<tr>
-<td>"Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism" — Narayanan et al.</td>
-<td>2021</td>
-<td>Established 3D parallelism as the standard recipe for frontier model training; data parallelism's role in this composition is precisely defined</td>
+<td><a href="https://arxiv.org/abs/1706.02677">Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour</a></td>
+<td>2017</td>
+<td>Goyal et al.</td>
+<td>Linear scaling rule for batch sizes</td>
 </tr>
 </tbody>
 </table>
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>ByteScale (2025) trains LLMs with context lengths up to 2048K tokens across more than 12,000 GPUs, achieving near-linear scaling efficiency by dynamically rebalancing data-parallel workloads as sequence lengths vary within a batch. SimpleFSDP (2024) demonstrates 68.67% throughput improvement over PyTorch eager FSDP on GPT-class models by using <code>torch.compile</code> to automatically fuse and overlap AllGather and reduce-scatter operations with matrix multiplications. On standard LLM training benchmarks, FSDP2 (the rewrite of PyTorch FSDP released in 2024) achieves model FLOP utilization above 60% on 512-GPU configurations for 70B-parameter models, compared to approximately 38–45% for naive DDP at the same scale.</p>
-<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The central research question is whether distributed compilers can automatically synthesize optimal communication schedules without developer intervention. SimpleFSDP's use of <code>torch.compile</code> and DTensor is the first serious answer: by representing sharded tensors as first-class compiler objects, the system can reason about when to insert AllGather and reduce-scatter operations and fuse them with adjacent compute kernels. The open question is whether this approach generalizes to dynamic computation graphs — mixture-of-experts models with variable expert routing, speculative decoding with variable draft lengths, and variable-length sequence batches where the optimal sharding strategy changes per step.</p>
-<p><strong>Engineering &amp; systems.</strong> The practical frontier is the integration of data parallelism with heterogeneous network topologies. Within a node, NVLink provides ~900 GB/s bandwidth; between nodes, InfiniBand HDR provides ~200 GB/s; between data centers, bandwidth drops by another order of magnitude. Production systems like ByteScale address this by implementing hierarchical AllReduce — reduce within a node over NVLink first, then reduce across nodes over InfiniBand — and by dynamically adjusting the data-parallel degree based on measured network conditions. FSDP2's <code>DeviceMesh</code> abstraction makes this topology-aware sharding expressible in user code, but the optimal configuration still requires manual tuning.</p>
-<p><strong>Open problems.</strong> The specific unsolved question is: given a model with dynamic computation (variable sequence lengths, conditional routing), a heterogeneous network topology (NVLink intra-node, InfiniBand inter-node), and a changing batch distribution during training, can a compiler automatically determine the optimal data-parallel degree, sharding strategy, and communication schedule at each training step without requiring the developer to specify any of these? Current systems require static configuration at job launch. The gap between static configuration and dynamic optimality is where the next generation of distributed training infrastructure will be built.</p>
-<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Meta</strong> — Trains Llama 3 (405B parameters) using PyTorch FSDP with 3D parallelism across thousands of H100 GPUs; FSDP handles the data-parallel dimension with full parameter sharding, reducing per-GPU memory from ~3TB to ~200GB at 16-way data parallelism. Source: <a href="https://ai.meta.com/research/publications/">ai.meta.com/research/publications/</a></li>
-<li><strong>Google DeepMind</strong> — Uses data parallelism as the outermost dimension in Pathways, with TPU pods connected via high-bandwidth inter-chip interconnects; the data-parallel AllReduce runs over dedicated ICI (Inter-Chip Interconnect) fabric at 4.8 Tb/s aggregate bandwidth per pod. Source: <a href="https://research.google/pubs/">research.google/pubs/</a></li>
-<li><strong>Microsoft / Azure</strong> — DeepSpeed ZeRO-3 is deployed in production for training across 10,000+ GPUs; the ZeRO-Infinity extension offloads sharded parameters to NVMe storage, enabling models with trillions of parameters on commodity hardware. Source: <a href="https://www.microsoft.com/en-us/research/">research.microsoft.com</a></li>
-<li><strong>ByteDance</strong> — ByteScale trains LLMs with 2048K context windows across 12,000+ GPUs using dynamic data-parallel rebalancing; the system monitors per-step compute time and redistributes sequence shards to eliminate stragglers caused by variable-length sequences.</li>
-</ul>
-<hr />
-<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A Ring-AllReduce collective from scratch using <code>torch.distributed</code> primitives, integrated into a multi-process MLP training loop on MNIST — no <code>DistributedDataParallel</code> wrapper, no black box.</p>
-<p><strong>Why this build:</strong> DDP and FSDP hide the communication primitive. Building Ring-AllReduce manually makes the chunking, transfer, and aggregation concrete, which is the prerequisite for understanding every performance optimization above it.</p>
-<p><strong>Stack:</strong> Python 3.10+, PyTorch 2.2+, torchvision 0.17+. Runs on free Colab CPU (multi-process simulation) or any machine with 2+ GPUs. No paid compute required.</p>
-<p><strong>Estimated time:</strong> 45–60 minutes.</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Install and verify the environment</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># In a Colab cell or terminal</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span>  <span class="c1"># should be 2.2+</span>
-</code></pre></div>
-<ol>
-<li><strong>Write the Ring-AllReduce function</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># ring_allreduce.py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">ring_allreduce</span><span class="p">(</span><span class="n">tensor</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Implements Ring-AllReduce in two phases:</span>
-<span class="sd">      Phase 1 (reduce-scatter): each rank accumulates a chunk from its left neighbor</span>
-<span class="sd">      Phase 2 (all-gather):     each rank broadcasts its accumulated chunk to all others</span>
-<span class="sd">    Returns the sum of `tensor` across all ranks, on every rank.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">world_size</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_world_size</span><span class="p">()</span>
-    <span class="n">rank</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">get_rank</span><span class="p">()</span>
-
-    <span class="c1"># Flatten and chunk the tensor into world_size pieces</span>
-    <span class="n">flat</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span><span class="o">.</span><span class="n">float</span><span class="p">()</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">chunk_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">flat</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="o">+</span> <span class="n">world_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">//</span> <span class="n">world_size</span>
-    <span class="c1"># Pad to make evenly divisible</span>
-    <span class="n">padded_size</span> <span class="o">=</span> <span class="n">chunk_size</span> <span class="o">*</span> <span class="n">world_size</span>
-    <span class="n">padded</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">padded_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">flat</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
-    <span class="n">padded</span><span class="p">[:</span><span class="n">flat</span><span class="o">.</span><span class="n">numel</span><span class="p">()]</span> <span class="o">=</span> <span class="n">flat</span>
-    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">padded</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">world_size</span><span class="p">))</span>
-
-    <span class="n">left</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span>
-    <span class="n">right</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span>
-
-    <span class="c1"># --- Phase 1: Reduce-scatter ---</span>
-    <span class="c1"># Each rank sends its (rank - step) chunk to the right and receives from the left</span>
-    <span class="n">send_chunk_idx</span> <span class="o">=</span> <span class="n">rank</span>
-    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">send_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank</span> <span class="o">-</span> <span class="n">step</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span>
-        <span class="n">recv_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank</span> <span class="o">-</span> <span class="n">step</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span>
-        <span class="n">send_buf</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">send_idx</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-        <span class="n">recv_buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">chunks</span><span class="p">[</span><span class="n">recv_idx</span><span class="p">])</span>
-        <span class="c1"># Non-blocking send to right, blocking recv from left</span>
-        <span class="n">send_req</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">send_buf</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="n">right</span><span class="p">)</span>
-        <span class="n">dist</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">recv_buf</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">left</span><span class="p">)</span>
-        <span class="n">send_req</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="n">chunks</span><span class="p">[</span><span class="n">recv_idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">recv_buf</span>
-
-    <span class="c1"># --- Phase 2: All-gather ---</span>
-    <span class="c1"># Each rank now holds the fully reduced chunk at index `rank`</span>
-    <span class="c1"># Circulate the reduced chunks so every rank gets all chunks</span>
-    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">world_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">send_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank</span> <span class="o">-</span> <span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span>
-        <span class="n">recv_idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">rank</span> <span class="o">-</span> <span class="n">step</span><span class="p">)</span> <span class="o">%</span> <span class="n">world_size</span>
-        <span class="n">send_buf</span> <span class="o">=</span> <span class="n">chunks</span><span class="p">[</span><span class="n">send_idx</span><span class="p">]</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-        <span class="n">recv_buf</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">chunks</span><span class="p">[</span><span class="n">recv_idx</span><span class="p">])</span>
-        <span class="n">send_req</span> <span class="o">=</span> <span class="n">dist</span><span class="o">.</span><span class="n">isend</span><span class="p">(</span><span class="n">send_buf</span><span class="p">,</span> <span class="n">dst</span><span class="o">=</span><span class="n">right</span><span class="p">)</span>
-        <span class="n">dist</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">recv_buf</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="n">left</span><span class="p">)</span>
-        <span class="n">send_req</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
-        <span class="n">chunks</span><span class="p">[</span><span class="n">recv_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">recv_buf</span>
-
-    <span class="c1"># Reassemble and trim padding</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span><span class="n">chunks</span><span class="p">)[:</span><span class="n">flat</span><span class="o">.</span><span class="n">numel</span><span class="p">()]</span>
-    <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">view_as</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Write the training worker function</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># train_worker.py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torchvision</span><span class="w"> </span><span class="kn">import</span> <span class="n">datasets</span><span class="p">,</span> <span class="n">transforms</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">DistributedSampler</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ring_allreduce</span><span class="w"> </span><span class="kn">import</span> <span class="n">ring_allreduce</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">train</span><span class="p">(</span><span class="n">rank</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">world_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-    <span class="c1"># Initialize the process group using the file-based rendezvous (works on single machine)</span>
-    <span class="n">dist</span><span class="o">.</span><span class="n">init_process_group</span><span class="p">(</span>
-        <span class="n">backend</span><span class="o">=</span><span class="s2">&quot;gloo&quot;</span><span class="p">,</span>          <span class="c1"># gloo works on CPU; use &quot;nccl&quot; for GPU</span>
-        <span class="n">init_method</span><span class="o">=</span><span class="s2">&quot;env://&quot;</span><span class="p">,</span>
-        <span class="n">world_size</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span>
-        <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span>
-    <span class="p">)</span>
-
-    <span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>  <span class="c1"># change to f&quot;cuda:{rank}&quot; for GPU</span>
-
-    <span class="c1"># Simple MLP</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-        <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(),</span>
-        <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="mi">256</span><span class="p">),</span>
-        <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
-        <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
-    <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="c1"># Each rank gets a disjoint shard of MNIST</span>
-    <span class="n">transform</span> <span class="o">=</span> <span class="n">transforms</span><span class="o">.</span><span class="n">Compose</span><span class="p">([</span><span class="n">transforms</span><span class="o">.</span><span class="n">ToTensor</span><span class="p">()])</span>
-    <span class="n">dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">MNIST</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="s2">&quot;/tmp/mnist&quot;</span><span class="p">,</span> <span class="n">train</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">download</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">transform</span><span class="o">=</span><span class="n">transform</span><span class="p">)</span>
-    <span class="n">sampler</span> <span class="o">=</span> <span class="n">DistributedSampler</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">num_replicas</span><span class="o">=</span><span class="n">world_size</span><span class="p">,</span> <span class="n">rank</span><span class="o">=</span><span class="n">rank</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">loader</span> <span class="o">=</span> <span class="n">DataLoader</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span> <span class="n">sampler</span><span class="o">=</span><span class="n">sampler</span><span class="p">)</span>
-
-    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
-    <span class="n">loss_fn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
-
-    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
-        <span class="n">sampler</span><span class="o">.</span><span class="n">set_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-        <span class="n">total_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">loader</span><span class="p">:</span>
-            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">),</span> <span class="n">y</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
-            <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="n">loss_fn</span><span class="p">(</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">y</span><span class="p">)</span>
-            <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-
-            <span class="c1"># --- Manual gradient synchronization via Ring-AllReduce ---</span>
-            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="c1"># Sum gradients across all ranks, then divide by world_size</span>
-                    <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">ring_allreduce</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="p">)</span> <span class="o">/</span> <span class="n">world_size</span>
-
-            <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-            <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">avg_loss</span> <span class="o">=</span> <span class="n">total_loss</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">loader</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2"> | Rank 0 avg loss: </span><span class="si">{</span><span class="n">avg_loss</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-    <span class="c1"># Sanity check: all ranks should have identical parameters after synchronization</span>
-    <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">():</span>
-        <span class="n">tensor</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-        <span class="n">dist</span><span class="o">.</span><span class="n">broadcast</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">src</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">param</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">),</span> \
-            <span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">: parameter divergence detected!&quot;</span>
-
-    <span class="k">if</span> <span class="n">rank</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ All ranks have identical parameters — Ring-AllReduce is correct.&quot;</span><span class="p">)</span>
-
-    <span class="n">dist</span><span class="o">.</span><span class="n">destroy_process_group</span><span class="p">()</span>
-</code></pre></div>
-<ol>
-<li><strong>Write the launcher script</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># launch.py</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.multiprocessing</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mp</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">train_worker</span><span class="w"> </span><span class="kn">import</span> <span class="n">train</span>
-
-<span class="n">WORLD_SIZE</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># simulate 4 workers on one machine</span>
-
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_ADDR&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;localhost&quot;</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;MASTER_PORT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;29500&quot;</span>
-    <span class="n">mp</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">WORLD_SIZE</span><span class="p">,),</span> <span class="n">nprocs</span><span class="o">=</span><span class="n">WORLD_SIZE</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Run the training</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>launch.py
-</code></pre></div>
-<ol>
-<li><strong>Verify correctness against PyTorch's built-in AllReduce</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># Add this inside train() after your ring_allreduce call for one gradient tensor</span>
-<span class="c1"># to confirm your implementation matches the reference:</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch.distributed</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dist</span>
-
-<span class="n">test_grad</span> <span class="o">=</span> <span class="n">param</span><span class="o">.</span><span class="n">grad</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-<span class="n">ring_result</span> <span class="o">=</span> <span class="n">ring_allreduce</span><span class="p">(</span><span class="n">test_grad</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span> <span class="o">/</span> <span class="n">world_size</span>
-
-<span class="n">ref</span> <span class="o">=</span> <span class="n">test_grad</span><span class="o">.</span><span class="n">clone</span><span class="p">()</span>
-<span class="n">dist</span><span class="o">.</span><span class="n">all_reduce</span><span class="p">(</span><span class="n">ref</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="n">dist</span><span class="o">.</span><span class="n">ReduceOp</span><span class="o">.</span><span class="n">SUM</span><span class="p">)</span>
-<span class="n">ref</span> <span class="o">/=</span> <span class="n">world_size</span>
-
-<span class="k">assert</span> <span class="n">torch</span><span class="o">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">ring_result</span><span class="p">,</span> <span class="n">ref</span><span class="p">,</span> <span class="n">atol</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">),</span> \
-    <span class="sa">f</span><span class="s2">&quot;Ring-AllReduce diverges from dist.all_reduce! Max diff: </span><span class="si">{</span><span class="p">(</span><span class="n">ring_result</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ref</span><span class="p">)</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rank </span><span class="si">{</span><span class="n">rank</span><span class="si">}</span><span class="s2">: ✓ Ring-AllReduce matches dist.all_reduce&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>After 3 epochs with 4 simulated workers, rank 0 should print:
-<div class="highlight"><pre><span></span><code>Epoch 1 | Rank 0 avg loss: 0.6821
-Epoch 2 | Rank 0 avg loss: 0.3914
-Epoch 3 | Rank 0 avg loss: 0.3102
-✓ All ranks have identical parameters — Ring-AllReduce is correct.
-Rank 0: ✓ Ring-AllReduce matches dist.all_reduce
-</code></pre></div></p>
-<p>Loss values will vary slightly by run due to random initialization, but should be in the 0.28–0.35 range after 3 epochs. The critical output is the two assertion lines confirming (1) parameter convergence across ranks and (2) numerical equivalence with PyTorch's reference AllReduce.</p>
-<h3 id="stretch-goals">Stretch goals<a class="headerlink" href="#stretch-goals" title="Permanent link">&para;</a></h3>
-<p>Once the basic build works, extend it in two directions. First, replace the manual gradient loop with PyTorch's <code>dist.all_reduce</code> and measure the wall-clock time difference — this quantifies the overhead of Python-level ring communication versus NCCL's optimized C++ kernel. Second, replace the <code>nn.Sequential</code> model with a two-layer model and add gradient bucketing: group parameters into two buckets and fire AllReduce on the first bucket while the second bucket's backward pass is still running. Measure whether this reduces total training time.</p>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong><code>RuntimeError: Address already in use</code> on port 29500</strong> → Change <code>MASTER_PORT</code> to any unused port (e.g., 29501).</li>
-<li><strong>Deadlock during <code>dist.recv</code></strong> → The ring topology is asymmetric: if rank 0 sends to rank 1 and rank 1 sends to rank 0 simultaneously with blocking sends, you get a deadlock. The fix is already in the recipe (<code>isend</code> for non-blocking send + blocking <code>recv</code>). If you modify the send/recv pattern, always use <code>isend</code>.</li>
-<li><strong>Parameter divergence assertion fails</strong> → This means gradients were not correctly averaged. Check that you are dividing by <code>world_size</code> after the AllReduce sum. The AllReduce computes a sum, not a mean.</li>
-<li><strong><code>gloo</code> backend not available</strong> → Install PyTorch with CPU support: <code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu</code>. The <code>gloo</code> backend is included in all standard PyTorch builds.</li>
-<li><strong>Slow training with 4 CPU workers</strong> → Expected. CPU-based multi-process communication is for correctness verification, not performance. Switch to <code>backend="nccl"</code> and <code>device=f"cuda:{rank}"</code> on a multi-GPU machine for realistic throughput.</li>
-</ul>
-<hr />
 <blockquote>
-<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+<p><em>Updated: 2026-05-25</em>
+DeepSpeed + FSDP are the standard libraries. ZeRO++ reduces communication overhead. For very large training runs (1000+ GPUs), 3D parallelism (data + tensor + pipeline) is required. Most frontier models use all three forms of parallelism simultaneously.</p>
 </blockquote>
-<hr />
-<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>PyTorch DDP</strong> — official implementation and documentation: <a href="https://pytorch.org/docs/stable/notes/ddp.html">pytorch.org/docs/stable/notes/ddp.html</a></li>
-<li><strong>PyTorch FSDP / FSDP2</strong> — <a href="https://pytorch.org/docs/stable/fsdp.html">pytorch.org/docs/stable/fsdp.html</a> and the FSDP2 tutorial at <a href="https://pytorch.org/tutorials/intermediate/FSDP_tutorial.html">pytorch.org/tutorials/intermediate/FSDP_tutorial.html</a></li>
-<li><strong>DeepSpeed ZeRO</strong> — official repository with ZeRO Stage 1/2/3 and ZeRO-Infinity: <a href="https://github.com/microsoft/DeepSpeed">github.com/microsoft/DeepSpeed</a></li>
-<li><strong>SimpleFSDP</strong> — Meta's compiler-native FSDP implementation: <a href="https://github.com/pytorch/torchtitan">github.com/pytorch/torchtitan</a> (SimpleFSDP is integrated into the torchtitan training framework)</li>
-<li><strong>NCCL</strong> — NVIDIA's Collective Communications Library, the C++ backend for GPU AllReduce: <a href="https://github.com/NVIDIA/nccl">github.com/NVIDIA/nccl</a></li>
-<li><strong>Megatron-LM</strong> — reference implementation of 3D parallelism including the data-parallel outer dimension: <a href="https://github.com/NVIDIA/Megatron-LM">github.com/NVIDIA/Megatron-LM</a></li>
-</ul>
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Understanding Ring-AllReduce at the primitive level makes the performance characteristics of DDP and FSDP predictable rather than mysterious — the bucket sizes, the overlap windows, and the scaling curves all follow directly from the bandwidth formula derived above.</p>
-<ul>
-<li>[[tensor-parallelism]] — the complementary parallelism strategy that splits individual matrix multiplications across GPUs within a node; data parallelism and tensor parallelism compose as the two innermost dimensions of 3D parallelism.</li>
-<li>[[pipeline-parallelism]] — splits the model's layer sequence across devices and uses micro-batching to keep all stages busy; data parallelism is the outermost wrapper around a pipeline-parallel group.</li>
-<li>[[gradient-compression]] — reduces the AllReduce communication volume by transmitting only the largest gradient values; directly addresses the bandwidth bottleneck that makes data parallelism communication-bound at scale.</li>
-</ul>
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../../04-neural-networks-dl/backpropagation/">Backpropagation</a> — Data parallelism replicates the model to perform backpropagation on different data subsets simultaneously.</li>
-<li><a href="../../07-attention-memory-reasoning/transformer/">Transformer Architecture</a> — Training massive Transformer models relies heavily on data-parallelism to scale across multiple GPUs.</li>
-<li><a href="../../02-generative-modeling/diffusion-models/">Diffusion Models</a> — Data-parallelism accelerates the computationally intensive training process of large-scale diffusion models.</li>
-<li><a href="../../06-reinforcement-learning/rlhf/">Reinforcement Learning from Human Feedback (RLHF)</a> — Scaling RLHF training pipelines often requires data-parallelism to process large batches of feedback.</li>
+<li>Model Parallelism — when model doesn't fit on one GPU even with ZeRO</li>
+<li>Mixed Precision — FP16/BF16 reduces memory and communication bandwidth</li>
+<li>Gradient Checkpointing — trades compute for memory within each device</li>
 </ul>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Zhao et al. (2023) — "PyTorch FSDP: Experiences on Scaling Fully Sharded Data Parallel" — <a href="https://arxiv.org/abs/2304.11277">https://arxiv.org/abs/2304.11277</a> — the most detailed public account of engineering production-scale data parallelism, including memory accounting, API design decisions, and failure modes encountered at Meta.</li>
-<li>Jia et al. (2018) — "Beyond Data and Model Parallelism for Deep Neural Networks" — <a href="https://arxiv.org/abs/1807.05358">https://arxiv.org/abs/1807.05358</a> — formalizes the full space of parallelization strategies as a search problem, making precise the conditions under which data parallelism is optimal.</li>
-<li>SimpleFSDP (2024) — "SimpleFSDP: Simpler Fully Sharded Data Parallel with torch.compile" — <a href="https://arxiv.org/abs/2411.00284">https://arxiv.org/abs/2411.00284</a> — demonstrates compiler-automated communication-computation overlap as the next evolution beyond manual DDP configuration; the benchmark numbers are the current reference for FSDP efficiency.</li>
-<li>Krizhevsky (2014) — "One weird trick for parallelizing convolutional neural networks" — <a href="https://arxiv.org/abs/1404.5997">https://arxiv.org/abs/1404.5997</a> — the foundational analysis of when data parallelism is communication-efficient and when model parallelism is necessary; the reasoning generalizes beyond CNNs.</li>
-<li>Lilian Weng's survey on large-scale distributed training (lil'log, 2021) — <a href="https://lilianweng.github.io/posts/2021-09-25-train-large/">https://lilianweng.github.io/posts/2021-09-25-train-large/</a> — a comprehensive walkthrough of data parallelism, model parallelism, and their composition, with diagrams that make the communication patterns concrete.</li>
+<li><a href="https://arxiv.org/abs/1909.08053">Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism</a> — Shoeybi et al. 2019</li>
 </ul>
 
 

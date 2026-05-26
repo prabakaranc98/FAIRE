@@ -3097,17 +3097,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#for-your-reader-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        For your reader type
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-it-is" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3141,28 +3130,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mathematical-foundations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mathematical foundations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-algorithms-techniques" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key algorithms / techniques
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#essential-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -3189,100 +3156,6 @@
     <span class="md-ellipsis">
       
         Current SotA
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-happening-now" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's happening now
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In production
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimum-valuable-build" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimum Valuable Build
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#code-implementations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Code &amp; implementations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What comes next
       
     </span>
   </a>
@@ -3932,7 +3805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -4002,14 +3875,14 @@
       
       
       
-        <span class="md-tag">implicit-regularization</span>
+        <span class="md-tag">interpolation</span>
       
     
       
       
       
       
-        <span class="md-tag">interpolation</span>
+        <span class="md-tag">overparameterization</span>
       
     
   </nav>
@@ -4021,96 +3894,22 @@
 
 <h1 id="double-descent">Double Descent<a class="headerlink" href="#double-descent" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> When model capacity crosses the interpolation threshold — the point where the model can exactly fit the training data — test error spikes and then falls again as capacity grows further, overturning the classical bias-variance tradeoff and explaining why massively overparameterized models generalize.</p>
+<p><strong>TL;DR:</strong> A phenomenon where model performance first worsens then improves again as model size grows past the interpolation threshold — challenging the classical bias-variance tradeoff and explaining why overparameterized models generalize.</p>
+<p>🚧 Agent-generated content pending. See <a href="../">track index</a> for context.</p>
 </blockquote>
-<hr />
-<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>I am...</th>
-<th>What you get</th>
-<th>Go to</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MS/applied practitioner</td>
-<td>A runnable PyTorch recipe that plots the double-descent curve, plus guidance on diagnosing it in LoRA fine-tuning</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-</tr>
-<tr>
-<td>Curious generalist</td>
-<td>An intuitive explanation of why "bigger is better" stopped being a paradox</td>
-<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-</tr>
-<tr>
-<td>Math/theory student</td>
-<td>The interpolation threshold condition, the bias-variance decomposition across regimes, and the PAC learning bound</td>
-<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
-</tr>
-<tr>
-<td>Researcher / frontier</td>
-<td>2025 results on agnostic PAC bounds near the threshold, deep feature learning, and the open constant problem</td>
-<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-</tr>
-</tbody>
-</table>
-<hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Imagine you are fine-tuning a large language model using LoRA and you decide to sweep the adapter rank to find the sweet spot. At rank 64 the model trains cleanly. At rank 128 the training loss begins to spike erratically mid-run — validation perplexity climbs, the loss curve looks broken, and every instinct says to stop and reduce capacity. But if you push through to rank 256, the instability resolves, the model converges to a lower loss than rank 64 ever achieved, and the final checkpoint outperforms both smaller configurations. You have just crossed the interpolation threshold twice: once into the danger zone, and once out the other side into the overparameterized regime where implicit regularization takes over.</p>
-<p>This phenomenon — test error falling, rising sharply, and then falling again as model capacity increases — is called double descent. The classical bias-variance tradeoff predicts a single U-shaped test error curve: underfitting on the left, overfitting on the right, with an optimal middle. That picture is correct for models that cannot perfectly fit the training data. But once a model is expressive enough to interpolate the training set — to achieve exactly zero training loss — something qualitatively different happens. Among all the functions that fit the data perfectly, gradient descent with implicit regularization tends to find the minimum-norm solution, which is often smoother and generalizes better than the best model just below the interpolation threshold. The threshold itself is the worst of all worlds: the model is just barely able to memorize the data, and the minimum-norm interpolant is highly sensitive to label noise.</p>
-<p>The phenomenon was named and systematically studied by Belkin et al. (2019) in "Reconciling Modern Machine Learning Practice and the Bias-Variance Trade-off," and the term "double descent" was coined by Nakkiran et al. (2019) in their empirical study across ResNets, transformers, and random forests. Both papers showed that the curve appears not just as a function of model size but also as a function of training time (epoch-wise double descent) and dataset size. The underlying mechanism — minimum-norm interpolation via implicit regularization — connects to a rich body of theory on kernel methods, random matrix theory, and the geometry of overparameterized optimization landscapes.</p>
-<hr />
+<p>Classical ML predicts a U-shaped bias-variance curve: too few parameters = underfitting, too many = overfitting. Double descent shows a second descent: as models grow past the interpolation threshold (where they can fit training data exactly), test performance improves again, eventually exceeding the classical sweet spot. This explains why neural networks with millions of parameters generalize well despite fitting training data exactly.</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>Every frontier lab is operating in the overparameterized regime by design. GPT-4, Gemini, and their successors are trained with far more parameters than training tokens would classically justify, and their generalization is explained precisely by the implicit regularization that operates past the interpolation threshold. Understanding double descent is not academic: it determines when to scale, when scaling will temporarily hurt, and how to interpret loss spikes during training runs that cost millions of dollars. The LoRA scenario above is not hypothetical — Wang et al. (2025) document exactly this transient divergence in high-rank LoRA fine-tuning and show that momentum-guided perturbations can smooth the trajectory through the threshold, recovering the benefits of high rank without the instability.</p>
-<p>At the theory frontier, the interpolation threshold is where classical PAC learning bounds break down. The standard agnostic PAC bound degrades near the threshold because the optimal learner's behavior changes character — it transitions from bias-dominated error to variance-dominated error and back. Hanneke et al. (2025) resolve a long-standing open question about the optimal constant in agnostic PAC bounds near this regime, tightening the characterization of what any learner can achieve when error matches capacity. Separately, Abbe et al. (2025) show that deep networks mitigate the sample complexity explosion at the threshold by sequentially reducing effective dimensionality through feature learning — a mechanism unavailable to shallow models and kernel methods. These results together suggest that the double-descent peak is not an immutable law but a property of the function class, and that architectural choices can shift or suppress it.</p>
-<hr />
+<p>Double descent is the theoretical foundation for why scaling works. It explains the empirical observation that larger models often perform better, even when they massively overfit training data. It challenges curriculum design (more data helps even when models are overfit) and our understanding of what "generalization" means.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Interpolation threshold</strong> — the precise model capacity at which training loss reaches zero; the model can fit every training point exactly, including noise.</li>
-<li><strong>Overparameterized regime</strong> — the region of capacity beyond the interpolation threshold, where infinitely many zero-training-loss solutions exist and the optimizer selects among them.</li>
-<li><strong>Minimum-norm interpolation</strong> — the specific solution selected by gradient descent (and kernel regression) in the overparameterized regime: the function with smallest norm that fits the data exactly.</li>
-<li><strong>Implicit regularization</strong> — the bias of an optimization algorithm toward low-complexity solutions, operating without an explicit penalty term in the loss function.</li>
-<li><strong>Epoch-wise double descent</strong> — the same U-then-rise-then-fall pattern observed as a function of training epochs rather than model size, occurring when a fixed model is trained past early stopping.</li>
-<li><strong>Effective model complexity</strong> — a unified measure (proposed by Nakkiran et al.) that captures capacity across model size, training time, and dataset size, enabling a single double-descent curve to describe all three axes.</li>
-<li><strong>Benign overfitting</strong> — the theoretical property of minimum-norm interpolants that fit noisy data exactly yet still achieve near-optimal test error, proven rigorously for linear models and random features.</li>
-<li><strong>Interpolation peak</strong> — the specific capacity value where test error is maximally elevated; the worst operating point, where the model memorizes noise without the smoothing benefit of overparameterization.</li>
+<li><strong>Interpolation threshold</strong> — model size where training error reaches zero</li>
+<li><strong>Underparameterized regime</strong> — fewer parameters than interpolation threshold; classical bias-variance applies</li>
+<li><strong>Overparameterized regime</strong> — beyond interpolation threshold; performance keeps improving</li>
+<li><strong>Benign overfitting</strong> — zero training loss models that generalize; theoretically characterized for linear models</li>
+<li><strong>Sample-wise double descent</strong> — varying training samples shows same U-then-improve pattern</li>
+<li><strong>Epoch-wise double descent</strong> — occurs during training too, not just as a function of model size</li>
 </ul>
-<hr />
-<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p>The classical bias-variance decomposition for a model with parameter count <span class="arithmatex">\(p\)</span> trained on <span class="arithmatex">\(n\)</span> samples gives expected test error as:</p>
-<div class="arithmatex">\[
-\mathbb{E}[\text{err}] = \text{Bias}^2 + \text{Variance} + \sigma^2
-\]</div>
-<p>where <span class="arithmatex">\(\text{Bias}^2\)</span> is the squared difference between the best model in the class and the true function, <span class="arithmatex">\(\text{Variance}\)</span> is the sensitivity of the learned model to training set randomness, and <span class="arithmatex">\(\sigma^2\)</span> is irreducible label noise. This equation says that in the classical regime (<span class="arithmatex">\(p \ll n\)</span>), bias dominates; in the mildly overparameterized regime near <span class="arithmatex">\(p \approx n\)</span>, variance explodes because the model is just barely able to interpolate and is maximally sensitive to noise.</p>
-<p>The interpolation condition for a linear model with feature matrix <span class="arithmatex">\(\mathbf{X} \in \mathbb{R}^{n \times p}\)</span> is:</p>
-<div class="arithmatex">\[
-p \geq n \iff \text{rank}(\mathbf{X}) = n
-\]</div>
-<p>where <span class="arithmatex">\(p\)</span> is the number of parameters (features), <span class="arithmatex">\(n\)</span> is the number of training samples, and <span class="arithmatex">\(\text{rank}(\mathbf{X}) = n\)</span> is the condition under which the system <span class="arithmatex">\(\mathbf{X}\boldsymbol{\beta} = \mathbf{y}\)</span> has infinitely many exact solutions. This equation says that once features outnumber samples, perfect training fit is achievable and the optimizer must choose among solutions.</p>
-<p>In the overparameterized linear regime, gradient descent from zero initialization converges to the minimum-norm interpolant:</p>
-<div class="arithmatex">\[
-\hat{\boldsymbol{\beta}}_{\text{MN}} = \mathbf{X}^\top (\mathbf{X}\mathbf{X}^\top)^{-1} \mathbf{y}
-\]</div>
-<p>where <span class="arithmatex">\(\hat{\boldsymbol{\beta}}_{\text{MN}} \in \mathbb{R}^p\)</span> is the minimum Euclidean norm solution, <span class="arithmatex">\(\mathbf{X} \in \mathbb{R}^{n \times p}\)</span> is the feature matrix with <span class="arithmatex">\(p &gt; n\)</span>, <span class="arithmatex">\(\mathbf{X}^\top\)</span> is its transpose, <span class="arithmatex">\((\mathbf{X}\mathbf{X}^\top)^{-1}\)</span> is the inverse of the <span class="arithmatex">\(n \times n\)</span> Gram matrix, and <span class="arithmatex">\(\mathbf{y} \in \mathbb{R}^n\)</span> is the label vector. This equation says that the pseudoinverse solution — the one gradient descent finds — is the smoothest function consistent with the data, which is why it generalizes despite fitting noise.</p>
-<p>The agnostic PAC learning bound near the interpolation threshold (Hanneke et al., 2025) gives the optimal achievable error for any learner:</p>
-<div class="arithmatex">\[
-\mathcal{L}(\hat{h}) \leq c \cdot \tau + O\!\left(\sqrt{\frac{\tau(d + \log(1/\delta))}{m}} + \frac{d + \log(1/\delta)}{m}\right)
-\]</div>
-<p>where <span class="arithmatex">\(\hat{h}\)</span> is the learned hypothesis, <span class="arithmatex">\(\tau\)</span> is the best achievable error by any hypothesis in the class (the approximation error), <span class="arithmatex">\(d\)</span> is the VC dimension of the hypothesis class, <span class="arithmatex">\(m\)</span> is the number of training samples, <span class="arithmatex">\(\delta\)</span> is the failure probability, and <span class="arithmatex">\(c\)</span> is a constant currently proven to be at most <span class="arithmatex">\(2.1\)</span>. This equation says that near the interpolation threshold, the optimal learner's error scales linearly with the irreducible approximation error <span class="arithmatex">\(\tau\)</span>, and the open question is whether <span class="arithmatex">\(c\)</span> can be reduced to exactly <span class="arithmatex">\(1\)</span>.</p>
-<hr />
-<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Random feature regression</strong> — introduced by Rahimi &amp; Recht (2007); approximates a kernel with random Fourier features, making the interpolation threshold explicit at <span class="arithmatex">\(p = n\)</span> and enabling clean empirical study of double descent without deep network confounds.</li>
-<li><strong>Minimum-norm interpolation (pseudoinverse regression)</strong> — the closed-form solution <span class="arithmatex">\(\hat{\boldsymbol{\beta}} = \mathbf{X}^+\mathbf{y}\)</span> that gradient descent from zero initialization converges to; the theoretical baseline for proving benign overfitting.</li>
-<li><strong>Epoch-wise double descent via early stopping</strong> — Nakkiran et al. (2019) showed that training a fixed model past early stopping produces the same double-descent curve in the time dimension; early stopping is equivalent to implicit capacity control.</li>
-<li><strong>LoRA-MGPO (Wang et al., 2025)</strong> — momentum-guided perturbation optimization for high-rank LoRA adapters; applies targeted noise to the optimizer state at the interpolation threshold to smooth the transient divergence and recover stable convergence.</li>
-<li><strong>Stochastic gradient descent with label noise</strong> — Blanc et al. (2020) showed that SGD with label noise implicitly regularizes toward low-complexity functions by preferring flat minima, providing a mechanism for why overparameterized models generalize.</li>
-<li><strong>Ridgeless regression</strong> — the limit of ridge regression as the regularization coefficient <span class="arithmatex">\(\lambda \to 0\)</span>; equivalent to minimum-norm interpolation and the standard theoretical model for studying double descent in linear settings.</li>
-<li><strong>Deep feature learning (Abbe et al., 2025)</strong> — sequential dimensionality reduction through depth, where each layer learns a lower-dimensional representation that reduces the effective <span class="arithmatex">\(p/n\)</span> ratio seen by subsequent layers, suppressing the interpolation peak.</li>
-</ul>
-<hr />
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4123,32 +3922,19 @@ p \geq n \iff \text{rank}(\mathbf{X}) = n
 </thead>
 <tbody>
 <tr>
-<td>"Reconciling Modern Machine Learning Practice and the Bias-Variance Trade-off"</td>
+<td><a href="https://arxiv.org/abs/1812.11118">Reconciling Modern Machine-Learning Practice and the Classical Bias–Variance Trade-Off</a></td>
+<td>2018</td>
+<td>Belkin et al.</td>
+<td>First clear statement of double descent</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/1912.02292">Deep Double Descent: Where Bigger Models and More Data Hurt</a></td>
 <td>2019</td>
-<td>Belkin, Hsu, Ma, Mandal</td>
-<td>Named and formalized the double-descent curve; proved benign overfitting for kernel interpolation</td>
-</tr>
-<tr>
-<td>"Deep Double Descent: Where Bigger Models and More Data Hurt"</td>
-<td>2019</td>
-<td>Nakkiran, Kaplun, Bansal, Yang, Barak, Sutskever</td>
-<td>Empirical demonstration across ResNets, transformers, random forests; introduced epoch-wise double descent and effective model complexity</td>
-</tr>
-<tr>
-<td>"On Agnostic PAC Learning in the Small Error Regime"</td>
-<td>2025</td>
-<td>Hanneke, Moran, Yehudayoff</td>
-<td>Resolves optimal agnostic PAC bounds near the interpolation threshold; establishes the <span class="arithmatex">\(c \leq 2.1\)</span> constant and states the open problem of reducing it to 1</td>
-</tr>
-<tr>
-<td>"The Computational Advantage of Depth"</td>
-<td>2025</td>
-<td>Abbe, Boix-Adsera, Brennan, Bresler, Muthukumar</td>
-<td>Shows deep networks suppress the interpolation peak via sequential feature learning; contrasts with shallow/kernel methods</td>
+<td>Nakkiran et al.</td>
+<td>Double descent in deep networks; epoch-wise phenomenon</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4160,267 +3946,31 @@ p \geq n \iff \text{rank}(\mathbf{X}) = n
 </thead>
 <tbody>
 <tr>
-<td>"Reconciling Modern Machine Learning Practice and the Bias-Variance Trade-off" (Belkin et al.)</td>
+<td><a href="https://arxiv.org/abs/1812.11118">Reconciling Modern ML Practice...</a></td>
+<td>2018</td>
+<td>Double descent curve — reframed generalization debate</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/abs/1906.11300">Benign Overfitting in Linear Regression</a></td>
 <td>2019</td>
-<td>First rigorous proof that interpolating estimators can generalize; coined "double descent" as a phenomenon</td>
-</tr>
-<tr>
-<td>"Deep Double Descent" (Nakkiran et al.)</td>
-<td>2019</td>
-<td>Empirical universality of double descent across architectures and training axes; introduced effective model complexity</td>
-</tr>
-<tr>
-<td>"Surprises in High-Dimensional Ridgeless Least Squares Interpolation" (Hastie, Montanari, Rosset, Tibshirani)</td>
-<td>2022</td>
-<td>Exact asymptotic characterization of test error for ridgeless regression using random matrix theory</td>
-</tr>
-<tr>
-<td>"Benign Overfitting in Linear Regression" (Bartlett, Montanari, Rakhlin, Tsigler)</td>
-<td>2020</td>
-<td>Proved that minimum-norm interpolation achieves near-optimal test error under spike covariance structure; established "benign overfitting" as a formal concept</td>
-</tr>
-<tr>
-<td>"Two Models of Double Descent for Weak Features" (Mei &amp; Montanari)</td>
-<td>2022</td>
-<td>Exact double-descent curve for random feature models using the Gaussian equivalence principle</td>
+<td>Bartlett et al.</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>The sharpest theoretical characterization of double descent is now in the linear and random-feature settings, where exact asymptotic test error curves are known via random matrix theory. Hastie et al. (2022) give the precise test error of ridgeless regression as a function of <span class="arithmatex">\(p/n\)</span> for isotropic Gaussian features, matching empirical curves on real datasets. On the deep learning side, Nakkiran et al.'s (2019) empirical results on ResNet-18 trained on CIFAR-10 with 20% label noise remain the canonical benchmark: test error peaks at roughly 0.4M parameters (the interpolation threshold for that dataset) and falls to below the classical optimum at 10M+ parameters. The 2025 results from Abbe et al. show that depth suppresses this peak measurably — a 4-layer network reaches the same test error as a 2-layer network at roughly half the parameter count past the threshold, quantifying the computational advantage of depth for the first time.</p>
-<hr />
-<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The central open question has shifted from "does double descent exist?" to "can we predict where the interpolation peak falls for deep, nonlinear architectures on real data?" Random matrix theory gives exact answers for linear models with Gaussian features, but extending these results to ReLU networks trained with SGD on structured data (natural images, text) remains open. The 2025 result from Hanneke et al. on agnostic PAC bounds tightens the theoretical envelope near the threshold but does not yet give a constructive prediction of the peak location. A parallel line of work is studying how the threshold shifts under distribution shift — if the test distribution differs from training, the effective interpolation threshold changes, and the peak can move in ways that are not yet analytically characterized.</p>
-<p><strong>Engineering and systems.</strong> The most practically urgent manifestation of double descent in 2025 is in parameter-efficient fine-tuning. LoRA rank selection is effectively a capacity control problem, and the interpolation threshold appears at different ranks depending on the base model, the task, and the dataset size. Wang et al. (2025) show that LoRA-MGPO — which applies momentum-guided perturbations at the threshold — recovers stable convergence at high rank without requiring the practitioner to know where the threshold is in advance. This is the engineering equivalent of a smooth crossing: instead of stopping before the peak or waiting for it to resolve, the optimizer actively smooths the trajectory. Similar ideas are appearing in mixture-of-experts routing, where individual expert capacity can cross local interpolation thresholds during training.</p>
-<p><strong>Open problems.</strong> The most precisely stated open problem in this area comes directly from Hanneke et al. (2025): can the constant <span class="arithmatex">\(c\)</span> in the agnostic PAC bound <span class="arithmatex">\(c \cdot \tau + O\!\left(\sqrt{\tau(d + \log(1/\delta))/m}\right)\)</span> be reduced from <span class="arithmatex">\(2.1\)</span> to exactly <span class="arithmatex">\(1\)</span>? A value of <span class="arithmatex">\(c = 1\)</span> would mean the optimal learner's error is exactly the irreducible approximation error plus a vanishing sample complexity term — a complete characterization of what is achievable near the threshold. The current proof technique cannot close this gap. A second open problem: for deep nonlinear networks trained with SGD on non-Gaussian data, can the location of the interpolation peak be predicted analytically — without running training to completion — from properties of the architecture and dataset alone?</p>
-<hr />
-<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Meta AI</strong> — LLaMA fine-tuning pipelines use rank-swept LoRA with automated loss-spike detection; the engineering team documents that high-rank adapters (rank ≥ 128) require learning rate warmup extensions to traverse the interpolation threshold stably — <a href="https://ai.meta.com/research/">ai.meta.com/research</a></li>
-<li><strong>Google DeepMind</strong> — Gemini's training infrastructure monitors effective model complexity metrics derived from Nakkiran et al.'s framework to detect epoch-wise double descent during long pretraining runs, triggering adaptive checkpoint selection — <a href="https://research.google">research.google</a></li>
-<li><strong>OpenAI</strong> — GPT-4 technical report notes that model capacity was deliberately chosen well into the overparameterized regime, with the interpolation threshold for the pretraining corpus estimated to be orders of magnitude below the deployed parameter count — <a href="https://openai.com/research">openai.com/research</a></li>
-<li><strong>Stability AI</strong> — Stable Diffusion fine-tuning guides document that DreamBooth runs on small datasets (3–30 images) operate near the interpolation threshold; the recommended step count is calibrated to avoid the epoch-wise peak — <a href="https://stability.ai/research">stability.ai/research</a></li>
-</ul>
-<hr />
-<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A self-contained PyTorch script that trains random feature regression models of increasing capacity on a noisy synthetic dataset and plots the classic double-descent test error curve, with the interpolation threshold visually marked.</p>
-<p><strong>Why this build:</strong> Random feature regression makes the interpolation threshold explicit and analytically predictable (<span class="arithmatex">\(p = n\)</span>), so the curve you produce is not an artifact of architecture choices — it is the phenomenon in its purest form. Every feature of the curve (the classical descent, the interpolation peak, the second descent) is visible in under 60 seconds on CPU.</p>
-<p><strong>Stack:</strong> Python 3.10+, PyTorch 2.2, NumPy 1.26, Matplotlib 3.8 — all available on free Colab T4 or any laptop.</p>
-<p><strong>Estimated time:</strong> 15 minutes to run, 30 minutes to understand the output.</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Install and import</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># No pip installs needed on Colab — all packages are pre-installed</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-
-<span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="n">device</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span> <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running on: </span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Generate a noisy synthetic dataset</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># True function: sin(2*pi*x), observed with Gaussian noise</span>
-<span class="n">n_train</span> <span class="o">=</span> <span class="mi">200</span>       <span class="c1"># number of training samples — interpolation threshold at p = n_train</span>
-<span class="n">n_test</span>  <span class="o">=</span> <span class="mi">2000</span>      <span class="c1"># test samples for reliable error estimation</span>
-<span class="n">sigma</span>   <span class="o">=</span> <span class="mf">0.3</span>       <span class="c1"># label noise standard deviation</span>
-
-<span class="n">x_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">n_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>          <span class="c1"># uniform on [-1, 1]</span>
-<span class="n">y_train</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x_train</span><span class="p">)</span> <span class="o">+</span> <span class="n">sigma</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">n_train</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-
-<span class="n">x_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n_test</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-<span class="n">y_test</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">x_test</span><span class="p">)</span>           <span class="c1"># noiseless ground truth</span>
-
-<span class="c1"># Sanity check: training labels should have nonzero variance</span>
-<span class="k">assert</span> <span class="n">y_train</span><span class="o">.</span><span class="n">std</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;Label variance too low — check data generation&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Train: </span><span class="si">{</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, Test: </span><span class="si">{</span><span class="n">x_test</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Define random feature regression with minimum-norm solution</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">random_feature_regression</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fits minimum-norm random feature regression with p features.</span>
-<span class="sd">    Returns train MSE and test MSE.</span>
-
-<span class="sd">    p: number of random Fourier features (capacity parameter)</span>
-<span class="sd">    gamma: RBF kernel bandwidth</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">n</span> <span class="o">=</span> <span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-    <span class="c1"># Sample random frequencies and phases for RFF approximation</span>
-    <span class="n">omega</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">x_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="n">gamma</span>   <span class="c1"># shape: (d, p)</span>
-    <span class="n">bias</span>  <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span>                  <span class="c1"># shape: (p,)</span>
-
-    <span class="c1"># Compute random feature maps: phi(x) = sqrt(2/p) * cos(x @ omega + bias)</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">phi</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="n">p</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">torch</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">@</span> <span class="n">omega</span> <span class="o">+</span> <span class="n">bias</span><span class="p">)</span>  <span class="c1"># shape: (n, p)</span>
-
-    <span class="n">Phi_train</span> <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">x_train</span><span class="p">)</span>   <span class="c1"># (n_train, p)</span>
-    <span class="n">Phi_test</span>  <span class="o">=</span> <span class="n">phi</span><span class="p">(</span><span class="n">x_test</span><span class="p">)</span>    <span class="c1"># (n_test, p)</span>
-
-    <span class="c1"># Minimum-norm interpolant via pseudoinverse</span>
-    <span class="c1"># When p &gt;= n: beta = Phi^T (Phi Phi^T)^{-1} y  (right pseudoinverse)</span>
-    <span class="c1"># When p &lt;  n: beta = (Phi^T Phi)^{-1} Phi^T y  (left pseudoinverse, least squares)</span>
-    <span class="n">beta</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">lstsq</span><span class="p">(</span><span class="n">Phi_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s1">&#39;gelsd&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">solution</span>  <span class="c1"># shape: (p, 1)</span>
-
-    <span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">Phi_train</span> <span class="o">@</span> <span class="n">beta</span>
-    <span class="n">y_pred_test</span>  <span class="o">=</span> <span class="n">Phi_test</span>  <span class="o">@</span> <span class="n">beta</span>
-
-    <span class="n">train_mse</span> <span class="o">=</span> <span class="p">((</span><span class="n">y_pred_train</span> <span class="o">-</span> <span class="n">y_train</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-    <span class="n">test_mse</span>  <span class="o">=</span> <span class="p">((</span><span class="n">y_pred_test</span>  <span class="o">-</span> <span class="n">y_test</span><span class="p">)</span>  <span class="o">**</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">train_mse</span><span class="p">,</span> <span class="n">test_mse</span>
-</code></pre></div>
-<ol>
-<li><strong>Sweep model capacity across the interpolation threshold</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># Capacity values: from heavily underparameterized to heavily overparameterized</span>
-<span class="c1"># Interpolation threshold is at p = n_train = 200</span>
-<span class="n">p_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span> <span class="o">+</span> \
-           <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span> <span class="o">+</span> \
-           <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">180</span><span class="p">,</span> <span class="mi">230</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> \   <span class="c1"># fine grid near the threshold</span>
-           <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">230</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span> <span class="o">+</span> \
-           <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">2001</span><span class="p">,</span> <span class="mi">100</span><span class="p">))</span>
-
-<span class="n">train_errors</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="n">test_errors</span>  <span class="o">=</span> <span class="p">[]</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sweeping capacity...&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">p_values</span><span class="p">:</span>
-    <span class="c1"># Average over 5 random seeds to reduce variance in the curve</span>
-    <span class="n">tr_list</span><span class="p">,</span> <span class="n">te_list</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">seed</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
-        <span class="n">torch</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-        <span class="n">tr</span><span class="p">,</span> <span class="n">te</span> <span class="o">=</span> <span class="n">random_feature_regression</span><span class="p">(</span><span class="n">x_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">x_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
-        <span class="n">tr_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tr</span><span class="p">)</span>
-        <span class="n">te_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">te</span><span class="p">)</span>
-    <span class="n">train_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tr_list</span><span class="p">))</span>
-    <span class="n">test_errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">te_list</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">p</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  p=</span><span class="si">{</span><span class="n">p</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> | train MSE=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tr_list</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | test MSE=</span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">te_list</span><span class="p">)</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Sanity check: training error should be near zero past the threshold</span>
-<span class="n">idx_threshold</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">p_values</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span> <span class="o">&gt;=</span> <span class="n">n_train</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">train_errors</span><span class="p">[</span><span class="n">idx_threshold</span> <span class="o">+</span> <span class="mi">5</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mf">0.01</span><span class="p">,</span> \
-    <span class="s2">&quot;Training error should be near zero well past the interpolation threshold&quot;</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Interpolation confirmed: training error collapses past threshold&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Plot the double-descent curve</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
-
-<span class="c1"># Left: full curve</span>
-<span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">test_errors</span><span class="p">,</span>  <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span>  <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Test MSE&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">train_errors</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train MSE&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">n_train</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;Interpolation threshold (p=</span><span class="si">{</span><span class="n">n_train</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Number of random features (p)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Mean Squared Error&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Double Descent: Random Feature Regression&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">test_errors</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">))</span>
-<span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="s1">&#39;Interpolation</span><span class="se">\n</span><span class="s1">peak&#39;</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">n_train</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">test_errors</span><span class="p">)),</span>
-            <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="n">n_train</span> <span class="o">+</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">test_errors</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.9</span><span class="p">),</span>
-            <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">),</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># Right: zoom near threshold</span>
-<span class="n">ax2</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">mask</span> <span class="o">=</span> <span class="p">[</span><span class="mi">150</span> <span class="o">&lt;=</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mi">500</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">p_values</span><span class="p">]</span>
-<span class="n">p_zoom</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">p_values</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="p">]</span>
-<span class="n">te_zoom</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">test_errors</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="p">]</span>
-<span class="n">tr_zoom</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">train_errors</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span> <span class="k">if</span> <span class="n">m</span><span class="p">]</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">p_zoom</span><span class="p">,</span> <span class="n">te_zoom</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;steelblue&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Test MSE&#39;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">p_zoom</span><span class="p">,</span> <span class="n">tr_zoom</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;darkorange&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Train MSE&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">n_train</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;p = n = </span><span class="si">{</span><span class="n">n_train</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;Number of random features (p)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Zoom: Near Interpolation Threshold&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">13</span><span class="p">)</span>
-<span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
-
-<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;double_descent_curve.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Saved: double_descent_curve.png&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Verify the three regimes quantitatively</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># Identify the three regimes</span>
-<span class="n">p_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p_values</span><span class="p">)</span>
-<span class="n">te_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">test_errors</span><span class="p">)</span>
-
-<span class="n">underfit_mse</span>  <span class="o">=</span> <span class="n">te_arr</span><span class="p">[</span><span class="n">p_arr</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-<span class="n">peak_mse</span>      <span class="o">=</span> <span class="n">te_arr</span><span class="p">[(</span><span class="n">p_arr</span> <span class="o">&gt;=</span> <span class="mi">180</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">p_arr</span> <span class="o">&lt;=</span> <span class="mi">230</span><span class="p">)]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-<span class="n">overfit_mse</span>   <span class="o">=</span> <span class="n">te_arr</span><span class="p">[</span><span class="n">p_arr</span> <span class="o">&gt;</span> <span class="mi">800</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Three-regime summary:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Underparameterized (p &lt; 100):   avg test MSE = </span><span class="si">{</span><span class="n">underfit_mse</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Interpolation peak (p ≈ n):     max test MSE = </span><span class="si">{</span><span class="n">peak_mse</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Overparameterized (p &gt; 800):    avg test MSE = </span><span class="si">{</span><span class="n">overfit_mse</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  Peak / overparameterized ratio: </span><span class="si">{</span><span class="n">peak_mse</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">overfit_mse</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  → The interpolation peak is </span><span class="si">{</span><span class="n">peak_mse</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">overfit_mse</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">x worse than the overparameterized regime&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>The saved PNG shows two panels. In the left panel, test MSE follows a U-shape from <span class="arithmatex">\(p = 10\)</span> to <span class="arithmatex">\(p \approx 180\)</span>, spikes sharply at <span class="arithmatex">\(p \approx 200\)</span> (the interpolation threshold), and then falls monotonically as <span class="arithmatex">\(p\)</span> grows past 400. Training MSE drops to near zero at <span class="arithmatex">\(p = 200\)</span> and stays there. In the right panel, the spike is clearly visible as a narrow peak centered on <span class="arithmatex">\(p = n = 200\)</span>. The terminal output should show something like:</p>
-<div class="highlight"><pre><span></span><code>Three-regime summary:
-  Underparameterized (p &lt; 100):   avg test MSE = 0.1823
-  Interpolation peak (p ≈ n):     max test MSE = 0.8741
-  Overparameterized (p &gt; 800):    avg test MSE = 0.0952
-
-  Peak / overparameterized ratio: 9.2x
-  → The interpolation peak is 9.2x worse than the overparameterized regime
-</code></pre></div>
-<p>The exact numbers vary by seed, but the peak should be at least 5× worse than the overparameterized regime for this noise level.</p>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Curve is flat with no visible peak</strong> → The noise level <span class="arithmatex">\(\sigma\)</span> is too low; increase to at least <span class="arithmatex">\(0.3\)</span>. Without label noise, the interpolation peak is suppressed.</li>
-<li><strong>Training MSE never reaches zero</strong> → The <code>lstsq</code> driver may be using a regularized solver; switch to <code>driver='gelsd'</code> explicitly, or verify that <span class="arithmatex">\(p &gt; n\)</span> for the overparameterized points.</li>
-<li><strong>Peak appears at wrong location</strong> → The threshold is at <span class="arithmatex">\(p = n_{\text{train}}\)</span>, not at a fixed value; if you changed <code>n_train</code>, the peak shifts accordingly.</li>
-<li><strong>Curve is very noisy</strong> → Increase the number of seeds in the averaging loop from 5 to 15; the curve near the threshold has high variance by construction.</li>
-<li><strong><code>lstsq</code> returns NaN for large p</strong> → Add a tiny ridge: replace <code>lstsq</code> with <code>torch.linalg.solve((Phi_train.T @ Phi_train + 1e-10 * torch.eye(p)), Phi_train.T @ y_train)</code> for the underparameterized case.</li>
-</ul>
-<hr />
 <blockquote>
-<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+<p><em>Updated: 2026-05-25</em>
+Double descent is well-established theoretically for linear models and empirically for neural networks. The frontier is explaining <em>why</em> specific inductive biases of SGD + neural network architectures lead to benign overfitting in practice. µP and feature learning theory (Yang &amp; Hu, 2022) are the current theoretical tools.</p>
 </blockquote>
-<hr />
-<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Nakkiran et al. deep double descent reproduction</strong> — official OpenAI codebase: <a href="https://github.com/openai/double-descent">github.com/openai/double-descent</a> — ResNet-18 and transformer experiments from the original paper.</li>
-<li><strong>Belkin lab interpolation experiments</strong> — <a href="https://github.com/mikhail-belkin/interpolation">github.com/mikhail-belkin/interpolation</a> — kernel and random feature experiments from the benign overfitting line of work.</li>
-<li><strong>LoRA-MGPO</strong> — <a href="https://github.com/wangxingjun778/LoRA-MGPO">github.com/wangxingjun778/LoRA-MGPO</a> — momentum-guided perturbation optimizer for high-rank LoRA, directly addressing the interpolation threshold instability in LLM fine-tuning.</li>
-<li><strong>HuggingFace PEFT</strong> — <a href="https://huggingface.co/docs/peft">huggingface.co/docs/peft</a> — the standard library for LoRA fine-tuning; rank is the primary capacity control parameter and the site of double descent in practice.</li>
-</ul>
-<hr />
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Understanding double descent makes the behavior of overparameterized models precise rather than mysterious — the following concepts extend or apply this understanding directly.</p>
-<ul>
-<li><a href="./implicit-regularization.md">Implicit Regularization</a> — the mechanism that selects the minimum-norm interpolant from among all zero-training-loss solutions; double descent is the observable consequence of implicit regularization operating past the threshold.</li>
-<li><a href="./bias-variance-tradeoff.md">Bias-Variance Tradeoff</a> — the classical framework that double descent extends; understanding where the classical picture breaks down requires knowing the classical picture first.</li>
-<li><a href="../pac-learning/">PAC Learning</a> — the formal framework in which the interpolation threshold appears as a phase transition in sample complexity; the Hanneke et al. (2025) result lives here.</li>
-</ul>
-<hr />
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../../05-statistical-probabilistic-ml/bayesian-inference/">Bayesian Inference</a> — Bayesian model averaging can mitigate the overfitting peak associated with double-descent.</li>
-<li><a href="../../07-attention-memory-reasoning/transformer/">Transformer Architecture</a> — Highly overparameterized transformer architectures frequently exhibit double-descent behavior during training.</li>
-<li><a href="../../04-neural-networks-dl/backpropagation/">Backpropagation</a> — Double-descent is commonly observed in deep neural networks optimized using backpropagation.</li>
+<li><a href="../pac-learning/">PAC Learning</a> — classical framework that double descent challenges</li>
+<li><a href="../../04-neural-networks-dl/scaling-laws/">Scaling Laws</a> — double descent is the per-model microcosm of scaling law behavior</li>
+<li>Implicit Bias — SGD's implicit regularization explains benign overfitting</li>
 </ul>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Belkin et al. (2019) — "Reconciling Modern Machine Learning Practice and the Bias-Variance Trade-off" — <a href="https://arxiv.org/abs/1812.11118">arxiv.org/abs/1812.11118</a> — the foundational paper; reading the proof of benign overfitting for kernel interpolation gives the clearest mechanistic understanding of why the second descent occurs.</li>
-<li>Nakkiran et al. (2019) — "Deep Double Descent: Where Bigger Models and More Data Hurt" — <a href="https://arxiv.org/abs/1912.02292">arxiv.org/abs/1912.02292</a> — the empirical universality paper; the appendix contains the effective model complexity definition and the epoch-wise double descent experiments not covered in the main text.</li>
-<li>Bartlett, Montanari, Rakhlin, Tsigler (2020) — "Benign Overfitting in Linear Regression" — <a href="https://arxiv.org/abs/1906.11300">arxiv.org/abs/1906.11300</a> — the rigorous proof that minimum-norm interpolation achieves near-optimal test error; the spike covariance condition is the key structural assumption.</li>
-<li>Hastie, Montanari, Rosset, Tibshirani (2022) — "Surprises in High-Dimensional Ridgeless Least Squares Interpolation" — <a href="https://arxiv.org/abs/1903.08560">arxiv.org/abs/1903.08560</a> — derives the exact asymptotic double-descent curve using random matrix theory; the most mathematically complete treatment of the linear case.</li>
-<li>Lilian Weng — "Are Deep Neural Networks Dramatically Overfitted?" (lil'log, 2019) — <a href="https://lilianweng.github.io/posts/2019-03-14-are-deep-neural-networks-dramatically-overfitted/">lilianweng.github.io/posts/2019-03-14-are-deep-neural-networks-dramatically-overfitted</a> — an accessible survey of the empirical evidence for double descent across model families, useful as a companion to the theoretical papers.</li>
-<li>Mei &amp; Montanari (2022) — "The Generalization Error of Random Features Regression" — <a href="https://arxiv.org/abs/1904.12191">arxiv.org/abs/1904.12191</a> — derives the exact double-descent curve for random feature models using the Gaussian equivalence principle; the mathematical bridge between the linear theory and the random feature experiments in the MVB above.</li>
+<li><a href="https://arxiv.org/abs/2105.02180">A Unifying Tutorial on Approximate Message Passing</a> — connections to statistical physics of high-dimensional learning</li>
 </ul>
 
 

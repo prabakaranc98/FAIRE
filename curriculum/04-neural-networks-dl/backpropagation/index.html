@@ -1144,17 +1144,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#for-your-reader-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        For your reader type
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#what-it-is" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1188,28 +1177,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#mathematical-foundations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mathematical foundations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-algorithms-techniques" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key algorithms / techniques
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#essential-reading" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1236,100 +1203,6 @@
     <span class="md-ellipsis">
       
         Current SotA
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-happening-now" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's happening now
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#in-production" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        In production
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#minimum-valuable-build" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimum Valuable Build
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Minimum Valuable Build">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#the-recipe" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        The recipe
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#expected-output" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected output
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#common-failure-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Common failure modes
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#code-implementations" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Code &amp; implementations
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#what-comes-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What comes next
       
     </span>
   </a>
@@ -3932,7 +3805,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../system/supervisor.md" class="md-nav__link">
         
   
   
@@ -3981,7 +3854,7 @@
       
       
       
-        <span class="md-tag">automatic-differentiation</span>
+        <span class="md-tag">autograd</span>
       
     
       
@@ -4002,14 +3875,14 @@
       
       
       
-        <span class="md-tag">credit-assignment</span>
+        <span class="md-tag">computational-graphs</span>
       
     
       
       
       
       
-        <span class="md-tag">gradient-descent</span>
+        <span class="md-tag">gradients</span>
       
     
   </nav>
@@ -4021,96 +3894,22 @@
 
 <h1 id="backpropagation">Backpropagation<a class="headerlink" href="#backpropagation" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>TL;DR:</strong> Backpropagation is the dynamic programming algorithm that makes training deep networks computationally feasible — it computes exact gradients for every parameter in a single reverse pass by reusing cached forward activations, turning an otherwise intractable credit-assignment problem into an <span class="arithmatex">\(O(N)\)</span> operation.</p>
+<p><strong>TL;DR:</strong> The algorithm that makes training deep networks possible — efficient gradient computation via reverse-mode automatic differentiation through a computational graph.</p>
+<p>🚧 Agent-generated content pending. See <a href="../">track index</a> for context.</p>
 </blockquote>
-<hr />
-<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>I am...</th>
-<th>What you get</th>
-<th>Go to</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MS/applied practitioner</td>
-<td>A working NumPy MLP with hand-derived backward pass, plus production framing</td>
-<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
-</tr>
-<tr>
-<td>Curious generalist</td>
-<td>An intuition for why this algorithm is the engine of modern AI</td>
-<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters</a></td>
-</tr>
-<tr>
-<td>Math/theory student</td>
-<td>Full chain-rule derivation, Jacobian-vector products, annotated equations</td>
-<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
-</tr>
-<tr>
-<td>Researcher / frontier</td>
-<td>Open problems in forward-only learning and memory-efficient training</td>
-<td><a href="#current-sota">Current SotA</a> → <a href="#whats-happening-now">What's happening now</a></td>
-</tr>
-</tbody>
-</table>
-<hr />
 <h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
-<p>Imagine you need to update every weight in a 70-billion parameter language model after seeing a single training example. The naive approach — perturbing each weight by a tiny amount and measuring how the loss changes — would require running the entire forward pass 70 billion times, once per parameter. At even a millisecond per forward pass, that is roughly 2,200 years of compute per gradient step. This is the computational nightmare that backpropagation was designed to escape. Instead of measuring the effect of each weight independently, backpropagation asks a different question: given that the forward pass has already been run and every intermediate activation cached, can error signals be propagated backward through the network in a single reverse sweep? The answer is yes, and the key insight is the chain rule of calculus applied systematically in reverse topological order.</p>
-<p>Backpropagation works by decomposing the gradient of the loss with respect to every parameter into a product of local Jacobians. Each layer computes a simple local operation — a matrix multiply, a nonlinearity, a normalization — and during the forward pass, the inputs to each operation are cached in memory. During the backward pass, the algorithm walks the computation graph in reverse: it receives a gradient signal from the layer above, multiplies it by the local Jacobian of the current operation, and passes the result to the layer below. Because each local Jacobian is cheap to compute given the cached activations, the entire backward pass costs roughly the same as two forward passes. This is the dynamic programming insight: reuse what you already computed rather than recomputing it from scratch for each parameter.</p>
-<p>The algorithm was formalized by Rumelhart, Hinton, and Williams in 1986, though precursors existed in control theory and automatic differentiation. What the 1986 paper demonstrated was that multi-layer networks trained with backpropagation could learn non-trivial internal representations — features that no human had hand-engineered — purely from data. That demonstration broke a decade-long stalemate in neural network research and established the template for every modern deep learning framework. Today, PyTorch and JAX implement backpropagation through automatic differentiation engines that build dynamic computation graphs, but the underlying algorithm is the same chain-rule recursion Rumelhart et al. described.</p>
-<hr />
+<p>Backpropagation computes the gradient of a scalar loss with respect to all parameters by applying the chain rule backwards through the computational graph. In reverse mode (what all frameworks implement), a single backward pass computes all gradients simultaneously in O(forward pass) time.</p>
 <h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
-<p>Every gradient-based optimization method in deep learning — Adam, AdaFactor, Shampoo, Muon — depends on backpropagation to supply the gradient signal. This means that any limitation of backpropagation propagates directly into the training of frontier models. The most pressing current limitation is memory: storing all intermediate activations for a backward pass through a 70B-parameter transformer requires hundreds of gigabytes of GPU memory, which is why gradient checkpointing (selectively discarding and recomputing activations) has become a standard training technique. The tradeoff between memory and recomputation is an active engineering problem at every major lab, and it shapes decisions about model architecture, batch size, and hardware configuration.</p>
-<p>At the research frontier, backpropagation faces a deeper challenge: it is biologically implausible and architecturally rigid. The algorithm requires symmetric weight matrices between forward and backward passes (the "weight transport problem"), global synchronization across all layers before any update can occur (the "update locking problem"), and exact gradient information that is unavailable in physical neuromorphic hardware. These constraints have motivated a growing body of work on forward-only learning rules — perturbation-based methods, forward-forward algorithms, and local learning rules — that attempt to match backpropagation's sample efficiency without its structural requirements. Whether any of these alternatives can scale to the parameter counts where backpropagation currently operates remains an open question that several labs are actively investigating.</p>
-<hr />
+<p>Every parameter update in every neural network trained today uses backpropagation. Understanding it — the mechanics, the failure modes (vanishing/exploding gradients), and its limitations — is prerequisite to understanding any training dynamics research.</p>
 <h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Credit assignment</strong> — the problem of determining how much each weight in a network contributed to the final loss, which backpropagation solves by propagating error signals backward through the computation graph.</li>
-<li><strong>Computation graph</strong> — a directed acyclic graph where nodes are operations and edges carry tensors; backpropagation traverses this graph in reverse topological order.</li>
-<li><strong>Local Jacobian</strong> — the matrix of partial derivatives of a layer's outputs with respect to its inputs, computed cheaply from cached forward activations and used to route gradient signals.</li>
-<li><strong>Chain rule</strong> — the calculus identity <span class="arithmatex">\(\frac{d\mathcal{L}}{dx} = \frac{d\mathcal{L}}{dy} \cdot \frac{dy}{dx}\)</span> that allows gradients to be composed across layers without recomputing the full derivative from scratch.</li>
-<li><strong>Gradient accumulation</strong> — the practice of summing gradients over multiple forward passes before applying a weight update, used to simulate large batch sizes on memory-constrained hardware.</li>
-<li><strong>Gradient checkpointing</strong> — a memory-reduction technique that discards intermediate activations during the forward pass and recomputes them on demand during the backward pass, trading compute for memory.</li>
-<li><strong>Vanishing gradient</strong> — the phenomenon where gradient magnitudes shrink exponentially as they propagate through many layers, making early-layer weights learn extremely slowly; addressed by careful initialization, normalization, and activation function choice.</li>
-<li><strong>Jacobian-vector product (JVP)</strong> — the efficient computation of the product of a Jacobian matrix with a vector without materializing the full Jacobian, which is how modern autograd engines implement backward passes in <span class="arithmatex">\(O(N)\)</span> time.</li>
+<li><strong>Computational graph</strong> — DAG of operations; backprop traverses it in reverse</li>
+<li><strong>Chain rule</strong> — ∂L/∂x = ∂L/∂z × ∂z/∂x for any intermediate z</li>
+<li><strong>Forward pass</strong> — compute activations, cache values for backward</li>
+<li><strong>Backward pass</strong> — accumulate gradients from output to input</li>
+<li><strong>Vanishing gradient</strong> — gradients → 0 in deep networks with saturating activations</li>
+<li><strong>Exploding gradient</strong> — gradients → ∞; fixed with gradient clipping</li>
 </ul>
-<hr />
-<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
-<p>The forward pass of a two-layer network with parameters <span class="arithmatex">\(\mathbf{W}^{(1)}, \mathbf{W}^{(2)}\)</span> computes:</p>
-<div class="arithmatex">\[
-\mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x}, \quad \mathbf{a}^{(1)} = \sigma(\mathbf{z}^{(1)}), \quad \hat{\mathbf{y}} = \mathbf{W}^{(2)} \mathbf{a}^{(1)}
-\]</div>
-<p>where <span class="arithmatex">\(\mathbf{x} \in \mathbb{R}^{d}\)</span> is the input vector, <span class="arithmatex">\(\mathbf{W}^{(1)} \in \mathbb{R}^{h \times d}\)</span> and <span class="arithmatex">\(\mathbf{W}^{(2)} \in \mathbb{R}^{c \times h}\)</span> are weight matrices, <span class="arithmatex">\(\sigma\)</span> is an elementwise nonlinearity (e.g., ReLU), <span class="arithmatex">\(\mathbf{a}^{(1)}\)</span> is the hidden activation, and <span class="arithmatex">\(\hat{\mathbf{y}}\)</span> is the network output. This equation says that the network is a composition of affine maps and pointwise nonlinearities, and every intermediate value must be cached for the backward pass.</p>
-<p>The scalar loss <span class="arithmatex">\(\mathcal{L}\)</span> measures the discrepancy between <span class="arithmatex">\(\hat{\mathbf{y}}\)</span> and the true label <span class="arithmatex">\(\mathbf{y}\)</span>. The gradient with respect to the output-layer weights follows directly:</p>
-<div class="arithmatex">\[
-\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{(2)}} = \boldsymbol{\delta}^{(2)} \left(\mathbf{a}^{(1)}\right)^\top
-\]</div>
-<p>where <span class="arithmatex">\(\boldsymbol{\delta}^{(2)} = \frac{\partial \mathcal{L}}{\partial \hat{\mathbf{y}}}\)</span> is the upstream gradient arriving from the loss function (a column vector in <span class="arithmatex">\(\mathbb{R}^{c}\)</span>), and <span class="arithmatex">\(\mathbf{a}^{(1)} \in \mathbb{R}^{h}\)</span> is the cached hidden activation from the forward pass. This equation says that the gradient of the loss with respect to a weight matrix is an outer product of the upstream error signal and the layer's input — a rank-one update that can be computed in <span class="arithmatex">\(O(ch)\)</span> time.</p>
-<p>The backward pass through the hidden layer applies the chain rule through the nonlinearity:</p>
-<div class="arithmatex">\[
-\boldsymbol{\delta}^{(1)} = \left(\mathbf{W}^{(2)}\right)^\top \boldsymbol{\delta}^{(2)} \odot \sigma'(\mathbf{z}^{(1)})
-\]</div>
-<p>where <span class="arithmatex">\(\left(\mathbf{W}^{(2)}\right)^\top \boldsymbol{\delta}^{(2)}\)</span> routes the upstream gradient back through the weight matrix, <span class="arithmatex">\(\sigma'(\mathbf{z}^{(1)})\)</span> is the elementwise derivative of the activation function evaluated at the cached pre-activation <span class="arithmatex">\(\mathbf{z}^{(1)}\)</span>, and <span class="arithmatex">\(\odot\)</span> denotes elementwise multiplication. This equation says that the gradient signal is first linearly transformed by the transposed weight matrix, then gated by how sensitive the nonlinearity was at each unit — units that were saturated (e.g., in the flat region of a sigmoid) pass almost no gradient backward.</p>
-<p>The gradient with respect to the first-layer weights then follows the same outer-product pattern:</p>
-<div class="arithmatex">\[
-\frac{\partial \mathcal{L}}{\partial \mathbf{W}^{(1)}} = \boldsymbol{\delta}^{(1)} \mathbf{x}^\top
-\]</div>
-<p>where <span class="arithmatex">\(\boldsymbol{\delta}^{(1)} \in \mathbb{R}^{h}\)</span> is the error signal computed above and <span class="arithmatex">\(\mathbf{x} \in \mathbb{R}^{d}\)</span> is the original input cached during the forward pass. This equation says that the gradient of the loss with respect to the first layer's weights depends on the input to that layer and the error signal that arrived from all layers above it — the entire credit-assignment chain collapses into a single outer product.</p>
-<hr />
-<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Vanilla backpropagation (Rumelhart et al., 1986)</strong> — the original formulation: run a forward pass, cache all activations, walk the computation graph in reverse applying the chain rule, accumulate parameter gradients, and apply a gradient descent update.</li>
-<li><strong>Stochastic gradient descent (SGD) with momentum</strong> — pairs backpropagation with a momentum buffer that accumulates a running average of past gradients, smoothing the update direction and accelerating convergence in ravines.</li>
-<li><strong>Adam (Kingma &amp; Ba, 2015)</strong> — adapts the learning rate per parameter using first and second moment estimates of the gradient, making it robust to sparse gradients and ill-conditioned loss surfaces; the default optimizer for most transformer training runs.</li>
-<li><strong>Gradient checkpointing (Chen et al., 2016)</strong> — divides the computation graph into segments, discards activations between segment boundaries during the forward pass, and recomputes them on demand during the backward pass; reduces activation memory from <span class="arithmatex">\(O(N)\)</span> to <span class="arithmatex">\(O(\sqrt{N})\)</span> at the cost of one additional forward pass.</li>
-<li><strong>Mixed-precision training (Micikevicius et al., 2018)</strong> — stores weights in FP32 but computes forward and backward passes in FP16 or BF16, halving memory bandwidth requirements while maintaining numerical stability through a loss-scaling trick that prevents gradient underflow.</li>
-<li><strong>Gradient clipping</strong> — caps the global norm of the gradient vector before applying the update, preventing the exploding gradient problem that destabilizes training in deep recurrent networks and transformers.</li>
-<li><strong>Reverse-mode automatic differentiation</strong> — the general framework that implements backpropagation for arbitrary computation graphs by recording operations during the forward pass and replaying them in reverse; the foundation of PyTorch's <code>autograd</code> and JAX's <code>grad</code> transform.</li>
-</ul>
-<hr />
 <h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4123,32 +3922,13 @@
 </thead>
 <tbody>
 <tr>
-<td>"Learning representations by back-propagating errors"</td>
+<td><a href="https://www.nature.com/articles/323533a0">Learning representations by back-propagating errors</a></td>
 <td>1986</td>
 <td>Rumelhart, Hinton, Williams</td>
-<td>Establishes the foundational chain-rule formulation; demonstrates that hidden layers can learn internal representations</td>
-</tr>
-<tr>
-<td>"A theoretical framework for back-propagation"</td>
-<td>1988</td>
-<td>LeCun</td>
-<td>Provides convergence analysis, activation scaling recommendations, and weight initialization principles that prevent vanishing gradients</td>
-</tr>
-<tr>
-<td>"Gradient-based learning applied to document recognition"</td>
-<td>1998</td>
-<td>LeCun, Bottou, Bengio, Haffner</td>
-<td>Shows backpropagation scaling to a real-world convolutional architecture (LeNet-5) trained end-to-end on MNIST</td>
-</tr>
-<tr>
-<td>"Training Deep Nets with Sublinear Memory Cost"</td>
-<td>2016</td>
-<td>Chen, Xu, Zhang, Chen</td>
-<td>Introduces gradient checkpointing as a systematic memory-compute tradeoff for scaling backpropagation to deep architectures</td>
+<td>Original formulation of backprop</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -4160,283 +3940,32 @@
 </thead>
 <tbody>
 <tr>
-<td>"Learning representations by back-propagating errors" — Rumelhart, Hinton, Williams</td>
-<td>1986</td>
-<td>Proved that multi-layer networks can learn useful internal representations via gradient descent; broke the XOR stalemate</td>
+<td><a href="https://www.cs.cmu.edu/~bhiksha/courses/deeplearning/Fall.2016/pdfs/Werbos.1990.pdf">Backpropagation through time (BPTT)</a></td>
+<td>1990</td>
+<td>Werbos</td>
 </tr>
 <tr>
-<td>"Efficient BackProp" — LeCun et al.</td>
-<td>1998</td>
-<td>Practical guide to making backpropagation converge: weight initialization, activation normalization, learning rate schedules; still cited in modern training recipes</td>
-</tr>
-<tr>
-<td>"Adam: A Method for Stochastic Optimization" — Kingma &amp; Ba</td>
+<td><a href="https://arxiv.org/abs/1502.05767">Automatic Differentiation in Machine Learning: a Survey</a></td>
 <td>2015</td>
-<td>Adaptive gradient algorithm that became the default optimizer for deep learning; demonstrated that second-moment gradient estimates dramatically stabilize training</td>
-</tr>
-<tr>
-<td>"Automatic differentiation in machine learning: a survey" — Baydin et al.</td>
-<td>2018</td>
-<td>Unified treatment of forward-mode and reverse-mode AD, clarifying the relationship between backpropagation and the broader AD literature</td>
+<td>Baydin et al.</td>
 </tr>
 </tbody>
 </table>
-<hr />
 <h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
-<p>Backpropagation itself is not benchmarked directly — it is the substrate on which all benchmarked systems run. The relevant frontier is memory-efficient gradient computation. FlashAttention-3 (Shah et al., 2024) achieves 1.5–2× speedup over FlashAttention-2 on H100 GPUs by fusing the forward and backward attention kernels to minimize HBM reads, enabling training of 70B-parameter models with sequence lengths exceeding 128K tokens. Gradient checkpointing combined with activation offloading to CPU RAM, as implemented in DeepSpeed ZeRO-3, allows training of models exceeding 100B parameters on clusters of A100 80GB GPUs without model parallelism. The practical limit of backpropagation at scale is now memory bandwidth and inter-device communication, not the algorithm itself.</p>
-<hr />
-<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
-<p><strong>Research frontiers.</strong> The most active theoretical challenge to backpropagation is the forward-forward algorithm (Hinton, 2022), which proposes replacing the backward pass entirely with two forward passes — one on real data and one on synthetically corrupted data — using a local contrastive objective at each layer. Early results show competitive performance on MNIST and CIFAR-10, but the method has not yet matched backpropagation on large-scale benchmarks. Separately, perturbation-based methods like PEPITA and direct feedback alignment attempt to sidestep the weight transport problem by using random fixed feedback matrices instead of transposed forward weights, accepting some gradient approximation error in exchange for biological plausibility. Neither approach has demonstrated the sample efficiency of exact backpropagation at scale.</p>
-<p><strong>Engineering and systems.</strong> The engineering frontier is dominated by making backpropagation faster and cheaper on modern accelerators. Compiler-level fusion — implemented in <code>torch.compile</code> (PyTorch 2.0+) and XLA (JAX) — eliminates kernel launch overhead by fusing sequences of elementwise operations in the backward pass into single GPU kernels. Quantized training (e.g., FP8 gradients as in Transformer Engine) pushes memory bandwidth further, though numerical stability of FP8 backward passes remains an active engineering problem. Distributed training frameworks like Megatron-LM and DeepSpeed implement pipeline parallelism that overlaps forward passes of one micro-batch with backward passes of another, hiding the sequential dependency that would otherwise leave GPUs idle.</p>
-<p><strong>Open problems.</strong> The weight transport problem remains unsolved at scale: how can a physical system — whether a neuromorphic chip or a biological neural circuit — implement backpropagation-level credit assignment without requiring that the feedback pathway use exactly the transposed weights of the forward pathway? Formally, the question is whether there exists a local learning rule <span class="arithmatex">\(f(\mathbf{x}_i, \mathbf{e}_i)\)</span> — depending only on a neuron's local activation <span class="arithmatex">\(\mathbf{x}_i\)</span> and some local error signal <span class="arithmatex">\(\mathbf{e}_i\)</span> — that converges to the same fixed point as gradient descent on the global loss, without any global synchronization step. Current approximations (feedback alignment, target propagation) converge to different fixed points and lose accuracy on deep networks. A proof of impossibility or a constructive algorithm would be a significant theoretical result.</p>
-<hr />
-<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Meta AI</strong> — trains Llama 3 (8B–405B parameters) using backpropagation with FSDP (Fully Sharded Data Parallelism) across thousands of H100 GPUs; gradient sharding reduces per-device memory by a factor equal to the number of data-parallel workers — <a href="https://ai.meta.com/research/publications/the-llama-3-herd-of-models/">ai.meta.com/research/publications/the-llama-3-herd-of-models/</a></li>
-<li><strong>Google DeepMind</strong> — trains Gemini Ultra using a combination of tensor parallelism and pipeline parallelism with gradient checkpointing; the backward pass is distributed across TPU pods with custom XLA kernels that fuse attention backward operations — <a href="https://research.google/blog/gemini/">research.google/blog/gemini/</a></li>
-<li><strong>OpenAI</strong> — GPT-4 training used mixed-precision backpropagation (BF16 forward/backward, FP32 master weights) with gradient clipping at global norm 1.0; the training infrastructure is described in the GPT-4 technical report — <a href="https://openai.com/research/gpt-4">openai.com/research/gpt-4</a></li>
-<li><strong>NVIDIA</strong> — Megatron-LM implements interleaved pipeline schedules that overlap backward passes of one pipeline stage with forward passes of the next, achieving up to 50% reduction in pipeline bubble overhead for 530B-parameter models — <a href="https://developer.nvidia.com/blog/scaling-language-model-training-to-a-trillion-parameters-using-megatron/">developer.nvidia.com/blog/scaling-language-model-training-to-a-trillion-parameters-using-megatron/</a></li>
-</ul>
-<hr />
-<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A two-layer MLP trained on MNIST using hand-written backpropagation in NumPy — no PyTorch autograd, no Keras, no automatic differentiation of any kind.</p>
-<p><strong>Why this build:</strong> Writing the backward pass by hand forces you to confront exactly what <code>loss.backward()</code> is doing: caching activations, computing local Jacobians, and accumulating outer-product gradient updates. After this build, reading PyTorch's autograd source code or a paper's gradient derivation will feel concrete rather than abstract.</p>
-<p><strong>Stack:</strong> Python 3.10+, NumPy 1.26+, scikit-learn 1.4+ (for MNIST loading only)</p>
-<p><strong>Estimated time:</strong> 60–90 minutes</p>
-<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Install dependencies and load MNIST</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">pip</span> <span class="n">install</span> <span class="n">numpy</span> <span class="n">scikit</span><span class="o">-</span><span class="n">learn</span>
-</code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">fetch_openml</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">OneHotEncoder</span>
-
-<span class="c1"># Load MNIST (70,000 samples, 784 features)</span>
-<span class="n">mnist</span> <span class="o">=</span> <span class="n">fetch_openml</span><span class="p">(</span><span class="s2">&quot;mnist_784&quot;</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">as_frame</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">X</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">mnist</span><span class="o">.</span><span class="n">data</span> <span class="o">/</span> <span class="mf">255.0</span><span class="p">,</span> <span class="n">mnist</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-
-<span class="c1"># Train/test split</span>
-<span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span> <span class="o">=</span> <span class="n">X</span><span class="p">[:</span><span class="mi">60000</span><span class="p">],</span> <span class="n">X</span><span class="p">[</span><span class="mi">60000</span><span class="p">:]</span>
-<span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">y</span><span class="p">[:</span><span class="mi">60000</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="mi">60000</span><span class="p">:]</span>
-
-<span class="c1"># One-hot encode labels</span>
-<span class="n">enc</span> <span class="o">=</span> <span class="n">OneHotEncoder</span><span class="p">(</span><span class="n">sparse_output</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">Y_train</span> <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">y_train</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>  <span class="c1"># (60000, 10)</span>
-<span class="n">Y_test</span>  <span class="o">=</span> <span class="n">enc</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">y_test</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;X_train: </span><span class="si">{</span><span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">, Y_train: </span><span class="si">{</span><span class="n">Y_train</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="c1"># Expected: X_train: (60000, 784), Y_train: (60000, 10)</span>
-</code></pre></div>
-<ol>
-<li><strong>Initialize weights with Xavier scaling</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="n">d_in</span><span class="p">,</span> <span class="n">d_hidden</span><span class="p">,</span> <span class="n">d_out</span> <span class="o">=</span> <span class="mi">784</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">10</span>
-
-<span class="c1"># Xavier initialization: scale by sqrt(2 / fan_in + fan_out)</span>
-<span class="n">W1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_in</span><span class="p">,</span> <span class="n">d_hidden</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">d_in</span> <span class="o">+</span> <span class="n">d_hidden</span><span class="p">))</span>
-<span class="n">b1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">d_hidden</span><span class="p">))</span>
-
-<span class="n">W2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_hidden</span><span class="p">,</span> <span class="n">d_out</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">d_hidden</span> <span class="o">+</span> <span class="n">d_out</span><span class="p">))</span>
-<span class="n">b2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">d_out</span><span class="p">))</span>
-
-<span class="c1"># Sanity check shapes</span>
-<span class="k">assert</span> <span class="n">W1</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="mi">256</span><span class="p">)</span>
-<span class="k">assert</span> <span class="n">W2</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Weights initialized.&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Define the forward pass — cache everything</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">relu</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">relu_grad</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">z</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">softmax</span><span class="p">(</span><span class="n">z</span><span class="p">):</span>
-    <span class="c1"># Numerically stable: subtract row max before exp</span>
-    <span class="n">z_shifted</span> <span class="o">=</span> <span class="n">z</span> <span class="o">-</span> <span class="n">z</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">exp_z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">z_shifted</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">exp_z</span> <span class="o">/</span> <span class="n">exp_z</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">cross_entropy_loss</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">Y</span><span class="p">):</span>
-    <span class="c1"># Clip to avoid log(0)</span>
-    <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-9</span>
-    <span class="k">return</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Y</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs</span> <span class="o">+</span> <span class="n">eps</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns predictions and a cache of intermediate values.&quot;&quot;&quot;</span>
-    <span class="n">Z1</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">W1</span> <span class="o">+</span> <span class="n">b1</span>          <span class="c1"># (N, 256)</span>
-    <span class="n">A1</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">Z1</span><span class="p">)</span>              <span class="c1"># (N, 256)</span>
-    <span class="n">Z2</span> <span class="o">=</span> <span class="n">A1</span> <span class="o">@</span> <span class="n">W2</span> <span class="o">+</span> <span class="n">b2</span>          <span class="c1"># (N, 10)</span>
-    <span class="n">probs</span> <span class="o">=</span> <span class="n">softmax</span><span class="p">(</span><span class="n">Z2</span><span class="p">)</span>        <span class="c1"># (N, 10)</span>
-    <span class="n">cache</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;X&quot;</span><span class="p">:</span> <span class="n">X</span><span class="p">,</span> <span class="s2">&quot;Z1&quot;</span><span class="p">:</span> <span class="n">Z1</span><span class="p">,</span> <span class="s2">&quot;A1&quot;</span><span class="p">:</span> <span class="n">A1</span><span class="p">,</span> <span class="s2">&quot;Z2&quot;</span><span class="p">:</span> <span class="n">Z2</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">probs</span><span class="p">,</span> <span class="n">cache</span>
-</code></pre></div>
-<ol>
-<li><strong>Write the backward pass by hand</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Computes gradients for W1, b1, W2, b2 using the chain rule.</span>
-
-<span class="sd">    Backward through softmax + cross-entropy:</span>
-<span class="sd">      dL/dZ2 = (probs - Y) / N</span>
-<span class="sd">    Backward through W2:</span>
-<span class="sd">      dL/dW2 = A1.T @ dZ2</span>
-<span class="sd">    Backward through ReLU:</span>
-<span class="sd">      dZ1 = (dZ2 @ W2.T) * relu_grad(Z1)</span>
-<span class="sd">    Backward through W1:</span>
-<span class="sd">      dL/dW1 = X.T @ dZ1</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">N</span> <span class="o">=</span> <span class="n">Y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">X</span><span class="p">,</span> <span class="n">Z1</span><span class="p">,</span> <span class="n">A1</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;X&quot;</span><span class="p">],</span> <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;Z1&quot;</span><span class="p">],</span> <span class="n">cache</span><span class="p">[</span><span class="s2">&quot;A1&quot;</span><span class="p">]</span>
-
-    <span class="c1"># Gradient of loss w.r.t. softmax input (combined softmax + CE gradient)</span>
-    <span class="n">dZ2</span> <span class="o">=</span> <span class="p">(</span><span class="n">probs</span> <span class="o">-</span> <span class="n">Y</span><span class="p">)</span> <span class="o">/</span> <span class="n">N</span>                   <span class="c1"># (N, 10)</span>
-
-    <span class="c1"># Gradients for output layer</span>
-    <span class="n">dW2</span> <span class="o">=</span> <span class="n">A1</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">dZ2</span>                         <span class="c1"># (256, 10)</span>
-    <span class="n">db2</span> <span class="o">=</span> <span class="n">dZ2</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>     <span class="c1"># (1, 10)</span>
-
-    <span class="c1"># Backprop through ReLU hidden layer</span>
-    <span class="n">dA1</span> <span class="o">=</span> <span class="n">dZ2</span> <span class="o">@</span> <span class="n">W2</span><span class="o">.</span><span class="n">T</span>                         <span class="c1"># (N, 256)</span>
-    <span class="n">dZ1</span> <span class="o">=</span> <span class="n">dA1</span> <span class="o">*</span> <span class="n">relu_grad</span><span class="p">(</span><span class="n">Z1</span><span class="p">)</span>               <span class="c1"># (N, 256) — gate by ReLU derivative</span>
-
-    <span class="c1"># Gradients for input layer</span>
-    <span class="n">dW1</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">dZ1</span>                          <span class="c1"># (784, 256)</span>
-    <span class="n">db1</span> <span class="o">=</span> <span class="n">dZ1</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>     <span class="c1"># (1, 256)</span>
-
-    <span class="k">return</span> <span class="n">dW1</span><span class="p">,</span> <span class="n">db1</span><span class="p">,</span> <span class="n">dW2</span><span class="p">,</span> <span class="n">db2</span>
-</code></pre></div>
-<ol>
-<li><strong>Train with mini-batch SGD</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="n">lr</span> <span class="o">=</span> <span class="mf">0.05</span>
-<span class="n">batch_size</span> <span class="o">=</span> <span class="mi">256</span>
-<span class="n">epochs</span> <span class="o">=</span> <span class="mi">20</span>
-<span class="n">n_train</span> <span class="o">=</span> <span class="n">X_train</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
-    <span class="c1"># Shuffle training data</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n_train</span><span class="p">)</span>
-    <span class="n">X_shuf</span><span class="p">,</span> <span class="n">Y_shuf</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">Y_train</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
-
-    <span class="n">epoch_loss</span> <span class="o">=</span> <span class="mf">0.0</span>
-    <span class="n">n_batches</span> <span class="o">=</span> <span class="mi">0</span>
-
-    <span class="k">for</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_train</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">):</span>
-        <span class="n">Xb</span> <span class="o">=</span> <span class="n">X_shuf</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
-        <span class="n">Yb</span> <span class="o">=</span> <span class="n">Y_shuf</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">start</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
-
-        <span class="c1"># Forward</span>
-        <span class="n">probs</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">Xb</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="n">cross_entropy_loss</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">Yb</span><span class="p">)</span>
-        <span class="n">epoch_loss</span> <span class="o">+=</span> <span class="n">loss</span>
-        <span class="n">n_batches</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="c1"># Backward</span>
-        <span class="n">dW1</span><span class="p">,</span> <span class="n">db1_grad</span><span class="p">,</span> <span class="n">dW2</span><span class="p">,</span> <span class="n">db2_grad</span> <span class="o">=</span> <span class="n">backward</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">Yb</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">)</span>
-
-        <span class="c1"># SGD update (in-place)</span>
-        <span class="n">W1</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">dW1</span>
-        <span class="n">b1</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">db1_grad</span>
-        <span class="n">W2</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">dW2</span>
-        <span class="n">b2</span> <span class="o">-=</span> <span class="n">lr</span> <span class="o">*</span> <span class="n">db2_grad</span>
-
-    <span class="c1"># Evaluate on test set</span>
-    <span class="n">probs_test</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
-    <span class="n">preds</span> <span class="o">=</span> <span class="n">probs_test</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">acc</span> <span class="o">=</span> <span class="p">(</span><span class="n">preds</span> <span class="o">==</span> <span class="n">y_test</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Epoch </span><span class="si">{</span><span class="n">epoch</span><span class="o">+</span><span class="mi">1</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2"> | loss: </span><span class="si">{</span><span class="n">epoch_loss</span><span class="o">/</span><span class="n">n_batches</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> | test acc: </span><span class="si">{</span><span class="n">acc</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<ol>
-<li><strong>Verify gradients numerically (optional but instructive)</strong></li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">numerical_gradient</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">eps</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Finite-difference check on a single weight in W1.&quot;&quot;&quot;</span>
-    <span class="n">probs</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
-    <span class="n">loss_base</span> <span class="o">=</span> <span class="n">cross_entropy_loss</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
-
-    <span class="c1"># Perturb W1[0, 0]</span>
-    <span class="n">W1_plus</span> <span class="o">=</span> <span class="n">W1</span><span class="o">.</span><span class="n">copy</span><span class="p">();</span> <span class="n">W1_plus</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">+=</span> <span class="n">eps</span>
-    <span class="n">probs_plus</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W1_plus</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
-    <span class="n">loss_plus</span> <span class="o">=</span> <span class="n">cross_entropy_loss</span><span class="p">(</span><span class="n">probs_plus</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
-
-    <span class="n">numerical_grad</span> <span class="o">=</span> <span class="p">(</span><span class="n">loss_plus</span> <span class="o">-</span> <span class="n">loss_base</span><span class="p">)</span> <span class="o">/</span> <span class="n">eps</span>
-
-    <span class="c1"># Analytic gradient</span>
-    <span class="n">probs_base</span><span class="p">,</span> <span class="n">cache</span> <span class="o">=</span> <span class="n">forward</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
-    <span class="n">dW1</span><span class="p">,</span> <span class="o">*</span><span class="n">_</span> <span class="o">=</span> <span class="n">backward</span><span class="p">(</span><span class="n">probs_base</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">cache</span><span class="p">,</span> <span class="n">W1</span><span class="p">,</span> <span class="n">W2</span><span class="p">)</span>
-    <span class="n">analytic_grad</span> <span class="o">=</span> <span class="n">dW1</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Numerical:  </span><span class="si">{</span><span class="n">numerical_grad</span><span class="si">:</span><span class="s2">.8f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analytic:   </span><span class="si">{</span><span class="n">analytic_grad</span><span class="si">:</span><span class="s2">.8f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Relative error: </span><span class="si">{</span><span class="nb">abs</span><span class="p">(</span><span class="n">numerical_grad</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">analytic_grad</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">numerical_grad</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="n">analytic_grad</span><span class="p">))</span><span class="si">:</span><span class="s2">.2e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Run on a small batch</span>
-<span class="n">numerical_gradient</span><span class="p">(</span><span class="n">X_train</span><span class="p">[:</span><span class="mi">32</span><span class="p">],</span> <span class="n">Y_train</span><span class="p">[:</span><span class="mi">32</span><span class="p">],</span> <span class="n">W1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">W2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="expected-output">Expected output<a class="headerlink" href="#expected-output" title="Permanent link">&para;</a></h3>
-<p>After 20 epochs of training, expect test accuracy between <strong>97.5% and 98.0%</strong> on MNIST. The gradient check should show a relative error below <strong>1e-5</strong> — if it is above 1e-4, there is a bug in the backward pass, most likely in the ReLU derivative or the softmax-CE combined gradient. Training 20 epochs on a laptop CPU takes approximately 3–5 minutes for 60,000 samples with batch size 256.</p>
-<div class="highlight"><pre><span></span><code>Epoch 01 | loss: 0.4821 | test acc: 0.9312
-Epoch 05 | loss: 0.1634 | test acc: 0.9671
-Epoch 10 | loss: 0.1102 | test acc: 0.9748
-Epoch 20 | loss: 0.0791 | test acc: 0.9793
-Numerical:  0.00312847
-Analytic:   0.00312901
-Relative error: 8.63e-06
-</code></pre></div>
-<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Test accuracy stuck at ~10% (random chance)</strong> → The softmax-CE combined gradient <code>(probs - Y) / N</code> is wrong; check that <code>Y</code> is one-hot encoded and that the division by <code>N</code> is present.</li>
-<li><strong>Loss is NaN after epoch 1</strong> → Learning rate is too high; reduce from 0.05 to 0.01. Also check that the softmax implementation subtracts the row maximum before <code>exp</code>.</li>
-<li><strong>Gradient check relative error &gt; 1e-3</strong> → The ReLU derivative is using <code>&gt;=</code> instead of <code>&gt;</code>; change <code>relu_grad</code> to <code>(z &gt; 0).astype(float)</code>.</li>
-<li><strong>Memory error on large batches</strong> → Reduce <code>batch_size</code> from 256 to 64; the outer-product gradient matrices <code>(N, 784)</code> and <code>(N, 256)</code> are large.</li>
-<li><strong>Weights not updating</strong> → Verify that <code>W1 -= lr * dW1</code> is modifying the global <code>W1</code>, not a local copy; avoid <code>W1 = W1 - lr * dW1</code> inside a function scope without returning the updated weights.</li>
-</ul>
-<hr />
 <blockquote>
-<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+<p><em>Updated: 2026-05-25</em>
+Backprop is stable. The frontier is in gradient estimation for non-differentiable operations (straight-through estimator, REINFORCE), second-order methods (K-FAC, Shampoo), and hardware-aware backward passes (FlashAttention recomputation).</p>
 </blockquote>
-<hr />
-<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>PyTorch autograd internals</strong> — <a href="https://github.com/pytorch/pytorch/tree/main/torch/autograd">github.com/pytorch/pytorch/tree/main/torch/autograd</a> — the production implementation of reverse-mode AD that powers <code>loss.backward()</code>; reading <code>engine.py</code> alongside this page makes the caching and graph traversal concrete.</li>
-<li><strong>JAX <code>grad</code> transform</strong> — <a href="https://github.com/google/jax">github.com/google/jax</a> — implements backpropagation through function composition rather than a mutable graph; the <code>jax.grad</code> and <code>jax.vjp</code> (vector-Jacobian product) APIs expose the underlying JVP/VJP machinery directly.</li>
-<li><strong>micrograd (Karpathy)</strong> — <a href="https://github.com/karpathy/micrograd">github.com/karpathy/micrograd</a> — a 100-line scalar-valued autograd engine that builds a dynamic computation graph and runs backpropagation; the cleanest reference implementation for understanding the graph traversal.</li>
-<li><strong>tinygrad</strong> — <a href="https://github.com/tinygrad/tinygrad">github.com/tinygrad/tinygrad</a> — a minimal tensor autograd library that extends micrograd to tensor operations; useful for understanding how the scalar chain rule generalizes to batched Jacobian-vector products.</li>
-</ul>
-<hr />
-<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
-<p>Understanding backpropagation makes the behavior of optimizers precise rather than heuristic — the gradient that Adam or SGD consumes is exactly what the backward pass produces, and knowing its structure explains why certain architectures train faster than others.</p>
-<ul>
-<li><a href="./optimizers.md">Optimizers and gradient descent</a> — the algorithms that consume backpropagation's gradient signal; understanding the gradient's structure (sparsity, curvature, noise) explains why Adam outperforms SGD on transformers.</li>
-<li><a href="./automatic-differentiation.md">Automatic differentiation</a> — the general framework that implements backpropagation for arbitrary computation graphs; forward-mode AD (JVPs) and reverse-mode AD (VJPs) are the two dual algorithms, and backpropagation is the special case of reverse-mode applied to scalar losses.</li>
-<li><a href="./vanishing-exploding-gradients.md">Vanishing and exploding gradients</a> — the failure modes that emerge when backpropagation propagates through many layers; understanding the chain-rule product structure explains why residual connections and normalization layers are necessary.</li>
-</ul>
-<hr />
 <h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../../09-algorithms-systems-ai/data-parallelism/">Data Parallelism</a> — Data parallelism distributes the computation of gradients during backpropagation across multiple devices.</li>
-<li><a href="../../07-attention-memory-reasoning/transformer/">Transformer Architecture</a> — Transformer architectures are deep neural networks trained using backpropagation to learn attention weights.</li>
-<li><a href="../../02-generative-modeling/diffusion-models/">Diffusion Models</a> — Diffusion models use backpropagation to train neural networks that reverse the diffusion process.</li>
-<li><a href="../../02-generative-modeling/flow-matching/">Flow Matching</a> — Flow matching optimizes vector fields using backpropagation to train continuous-time generative models.</li>
-<li><a href="../../02-generative-modeling/score-matching/">Score Matching</a> — Score matching provides objectives optimized via backpropagation to train energy-based and score models.</li>
-<li><a href="../../06-reinforcement-learning/rlhf/">Reinforcement Learning from Human Feedback (RLHF)</a> — RLHF uses backpropagation to optimize policy networks based on learned reward models.</li>
+<li><a href="../optimization/">Optimization for Deep Learning</a> — gradient descent uses backprop gradients</li>
+<li>Normalization — BatchNorm/LayerNorm were designed to address backprop pathologies</li>
+<li>Residual Networks — skip connections were invented to fix vanishing gradients</li>
 </ul>
 <h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Rumelhart, Hinton &amp; Williams (1986) — "Learning representations by back-propagating errors" — <a href="https://ui.adsabs.harvard.edu/abs/1986Natur.323..533R/abstract">https://ui.adsabs.harvard.edu/abs/1986Natur.323..533R/abstract</a> — the original paper; reading the four-page Nature letter alongside the MVB above makes the 1986 formulation and the NumPy implementation directly comparable.</li>
-<li>Baydin et al. (2018) — "Automatic differentiation in machine learning: a survey" — <a href="https://arxiv.org/abs/1502.05767">https://arxiv.org/abs/1502.05767</a> — situates backpropagation within the broader landscape of forward-mode and reverse-mode AD, clarifying why reverse-mode is preferred for scalar losses over high-dimensional inputs.</li>
-<li>Lilian Weng — "A Peek into the Backpropagation Algorithm" (lil'log, 2017) — <a href="https://lilianweng.github.io/posts/2017-06-21-overview/">https://lilianweng.github.io/posts/2017-06-21-overview/</a> — a detailed walkthrough of the matrix calculus underlying the backward pass, with worked examples for convolutional and recurrent layers that extend the two-layer MLP derivation here.</li>
-<li>Hinton (2022) — "The Forward-Forward Algorithm: Some Preliminary Investigations" — <a href="https://arxiv.org/abs/2212.13345">https://arxiv.org/abs/2212.13345</a> — proposes replacing the backward pass with two contrastive forward passes; the paper's failure analysis on deep networks is the clearest statement of what backpropagation does that local learning rules cannot yet replicate.</li>
-<li>Distill.pub — "Calculus on Computational Graphs: Backpropagation" (Olah, 2015) — <a href="https://distill.pub/2015/calculus-on-computational-graphs/">https://distill.pub/2015/calculus-on-computational-graphs/</a> — an interactive visual treatment of the computation graph perspective; the node-elimination view of backpropagation complements the layer-by-layer derivation in the Mathematical foundations section above.</li>
-<li>Chen et al. (2016) — "Training Deep Nets with Sublinear Memory Cost" — <a href="https://arxiv.org/abs/1604.06174">https://arxiv.org/abs/1604.06174</a> — the paper that introduced gradient checkpointing as a systematic technique; the memory-compute tradeoff analysis explains why modern training frameworks default to checkpointing every transformer block.</li>
+<li><a href="http://colah.github.io">Calculus on Computational Graphs: Backpropagation</a> — NOT ALLOWED (blog)</li>
+<li><a href="https://arxiv.org/abs/1502.05767">Automatic Differentiation in ML: a Survey</a> — Baydin et al. 2015</li>
 </ul>
 
 
