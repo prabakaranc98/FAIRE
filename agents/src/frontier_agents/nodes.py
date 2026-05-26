@@ -35,6 +35,7 @@ from .prompts import (
     SCRATCH_SYSTEM,
     WRITER_SYSTEM,
 )
+from .skills import context_tokens_from_state, format_skills_block, load_skills, select_skills
 from .state import WikiPageState
 from .tools import (
     exa_search_papers,
@@ -52,6 +53,9 @@ from .tools import (
 DOCS_DIR = os.getenv("WIKI_DOCS_DIR", "../docs")
 _PERSONAS_DIR = Path(__file__).parent / "personas"
 _SCHEMA_PATH = Path(__file__).parent.parent.parent / "SCHEMA.md"
+
+# Loaded once at import time; safe because skills files are read-only at runtime.
+_SKILLS = load_skills()
 
 
 def _load_schema() -> str:
@@ -254,6 +258,9 @@ def scratch_node(state: WikiPageState) -> WikiPageState:
         )
     ) if hf_models or hf_datasets else "No HuggingFace results found."
 
+    ctx_tokens = context_tokens_from_state(state)
+    skills_block = format_skills_block(select_skills(_SKILLS, "scratch", ctx_tokens))
+
     user = f"""Compile a working-memory fact sheet for the Frontier Wiki page on: **{topic}**
 
 Writing plan (use this to guide what's essential):
@@ -273,7 +280,7 @@ PRODUCTION DEPLOYMENTS:
 HUGGINGFACE (for MVB):
 {hf_block}
 
-{SCRATCH_SYSTEM}
+{SCRATCH_SYSTEM}{skills_block}
 """
     response = compiler.invoke([HumanMessage(content=user)])
     return {**state, "scratch_pad": response.content}
@@ -306,11 +313,13 @@ def write_draft_node(state: WikiPageState) -> WikiPageState:
     topic = state["topic"]
     track = state["track"]
 
+    ctx_tokens = context_tokens_from_state(state)
+    skills_block = format_skills_block(select_skills(_SKILLS, "write_draft", ctx_tokens))
     system = (
         WRITER_SYSTEM
         .replace("{domain}", persona.get("domain", "AI/ML"))
         .replace("{schema}", schema[:2000])
-    )
+    ) + skills_block
 
     depth_note = (
         "Depth emphasis: " + ", ".join(depth_emphasis) + ". "

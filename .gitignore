@@ -22,5 +22,9 @@ site/
 .vscode/
 *.swp
 
-# Claude Code internal
-.claude/
+# Claude Code internal (settings and memory stay local)
+.claude/settings.json
+.claude/settings.local.json
+.claude/memory/
+.claude/plans/
+# .claude/commands/ is tracked — project slash commands are project assets
