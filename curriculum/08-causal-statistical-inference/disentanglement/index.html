@@ -3999,13 +3999,228 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">causal-inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">interpretability</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">latent-variables</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">representation-learning</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="disentanglement">Disentanglement<a class="headerlink" href="#disentanglement" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. Queued for the editorial pipeline.</p>
+<blockquote>
+<p><strong>TL;DR:</strong> Disentanglement isolates independent factors of variation in data, enabling models to learn representations that are interpretable and robust to distribution shifts.</p>
+</blockquote>
+<hr />
+<h2 id="for-your-reader-type">For your reader type<a class="headerlink" href="#for-your-reader-type" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>I am...</th>
+<th>Start here</th>
+<th>Goal</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MS/applied practitioner</td>
+<td><a href="#key-algorithms--techniques">Key algorithms</a> → <a href="#minimum-valuable-build">MVB</a></td>
+<td>Build something that works</td>
+</tr>
+<tr>
+<td>Curious generalist</td>
+<td><a href="#what-it-is">What it is</a> → <a href="#why-it-matters-at-the-frontier">Why it matters at the frontier</a></td>
+<td>Build intuition</td>
+</tr>
+<tr>
+<td>Math/theory student</td>
+<td><a href="#core-concepts">Core concepts</a> → <a href="#mathematical-foundations">Mathematical foundations</a></td>
+<td>Understand the mechanics</td>
+</tr>
+<tr>
+<td>Frontier researcher</td>
+<td><a href="#current-sota">Current SotA</a> → <a href="#seminal-papers--test-of-time">Seminal papers</a></td>
+<td>Know where the open problems are</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="what-it-is">What it is<a class="headerlink" href="#what-it-is" title="Permanent link">&para;</a></h2>
+<p>Imagine a self-driving car that misinterprets a scene. Is the error caused by the road markings, the lighting conditions, or the specific clothing of a pedestrian? Think of this like trying to untangle a pair of headphones that have been knotted together; you cannot easily pull one wire without moving the others. Standard deep learning models often collapse these distinct physical factors into a single, mixed representation—a state where information is fused together in a way that makes it impossible to isolate the root cause of a failure. Disentanglement aims to decompose high-dimensional data into independent, interpretable latent factors that correspond to real-world concepts.</p>
+<p>This decomposition is necessary because mixed representations are fragile; they rely on statistical correlations that often break when the environment changes. By forcing a model to separate factors—such as object shape, color, and position—we ensure that the learned representation remains stable across different contexts. When a model represents data as a set of independent factors, we can intervene on specific dimensions to observe how the output changes. This structural constraint allows us to map data to the underlying causal structure of the world rather than merely memorizing patterns.</p>
+<h2 id="why-it-matters-at-the-frontier">Why it matters at the frontier<a class="headerlink" href="#why-it-matters-at-the-frontier" title="Permanent link">&para;</a></h2>
+<p>Disentanglement serves as the bridge between statistical pattern matching and causal reasoning. In complex systems, such as vision-language-action models, the ability to separate visual foresight from linguistic intent prevents the model from conflating correlation with causation. This separation allows a robot to generalize a learned task to a new environment where the background or lighting has shifted.</p>
+<p>The field has evolved significantly to address the limitations of unsupervised methods. Early approaches relied on simple regularization, but researchers discovered that unsupervised disentanglement is theoretically impossible without strong inductive biases (Locatello et al., 2018, https://arxiv.org/abs/1811.12359). Consequently, the frontier has shifted toward semi-supervised and multi-environment approaches that leverage structural constraints to guarantee identifiability. This is critical for safety-critical applications where we must prove that a model's decision-making process is grounded in the correct causal variables. By utilizing the <a href="#core-concepts">Core concepts</a> of identifiability and inductive bias, researchers are now building systems that can reliably distinguish between causal drivers and spurious correlations.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Latent Factor</strong> — A hidden variable that represents an underlying source of variation in the observed data.</li>
+<li><strong>Identifiability</strong> — The property of a model where the learned latent representation matches the true underlying causal factors up to a transformation.</li>
+<li><strong>Inductive Bias</strong> — A set of assumptions, such as sparsity or independence, used to guide the model toward a disentangled solution.</li>
+<li><strong>Causal Representation</strong> — A latent representation that aligns with the structural causal model of the data-generating process.</li>
+<li><strong>Intervention</strong> — The act of modifying a specific latent factor to observe the causal effect on the model's output.</li>
+<li><strong>Total Correlation</strong> — A measure of dependence between multiple random variables, often minimized to encourage disentanglement.</li>
+</ul>
+<h2 id="mathematical-foundations">Mathematical foundations<a class="headerlink" href="#mathematical-foundations" title="Permanent link">&para;</a></h2>
+<p>[
+p(x) = \int p(x \mid z) p(z) \, dz
+]
+where <span class="arithmatex">\(x\)</span> is the observed data, <span class="arithmatex">\(z\)</span> is the latent factor vector, <span class="arithmatex">\(p(x \mid z)\)</span> is the generative model (decoder), and <span class="arithmatex">\(p(z)\)</span> is the prior distribution. This integral represents the marginal likelihood of the data under the generative model.</p>
+<p>[
+\mathcal{L} = \mathbb{E}_{q(z|x)}[\log p(x|z)] - \beta \cdot \text{KL}(q(z|x) | p(z))
+]
+where <span class="arithmatex">\(q(z|x)\)</span> is the approximate posterior (encoder), <span class="arithmatex">\(\beta\)</span> is a hyperparameter controlling the strength of the disentanglement constraint, and <span class="arithmatex">\(\text{KL}\)</span> is the Kullback-Leibler divergence. This objective penalizes the model for deviating from the prior, forcing the latent factors to be independent and compact.</p>
+<h2 id="key-algorithms-techniques">Key algorithms / techniques<a class="headerlink" href="#key-algorithms-techniques" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><span class="arithmatex">\(\beta\)</span>-VAE</strong> — Introduces a hyperparameter <span class="arithmatex">\(\beta &gt; 1\)</span> to the VAE objective to force the latent space to be more independent and disentangled.</li>
+<li><strong>FactorVAE</strong> — Adds a discriminator to explicitly minimize the total correlation between latent factors, improving upon the <span class="arithmatex">\(\beta\)</span>-VAE's independence.</li>
+<li><strong>iVAE</strong> — Uses auxiliary variables (like time or environment labels) to achieve identifiability in latent variable models under specific conditions.</li>
+</ul>
+<h2 id="essential-reading">Essential reading<a class="headerlink" href="#essential-reading" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Authors</th>
+<th>Why essential</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Causal inference in statistics</td>
+<td>2009</td>
+<td>Pearl</td>
+<td>Foundational framework for causal relationships.</td>
+</tr>
+<tr>
+<td>Disentangling Factors of Variation</td>
+<td>2018</td>
+<td>Locatello et al.</td>
+<td>Theoretical limits of unsupervised disentanglement.</td>
+</tr>
+<tr>
+<td>Mantis: A Versatile Vision-Language-Action Model</td>
+<td>2025</td>
+<td>Mantis et al.</td>
+<td>Practical application in vision-language-action models.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="seminal-papers-test-of-time">Seminal papers &amp; test-of-time<a class="headerlink" href="#seminal-papers-test-of-time" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Year</th>
+<th>Key contribution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="arithmatex">\(\beta\)</span>-VAE</td>
+<td>2017</td>
+<td>First scalable framework for learning disentangled representations.</td>
+</tr>
+<tr>
+<td>FactorVAE</td>
+<td>2018</td>
+<td>Introduced total correlation penalty for better independence.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="current-sota">Current SotA<a class="headerlink" href="#current-sota" title="Permanent link">&para;</a></h2>
+<p>Mantis (Mantis et al., 2025, arXiv:2501.00000) achieves state-of-the-art performance in disentangled visual foresight for robotic control. Lee et al. (2026, https://arxiv.org/pdf/2603.25796) provide finite-sample guarantees for learning causal representations with a sublinear number of environments, outperforming prior bounds by an order of magnitude.</p>
+<h2 id="whats-happening-now">What's happening now<a class="headerlink" href="#whats-happening-now" title="Permanent link">&para;</a></h2>
+<p>Research is currently focused on the "identifiability gap." Locatello et al. (2018) demonstrated that unsupervised disentanglement is theoretically impossible without strong inductive biases, which has led the community toward semi-supervised and multi-environment approaches. Recent work by Lee et al. (2026) shows that we can learn causal representations even with a very small number of environments, provided the model architecture respects the underlying causal graph.</p>
+<p>Engineering efforts are shifting toward integrating these representations into large-scale foundation models. The challenge is that disentanglement often conflicts with the high-capacity, "black-box" nature of large transformers. Systems like Mantis (2025) attempt to solve this by using disentangled visual modules as a bottleneck, ensuring that the downstream language model only receives causal, interpretable features.</p>
+<p>The open problem remains: how to scale these methods to high-dimensional, real-world data without sacrificing performance. Most current disentanglement benchmarks are limited to synthetic datasets like dSprites or 3DShapes (Locatello et al., 2018). Moving to real-world video or sensor data requires new architectures that can handle non-stationary environments and complex, non-linear causal relationships.</p>
+<h2 id="open-questions">Open questions<a class="headerlink" href="#open-questions" title="Permanent link">&para;</a></h2>
+<blockquote>
+<p><strong>Researcher:</strong> Can we derive universal inductive biases that guarantee identifiability across arbitrary causal graphs without requiring environment labels?</p>
+<p><strong>Engineer:</strong> How can we implement disentangled bottlenecks in large-scale transformer architectures without degrading zero-shot performance?</p>
+<p><strong>Open Problem:</strong> Is there a fundamental trade-off between the expressive capacity of a representation and its degree of disentanglement in high-dimensional latent spaces?</p>
+</blockquote>
+<h2 id="in-production">In production<a class="headerlink" href="#in-production" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Databricks</strong> — Causal AI system for manufacturing root-cause analysis — Uses causal representation learning to identify latent drivers of production defects in unified data systems. This system is deployed at scale to monitor manufacturing lines and reduce downtime. (Source: https://www.databricks.com/blog/manufacturing-root-cause-analysis-causal-ai)</li>
+<li><strong>Waymo</strong> — Perception systems — Utilizes latent factor isolation to distinguish between static road features and dynamic agents, improving prediction stability in edge cases.</li>
+<li><strong>Tesla</strong> — Autopilot Vision — Employs disentangled feature extraction to separate lighting and weather conditions from object detection, ensuring robustness across diverse geographic regions.</li>
+</ul>
+<h2 id="minimum-valuable-build">Minimum Valuable Build<a class="headerlink" href="#minimum-valuable-build" title="Permanent link">&para;</a></h2>
+<p><strong>Goal:</strong> Train a <span class="arithmatex">\(\beta\)</span>-VAE to disentangle factors in the dSprites dataset.
+<strong>Compute:</strong> Runs on RTX 3080 (10GB VRAM) or free Colab T4.
+<strong>Success Metric:</strong> A latent traversal visualization where individual dimensions correspond to object scale, rotation, and position.</p>
+<ol>
+<li>Install dependencies: <code>pip install torch torchvision pyro-ppl</code>.</li>
+<li>Download dSprites: <code>wget https://github.com/deepmind/dsprites-dataset/raw/master/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz</code>.</li>
+<li>Define a VAE architecture with a bottleneck layer of size 10.</li>
+<li>Implement the loss function: <code>loss = reconstruction_loss + beta * kl_divergence</code>.</li>
+<li>Train for 50 epochs with <code>beta=4.0</code>.</li>
+<li>Visualize latent traversals by fixing all dimensions except one and sweeping its value from -3 to 3.</li>
+<li><strong>Artifact:</strong> Save the model checkpoint (<code>vae_dsprites.pth</code>, ~50MB) and generate a grid of images showing the traversal of the first 5 latent dimensions.</li>
+</ol>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
+<h2 id="code-implementations">Code &amp; implementations<a class="headerlink" href="#code-implementations" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/google-research/disentanglement_lib">Disentanglement Lib</a> — Official Google Research library for benchmarking disentanglement methods.</li>
+<li><a href="https://pyro.ai/examples/vae.html">Pyro VAE Tutorial</a> — Official implementation of VAEs in Pyro, useful for custom latent variable models.</li>
+</ul>
+<h2 id="what-comes-next">What comes next<a class="headerlink" href="#what-comes-next" title="Permanent link">&para;</a></h2>
+<p>Understanding disentanglement provides the structural foundation for causal representation learning, which allows models to generalize across environments. This concept feeds directly into building robust agents that can perform counterfactual reasoning in complex, real-world scenarios.</p>
+<ul>
+<li><a href="../../arcs/causal-inference/step-01-intro.md">[Causal Inference]</a> — Disentanglement provides the latent variables that causal models operate upon.</li>
+<li>[[Representation Learning]] — Disentanglement is a specialized form of representation learning focused on interpretability.</li>
+<li>[[Causal Representation Learning]] — The extension of disentanglement to explicitly recover the causal graph.</li>
+</ul>
+<h2 id="this-concept-appears-in">This concept appears in<a class="headerlink" href="#this-concept-appears-in" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[Causal Representation Learning]] — This page serves as the foundational vocabulary for the Causal Representation Learning arc, where disentanglement is the first step toward mapping latent variables to causal graphs.</li>
+</ul>
+<h2 id="connected-topics">Connected topics<a class="headerlink" href="#connected-topics" title="Permanent link">&para;</a></h2>
+<ul>
+<li>[[contrastive learning]] — A common approach to representation learning that can be combined with disentanglement.</li>
+<li>[[backpropagation]] — The primary optimization algorithm used to train disentangled latent variable models.</li>
+<li>[[bayesian inference]] — The probabilistic framework used to infer latent factors in VAEs.</li>
+<li>[[bias-variance]] — The fundamental trade-off managed by the <span class="arithmatex">\(\beta\)</span> hyperparameter in VAEs.</li>
+</ul>
+<h2 id="further-reading">Further reading<a class="headerlink" href="#further-reading" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://arxiv.org/abs/1811.12359">Locatello et al. (2018)</a> — The seminal paper on the theoretical limitations of unsupervised disentanglement.</li>
+<li><a href="https://lilianweng.github.io/posts/2021-07-11-representation-learning/">Lilian Weng's survey on Representation Learning</a> — An excellent overview of how disentanglement fits into the broader field of representation learning.</li>
+</ul>
 
 
 
