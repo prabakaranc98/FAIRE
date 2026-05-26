@@ -743,21 +743,45 @@ the exact phrase you saw) and actionable in `fix_suggestions` (name the edit).
 def _aggregate_review(
     structured: ReviewResult,
     panel: dict[str, CriticScore],
+    revision_count: int = 0,
+    prev_panel_min: float | None = None,
 ) -> tuple[float, bool, list[str], dict[str, float]]:
     """Combine the structured rubric reviewer with the critic panel.
 
     Returns (confidence, approved, all_issues, per_dim_scores).
 
-    Confidence is the MINIMUM of (structured.confidence, min(panel scores)) —
-    any critic flagging a real problem can block. This is the conservative gate.
+    Approval rule (replaces the old strict `all critics ≥ 0.6`):
+      - panel_avg ≥ 0.65          (consensus, robust to one outlier)
+      - panel_worst ≥ 0.4         (catastrophic floor — one critic at 0.3 still blocks)
+      - rubric_ok                 (structured-rubric thresholds, unchanged)
+      - Revision-aware escape: if revision_count ≥ 1 AND panel_min hasn't improved
+        by ≥ 0.05 since the previous review, accept anyway — the revision-spiral
+        won't break through; stop wasting tokens.
+
+    Confidence is the average panel score (with worst-case floor) — gives the
+    supervisor a smoother signal than the old min().
     """
     panel_scores = {name: cs.score for name, cs in panel.items()}
-    min_panel = min(panel_scores.values()) if panel_scores else 1.0
-    confidence = min(structured.confidence, min_panel)
+    panel_avg = (sum(panel_scores.values()) / len(panel_scores)) if panel_scores else 1.0
+    panel_worst = min(panel_scores.values()) if panel_scores else 1.0
+    # Composite confidence: average modulated by worst-case
+    confidence = min(structured.confidence, panel_avg) if panel_scores else structured.confidence
 
-    # Approval gate: existing rubric must pass AND every critic ≥ 0.6
     rubric_ok = _rubric_approve(structured)
-    panel_ok = all(s >= 0.6 for s in panel_scores.values())
+    panel_ok = panel_avg >= 0.65 and panel_worst >= 0.4
+
+    # Revision-spiral escape: if we revised but the worst critic didn't budge,
+    # stop chasing it. Better to ship and move on than burn tokens revising
+    # to the same flag.
+    if (
+        not panel_ok
+        and revision_count >= 1
+        and prev_panel_min is not None
+        and panel_worst - prev_panel_min < 0.05
+        and rubric_ok
+    ):
+        panel_ok = True  # accept with the floor it has — the next revision won't help
+
     approved = rubric_ok and panel_ok
 
     all_issues = list(structured.issues)
@@ -848,7 +872,22 @@ PAGE TO REVIEW:
 
         panel = panel_future.result()
 
-    confidence, approved, all_issues, per_dim = _aggregate_review(structured, panel)
+    # Revision-aware accept: stash the previous panel_min so _aggregate_review
+    # can detect "we revised but the critic didn't budge — accept and move on."
+    prev_rubric = state.get("review_rubric") or {}
+    prev_panel_min = None
+    if prev_rubric:
+        # panel scores were stored alongside structured-rubric in review_rubric
+        # Pick out the critic-* keys and take their min.
+        critic_keys = [k for k in prev_rubric if k.startswith("critic-")]
+        if critic_keys:
+            prev_panel_min = min(prev_rubric[k] for k in critic_keys)
+
+    confidence, approved, all_issues, per_dim = _aggregate_review(
+        structured, panel,
+        revision_count=state.get("revision_count", 0),
+        prev_panel_min=prev_panel_min,
+    )
 
     summary = (
         f"PASS: {structured.passed}\nConfidence: {confidence:.2f} "

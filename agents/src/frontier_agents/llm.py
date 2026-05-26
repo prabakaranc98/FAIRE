@@ -20,12 +20,19 @@ from langchain_openai import ChatOpenAI
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # Default model IDs — override via .env
+# Role split (2026-05-26):
+#   WRITER + MVB use openai/gpt-5.1-codex-mini — coding-specialized for clean LaTeX,
+#     markdown tables, code recipes, real HF model IDs (cuts phantom-ID failures).
+#   RESEARCH uses google/gemini-3.1-flash (full, not lite) for richer context synthesis
+#     during plan_and_scratch — the writer reads the scratch_pad as its main source.
+#   CRITIC + FALLBACK use gemini-3.1-flash-lite — cheap non-reasoning for 8-way fanout.
+#   REVIEWER uses openai/gpt-5-mini — reasoning model for the single structured rubric call.
 _DEFAULTS = {
-    "WRITER_MODEL":   "anthropic/claude-opus-4.7",
-    "MVB_MODEL":      "anthropic/claude-opus-4.7",
-    "REVIEWER_MODEL": "google/gemini-3.1-pro-preview",
-    "CRITIC_MODEL":   "google/gemini-3.1-flash-lite",  # non-reasoning, latest cheap+good
-    "RESEARCH_MODEL": "google/gemini-3.1-flash-lite",  # 3.1 > 2.0 for synthesis
+    "WRITER_MODEL":   "openai/gpt-5.1-codex-mini",
+    "MVB_MODEL":      "openai/gpt-5.1-codex-mini",
+    "REVIEWER_MODEL": "openai/gpt-5-mini",
+    "CRITIC_MODEL":   "google/gemini-3.1-flash-lite",
+    "RESEARCH_MODEL": "google/gemini-3.1-flash",
     "FALLBACK_MODEL": "google/gemini-3.1-flash-lite",
 }
 
