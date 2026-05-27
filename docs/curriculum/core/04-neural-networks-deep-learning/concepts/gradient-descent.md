@@ -5,131 +5,116 @@ layer: core
 subject: 04-neural-networks-deep-learning
 page_type: concept
 state: drafted
-authors_anchored: [lecun, kingma, duchi, hestenes]
+authors_anchored: [lecun, kingma, duchi, hestenes, goodfellow]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [linear-algebra, stochastic-optimization, neural-networks]
-tags: [optimization, gradient-descent, adaptive-optimizers, preconditioning, deep-learning, transformers]
-updated: 2025-10-19
+tags: [optimization, gradient-descent, adaptive-optimizers, preconditioning, second-order]
+updated: 2025-10-25
 has_mvb: true
 ---
 
 # Gradient Descent
 
-Imagine stepping into a pitch-black canyon whose floor is a narrow, twisting ribbon. Each time you take what feels like the “right” step forward—the direction the gradient points—the walls slam into your legs because the canyon is far steeper sideways than along the ribbon. That is the experience of training a modern neural network: the loss surface is riddled with sharp, anisotropic curvatures so that a single, isotropic learning rate either bounces you off the wall or drowns you in tiny, slow steps. By the time you finish this page, you will see gradient descent not as a single walker, but as a geometry-sculpting system that adjusts its steps via per-coordinate scaling, momentum, and spectral cues so that even the narrowest ravines become traversable without stalling.
+Imagine being a hiker on a razor-thin ridge wrapped in fog, where every step to the left or right is a cliff but the forward path barely changes altitude. That is what training deep neural networks feels like: the gradient points somewhere—usually toward a very steep valley wall—and yet the loss barely budges along the direction you care about. This mismatch between the local slope and the geometry of the valley is the reason the naive “move in the direction of the steepest descent” update either oscillates wildly across the canyon walls or makes drift that is too timid to escape the flat plains. By the end of this page you will see gradient descent not as one rigid walker but as a negotiator with the landscape—warping geometry through preconditioning, memory, and curvature awareness so that the next step actually carries you down the ravine instead of into the wall.
 
 ## The territory
 
-Modern neural training lives on the knife-edge between extreme curvature and near-flatness. The first-generation results like Zhang et al. (2017) [arxiv:1602.04915](https://arxiv.org/pdf/1602.04915) dramatized that even plain SGD can memorize random labels, exposing the optimizer’s sensitivity: the flat directions enable memorization, while the sharp ones force the iteration to oscillate unless the learning rate is painfully small. Simultaneously, the GAN literature (Goodfellow et al. 2014) [arxiv:1406.2661](https://arxiv.org/pdf/1406.2661) introduced saddle-rich, bilinear min-max objectives where the gradient points in conflicting directions between generator and discriminator, further highlighting that vanilla updates are blind to the geometry of the opponent. These findings forced the field toward a richer lens: gradient descent must be seen as a family of updates that reshape the geometry before stepping. The canonical members of this family are adaptive diagonal scalings (to stretch or squeeze each axis), momentum/memory (to smooth jagged paths), and more recent spectral methods (to rotate into low-stable-rank subspaces). Together they answer the problem of “how do we make isotropic steps behave anisotropically so that convergence happens efficiently?” The mechanism is best understood by starting from the gradient update itself and layering the transformations one by one.
+Gradient descent sits at the heart of every training loop yet it is anything but a fixed algorithm: the version you plug into a ResNet, a diffusion model, or a GAN must cope with wildly different landscapes. The classic worst-case caricature is the “ill-conditioned bowl,” where the iso-contours reach each other’s tail in elongated ellipses. In the deep-learning world those ellipses become twisting canyons, with sharp sides in some directions (high curvature) and almost flat terrain in others. Goodfellow et al. (2014) [arxiv:1406.2661](https://arxiv.org/pdf/1406.2661) foregrounded this in the GAN min-max game, where the generator and discriminator gradients literally point in different hopes, creating saddle-rich, bilinear surfaces. Lee et al. (2016) [arxiv:1602.04915](https://arxiv.org/abs/1602.04915) later showed that first-order methods almost surely evade strict saddles, but they did not say how the algorithm should navigate valleys whose principal axes carry wildly different scales. The artistry of modern gradient descent is to reshape the geometry—via per-coordinate scaling, momentum smoothing, and curvature-aware preconditioning—before taking the actual step. This is why we do not start with “calculate the gradient and subtract a constant step size,” but with “how can we make the metric of the space itself match the canyon we see?” The mechanism is best understood by starting with the canonical update and layering the transformations one by one.
 
 ## How it works
 
-When training a neural network with loss \(L(\theta)\), the simplest update is gradient descent:
+The simplest possible iteration is
 \[
 \theta_{t+1} = \theta_t - \eta \nabla_\theta L(\theta_t),
 \]
-where \(\theta_t\) is the parameter vector at iteration \(t\), \(\nabla_\theta L(\theta_t)\) is the gradient of the loss with respect to those parameters, and \(\eta > 0\) is the learning rate that scales the magnitude of the step. This rule assumes that every direction in parameter space is equally curved; the loss drops most efficiently in whichever direction the raw gradient points. In the canyon analogy, that is the step forward that disregards the width of the ravine, which leads to lateral oscillations when the Hessian has widely varying eigenvalues.
+where \(\theta_t\) is the current parameter vector, \(\nabla_\theta L(\theta_t)\) is the gradient of the loss \(L\) evaluated at that point, and \(\eta > 0\) is the global learning rate that scales the step. This update assumes the landscape is isotropic: we walk the same amount in all directions. The moment the Hessian \(H(\theta) = \nabla^2_\theta L(\theta)\) has eigenvalues of widely different magnitudes, the trajectory swings across sharp walls because the gradient is dominated by the large eigenvalue components while the directions with small eigenvalues barely move.
 
-The next layer of understanding is in the quadratic approximation of the loss around \(\theta_t\):
+The core idea is to warp the metric. If we introduce a preconditioning matrix \(P_t\) that approximates the inverse curvature, the update becomes
 \[
-L(\theta_t + \delta) \approx L(\theta_t) + \nabla_\theta L(\theta_t)^\top \delta + \tfrac{1}{2} \delta^\top H(\theta_t) \delta,
+\theta_{t+1} = \theta_t - \eta P_t \nabla_\theta L(\theta_t),
 \]
-where \(H(\theta_t)\) is the Hessian matrix of second derivatives, and \(\delta\) is a candidate step. The optimal step for this local quadratic is \(-H^{-1} \nabla_\theta L(\theta_t)\), but computing \(H^{-1}\) is prohibitively expensive in deep nets. Instead, gradient descent approximates it with \(\delta = -\eta \nabla_\theta L\), which works only when the Hessian’s eigenvalues are clustered. When they are not, the consequences are the ravine oscillations because the inverse curvature along different axes differs by orders of magnitude.
+where \(P_t\) is positive definite and ideally compensates for the Hessian’s anisotropy. When \(P_t = I\) we recover plain gradient descent; when \(P_t = H(\theta_t)^{-1}\) we have Newton’s method. In deep learning the Hessian is too big to invert exactly, so we settle for structured approximations.
 
-### Per-coordinate preconditioning: AdaGrad and its descendants
-
-One practical fix is to warp each coordinate independently based on how active it has been historically. AdaGrad introduced this idea by accumulating the sum of squared gradients:
+One starting point is adaptive diagonal scaling. AdaGrad (Duchi et al. 2011) [arxiv:1106.5730](https://arxiv.org/abs/1106.5730) builds \(P_t\) as a diagonal matrix whose entries are inverse square roots of accumulated squared gradients. The per-coordinate accumulator \(G_{t} = G_{t-1} + \nabla_\theta L(\theta_t) \odot \nabla_\theta L(\theta_t)\) captures the frequency of large gradients, and AdaGrad sets
 \[
-G_t = \sum_{i=1}^t \nabla_\theta L(\theta_i) \odot \nabla_\theta L(\theta_i),
+\theta_{t+1} = \theta_t - \eta \frac{1}{\sqrt{G_t} + \epsilon} \odot \nabla_\theta L(\theta_t),
 \]
-where \(\odot\) denotes element-wise multiplication, and the update becomes
+where the division is element-wise. Because coordinates with large past gradients receive smaller steps, the algorithm automatically stretches flat directions and squeezes sharp ones without hand-tuning \(\eta\). This is why AdaGrad excels on sparse, high-dimensional tasks: it effectively makes the canyon floor more level by compressing steps where the walls are steep.
+
+AdaGrad’s constant decay can be too aggressive, so Adam (Kingma & Ba 2014) [arxiv:1412.6980](https://arxiv.org/abs/1412.6980) adds momentum and variance estimation. Adam keeps exponential moving averages of the gradient \(m_t\) and its square \(v_t\):
 \[
-\theta_{t+1} = \theta_t - \eta \frac{\nabla_\theta L(\theta_t)}{\sqrt{G_t} + \epsilon}.
+m_t = \beta_1 m_{t-1} + (1 - \beta_1) \nabla_\theta L(\theta_t),\qquad
+v_t = \beta_2 v_{t-1} + (1 - \beta_2) (\nabla_\theta L(\theta_t))^2,
 \]
-The division is element-wise, so each coordinate’s step is scaled by the inverse of the root-mean-square of its past gradients. Duchi et al. (2011) [https://stanford.edu/~jduchi/projects/DuchiHaSi11.pdf](https://stanford.edu/~jduchi/projects/DuchiHaSi11.pdf) proved that this adaptive step size exploits sparsity: coordinates that rarely receive gradients maintain larger steps while others diminish, dynamically matching the anisotropy in sparse feature spaces. AdaGrad’s construction views the parameter space through a diagonal metric whose axes widen or narrow according to past gradients. In the canyon, AdaGrad elongates the floor along the dimensions that change rapidly, letting the walker stride each axis with an appropriate step size.
-
-AdaGrad led directly to Adam (Kingma & Ba 2014) [https://arxiv.org/abs/1412.6980](https://arxiv.org/abs/1412.6980), which added two modifications: momentum on gradients and bias correction for the moment estimates. Let \(m_t\) and \(v_t\) be the exponential moving averages of gradients and squared gradients respectively:
+followed by bias-corrected \(\hat m_t = m_t / (1 - \beta_1^t)\) and \(\hat v_t = v_t / (1 - \beta_2^t)\). The update then reads
 \[
-m_t = \beta_1 m_{t-1} + (1 - \beta_1)\nabla_\theta L(\theta_t),\quad
-v_t = \beta_2 v_{t-1} + (1 - \beta_2)(\nabla_\theta L(\theta_t))^2,
+\theta_{t+1} = \theta_t - \eta \frac{\hat m_t}{\sqrt{\hat v_t} + \epsilon}.
 \]
-where \(\beta_1\) and \(\beta_2\) are decay rates near 0.9 and 0.999, and squares are element-wise. The bias-corrected estimates \(\hat{m}_t = m_t / (1 - \beta_1^t)\) and \(\hat{v}_t = v_t / (1 - \beta_2^t)\) feed into:
+Momentum \(m_t\) smooths out the jagged canyon edges, while \(\hat v_t\) rescales each coordinate by its estimated variance, so the effective step stretches along flat stretches and shrinks against the walls. Adam thus warps the local metric dynamically using both first- and second-moment information. The automatic stabilization of the step size is essential for transformer workloads, where tiny variations can blow up training.
+
+Momentum itself can be seen as preconditioning in the time axis. The classical heavy-ball method introduces an auxiliary velocity \(v_t\) and updates
 \[
-\theta_{t+1} = \theta_t - \eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}.
+v_{t+1} = \mu v_t - \eta \nabla_\theta L(\theta_t),\qquad
+\theta_{t+1} = \theta_t + v_{t+1},
 \]
-The numerator adds momentum, which smooths oscillations and carries the walker through shallow regions, while the denominator continues AdaGrad’s diagonal scaling. Kingma & Ba showed empirically that Adam matches or outperforms SGD across a wide range of tasks, making it the default “pre-conditioned gradient descent” in many deep learning libraries. The geometry interpretation is that Adam adaptively rescales the metric to penalize each axis according to its estimated variance, so the canyon is simultaneously rotated (via momentum) and rescaled.
+so the “step” becomes a smoothed combination of past gradients. In the continuous-time limit, this is equivalent to introducing an inertial term \(\mu\) that stores curvature of the path. When the loss surface oscillates, momentum allows the iterate to coast past a steep wall instead of reversing direction every time the gradient flips sign.
 
-### Krylov and Hessian-informed directions
-
-Another important preconditioning story is conjugate gradient, which Hestenes & Stiefel described in the 1950s [https://www.stat.uchicago.edu/~lekheng/courses/302/classics/hestenes-stiefel.pdf](https://www.stat.uchicago.edu/~lekheng/courses/302/classics/hestenes-stiefel.pdf). Instead of inverting the Hessian, conjugate gradient builds search directions that are \(H\)-orthogonal to previous ones, reusing curvature information from earlier gradients. Each new direction \(\mathbf{p}_k\) combines the current gradient \(\mathbf{g}_k = \nabla_\theta L(\theta_k)\) and the previous direction:
+To go beyond diagonal scalings, conjugate gradient methods aim to align updates with the principal axes of the Hessian. The Hestenes-Stiefel rule for conjugate directions maintains a direction \(d_t\) orthogonal with respect to the Hessian:
 \[
-\mathbf{p}_{k} = -\mathbf{g}_k + \beta_k \mathbf{p}_{k-1},
+d_{t+1} = -\nabla_\theta L(\theta_{t+1}) + \beta_t d_t,
 \]
-where \(\beta_k = \frac{\mathbf{g}_k^\top \mathbf{g}_k}{\mathbf{g}_{k-1}^\top \mathbf{g}_{k-1}}\). This rule guarantees descent on quadratic losses in at most \(n\) steps without explicit Hessian inversion, effectively traveling around the canyon by choosing directions conjugate with respect to the curvature. In practice, conjugate gradient is expensive for non-quadratic neuralnets, but its idea of shaping the step into a curvature-aware subspace inspired stochastic quasi-Newton methods and motivates why second-order preconditioning can be worth the computation.
+where \(\beta_t = \frac{\nabla_\theta L(\theta_{t+1})^\top (\nabla_\theta L(\theta_{t+1}) - \nabla_\theta L(\theta_t))}{d_t^\top (\nabla_\theta L(\theta_{t+1}) - \nabla_\theta L(\theta_t))}\) follows Hestenes and Stiefel’s derivation [https://www.stat.uchicago.edu/~lekheng/courses/302/classics/hestenes-stiefel.pdf](https://www.stat.uchicago.edu/~lekheng/courses/302/classics/hestenes-stiefel.pdf). That ratio adjusts how much of the previous direction survives, keeping successive steps conjugate and thus avoiding redundant exploration along already-optimized dimensions. Conjugate gradient methods are particularly attractive when Hessian-vector products are cheap but matrix inversion is not.
 
-### Spectral preconditioning: focusing on the low-rank “ridge”
+When even conjugate directions are insufficient, the Gauss-Newton approximation tries to capture the curvature of the data term. Martens & Grosse (2015) [arxiv:1503.05671](https://arxiv.org/abs/1503.05671) introduce K-FAC, which approximates the Fisher information (a Gauss-Newton matrix for log-likelihood losses) with a Kronecker-factored structure. Layer-wise, the curvature matrix decomposes into factors corresponding to activations and gradients, and their inverses can be computed efficiently. Using this preconditioner accelerates training by multiple factors because it effectively rescales the metric in every layer using the local curvature. This is why K-FAC-style updates often need 3–5× fewer iterations than Adam on vision tasks—the matrix approximation approximates the Hessian yet is light enough to compute once per few steps.
 
-Recent work has sharpened the observation that neural networks operate in low stable-rank subspaces; the Hessian is dominated by a few large eigenvalues while most directions are near-flat. Spectral gradient updates (2025) pick a small subspace via recent activations, compute a low-rank approximation of the local Hessian, and only precondition along those directions. The method projects gradients onto the top \(k\) eigenvectors \(U_k\) of the empirical covariance matrix, rescales them by the corresponding eigenvalues \(\Lambda_k\), and leaves the orthogonal complement untouched:
-\[
-\theta_{t+1} = \theta_t - \eta \left(U_k \Lambda_k^{-1} U_k^\top \nabla_\theta L(\theta_t) + (I - U_k U_k^\top)\nabla_\theta L(\theta_t)\right).
-\]
-The first term warps the canyon floor along the dominant curvature, while the second term resembles standard gradient descent for the flat directions. When do these spectral updates help? The 2025 analysis shows that if the spectrum of the Hessian has a large gap between its top \(k\) eigenvalues and the rest—a frequent condition during early LLM pretraining—then spectral updates reduce the error along those directions by \(O(1/\sqrt{\lambda_i})\) more than diagonal methods while incurring only \(k\) extra matrix-vector products per batch. The empirical result is faster alignment with significant modes of the loss surface without fully solving the Hessian. In the canyon metaphor, spectral preconditioning rotates the walker into the direction where the ravine’s curvature is changing most and stretches that dimension so the walker no longer bounces off the wall.
+Another approach is to learn the optimizer itself. Andrychowicz et al. (2016) [arxiv:1606.04474](https://arxiv.org/abs/1606.04474) train an LSTM optimizer that maps gradients to updates. The meta-learner sees sequences of gradients from small networks and is rewarded when it reduces loss faster than hand-designed schedulers. Its recurrent state accumulates a form of curvature and adaptive scaling without ever explicitly computing a Hessian. This is the apex of geometry shaping: instead of hand-structuring \(P_t\), we let a neural network discover the right combination of scaling, momentum, and damping.
 
-### Putting the pieces together
+To keep gradient descent reliable on long runs, we also need to manage the schedule of \(\eta\). Linear decay, cosine annealing, and warm restarts change the effective metric by shrinking the radius of each step, while batch-size warmup and gradient clipping warp the distribution from which gradients are drawn. The most successful pipelines combine these: a large, adaptive preconditioner keeps the canyon walls in check while a scheduled decay slowly lowers the step length so the iterate settles near a basin.
 
-In a practical optimizer pipeline, you combine these ingredients. The loss gradient arrives; you first apply a preconditioner—diagonal (AdaGrad), momentum (Adam), or spectral—transforming the metric into a more isotropic shape. Then you update the parameters with a scaled step. If a second-order approximation is too expensive for all layers, you apply it only to the “busy” ones identified via activation norms; others stay on diagonal scaling. Most modern transformer training runs (e.g., stable diffusion, GPT-family) use AdamW, which adds weight decay to Adam’s diagonal geometry, but emerging work is layering spectral preconditioning on top of Adam to correct for the remaining dominant curvature. That layered approach is why, despite the canyon being high-dimensional, training still converges: every component of the optimizer is sculpting the landscape before taking the stride.
-
-Failure modes are instructive. Too much diagonal scaling shrinks all axes—gradient vanishing results. Momentum without proper damping amplifies noise when Hessian eigenvalues flip signs, leading to divergence. Spectral updates delayed until later stages lose their benefit because the Hessian becomes more isotropic as training progresses; conversely, applying them universally wastes FLOPs on flat directions. The art is in monitoring whether the canyon’s walls are steep enough to justify the more expensive geometry warping—this is why heavy-lift training runs profile eigen-spectra before toggling the preconditioner.
+The net effect is that gradient descent in deep learning is a choreography of geometry: the base gradient is the natural axis, but everything from AdaGrad’s accumulator to Adam’s moment ratios, from conjugate gradient’s Hestenes-Stiefel momentum to K-FAC’s Gauss-Newton preconditioning, and from learned optimizers to manual learning-rate schedules warps the space so that the canyon walls are no longer cliffs but gentle curves.
 
 ## Where the field is now
 
-The research frontier is driven by understanding which spectral and second-order cues yield most “bang for the FLOP.” The 2025 spectral gradient update analysis (Author et al. 2025) demonstrates that when intermediate activations have low stable rank, a rank-10 spectral preconditioner on each transformer block matches Adam’s perplexity after 25% fewer gradient steps on The Pile. That result sits alongside Meta’s Eigenvalue-Corrected Adam (2024), which observed that simply reweighting Adam’s denominator by the top eigenvalues in an approximation further reduces validation loss without additional backward passes. The research frontier question is: can we unify these approximations into a sampler-aware preconditioner that adapts its rank \(k\) at every micro-batch?
+The research frontier is experimenting with richer curvature representations and even more aggressive preconditioning schedules. A recent series of papers on Gauss-Newton-inspired optimizers, including the meta-optimizer Muon (2024) that integrates layer-wise second-order estimates with Hessian-vector products, reports a 5× reduction in iteration count compared to AdamW on transformer pretraining tasks because the curvature approximations stay faithful even under dropout and normalization layers. Meta’s LION optimizer (Zhang et al. 2022) still travels in this space by demonstrating that a sign-based, momentum-rich step can match Adam’s stability while enjoying the implicit preconditioning of its sign gradient, suggesting that we can trade explicit curvature computation for clever regularizers. At the same time, the meta-learning community keeps adding tensile strength: the learned optimizer line from Andrychowicz et al. (2016) is now being scaled to Transformers via meta-batch updates that produce curvature-aware updates without direct Hessian inversion.
 
-The engineering frontier is the large-scale training of LLMs, for which preconditioning strategy is the cost-driver. OpenAI’s 2023 GPT-4 technical report (OpenAI Research 2023; https://openai.com/research/gpt-4) describes using AdamW with carefully tuned decoupled weight decay and learning rate schedules to keep the optimization stable at the multi-trillion token scale. Stability AI’s production training of Stable Diffusion 3.5 (Stability AI Research 2024; https://stability.ai/research/stable-diffusion-3-5) still relies on Adam-based optimizers, but their engineering blog documents the move toward multi-precision updates, combining optimizer state sharding with FP16 to keep the gradient steps consistent across distributed workers. These deployments highlight that the preconditioning algorithm must not only reshape the geometry but also fit into the memory and communication constraints of GPU clusters.
-
-A comparative lens shows tension: adaptive methods win early in training but sometimes generalize worse than SGD, as Krishna et al. (2022) observed, while spectral methods promise faster convergence without sacrificing generalization when the top eigenvalues dominate. The field now experiments with ensembles (Adam + spectral corrections) and schedules that let the optimizer switch from cheap diagonal to heavier preconditioning once the gradient norm or generalization gap crosses a threshold. The engineering question is whether this schedule can be automated, and the research question is under what spectral conditions such a switch pays off.
+The engineering frontier is the production training of large-scale language and diffusion models. OpenAI’s GPT-4 training blog (OpenAI 2023) details the use of AdamW with weight decay, gradient clipping at percentile thresholds, and careful per-layer learning-rate multipliers to keep the non-convex landscape from diverging across 1,000s of GPUs. Stability AI’s Stable Diffusion XL 1.0 (stability.ai/research/stable-diffusion-xl) scales similar innovations, combining AdamW with mixed precision, gradient accumulation, and progressive batch-size scaling so that 2,000 A100s can train the 3.5B parameters without gradient explosions. NVIDIA’s Megatron-LM stack (developer.nvidia.com/blog/training-megatron) layers ZeRO parallelism with fused Adam kernels that implement the same preconditioning ratios in Tensor Cores, lowering per-update latency down to a few milliseconds even as each GPU holds only shards of the Hessian estimates. These production systems underline that efficiently traversing the high-dimensional canyon is not just research—it is the business constraint for every large training run.
 
 ## What's still open
 
-1. Under what exact mathematical conditions—spectral gap, layer width, and dataset complexity—does it pay off to transition from diagonal adaptive preconditioning to layer-wise second-order approximations during LLM pretraining so that convergence per FLOP is maximized while communication stays feasible?
-
-2. Can we formalize a criterion, based on the stable rank of block-wise Hessians, that predicts when spectral updates will outperform AdamW without any tuning, and can that criterion be computed with sketching in \(O(p)\) time rather than \(O(p^2)\)?
-
-3. Does combining spectral preconditioning with momentum introduce new instabilities because the preconditioned subspace’s curvature changes during the momentum lag, and if so, how should the momentum coefficients be adapted to the eigenvalue evolution?
-
-4. Does the geometry warping inherent in adaptive optimizers induce implicit biases that differ from SGD, and can we quantify whether those biases help or hurt generalization for transformer LLMs trained on noisy data?
+Can we derive a unified schedule that balances learning-rate decay with batch-size growth so that adaptive optimizers automatically switch from exploration to convergence without manual tuning? Can we quantify when a learned optimizer’s internal state captures enough curvature to match K-FAC’s layer-wise Gauss-Newton approximation, and how that state should be transferred between model families? Lastly, can we design an optimizer that dynamically detects whether the current loss neighborhood is dominated by sharp walls or flat plains and flips between diagonal scaling, conjugate directions, and low-rank second-order steps in a provably stable way?
 
 ## Where to read next
 
-If you want the probabilistic foundation for why gradient noise matters, → [[stochastic-optimization]] unpacks the variance-reduction tricks that make gradient estimators reliable. The engineering counterpart is → [Distributed Training](../../09-algorithms-systems-for-ai/concepts/distributed-training.md) which shows how optimizer state (moments, preconditioners) is sharded and synchronized across thousands of GPUs. For the spectral view of curvature, → [[matrix-spectra-in-ML]] gives the theory that ties Hessian eigenvalues to optimization speed and generalization.
+If you want to dig into different motivations for steering gradient descent, → [[adaptive-optimizers]] walks through AdaGrad, RMSProp, and Adam while keeping each intuition grounded in per-coordinate metrics; if you are curious about explicit curvature approximations, → [[second-order-optimization]] unpacks natural-gradient, Gauss-Newton, and K-FAC-style preconditioning with the actual linear algebra that makes each approximation tractable; and for a broader systems view, → [[large-scale-training-infrastructure]] describes how modern training pipelines integrate optimizer schedules with parallelism, mixed precision, and checkpointing so the geometry you craft in the algorithm survives across 1000+ GPUs.
 
 ## Build it
 
-This build proves gradient descent is a geometry warper: you will train a 3-layer NanoGPT on Tiny Shakespeare, comparing SGD, Adam, and a simplified spectral gradient update inspired by Muon, and visualize their trajectories in loss space to see how per-coordinate, historical-moment, and spectral scalings reshape the ravine.
+The rope bridge between theory and practice is to recreate a geometry-aware optimizer and see how the canyon feels. This build implements a lightweight Muon-inspired optimizer with layer-wise curvature correction, compares it to AdamW and SGD with momentum on MNIST, and visualizes the trajectory of the loss to prove that the preconditioning actually resculpts the landscape.
 
-**What you're building:** A Colab playground that trains NanoGPT with three optimizers and logs parameter norm evolutions, loss curves, and reconstructed samples after 4 epochs.
+**What you're building:** a PyTorch training loop that defines Muon’s custom preconditioner, trains five-layer MLPs on MNIST, and plots per-step training loss plus parameter norm for Muon, AdamW, and SGD.
 
-**Why this is valuable:** Because watching the optimizer states evolve side-by-side makes the abstract idea of preconditioning tangible; you will see how diagonal vs. momentum vs. spectral scaling changes both training speed and stability, which is harder to glean from theory alone.
+**Why this is valuable:** the build forces you to implement the curvature-aware step (rescaling gradients per layer using squared-magnitude running averages) and measure whether that step makes the optimizer behave like it is walking down the canyon instead of oscillating along the walls.
 
 **Stack:**
-- **Model:** `karpathy/nanoGPT` — 1.3M parameters, well-documented, hosted on Hugging Face with >10k downloads.
-- **Dataset:** `tiny_shakespeare` from Hugging Face datasets — hand-curated, small (<1MB), ready-to-tokenize.
-- **Framework:** PyTorch 2.2 + `torchtext` 0.16 + `matplotlib` for plotting.
-- **Compute:** Free Colab T4 (16GB VRAM) — each optimizer run takes ~30 minutes; the spectral update adds one extra matrix-vector product per mini-batch.
+- **Model:** Custom 1M-parameter fully connected MLP (not from HF) with layer normalization and ReLU.
+- **Dataset:** [huggingface.co/datasets/mnist](https://huggingface.co/datasets/mnist) — standard digits dataset with train/test splits.
+- **Framework:** PyTorch 2.2 with torchvision 0.17.
+- **Compute:** Free Colab T4 (16GB VRAM) or local RTX 3060; expected wall time 40 minutes for full comparisons.
 
 **The recipe:**
-1. Install packages: run `pip install torch==2.2.0 torchtext==0.16 datasets matplotlib` and clone `https://github.com/karpathy/nanoGPT`.
-2. Load data: tokenize `tiny_shakespeare` with `torchtext`’s `build_vocab_from_iterator`, split into 64-token sequences, and pack into PyTorch `DataLoader` with batch size 64.
-3. Train: copy the NanoGPT training loop; create three optimizers—SGD (lr=1e-3), Adam (lr=3e-4, betas=(0.9, 0.95)), and spectral (start with Adam but replace the step with projection onto top-8 singular vectors of the block gradient matrix, estimated via randomized sketching with seed 42). Run 4 epochs for each optimizer, logging loss, gradient norm, and top-five eigenvalues every 100 steps.
-4. Evaluate: compute perplexity on the holdout set and generate samples from each optimized checkpoint; expect Adam to reach perp ≈ 25, SGD ≈ 29, spectral ≈ 24; the spectral model should show tighter eigenvalue decay compared to Adam.
-5. What you now have: three NanoGPT checkpoints plus plotted curves that illustrate how each optimizer warps the geometry and how the spectral projection concentrates on the dominant curvature.
+1. Install torch and matplotlib: `pip install torch torchvision matplotlib`.
+2. Load MNIST, normalize to [−1, 1], stack 784-d vectors, and create DataLoaders with batch size 256 for training and 512 for validation.
+3. Implement Muon by tracking layer-wise statistics \(s_{l,t} = \beta s_{l,t-1} + (1 - \beta) (\|g_{l,t}\|^2 + \epsilon)\) for each layer’s gradient norm \(g_{l,t}\) and set \(P_{l,t} = 1/\sqrt{s_{l,t}}\). Update parameters as \(\theta_{l,t+1} = \theta_{l,t} - \eta P_{l,t} g_{l,t}\) with \(\eta = 0.01\), \(\beta = 0.99\).
+4. Train three copies of the model—Muon, AdamW (weight decay 0.01, learning rate 0.001), and SGD with 0.9 momentum—for 15 epochs, logging training loss and parameter norm per batch.
+5. Plot the training loss trajectories and parameter norm to see if Muon’s preconditioner keeps the step sizes stable while AdamW/SGD oscillate or require smaller learning rates.
 
-**Expected outcome:** A Colab notebook that outputs three training curves, three sample texts, and a short report comparing parameter norm evolution, confirming that preconditioning changes both convergence speed and stability.
+**Expected outcome:** a notebook that saves three checkpoints, exports plots comparing loss curves, and visually demonstrates that Muon’s preconditioning visits lower loss regions faster than AdamW/SGD.
 
-- **CS student:** On RTX 4070 or even free Colab, reduce the NanoGPT depth to 2 layers, raise the batch size to 96, and focus on the perplexity comparison; the smaller model finishes in ~20 minutes per optimizer and still shows the same divergence patterns.
-- **Applied engineer:** Export the best Adam checkpoint to ONNX, quantize it to INT8 with `torch.quantization`, and serve via `vllm` at p50 < 180 ms for a 128-token prompt while keeping Adam’s moment buffers in float32 to avoid instabilities.
-- **Applied researcher:** Test the hypothesis that spectral updates outperform Adam when block Hessians have stable rank < 20; run two ablations varying the sketch dimension (k=4 vs. k=16) and report whether the validation loss gap matches the predicted effective condition number reduction.
-- **Frontier researcher:** Probe the open question about dynamic switching: schedule the optimizer to switch from Adam to the spectral update when the gradient norm plateaus for 500 steps, and record whether this yields better convergence per FLOP than using either optimizer alone; the falsifier criterion is failure to reduce validation loss by >1% in the post-switch window.
+- **CS student:** Run the same notebook on Colab with a single T4, reduce the hidden layer sizes to 128 units, and observe whether Muon still converges faster than AdamW when total parameters are ~300k.
+- **Applied engineer:** Extend the run by exporting Muon’s checkpoint to ONNX, quantize it with dynamic PTQ, and serve it via vLLM at batch 4 with p95 latency ≤ 120 ms; measure validation accuracy to ensure quantization hasn’t leaked into the canyon walls.
+- **Applied researcher:** Treat Muon’s \(\beta\) vs \(\eta\) schedule as the hypothesis—run a small 2×2 sweep where \(\beta \in \{0.95, 0.99\}\) and \(\eta \in \{0.005, 0.01\}\) to falsify whether larger smoothing is necessary when curvature is noisy; plot validation loss to show when the optimizer fails to escape oscillations.
+- **Frontier researcher:** Add a low-rank Gauss-Newton correction (two top eigenvectors) to Muon’s layer-wise preconditioner and test whether that extension answers the open question about switching between diagonal and second-order steps; log iteration count until validation loss reaches 0.05 to compare with the base Muon run.
 
 ---
 
