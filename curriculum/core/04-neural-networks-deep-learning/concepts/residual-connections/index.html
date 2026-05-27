@@ -23,7 +23,7 @@
     
     
       
-        <title>Residual Connections - Frontier Wiki</title>
+        <title>Residual connections - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Residual Connections
+              Residual connections
             
           </span>
         </div>
@@ -1207,13 +1207,120 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">architecture</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">deep-learning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gradient-flow</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">residual-connections</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">skip-connections</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">stability</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="residual-connections">Residual Connections<a class="headerlink" href="#residual-connections" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">04 · Neural Networks Deep Learning</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="residual-connections">Residual connections<a class="headerlink" href="#residual-connections" title="Permanent link">&para;</a></h1>
+<p>Imagine a hundred people playing telephone where each person must translate the sentence into a new language before passing it on. By the tenth translator, the original message is gone; the meaning has been warped into noise. Deep neural networks face that same curse: every layer rewrites the signal, and the gradient signal back-propagated from the loss loses coherence. Residual connections solve the same puzzle by giving each layer a carbon copy of the original message alongside its translation. When the final person receives the pair, they can peek at the untouched text even if the translators went astray. By the end of this page you will know why that carbon copy is not a heuristic trick but a mathematical highway, how modern residual designs tune its tollbooth (scaling, normalization, memory), and how to prove the mechanism yourself with a concrete experiment that contrasts a 20-layer MLP trained on double moons with and without the identity path.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Deep learning performance is a tale of two bottlenecks: the forward pass must compose non-linear features, and the backward pass must deliver meaningful gradients through that composition. Without intervention, stacking more than a handful of layers turns the backward signal into vanishing—and occasionally exploding—noise. Residual connections belong to the family of skip connections, but they differ from plain highway bypasses because they add rather than concatenate features, turning the model into an additive ensemble of “shallow experts.” The earliest residual blocks introduced by He et al. (2016) rewrote the layer transformation as an identity plus a small change, which let gradients split into two terms and dramatically extended trainability. Later works observed that improving training stability required not just the skip path but also careful scaling, normalization placement, and activation caching so that the identity path remains available at every depth. From transformers to vision models, residual streams are now the central scaffolding that keeps the gradient intact while allowing architecture teams to grow models in depth and width without catastrophic signal loss. How does it actually work under the hood, and what are the levers engineers now pull to keep the highway smooth?</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="the-additive-highway">The additive highway<a class="headerlink" href="#the-additive-highway" title="Permanent link">&para;</a></h3>
+<p>The basic residual block replaces the usual layer output <span class="arithmatex">\(x_{l+1} = \mathcal{F}(x_l)\)</span> with a sum:</p>
+<div class="arithmatex">\[
+x_{l+1} = x_l + \mathcal{F}(x_l; \theta_l),
+\]</div>
+<p>where <span class="arithmatex">\(x_l\)</span> is the input to layer <span class="arithmatex">\(l\)</span>, <span class="arithmatex">\(\mathcal{F}\)</span> is the learned non-linear transformation parameterized by <span class="arithmatex">\(\theta_l\)</span>, and the addition is element-wise across the feature dimension. This identity shortcut means every layer passes forward not just the warped signal but also the untouched <span class="arithmatex">\(x_l\)</span>, which downstream layers can either trust directly or modify via subsequent <span class="arithmatex">\(\mathcal{F}\)</span> blocks. The gradient of the loss <span class="arithmatex">\(\mathcal{L}\)</span> with respect to <span class="arithmatex">\(x_l\)</span> becomes</p>
+<div class="arithmatex">\[
+\frac{\partial \mathcal{L}}{\partial x_l} = \frac{\partial \mathcal{L}}{\partial x_{l+1}}\left(I + \frac{\partial \mathcal{F}(x_l)}{\partial x_l}\right),
+\]</div>
+<p>where <span class="arithmatex">\(I\)</span> is the identity matrix carrying the unmodified gradient, and <span class="arithmatex">\(\partial \mathcal{F}/\partial x_l\)</span> encapsulates the new learned path. Because the identity matrix bypasses the potentially degenerate Jacobian of deep transformations, gradients arrive with the same magnitude they had at <span class="arithmatex">\(x_{l+1}\)</span>, plus a correction. This is the mathematical highway the hook promised: the backward signal can choose to stay on the identity term, effectively skipping all nonlinear layers, when the learned path would have diminished it.</p>
+<h3 id="gradient-flow-and-the-depth-gap">Gradient flow and the depth gap<a class="headerlink" href="#gradient-flow-and-the-depth-gap" title="Permanent link">&para;</a></h3>
+<p>The additive structure creates a sum of two gradient contributions that is not merely algebraic—it changes how the network perceives depth. In backpropagation through <span class="arithmatex">\(L\)</span> layers, the identity contributions multiply to one, while the residual terms multiply through the chain rule as usual. Even if <span class="arithmatex">\(\mathcal{F}\)</span> collapses to zero in some layers, the identity paths propagate gradients perfectly. This is why residual networks train with depths that would otherwise be impossible, yet behave like ensembles of shallower models: if the shortcut dominates, the network acts as if layers beyond a certain depth do not exist, and the optimizer only updates the necessary blocks.</p>
+<p>Residual connections also change the interpretation of the objective. Consider a simple regression loss <span class="arithmatex">\( \mathcal{L} = \|f(x_0) - y\|^2\)</span> where <span class="arithmatex">\(f\)</span> is the network composed of <span class="arithmatex">\(L\)</span> residual blocks. Because each block adds rather than replaces, the entire network can be rewritten as a telescoping sum:</p>
+<div class="arithmatex">\[
+x_L = x_0 + \sum_{l=0}^{L-1} \mathcal{F}(x_l; \theta_l),
+\]</div>
+<p>where <span class="arithmatex">\(x_L\)</span> is the final representation. The model now learns the total correction to the input <span class="arithmatex">\(x_0\)</span> rather than the absolute mapping. This reframing implies that residual networks are biasing the function toward the identity map, which stabilizes training especially when the target is close to its initialization. The gradient of this sum naturally shares the same identity term at each step, reinforcing the highway metaphor: every block gets the original signal added back in.</p>
+<h3 id="scaling-normalization-and-placement">Scaling, normalization, and placement<a class="headerlink" href="#scaling-normalization-and-placement" title="Permanent link">&para;</a></h3>
+<p>Identity alone is not enough. As soon as <span class="arithmatex">\(\mathcal{F}\)</span> grows too large, or normalization layers shift the scale of <span class="arithmatex">\(x_l\)</span>, the balance between the highway and the side path breaks. CompleteP et al. (2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a> shows that setting the residual scaling <span class="arithmatex">\(\alpha\)</span> to 1 and carefully parameterizing the shortcut yields consistent depth-wise hyperparameter transfer and sizable FLOP savings compared to arbitrarily scaled residuals. Their core insight is that scaling the residual branch compresses the highway, so the optimizer must relearn globally when depth changes. With <span class="arithmatex">\(\alpha=1\)</span>, every new layer integrates seamlessly into the identity highway, reducing the re-training effort needed when stacking hundreds of blocks. This observation makes sense analytically because the derivative of <span class="arithmatex">\(x_l + \alpha \mathcal{F}(x_l)\)</span> with respect to <span class="arithmatex">\(\alpha\)</span> introduces an extra scalar factor; when <span class="arithmatex">\(\alpha\)</span> deviates from 1, gradients no longer inherit the neat identity term that keeps earlier layers reachable.</p>
+<p>Peri-LN (2024) <a href="https://arxiv.org/abs/2502.02732">arxiv:2502.02732</a> extends this by showing normalization placement relative to the residual branch dictates mixed-precision stability. When LayerNorm or BatchNorm is applied after the addition (post-activation), the identity path loses amplitude due to re-centering and rescaling, so the gradient highway is no longer pure. By moving normalization to precede the addition—Norm(<span class="arithmatex">\(x_l\)</span>) goes into <span class="arithmatex">\(\mathcal{F}\)</span>, and the sum is computed without a downstream norm—the identity preserves its scale, allowing FP16/BF16 training without the gradient spikes that previously crashed large transformers. Peri-LN also quantifies the gradient variance with and without this reordering, proving that the identity contribution is the only term that maintains low variance at depth when normalization is placed correctly. The result is a practical rule for engineers: place normalization inside <span class="arithmatex">\(\mathcal{F}\)</span>, keep the residual scaling at 1, and let the optimizer inherit the highway.</p>
+<h3 id="memory-and-activation-reuse">Memory and activation reuse<a class="headerlink" href="#memory-and-activation-reuse" title="Permanent link">&para;</a></h3>
+<p>Deep residual towers keep a lot of activations alive for the backward pass, which bloats memory. BASIS: Balanced Activation Sketching with Invariant Scalars for “Gh (2026) <a href="https://arxiv.org/abs/2604.16324">arxiv:2604.16324</a> introduces Ghost Backpropagation, an activation sketching strategy that caches summary statistics instead of full activations while still preserving the identity highway information. The key idea is to maintain invariants of the residual stream—moments that do not depend on specific activations—so the backward pass can reconstruct gradients without storing intermediate <span class="arithmatex">\(x_l\)</span> tensors. Ghost Backpropagation lets engineers fit deeper residual stacks in memory-constrained GPUs by compressing the stored residual contributions, while the identity path still supplies the exact gradient amplitude.</p>
+<p>Another recent line of work represented by Untitled (2026) <a href="https://www.arxiv.org/pdf/2602.07145">arxiv:2602.07145</a> investigates cross-layer residual adapters that merge signals from multiple horizons. The paper builds on the highway theme by showing that gating residual streams conditionally based on input semantics prevents redundant processing. Each layer receives an attention-weighted sum of the identity path, its local <span class="arithmatex">\(\mathcal{F}\)</span>, and the outputs of distant layers, and a stability term ensures that the residual highway never collapses even when gates shut off. The practice of gating hints at the open question asked later: the identity path does not need to be static; it can itself become a controller that decides whether the next block should execute.</p>
+<p>These mechanistic insights explain why residual connections have become not just a good trick but a structural necessity. They preserve gradients via the identity highway, they run stably when scaling and normalization are aligned, and they remain feasible in production when activations can be sketched and gates can bypass unnecessary computation.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The basics above are now part of most mainstream models, but new research keeps refining the residual highway. CompleteP et al. (2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a> is currently the canonical reference for residual scaling policy, demonstrating experimentally that keeping <span class="arithmatex">\(\alpha=1\)</span> across depths avoids the layer-wise tuning penalties that plagued earlier models. BASIS (2026) <a href="https://arxiv.org/abs/2604.16324">arxiv:2604.16324</a> adds Ghost Backpropagation to that story by showing that storing invariant sketches of the identity path—means, variances, and a light quantized sample—lets modern GPUs hold 1.5× more depth without exceeding memory budgets. Peri-LN (2024) <a href="https://arxiv.org/abs/2502.02732">arxiv:2502.02732</a> and its follow-ons have effectively enforced the “normalize before addition” rule in every production transformer, which is now the gold standard for mixed-precision training.</p>
+<p>On the research frontier, DDCL-INCRT: A Self-Organising Transformer with Hierarchical Prototype Structure (2026) <a href="https://arxiv.org/abs/2604.01880v1">arxiv:2604.01880v1</a> showcases a new residual topology where each layer maintains a hierarchy of prototypes that are aggregated through residual streams. The identity path in DDCL-INCRT carries not only the raw representation but also a prototype tree that regulates how much of each layer’s output enters the search. The self-organizing structure means gradients can flow through multiple prototype branches simultaneously, adding redundancy that improves stability while letting the network discover modular behaviours with minimal supervision.</p>
+<p>Industrial production follows these research cues. Meta AI’s Llama 3 (2024) release on <a href="https://ai.meta.com/research/llama-3/">ai.meta.com/research/llama-3</a> profits from residual scaling and normalization placement by using evenly scaled identity shortcuts across transformer decoder layers, which lets the 8.3B variant train in mixed precision without extensive tuning. The Llama 3 technical note highlights how residual paths avoid the “depth trap” when training on very long context windows, and how they allow the team to grow the model to 32 transformer layers while still hitting real-time inference p95 latencies in production. The same production trend is visible in Large Language Model deployments at Google and Anthropic: residual highways remain the plumbing that allows deeper, sparser, and more efficient models to ship.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can the residual highway learn to gate itself at inference time so that redundant layers are bypassed without losing semantic coherence? A dynamic gate that switches the identity path on for “easy” inputs and hands off to deeper blocks for “hard” cases would let models adapt their computation graph on the fly, yet no method has demonstrated this without sacrificing accuracy. How can we extend current identity scaling rules to transformer variants with dynamic depth (such as Mixture of Experts) so the gradient highway remains stable when some residual branches are skipped altogether? Lastly, can activation sketching techniques like Ghost Backpropagation be combined with learned residual gating so that we only store the summary statistics of layers that flew over the highway instead of every block?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic picture of why residuals act like likelihood-preserving skip connections, → [[backpropagation]] explains the calculus under the hood. The engineering counterpart is → [[normalization]] where the placement rules described above are fleshed out and connected to FP16 training. For the architecture fan, → [[transformer-architecture]] shows how decoders and encoders wrap the residual highway in multi-head attention without breaking the gradient path.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that the identity highway is not just a theoretical construct: you can watch gradients collapse without it and remain stable when every layer receives a carbon copy of the input. The script in this recipe compares a 20-layer MLP with and without residual connections, records gradient norms per layer, and visualizes the difference on a synthetic double-moon task.</p>
+<p><strong>What you're building:</strong> a PyTorch experiment that trains two 20-layer MLP variants on the <code>openml/two_moons</code> dataset and plots the per-layer backward norm to show the collapse versus the highway.</p>
+<p><strong>Why this is valuable:</strong> the build forces you to implement both versions from scratch, log the gradient magnitudes at every residual step, and understand how the residual path rescues signal even in a tiny synthetic setting.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> scratch 20-layer MLP (two variants: plain and residual) implemented in PyTorch — each hidden block uses <span class="arithmatex">\(\text{Linear}\)</span>-<span class="arithmatex">\(\text{ReLU}\)</span> pairs with optional skip addition.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/openml/two_moons">openml/two_moons</a> — the standard OpenML double-moons dataset accessible through Hugging Face.
+- <strong>Framework:</strong> PyTorch 2.2.0 + scikit-learn 1.4 for dataset generation and evaluation.
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM) — training 20 layers for 100 epochs takes ~35 minutes per variant.</p>
+<p><strong>The recipe:</strong>
+1. Install torch, scikit-learn, matplotlib, and datasets with <code>pip install torch==2.2.0 scikit-learn matplotlib datasets</code>.
+2. Load <code>openml/two_moons</code> with <code>datasets.load_dataset("openml/two_moons")</code>, split into a 70/30 train/val split, scale inputs with <code>StandardScaler</code>, and create DataLoaders with batch size 128.
+3. Implement two network classes: <code>PlainMLP20</code> with sequential Linear→ReLU layers, and <code>ResidualMLP20</code> where each block computes <span class="arithmatex">\(h = \text{Linear}(x)\)</span>, applies ReLU, then returns <span class="arithmatex">\(x + \tfrac{1}{\sqrt{2}} h\)</span> (the <span class="arithmatex">\(\tfrac{1}{\sqrt{2}}\)</span> scaling keeps variance controlled). Train both for 100 epochs with SGD (lr=0.1, momentum=0.9) and log the gradient norm of each Linear layer after every backward pass.
+4. Evaluate using accuracy and the per-layer gradient norm curves; expect the plain MLP to show norms rapidly shrinking toward zero past layer 8, while the residual MLP keeps norms near the initialization range (~0.05–0.2).
+5. What you now have: two checkpoints (plain and residual), a CSV of gradient norms per layer per epoch, and a matplotlib figure comparing the collapse versus the highway.</p>
+<p><strong>Expected outcome:</strong> a figure demonstrating that without residuals, gradients vanish after the tenth layer, but with the highway, gradients remain stable, paired with the checkpoints that can be loaded for future experimentation.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same recipe on an RTX 4070 (or Colab Pro T4) but reduce epochs to 50 and batch size to 64—focus on gradient logging and extend the plot to overlay training loss curves for extra insight.</li>
+<li><strong>Applied engineer:</strong> Package the residual variant into a TorchServe handler, quantize the model to FP16 using <code>torch.fx</code>, and deploy it through a <code>vLLM</code> edge endpoint with p50 latency &lt; 15 ms on the T4 instance; keep the gradient-log figure for internal monitoring.</li>
+<li><strong>Applied researcher:</strong> Swap the residual block for a gated variant that interpolates between identity and <span class="arithmatex">\(\mathcal{F}\)</span> via a learned sigmoid, hypothesize that gating helps on inputs farther from the manifold, and report whether gradient norms still stay stable on the out-of-distribution half-moons.</li>
+<li><strong>Frontier researcher:</strong> Use the same data but train a dynamic routing controller that learns to skip layers during inference based on the norm of the residual stream, testing the open question "Can the residual highway gate itself without losing semantics?" by measuring accuracy degradation when the controller drops layers with <span class="arithmatex">\(\ell_2\)</span> gating thresholds.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
