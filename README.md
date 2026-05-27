@@ -9,6 +9,17 @@
 
 Canonical statement: [pracha.me/frontier/faire](https://pracha.me/frontier/faire) · Curriculum source: [pracha.me/curriculum](https://pracha.me/curriculum).
 
+**Live wiki:** [pracha.me/FAIRE](https://pracha.me/FAIRE) · **Latest retro:** [system/backlog](https://pracha.me/FAIRE/system/backlog/) · **Closed-loop architecture:** [system/architecture](https://pracha.me/FAIRE/system/architecture/)
+
+### Where the system is right now
+
+- **71 substantive concept pages** across all 10 canonical tracks · 10 auto-seeded stubs awaiting the next cycle
+- **6 retrospective cycles** completed; backlog agent autonomously seeds the next sprint's stubs based on cross-page reference patterns
+- **Three-layer hallucination defense** active: regex check (future-dated arxiv IDs) → live HTTP HEAD verification against arxiv.org (phantom IDs) → LLM-reviewer keyword penalty (subtle fakes)
+- **8-critic panel** gates every draft; **knockout selector** keeps the higher-confidence draft when an improve pass regresses
+- **All-in cost: ~$0.18 per page** including revisions; latest cycle 88% approval, 71% first-try
+- **Schema:** track → arc → step (with MVB) → concept (reference). Cardinality caps keep the tree guiding, not intimidating: ≤5 arcs/track · ≤6 steps/arc · ≤4 MVBs/arc
+
 ---
 
 ## The pedagogical bet — three layers that compound
@@ -22,43 +33,36 @@ them offer: **learning that actually compounds.**
    CURRICULUM           ARCS                  MVBs
    (range)       →      (depth)         →     (proof)
    ─────────            ──────                ──────
-   One page per         Opinionated 6–10      One build per
-   concept across       step sequences        arc step, persona-
-   15 tracks.           from concept to       tagged. Each
-   Context that         frontier capability.  artifact is what
-   carries forward.     Curated readings +    the next step
-                        compounding-          loads.
-                        trajectory table.
-   ↑                                          ↑
+   One page per         Opinionated 4–5       One ship-able
+   concept across       step sequences        artifact per
+   the 10 canonical     from concept to       arc step, one
+   AI tracks.           frontier capability.  per persona.
+   Context that         Each step's artifact  HF model + dataset
+   carries forward.     is what the next      IDs verified live.
+                        step loads.
    ↑                                          ↑
    ↑─────── nudges back into curriculum ──────↑
             for the prereqs each step needs
 ```
 
-- **Curriculum** (`docs/curriculum/`) — 15 tracks (10 canonical + 5 extensions). Each pivotal page carries a **6-variant MVB block** (one per reader persona).
-- **Arc index** (`docs/arcs/{arc}/index.md`) — opinionated paths with a **Build menu** showing every step's MVB + persona + compute + metric at a glance.
-- **Arc step** (`docs/arcs/{arc}/step-NN-*.md`) — one build per page. `mvb_persona` declared in frontmatter. Step N's artifact is literally what step N+1 loads (verified by the compounding-chain audit).
+- **Curriculum** (`docs/curriculum/core/`) — 10 canonical tracks (per `pracha.me/curriculum`), each with concepts as the supporting reference layer. **~71 substantive pages live** as of the last cycle, plus a rolling backlog of auto-seeded stubs.
+- **Arc index** (`docs/curriculum/core/<track>/arcs/<arc-id>.md`) — one syllabus per arc. Step ladder with the compounding artifact chain visible. Cardinality cap: ≤5 arcs per track, ≤6 steps per arc.
+- **Arc step** (`docs/curriculum/core/<track>/arcs/<arc-id>/step-NN-<slug>.md`) — one persona-tagged build per page. Step N's artifact is literally what step N+1 loads (compounding-chain audit enforces this).
+- **MVB** (`docs/curriculum/core/<track>/builds/<mvb-id>.md`) — runnable recipe with the 5-gate quality bar (real ship-able artifact · concrete time-to-ship · real HF IDs · specific success metric · hardness in the middle).
 
 ---
 
-## The 7-persona MVB model
+## The 3-persona MVB model
 
-Every pivotal curriculum page serves 7 reader personas through the same article,
-routed by section and by their own MVB variant. See `docs/system/sense.md`.
+Every pivotal page serves three reader personas. These are the only ones the schema recognises — they cover the people FAIRE is actually for.
 
-| # | Persona | Comes to do | Time | Compute | Their build |
+| # | Persona | Comes to do | Time | Compute | Their MVB shape |
 |---|---|---|---|---|---|
-| 1 | Curious learner | Build a mental model | 30 min – 1 hr | Browser / Colab | A notebook that *shows* the concept |
-| 2 | CS student / tinkerer | Reproduce on a laptop | 4 hr – 1 day | RTX 3060/4070 | Small training run that hits a target metric |
-| 3 | Applied / production engineer | Ship at quality + latency | 3 days – 1 week | A10 / L4 / cloud | Real checkpoint served with measured latency |
-| 4 | Applied researcher | Run one focused experiment | 3 days – 1 week | A100 × few | Ablation with a stated hypothesis |
-| 5 | Theory student | Derive from first principles | 4 hr – 1 day | CPU | Derivation verified on toy data; one plot |
-| 6 | Frontier researcher | Find an open problem to push | 1 week+ | Varies | Probe of an open question, with a falsifier named |
-| 7 | PM / decision-maker | Decide whether to invest | 30 min | None | (synthesis only, no build) |
+| 1 | **Applied AI/ML engineer** (forward-deployed) | Ship into production by Friday | Half a day – 1 working day | Single A10 / L4 / Colab Pro A100 | Fine-tune a real model + serve it with a measured latency target |
+| 2 | **Research engineer** | Reproduce a paper's number on commodity hardware | 1–3 working days | 1×H100 or 2×A100 | A reproduced table or figure from a named paper within ±5% |
+| 3 | **Applied researcher** | Test one hypothesis with one falsifier | 2 days – 1 week | 1×A100 small | A 2–3 condition ablation with a plot and a falsification criterion |
 
-Each MVB variant must pass the **SENSIBLE · VALUABLE · FEASIBLE** quality bar
-(see `agents/skills/mvb-recipe.md`). The `verify_mvb_stack` tool checks against
-HuggingFace reality + rough GPU-VRAM math.
+Each MVB must clear the **5-gate quality bar** (see `agents/SCHEMA.md` "MVB page schema"). The `verify_mvb_stack` tool checks HuggingFace IDs live; the deterministic arxiv HEAD verifier rejects fake citations; the 8-critic panel checks the reading experience.
 
 ---
 

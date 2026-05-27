@@ -40,18 +40,17 @@ Each subject converges on the same shape — **concepts**, **authors**, **arcs**
 
 ---
 
-## Built for four readers
+## Built for three personas
 
-Every topic page is built for **four reader types** — and always answers the same question: *what can I do with this?*
+Every page that carries an MVB targets these three. The schema enforces it — any other persona tag is a writing error.
 
-| Reader | Gets | Outcome |
-|---|---|---|
-| **Applied practitioner** | Key algorithms + MVB recipe | Something built today |
-| **Curious generalist** | Clear intuition, no jargon | Genuine understanding |
-| **Theory student** | Annotated LaTeX, derivations | Rigorous mental model |
-| **Frontier researcher** | Named papers, open problems | Where to push next |
+| Persona | Comes to do | Time | Their MVB shape |
+|---|---|---|---|
+| **Applied AI/ML engineer** (forward-deployed) | Ship into production by Friday | Half a day – 1 working day | Fine-tune a real model and serve it with a measured latency target |
+| **Research engineer** | Reproduce a paper's number on commodity hardware | 1–3 working days | A reproduced table or figure within ±5% of the published number |
+| **Applied researcher** | Test one hypothesis with one falsifier | 2 days – 1 week | A 2–3 condition ablation with a plot and a falsification criterion |
 
-Pivotal pages include a **Minimum Valuable Build** — a concrete, runnable recipe with real HuggingFace model and dataset IDs, designed for a consumer GPU or free Colab tier.
+Every MVB clears the **5-gate quality bar**: a real ship-able artifact · a concrete time-to-ship · real HuggingFace model + dataset IDs · a specific success metric · *hardness in the middle* (fine-tune OR reproduce OR ablate OR deploy — never just `pip install` + `pipeline()`).
 
 ---
 

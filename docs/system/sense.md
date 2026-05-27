@@ -78,13 +78,13 @@ Seven readers, every page. The same article serves all of them by routing each p
 | 6 | Frontier researcher | Find an open problem to push | 1 week+ | Varies | A probe of an open question, with a falsifier named |
 | 7 | PM / decision-maker | Decide whether to invest | 30 min | None | (synthesis only, no build) |
 
-**Each pivotal page carries up to 6 MVB variants — one per persona except the PM** — sharing the same concept underneath but diverging in artifact, time, and success metric.
+**Each pivotal page carries 1–3 MVB variants — one per persona that has something distinct to do** — sharing the same concept underneath but diverging in artifact, time, and success metric. The canonical 3 are: applied-ai-engineer (a.k.a. forward-deployed engineer), research-engineer, applied-researcher. Any other persona tag is a writing error.
 
-## Three layers, one site
+## Three layers, one tree
 
-- **Curriculum** (`docs/curriculum/`) — one page per concept, organized across 15 tracks (10 canonical + 5 extensions). Range. No builds — those live in arcs. Each page backlinks to the arc steps that use it.
-- **Arc Index** (`docs/arcs/{arc}/index.md`) — opinionated paths from a starting concept to a frontier capability. Chapters, curated readings, compounding-trajectory table.
-- **Arc Step** (`docs/arcs/{arc}/step-NN-*.md`) — one build per page. Each step's artifact is literally what the next step loads. **MVBs (Minimum Valuable Builds) live here as milestones.**
+- **Curriculum** (`docs/curriculum/core/<track>/concepts/`) — one page per concept, organised across the 10 canonical AI tracks (per `pracha.me/curriculum`). The supporting reference layer. Concepts back-link to the arc steps that use them; an arc's prerequisites are real concept pages, not air.
+- **Arc index** (`docs/curriculum/core/<track>/arcs/<arc-id>.md`) — one syllabus per arc. Step ladder with the compounding artifact chain visible. Cardinality cap: ≤5 arcs per track, ≤6 steps per arc — to keep the tree guiding, not intimidating.
+- **Arc step** (`docs/curriculum/core/<track>/arcs/<arc-id>/step-NN-<slug>.md`) — one build per page. Each step's artifact is literally what the next step loads (compounding-chain audit enforces this). **MVBs live here as milestones.**
 
 ## Source policy (enforced by the reviewer)
 

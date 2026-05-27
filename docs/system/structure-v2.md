@@ -144,7 +144,7 @@ arc_position:                       # only for pages embedded in an arc
   arc: <arc-slug>
   prev: <slug>
   next: <slug>
-mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
+mvb_personas: [applied-researcher, research-engineer, applied-ai-engineer]  # the canonical 3
 prereqs: [<concept-slug>, ...]
 tags: []
 updated: YYYY-MM-DD
@@ -173,7 +173,7 @@ Only then does the loop resume — pointing at `curriculum-v2/`. The old `curric
 
 ## What stays the same
 
-- The 4 reader personas (cs-student / applied-engineer / applied-researcher / frontier-researcher).
+- The reader personas — now the canonical 3 (applied-researcher / research-engineer / applied-ai-engineer); the older 4-persona set was consolidated 2026-05-27 — see `agents/SCHEMA.md`.
 - The source policy (arxiv, .edu, huggingface, official docs only).
 - The arc / project / capstone framing from `faire_canon`.
 - The closed-loop observer / supervisor / scheduler architecture.
