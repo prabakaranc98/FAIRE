@@ -3,6 +3,9 @@ title: Frontier Wiki
 template: home.html
 ---
 
+<!-- cache-bust 2026-05-27T0510EDT: force Fastly CDN to re-fetch after rapid deploys -->
+
+
 ## The 10 canonical tracks
 
 FAIRE is organized around the 10 parallel learning tracks from [pracha.me/curriculum](https://pracha.me/curriculum). Each subject has its own arcs, concepts, key authors, and builds — slot in at any depth.
