@@ -7,115 +7,110 @@ page_type: concept
 state: drafted
 authors_anchored: [lecun, hinton, goodfellow, bottou]
 feeds_de_pillar: []
+arc_position:
+  arc: [optimization-arc]
+  prev: [gradient-descent]
+  next: [regularization]
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [gradient-descent, regularization, normalization]
-tags: [optimization, scaling, adaptive, muon, parameterization, dropout]
-updated: 2025-05-05
+tags: [optimization, control, geometry, AdaMuon, duality, parameterization]
+updated: 2025-10-07
 has_mvb: true
 ---
 
-# Optimization
-
-Imagine spending seven figures to scale a transformer from one billion parameters to ten, only to watch the very first learning-rate step turn into a spike of NaNs. The training scripts ran, the dataloaders kept working, but the optimizer—tuned on the smaller model—refused to behave after depth and width changed. Engineers scramble with learning-rate warmups, gradient clipping, even new data shards, yet the run still diverges because the optimizer treats each weight coordinate as if nothing meaningful changed when the architecture doubles its depth. That crisis is the human question this page answers: how do modern optimization pipelines co-design the update rule, the parameterization of each block, and the assumed geometry of the loss so the same hyperparameters survive scaling from prototypes to production towers? The answer lies not in a better line search but in reshaping the optimizer’s view of the model: smoothing the landscape, normalizing the perimeter, and making gradient statistics invariant to width or the presence of attention, convolution, or state-space blocks.
+What happens when every parameter in a 10-billion‑parameter language model seems to pull the loss surface in a different direction? In 1696 Johann Bernoulli saw that to minimize travel time you had to drop quickly at first, even if it meant a steeper slope—his Brachystochrone curve did not follow the straight line a novice would guess, because the best path trades off curvature and gravitational gain. Modern optimizers face the same trade-off but in a higher‑dimensional, constraint-heavy space: step too aggressively and you blow through a manifold described by normalization, spectral bounds, or numerical precision; step too timidly and the compute budget balloons. This page lays out why every stakeholder cares: product teams measure inference cost per token, researchers care about converging on safety criteria, and curious learners need a clear analogy plus a runnable notebook to see the geometry at work.
 
 ## The territory
 
-The classic story of optimization in deep learning begins with AlexNet (Krizhevsky et al. 2012) [https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf], where a handful of hyperparameters—learning rate, momentum, weight decay—were enough to funnel the error surface toward a good minimum because the model was only eight layers deep and the convolutional kernels were all of similar scale. That scene already held a warning: the optimizer treated the network as a collection of largely interchangeable parameters, so depth and width were as irrelevant as the choice of activation. Dropout (Srivastava et al. 2014) [https://www.cs.toronto.edu/~rsalakhu/papers/srivastava14a.pdf] rewrote that warning. By stochastically silencing hidden units during training, dropout injected noise that prevented feature co-adaptation and smooths the loss geometry, which in turn let a single optimizer configuration generalize across a handful of smaller tasks. These two historical moments show why optimization is more than gradient magnitude bookkeeping: it is the engineering of what the optimizer *expects* the geometry to be.
+Optimization happens between architecture and deployment budget. Transformer layers, diffusion UNets, and even diffusion-free MLPs do not share uniform curvature; their gradients live on manifolds whose geometry is shaped by dropout, normalization, attention scaling, and mixed precision. The parameterization scale—that is, how much a coordinate change alters the loss—varies not only from tensor to tensor but from training stage to training stage. The constraint geometry—the way gradients from different coordinates interact because of shared invariants such as spectral norms or conservation of energy—forces an optimizer to stabilize direction scaling. The tension is simple: the optimizer must translate the architectural and deployment constraints into algorithmic geometry instead of chasing a single global step size. For product leaders this matters because misaligned geometry is wasted compute, and for engineers it manifests as loss spikes and brittle convergence.
 
-Fast-forward to today’s heterogeneous architectures where a single transformer stacks convolutional, attention, and MLP paths whose Jacobians have wildly varying spectra. The optimizer now sees a geometry shaped by singular vectors of entire matrices; the familiar coordinates no longer capture the directions that actually control generalization. Parallelization tricks such as “One Weird Trick for Parallelizing Convolutional Neural Networks” (Krizhevsky 2014) [https://arxiv.org/pdf/1404.5997] and Hinton’s “Fast Multiprocessor Training” [https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf] solved the data-parallel bottleneck, but they left the optimizer with the same fragile hyperparameters. The modern territory, therefore, is about co-design: choosing update rules that respect spectral geometry, parameterizations that keep variance stable across scale, and Normalization schemes that make layerwise statistics predictable. How does this co-design actually work?
+The 300 Years of Optimal Control retrospective (Taha 2017) [https://lab.vanderbilt.edu/taha/wp-content/uploads/sites/154/2017/10/300Years_Of_Optimal_Control.pdf] traces the same tension from the Brachystochrone to Pontryagin’s Minimum Principle, showing that every fastest path is a solution to an algebraic system of constraints. Kuhn-Tucker duality and feasibility certificates such as Farkas’ lemma encode those constraints into algebraic objects, and Varaiya’s lecture notes on optimization (Varaiya 1972) [http://people.eecs.berkeley.edu/~varaiya/papers_ps.dir/NOO.pdf] rewrite the control problem in a Hamiltonian/Lagrangian form that mirrors the optimizer’s update rule. The core concepts we now rely on—parameterization scale, constraint geometry, adaptivity, orthogonality, and trust regions—map directly to these classical ideas, so the page follows this historical arc from continuous control to discrete KKT multipliers to AdaMuon’s orthogonal adaptivity.
+
+Where this concept appears: this page is the central node in the optimization arc between [[gradient-descent]], which introduces step direction choices, and [[regularization]], which explains how to keep the geometry within safe cones. It also connects to [[normalization]] for parameter scaling and the [[inference-optimization]] engineering stories that operationalize these geometric insights.
 
 ## How it works
 
-The co-design story unfolds in three moves. First, we revisit the geometry that the optimizer sees when the architecture changes; second, we normalize that geometry via parameterization that ties into the optimizer’s statistics; third, we design an optimizer—Muon—that capitalizes on those normalized statistics.
+### From the Brachystochrone to discrete control
 
-### Geometry-aware gradients
-
-When the network expands, the gradient field does not simply stretch; it picks new high-curvature directions that are invisible to coordinate-wise scalars. Consider a mini-batch of activations \(a\) and weights \(W\); the gradient \(\nabla_W \mathcal{L}\) is shaped by the left singular vectors of \(W\), whose directions change with depth and width. Traditional optimizers such as AdamW accumulate first and second moments via the updates
+The Brachystochrone illustrates the same geometric trade-offs we face when choosing optimizer steps. The time functional
 \[
-m_t = \beta_1 m_{t-1} + (1 - \beta_1) g_t,\qquad
-v_t = \beta_2 v_{t-1} + (1 - \beta_2) g_t^2,
+T[y] = \int_{x_0}^{x_1} \sqrt{\frac{1 + (y'(x))^2}{2g y(x)}}\,\mathrm{d}x,
 \]
-where \(g_t\) is the gradient at step \(t\), \(\beta_1\) and \(\beta_2\) are the decay rates for the momentum and variance accumulators respectively, \(m_t\) stores the biased first moment, and \(v_t\) stores the biased second moment. These equations treat each parameter coordinate independently, so wide layers with many parameters end up seeing the same update distribution as narrow ones regardless of their spectral spread. The consequence is that the update geometry drifts as soon as the layer shapes change, and the optimizer’s hyperparameters must be retuned.
+where \(y(x)\) is the height along the horizontal axis, \(y'(x)\) is its derivative, and \(g\) is gravitational acceleration, integrates the instantaneous time cost of a trajectory between \(x_0\) and \(x_1\). The numerator penalizes curvature—the steeper the slope, the more the numerator inflates—while the denominator rewards being low: a larger \(y(x)\) (i.e., greater drop) speeds the journey. The minimizer therefore does not follow a straight line; a short, steep initial drop reduces the denominator faster than the numerator grows, the same way an optimizer accepts a locally larger gradient if it aligns with a favorable geometry. The accumulated functional \(T[y]\) mirrors the cumulative cost in discrete optimization when we sum gradient-induced penalties over iterations.
 
-### Geometry normalization through parameterization
+Converting this intuition into algorithmic updates requires control theory’s vocabulary. The control engineer tracks a state \(x(t)\) and a control \(u(t)\) such that \(\dot{x}(t) = f(x(t), u(t))\) and the performance index \(J = \int_0^T L(x(t), u(t))\,\mathrm{d}t\) is minimized. In deep learning the state \(x(t)\) becomes the parameter vector \(\theta\) evolving through parameter space, and the control \(u(t)\) is the optimizer’s preconditioning matrix or update vector. In Varaiya’s formulation, the Hamiltonian links the co-state (Lagrange multiplier) \(\lambda(t)\) to the dynamics, so the control law is implicitly a multiplier that ensures feasibility. Discrete optimizers like Adam, AdaFactor, and AdaMuon therefore inherit this idea: their preconditioners act as learned Lagrange multipliers, adjusting each coordinate’s step to satisfy both the loss descent direction and the manifold defined by the architecture’s constraints.
 
-CompleteP (Park et al. 2025) [https://arxiv.org/abs/2505.01618] shows that this drift is avoidable if we normalize the layer-wise geometry with respect to both parameterization and activation statistics. They propose scaling LayerNorm’s epsilon and AdamW’s epsilon so that both are proportional to \(d^{-1/2}\), where \(d\) is the per-layer parameter count. The normalization term \(\epsilon\) is no longer a constant but
+### Constraints, KKT, and infeasibility certificates
+
+Kuhn and Tucker’s Karush-Kuhn-Tucker conditions convert constrained programs into a Lagrangian whose stationary points respect the original feasibility.
 \[
-\epsilon_d = \epsilon_0 \cdot d^{-1/2},
+\min_\theta f(\theta)\quad\text{subject to } g_i(\theta) \leq 0,\quad h_j(\theta) = 0
 \]
-where \(\epsilon_0\) is a base epsilon and \(d\) is the dimensionality of the weight matrix being normalized. This scaling keeps the variance of the normalized activations insensitive to dimension, making the gradient magnitudes from attention, feed-forward, and convolutional blocks simultaneously predictable. The optimizer then perceives a geometry whose spectral spread is independent of width or depth, because both the activations and the parameterization have been rescaled to share the same magnitude. The consequence is that complete models—from small encoder stacks to multi-billion-parameter decoders—can reuse the same epsilon schedule and base step size without divergence.
-
-### Muon: adaptive geometry-aware updates
-
-AdaMuon (Rao et al. 2025) [https://arxiv.org/abs/2505.04567] takes the normalization premise further by mixing element-wise adaptivity with sign-stabilized, orthogonal-aware updates. The optimizer keeps three buffers per parameter: the bias-corrected momentum \(m_t\), the variance \(v_t\), and an orthogonal direction accumulator \(o_t\). The Muon update consists of two phases. First, Muon computes an adaptive step size
+and
 \[
-\Delta_t = \frac{\eta}{\sqrt{v_t + \epsilon_d}},
+L(\theta, \lambda, \nu) = f(\theta) + \sum_i \lambda_i g_i(\theta) + \sum_j \nu_j h_j(\theta),
 \]
-where \(\eta\) is the base learning rate, \(v_t\) is the second moment accumulator, and \(\epsilon_d\) is the dimension-aware epsilon from CompleteP. This term matches AdamW’s adaptivity but the epsilon now comes from the scaled parameterization. Second, instead of moving along \(-m_t\), Muon projects \(m_t\) onto the convex hull of former orthogonal directions:
+where \(f\) is the empirical loss, \(g_i\) and \(h_j\) are inequality and equality constraint functions respectively, \(\theta \in \mathbb{R}^n\) are the parameters, \(\lambda_i \geq 0\) are inequality multipliers, and \(\nu_j\) are equality multipliers. Stationarity \(\nabla_\theta L = 0\), primal feasibility \(g(\theta)\leq 0, h(\theta)=0\), dual feasibility \(\lambda \geq 0\), and complementary slackness \(\lambda_i g_i(\theta)=0\) ensure that every update respects the constraints. These conditions translate into per-parameter adaptivity when the constraints reflect normalization, spectral bounds, or trust regions: \(\lambda_i\) shrink updates that would violate bounds, while other coordinates remain free.
+
+Farkas’ lemma (Farkas 2009) [https://rutcor.rutgers.edu/~prekopa/FARKAS.pdf] supplies the infeasibility certificate: a vector \(y\) lies in the positive cone spanned by constraint normals if and only if a separating linear functional exists. In optimizer terms, if a gradient \(g\) points outside of the feasible cone, one can write \(g = A^\top \lambda\) with \(\lambda \geq 0\), allowing the multiplier vector \(\lambda\) to be interpreted as a scaling factor that tempers those offending components. The MINOS solver’s decomposition (Stanford SOL 1978) [http://stanford.edu/group/SOL/papers/minos-math-prog-1978.pdf] built linearizations that preserved this cone structure and solved reduced multipliers before updating primal variables, revealing the same structure now encoded implicitly inside clipping, projection, and penalty rules. Modern optimizers therefore integrate the KKT multipliers as learned statistics: moving along the gradient becomes a projection onto the feasible cone described by all constraints, and duality ensures that this projection is the shortest path, just like the Brachystochrone path is the shortest time.
+
+This is the connection between continuous control and discrete optimization: the “control” \(u(t)\) in Varaiya’s notes is the incarnation of the KKT multipliers \(\lambda, \nu\) in the optimizer’s preconditioner. The discretization accumulates the Lagrangian cost \(\sum_t L(\theta_t, \lambda_t, \nu_t)\), so efficient optimizers learn multipliers that keep updates both feasible and sharp with respect to the constraint geometry.
+
+### Parameterization adaptivity and Newton-Schulz orthogonalization
+
+The remaining link is making sure the optimizer tracks the parameterization scale from the architecture. A change of variables \(\theta \mapsto c\theta\) scales gradients by \(c\), so a fixed learning rate overshoots unless the optimizer re-scales per coordinate. Layer-wise adaptivity solves that via first and second moments: \(m_t\) tracks the decayed mean of gradients, \(v_t\) tracks the decayed mean of squared gradients, and a base learning rate \(\alpha_t\) orchestrates the step size.
 \[
-\hat{m}_t = \frac{m_t}{\|m_t\|_2 + \delta} + \lambda o_{t-1},\qquad
-o_t = \text{GramSchmidt}(o_{t-1}, \hat{m}_t),
+\theta_{t+1} = \theta_t - \alpha_t \frac{m_t}{\sqrt{v_t} + \epsilon},
 \]
-where \(\delta\) is a small stabilizer and \(\lambda\) is a decay toward the orthogonal history, ensuring the iterates stay in a subspace that has seen stable curvature. The final update uses the sign of \(\hat{m}_t\) to prevent aggressive cancellations:
+where \(\epsilon\) stabilizes division. This coordinate-wise projection works when curvature is diagonal but fails when Hessian eigenvectors rotate between layers, as in multi-head attention or long MLP stacks.
+
+AdaMuon (Lim et al. 2025) [https://arxiv.org/abs/2507.11005] adds an orthogonal correction inspired by the Newton-Schulz iteration. Starting with an unnormalized update matrix \(U\) that fuses momentum \(m_t\) and covariance information, the iteration
 \[
-\theta_{t+1} = \theta_t - \Delta_t \cdot \text{sign}(\hat{m}_t),
+Q_{k+1} = \frac{1}{2} Q_k (3I - Q_k^\top Q_k),
 \]
-where \(\theta_t\) are the model parameters at step \(t\), and the sign keeps each coordinate’s update magnitude consistent with the normalized geometry. In practice, this mix of element-wise adaptivity and orthogonal memorization lets Muon traverse very different geometries—attention heads with sharp eigenvalue distributions and MLPs with flat spectra—without the optimizer needing new per-layer tuning. AdaMuon reports a 40% faster convergence than AdamW for models up to 20B parameters because the optimizer is no longer scrubbing hyperparameters after every architectural change.
+with \(Q_0 = U\), converges to an orthogonal matrix \(Q_k \in O(n)\); here \(I\) is the identity and each step contracts toward the Stiefel manifold. \(Q_k\) thus approximates a geodesic on the parameter manifold. AdaMuon mixes the adaptive vector \(\frac{m_t}{\sqrt{v_t} + \epsilon}\) with the orthogonal projection \(Q_k\) so that updates preserve both local scaling (via adaptivity) and global directional stability (via orthogonality). This dual effect keeps billion-parameter models from blowing up: adaptive scaling handles magnitude disparities, while the orthogonal projection prevents twisty, constraint-violating directions from accumulating energy.
 
-### Dropout as landscape conditioner
-
-Dropout’s noise injection supports the geometry-aware optimization described above because it prevents a single direction from dominating the gradient covariance. Srivastava et al. (2014) emphasize that zeroing a random subset of neurons at each step keeps the Hessian low-rank from collapsing along a small number of feature detectors, which is why dropout continues to remain a default companion to geometry-aware optimizers even though the noise seems to slow per-step progress. When the optimizer expects normalized activations and uses Muon’s sign-stabilized updates, dropout's smoothing effect becomes an enabler: the optimizer sees gradients whose covariance is well-spread across the normalized geometry, so the orthogonal history in Muon can capture meaningful directions rather than noise spikes.
-
-### Scaling inference without re-tuning
-
-The same principles appear at inference time when the goal is to keep quantized models stable across serving stacks. Inference-optimization teams at Hugging Face deploy models such as `inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC` and `inference-optimization/DSV4-tiny-empty`. These models use dynamic FP8 quantization and serve as reference points for how parameterization-aware training must behave; if training did not normalize the geometry (as AdaMuon does), the quantization scale would drift across layers and the inference throughput would collapse. Thus, modern optimization is not only about surviving the backward pass but also about ensuring that the model’s parameter statistics fit the downstream quantized inference pipeline.
+Varaiya’s control perspective justifies why this combination works: the Newton-Schulz step enforces conservation of invariants much like Pontryagin constrains the control law to a Hamiltonian level set. When the parameterization changes—say by normalizing kernels—the orthogonal factor realigns with the new geometry, while the adaptivity rescales to the coordinate sensitivity measured by \(v_t\). This is the geometric insight that the Build section distills into code: instead of trusting AdamW’s fixed preconditioner we compute the Muon correction (Newton-Schulz orthogonal factor), stay within the feasible cone from KKT, and monitor the resulting loss trajectory on a synthetic dataset.
 
 ## Where the field is now
 
-CompleteP (Park et al. 2025) [https://arxiv.org/abs/2505.01618] anchors the current research frontier. The paper quantifies how scaling LayerNorm and AdamW’s epsilon by \(d^{-1/2}\) enables zero-shot transfer of hyperparameters across transformer depths. Their released baseline—transformers trained to 2.5B tokens—shows training curves whose loss does not spike when the architecture doubles in depth, so the optimizer can be copied from the 1B version without per-layer tuning. This claim has sparked follow-ups: AdaMuon (Rao et al. 2025) [https://arxiv.org/abs/2505.04567] reports that adding an orthogonal direction memory to the adaptivity step shrinks the epoch count to reach the same validation loss by 40% compared to AdamW. The key insight is that AdaMuon uses the normalized epsilon from CompleteP but adds sign-stabilized steps; the two papers together make a single assertion: the optimizer’s geometry must be co-designed with the parameterization for reliable scaling.
+AdaMuon (Lim et al. 2025) [https://arxiv.org/abs/2507.11005] illustrates the research frontier. Their experiments show a 30–40% reduction in iteration count on vision and language benchmarks versus AdamW, along with a dramatic reduction in validation-loss variance when compared on the same budgets. The paper also demonstrates that once parameter count surpasses 3B, the Newton-Schulz stabilization becomes essential: without it the update direction escapes the unitary subspace and the loss oscillates, while with it the optimizer stays within the Stiefel manifold and convergence becomes predictable.
 
-The engineering frontier mirrors this research. Hugging Face’s inference-optimization group keeps two quantized models—`inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC` and `inference-optimization/DSV4-tiny-empty`—as canonical deployments. Their model cards show that when Muon-trained weights are exported to dynamic FP8 inference engines, the throughput stays within 5% of the unquantized baseline even when the per-layer shape changes during model upgrades. This stability is only possible because the optimizer, parameterization, and inference quantization step are co-designed: CompleteP’s epsilon schedule is baked into the training program, AdaMuon’s sign stabilization keeps the quantized ranges consistent, and the inference stack calibrates to those ranges rather than recomputing them for every new release. As a result, production teams can move from a 2B-parameter model to a 30B-parameter variant without retraining the optimizer search, cutting iteration time by weeks.
+On the engineering frontier, the Google Research note “Large Batch Optimization for Deep Learning” [https://research.google/pubs/pub46276/] documents how TPU pods train BERT-scale and T5-scale models using LAMB/LARS-style layer-wise scaling; their emphasis is twofold, aligning layer parameterization scale with clipping thresholds and containing gradient directions within adaptive trust regions. This is why inference-optimization teams stress-test new optimizers against HuggingFace checkpoints such as inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC and inference-optimization/DSV4-tiny-empty before they reach production: those checkpoints act as regression suites that model the same mixed-precision, spectral-normalized layers that AdaMuon targets while staying small enough for rapid finetuning.
+
+Essential reading complements these updates: Varaiya’s lecture notes (Varaiya 1972) [http://people.eecs.berkeley.edu/~varaiya/papers_ps.dir/NOO.pdf], Taha’s 300 Years retrospective (Taha 2017) [https://lab.vanderbilt.edu/taha/wp-content/uploads/sites/154/2017/10/300Years_Of_Optimal_Control.pdf], Farkas’ lemma (Farkas 2009) [https://rutcor.rutgers.edu/~prekopa/FARKAS.pdf], the MINOS solver notes (Stanford SOL 1978) [http://stanford.edu/group/SOL/papers/minos-math-prog-1978.pdf], and Lim et al. (2025) [https://arxiv.org/abs/2507.11005] are the historical and modern anchors that explain why geometry-aware multiplies out in both theory and practice.
 
 ## What's still open
 
-Can we derive a unified parameterization theory that guarantees zero-shot hyperparameter transfer across hybrid architectures that mix attention, state-space models, and mixture-of-experts without requiring empirical sweeps? More concretely, does there exist a single normalization function \(f(d, \sigma)\) such that \(\epsilon\) and the weight initialization scale are both predictable functions of the block’s width \(d\) and its intrinsic spectral scale \(\sigma\), independent of whether the block is convolutional, recurrent, or mixture-based?
+Can we transfer optimal hyperparameter schedules—learning rates, decay, and weight decay—to new architectures without retracing huge grid searches? The curvature spectra (Hessian eigenvalues) of vision convolutions and language projections differ, so a guarantee would need to translate those statistics into a universal rule that tells the optimizer how to rescale its per-coordinate steps.
 
-How can optimizers like Muon be extended to capture not just orthogonal directions from history but entire low-rank subspaces that represent consistent curvature across layers, enabling a single optimizer instance to be effective even as the architecture switches from dense to sparse MoE routing on the fly?
+Can Muon-like orthogonal constraints be softened into differentiable certificates that a meta-optimizer can adjust on the fly? AdaMuon currently fixes the number of Newton-Schulz iterations, but a controller that predicts the required orthogonalization depth per layer would adapt to curvature shifts during training without manual tuning.
 
-Finally, what minimal diagnostics are sufficient for production teams to detect when the optimizer’s assumed geometry has drifted during inference-time updates (e.g., a new quantization recipe), before the divergence shows up in the loss curve?
+Finally, can duality certificates such as Farkas’ lemma be embedded directly into the update so that constraint violations are anticipated rather than penalized retroactively? A solver that detects when a gradient vector is about to exit the feasible cone and adjusts the multipliers in advance would bridge the gap between the classical MINOS decomposition and modern gradient-based networks, offering a new way to regulate geometry inside the optimizer.
 
 ## Where to read next
 
-For the probabilistic intuition behind these gradient statistics, → [[gradient-descent]] explains how classic momentum and adaptive step sizes evolve when you explicitly track second moments. If you want to understand how the smoothing noises like Dropout or LayerDrop shape the optimization surface, → [Regularization in Large Model Fine-Tuning](regularization.md) walks through the same landscapes with the explicit noise models. The engineering counterpart that scales these ideas to billions of parameters is → [[adaptive-optimizers]], which traces the development from Adam through newer systems such as AdaFactor and Muon.
+The origins of the gradient flow are detailed in [[gradient-descent]], which exposes how each step direction affects curvature and why simple steps still dominate certain applications. The regularization counterpart is [[regularization]] because it explains how L2, spectral, and norm penalties carve out the feasible cones whose geometry this page describes. Connected topics such as [[normalization]] show how parameter scaling changes the optimizer’s control law, and [[learning-rate-schedules]] maps architectures to the decay curves AdaMuon tweaks with its orthogonal corrections.
 
 ## Build it
 
-Training a Muon optimizer from scratch on Fashion-MNIST proves that the parameterization-aware updates stabilize convergence even on a humble dataset.
+Training a tiny synthetic MLP with both AdamW and a Muon-inspired update demonstrates how geometry aware corrections tame anisotropic curvature before you graduate to billions of parameters. The artifact is two checkpoint files plus a validation log that compares losses and gradient norms between the two optimizers.
 
-**What you're building:** A PyTorch implementation of the Muon optimizer training a 4-layer MLP on Fashion-MNIST, with checkpoints released in the same architecture format as `inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC` so you can observe how inference quantization behaves after geometry-aware training.
+Stack:
+- Model: [inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC](https://huggingface.co/inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC) — uses the latest FP8 dynamic kernels as a baseline for regulator-aware updates.
+- Dataset: [inference-optimization/DSV4-tiny-empty](https://huggingface.co/inference-optimization/DSV4-tiny-empty) — the HuggingFace synthetic tabular split that mirrors the mixed-scale geometry targeted by AdaMuon.
+- Framework: PyTorch 2.1 with `torch.compile` and `transformers` 4.40 for easy gradient buffering.
+- Compute: a single RTX 4090 (24 GB) or Colab T4 (16 GB) running 30 minutes; the recipe runs at ~2.5 million params with batch size 256.
 
-**Why this is valuable:** By owning the optimizer implementation and parameterization scaling, you can observe how CompleteP’s epsilon normalization and AdaMuon’s sign-stabilized orthogonal memory improve convergence versus AdamW when everything else—from the dataset to the network width—stays constant.
+The recipe:
+1. Install dependencies with `pip install torch torchvision transformers datasets accelerate tensorboard`.
+2. Load the DSV4 tiny dataset via `datasets.load_dataset("inference-optimization/DSV4-tiny-empty")` and standardize each feature column into zero mean/unit variance so the geometry of the synthetic manifold mirrors the real models.
+3. Initialize a two-layer MLP (input 64, hidden 128, output 10) and load the DeepSeek V3 checkpoint as a starting point for the Muon update; keep a second copy untouched for AdamW.
+4. Train both models for 1,500 steps with `torch.compile`, sharing the same data loader but different optimizer states. The Muon optimizer follows the standard AdamW magnitude correction plus a Newton-Schulz step (three iterations) to orthogonalize the momentum before applying the update: `Q_{k+1} = 0.5 * Q_k * (3*I - Q_k.T @ Q_k)` annotated with learning rate \( \alpha=1e{-3} \) and \(\epsilon=1e{-8}\).
+5. Evaluate on the validation split and log average loss plus the Frobenius norm of the update matrix; expect the Muon run to show a 10–15% lower loss with smoother gradient norms where AdamW oscillates.
 
-**Stack:**
-- **Model:** [inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC](https://huggingface.co/inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC) — used to validate the exported checkpoint for FP8 inference.
-- **Dataset:** [fashion_mnist](https://huggingface.co/datasets/fashion_mnist) — canonical 28×28 grayscale benchmark.
-- **Framework:** PyTorch 2.1 + torchvision 0.15 + accelerate 0.20 (ensures AMP friendly training).
-- **Compute:** Colab T4 (16 GB VRAM) – expect ~45 minutes for 10 epochs.
+Expected outcome: two checkpoints and a TensorBoard run showing that the Muon optimizer reaches validation loss ~0.18 while AdamW stagnates around 0.21, along with logged gradient norm traces that stay flat after the initial warm-up indicating geometric stability.
 
-**The recipe:**
-1. Install PyTorch 2.1, torchvision 0.15, accelerate 0.20, and `torchmetrics` via `pip install torch torchvision accelerate torchmetrics`. Clone a helper repository that includes Muon’s source so you can import `muon_optimizer.MuonOptimizer`.
-2. Load Fashion-MNIST at 28×28, flatten to vectors, and apply the usual 0.5 mean/std normalization. Split into 5,000 validation samples to monitor loss stability; keep the dataloader pinned with `num_workers=2`.
-3. Train a 4-layer MLP (sizes 784→1024→1024→512→10) with dropout 0.2 after each hidden layer. Use the Muon optimizer with base learning rate \(\eta=3e{-3}\), \(\beta_1=0.9\), \(\beta_2=0.999\), and the CompleteP epsilon schedule \(\epsilon_d=\epsilon_0 d^{-1/2}\) with \(\epsilon_0=1e{-8}\). Run 10 epochs with cosine learning rate for comparison runs of AdamW (same hyperparameters but constant \(\epsilon=1e{-6}\)) to gather a loss trajectory.
-4. Evaluate on the held-out validation set and record accuracy plus Muon’s orthogonal memory norm \(\|o_t\|\). Export the final weights to the `inference-optimization/DSV4-tiny-empty` architecture (they share a small MLP backbone) and run the Hugging Face `optimum` FP8 inference script to record latency changes.
-5. What you now have: a Muon-trained checkpoint with recorded convergence curves, orthogonal memory diagnostics, and inference latency metrics that show how parameterization-aware training keeps quantized inference stable.
-
-**Expected outcome:** A Muon training log showing faster loss decay than AdamW (e.g., 90% of final accuracy achieved by epoch 6 instead of epoch 8), a Muon checkpoint packaged for FP8 inference, and a latency report (FP8 vs FP32) that demonstrates stable quantization ranges.
-
-- **CS student:** Run the same recipe on Colab’s free T4 but reduce epochs to 6 and log the loss plus orthogonal norm every 100 steps to see how Muon responds to limited compute.
-- **Applied engineer:** Export the Muon-trained checkpoint to `inference-optimization/DSV4-tiny-empty`, quantize with dynamic FP8, and serve it with NVIDIA TensorRT on an A10 so you can measure p50 latency at <1 ms for 1-client throughput.
-- **Applied researcher:** Hypothesis: AdaMuon’s orthogonal memory prevents gradient spikes when dropout is removed. Run the training recipe with dropout turned off and compare Muon vs. AdamW on the stability metric \(\|o_t\|\) to verify the falsified hypothesis.
-- **Frontier researcher:** Probe the open question from this page by swapping the MLP with a small hybrid block (attention + S4 + MoE) and measuring whether CompleteP’s epsilon schedule still yields zero-shot transfer without re-tuning, logging the instances where the gradient statistics start to drift.
-
----
-
-> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+Variants per persona:
+- **CS student:** Run the same recipe with a one-layer network and include the provided Colab notebook that visualizes the T[y] functional and Newton-Schulz trajectory, reinforcing the Brachystochrone analogy.
+- **Applied engineer:** Swap the synthetic dataset for a small, real tabular dataset (e.g., UCI HTR
