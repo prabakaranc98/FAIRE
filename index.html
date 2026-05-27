@@ -435,37 +435,36 @@
 
 <div class="fw-hero">
   <div class="fw-hero__inner">
-    <div class="fw-hero__eyebrow">Read · Build · Ship</div>
+    <div class="fw-hero__eyebrow">Read · Build · Ship · Reflect</div>
     <h1 class="fw-hero__title">
       A wiki for building<br>
       <span>valuable things at the frontier of AI.</span>
     </h1>
     <p class="fw-hero__subtitle">
-      Not a reference. Not a tutorial chase. Not a bookmark pile.
-      FAIRE walks you from a concept to a real build — across the 10 canonical tracks of frontier AI research.
-      Every page is self-contained reading. Every pivotal page closes with a Minimum Valuable Build you can ship today.
+      Written, reviewed and iteratively improved by a closed-loop multi-agent system.
+      Encyclopedic walk-throughs of the 10 canonical AI tracks — every pivotal page closes with a runnable Minimum Valuable Build, every cycle ends with a scrum-style retrospective that seeds the next.
     </p>
     <div class="fw-hero__cta">
       <a href="curriculum/" class="cta-primary">Start with the curriculum</a>
-      <a href="system/structure-v2/" class="cta-secondary">How this is built</a>
-      <a href="system/sense/" class="cta-secondary">Why this exists</a>
+      <a href="system/architecture/" class="cta-secondary">The closed-loop system</a>
+      <a href="system/backlog/" class="cta-secondary">Latest retrospective</a>
     </div>
     <div class="fw-hero__stats">
+      <div class="fw-hero__stat">
+        <span class="fw-hero__stat-num">60+</span>
+        <span class="fw-hero__stat-label">Pages shipped autonomously</span>
+      </div>
       <div class="fw-hero__stat">
         <span class="fw-hero__stat-num">10</span>
         <span class="fw-hero__stat-label">Canonical tracks (pracha.me)</span>
       </div>
       <div class="fw-hero__stat">
-        <span class="fw-hero__stat-num">Build</span>
-        <span class="fw-hero__stat-label">An MVB on every pivotal page</span>
+        <span class="fw-hero__stat-num">$0.18</span>
+        <span class="fw-hero__stat-label">Per page (incl. revisions)</span>
       </div>
       <div class="fw-hero__stat">
-        <span class="fw-hero__stat-num">4</span>
-        <span class="fw-hero__stat-label">Personas served per page</span>
-      </div>
-      <div class="fw-hero__stat">
-        <span class="fw-hero__stat-num">Ship</span>
-        <span class="fw-hero__stat-label">Self-contained, primary-source only</span>
+        <span class="fw-hero__stat-num">8</span>
+        <span class="fw-hero__stat-label">Critics on every draft</span>
       </div>
     </div>
   </div>
@@ -542,7 +541,7 @@
       <div class="fw-journey__step">
         <span class="tag">1 · Range</span>
         <h3>Curriculum</h3>
-        <p>One page per concept across 15 tracks. Context that carries forward — by page 3 the reader doesn't re-read what they already know. Reference voice, primary sources only.</p>
+        <p>One page per concept across the 10 canonical AI tracks. Context that carries forward — by page 3 the reader doesn't re-read what they already know. Reference voice, primary sources only.</p>
       </div>
       <div class="fw-journey__arrow">→</div>
       <div class="fw-journey__step">
@@ -560,6 +559,94 @@
     <div class="fw-journey__foot">
       <strong>The bet:</strong> not tutorial-chasing, not bookmark-stacking, not getting lost in piles of information.
       A wiki that closes every page with a directed nudge — what to build next, for the persona you are.
+    </div>
+  </div>
+</div>
+
+<style>
+  .fw-loop {
+    background: #FFFFFF;
+    padding: 3rem 1.5rem;
+    border-bottom: 1px solid #E5E7EB;
+  }
+  .fw-loop__inner { max-width: 1000px; margin: 0 auto; }
+  .fw-loop__eyebrow {
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+    color: #E8452A; text-transform: uppercase; text-align: center;
+    margin-bottom: 0.4rem;
+  }
+  .fw-loop__title {
+    font-size: 1.7rem; font-weight: 800; color: #111827;
+    text-align: center; margin-bottom: 0.4rem; letter-spacing: -0.02em;
+  }
+  .fw-loop__lede {
+    font-size: 1rem; color: #4B5563; text-align: center;
+    max-width: 780px; margin: 0 auto 2rem;
+  }
+  .fw-loop__grid {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+    margin-bottom: 1.6rem;
+  }
+  .fw-loop__node {
+    background: #FAFAFA; border: 1px solid #E5E7EB; border-radius: 12px;
+    padding: 1.1rem 1rem; text-align: left;
+  }
+  .fw-loop__node .num {
+    font-size: 0.72rem; font-weight: 800; color: #E8452A;
+    letter-spacing: 0.1em; text-transform: uppercase; display: block;
+    margin-bottom: 0.4rem;
+  }
+  .fw-loop__node h3 {
+    font-size: 0.98rem; font-weight: 800; color: #111827; margin: 0 0 0.4rem;
+    letter-spacing: -0.01em;
+  }
+  .fw-loop__node p {
+    font-size: 0.84rem; color: #4B5563; line-height: 1.55; margin: 0;
+  }
+  .fw-loop__node a { color: #E8452A; text-decoration: none; font-weight: 600; }
+  .fw-loop__guards {
+    background: rgba(232, 69, 42, 0.06);
+    border-left: 3px solid #E8452A;
+    border-radius: 4px;
+    padding: 1rem 1.2rem;
+    font-size: 0.9rem; color: #374151; line-height: 1.6;
+  }
+  @media (max-width: 720px) {
+    .fw-loop__grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<div class="fw-loop">
+  <div class="fw-loop__inner">
+    <div class="fw-loop__eyebrow">The system itself is the work</div>
+    <h2 class="fw-loop__title">A closed-loop agentic wiki</h2>
+    <p class="fw-loop__lede">
+      Every page is written by a LangGraph pipeline, reviewed by a panel of 8 critics, and held to a checklist the planner built from primary sources. After each cycle a retrospective agent reflects on what worked and what regressed, then seeds the next sprint with the gaps it identified.
+    </p>
+    <div class="fw-loop__grid">
+      <div class="fw-loop__node">
+        <span class="num">1 · Sense</span>
+        <h3>Observer</h3>
+        <p>Scans runs, coverage, citation health, unresolved wikilinks. Computes error signals against quality / coverage / staleness set-points.</p>
+      </div>
+      <div class="fw-loop__node">
+        <span class="num">2 · Decide</span>
+        <h3>Supervisor</h3>
+        <p>Reads the observation + last retro and rewrites the sprint queue — which topics to generate next, which to revisit, which arc to materialise.</p>
+      </div>
+      <div class="fw-loop__node">
+        <span class="num">3 · Act</span>
+        <h3>Sprint</h3>
+        <p>N pages built in parallel: research → checklist → write → review (8 critics + knockout selector) → commit. Hallucination guards run on every draft.</p>
+      </div>
+      <div class="fw-loop__node">
+        <span class="num">4 · Reflect</span>
+        <h3>Retrospective</h3>
+        <p>Scrum-style retro: went-well, went-wrong, needs-depth, what-to-add. Safe items auto-apply (stub-seeds). See the <a href="system/backlog/">latest backlog</a>.</p>
+      </div>
+    </div>
+    <div class="fw-loop__guards">
+      <strong>Built-in hallucination guards.</strong> Every draft passes a deterministic gate before review — future-dated arxiv IDs are rejected, pre-verified HuggingFace model IDs are mandatory, the writer's checklist is enforced. The 8-critic panel is the second gate; the knockout selector ensures revisions only land when they improve the page. <a href="system/architecture/">Full architecture →</a>
     </div>
   </div>
 </div>
