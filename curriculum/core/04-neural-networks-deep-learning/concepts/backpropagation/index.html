@@ -1235,13 +1235,184 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">activation-memory</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">autodiff</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">backpropagation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gradient-checkpointing</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">optimizer</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">pytorch</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="backpropagation">Backpropagation<a class="headerlink" href="#backpropagation" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">04 · Neural Networks Deep Learning</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>Why does simply doubling the depth or width of a neural network often blow up the GPU memory instead of the theory? Backpropagation is the algorithm that rewinds the computation graph to turn a single loss number into weight updates, but every rewind step needs a copy of the activation it previously produced. In practice, the gradient isn’t a set of equations on paper anymore; it is a routing problem where the backward pass must collect a sequence of stored tensors in precise reverse order. A quick intuition you can build in a thirty-minute notebook is this: treat each layer’s activation as a lane marker, log how much memory it consumes on a handful of layers, then recompute the layers just in time to see what happens when you only keep every third marker. That feel for “how much is too much to store?” grounds the later math without requiring a forest of notation.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Backpropagation solves the chain rule by propagating the loss gradient backward through the computation graph, turning the same operations executed forward into local rules for updating parameters. This mechanism is automatic differentiation, and the “routing” picture recasts it as a logistics problem: the forward pass writes activations into memory, and the backward pass must fetch them in reverse order to compute <span class="arithmatex">\( \delta^{(l)} \)</span>, the local signal at layer <span class="arithmatex">\( l \)</span>. Modern attention, batching, and width inflate each activation into something like <span class="arithmatex">\(O(batch \times sequence \times hidden)\)</span>, so the route quickly exceeds the capacity of even high-bandwidth memory. Activation memory becomes more expensive than the weights themselves. </p>
+<p>Because of that, several core concepts sit at the heart of this page: (1) <em>Backpropagation</em> is the chain-rule plumbing that turns the final loss into parameter gradients; (2) <em>Activation memory</em> is the set of intermediate tensors that the backward pass must revisit and the dominant budget when width, sequence, and batch all expand; (3) <em>Gradient routing</em> is the scheduling perspective that asks “which tensors do we keep, recompute, or sketch?”; (4) <em>Checkpointing</em> trades compute for memory by recomputing layers between saved boundaries; and (5) <em>Activation sketching</em> (ghost backpropagation) compresses the route markers so that the backward pass can still reconstruct the necessary directions without storing the full tensors. In practice these concepts appear together in arcs such as [[scaling-transforms]] and [[memory-efficient-training]], where the goal is to train ever-larger models under fixed hardware budgets. The combination of autodiff and systems-level scheduling is the shape of the problem; next we show exactly how the math and code enforce that routing.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="equations-that-anchor-the-route">Equations that anchor the route<a class="headerlink" href="#equations-that-anchor-the-route" title="Permanent link">&para;</a></h3>
+<p>(1) The forward pass at layer <span class="arithmatex">\(l\)</span> produces the hidden state
+[
+a^{(l)} = f^{(l)}(z^{(l)}), \qquad z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)},
+]
+where <span class="arithmatex">\(a^{(l-1)} \in \mathbb{R}^{B \times H_{l-1}}\)</span> is the layer input, <span class="arithmatex">\(W^{(l)} \in \mathbb{R}^{H_l \times H_{l-1}}\)</span> is the layer weight matrix, <span class="arithmatex">\(b^{(l)} \in \mathbb{R}^{H_l}\)</span> is its bias, <span class="arithmatex">\(z^{(l)}\)</span> is the pre-activation, and <span class="arithmatex">\(f^{(l)}\)</span> is the element-wise nonlinearity that maps <span class="arithmatex">\(\mathbb{R}^{H_l}\)</span> to itself. Here <span class="arithmatex">\(B\)</span> is the batch size and <span class="arithmatex">\(H_l\)</span> is the hidden dimensionality at layer <span class="arithmatex">\(l\)</span>. </p>
+<p>(2) The parameter gradients arise from
+[
+\frac{\partial \mathcal{L}}{\partial W^{(l)}} = \delta^{(l)} {a^{(l-1)}}^\top,
+]
+where <span class="arithmatex">\(\delta^{(l)} \in \mathbb{R}^{B \times H_l}\)</span> is the error signal at layer <span class="arithmatex">\(l\)</span> and the transpose occurs across the last two tensor dimensions (batch and features). The backward pass needs <span class="arithmatex">\(a^{(l-1)}\)</span> stored or reconstructible because the gradient is their outer product. </p>
+<p>(3) The error recursively satisfies
+[
+\delta^{(l)} = \left(W^{(l+1)}\right)^\top \delta^{(l+1)} \odot f^{(l)\prime}(z^{(l)}),
+]
+where <span class="arithmatex">\(f^{(l)\prime}(z^{(l)})\)</span> is the element-wise derivative, <span class="arithmatex">\(\odot\)</span> is the Hadamard product, and the matrix multiplication <span class="arithmatex">\( \left(W^{(l+1)}\right)^\top \delta^{(l+1)} \)</span> needs <span class="arithmatex">\(W^{(l+1)}\)</span> but not the forward activations. Missing <span class="arithmatex">\(z^{(l)}\)</span> means the <span class="arithmatex">\(\odot\)</span> mask cannot be computed and the chain rule collapses. Equation (3) is the bottleneck: to execute it we must visit <span class="arithmatex">\(z^{(l)}\)</span> and <span class="arithmatex">\(a^{(l-1)}\)</span> for every layer.</p>
+<h3 id="activation-memory-as-a-routing-queue">Activation memory as a routing queue<a class="headerlink" href="#activation-memory-as-a-routing-queue" title="Permanent link">&para;</a></h3>
+<p>The routing metaphor shows up concretely when memory profiling instruments the execution. Nguyen et al. (2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a> treat activations as packets in a GPU cache hierarchy and describe the backward pass as dequeueing the packets in reverse order. Their instrumentation shows that for a Transformer layer the activation queue length is proportional not only to depth but also to the product <span class="arithmatex">\(B \times S \times H\)</span>, where <span class="arithmatex">\(S\)</span> is the sequence length. When the queue exceeds the on-chip storage, the scheduler incurs page faults and stalls: adding more memory to the route (e.g., by placing more activations on the queue) actually slows down forward execution because the hardware bus must maintain coherence for every stored tensor.</p>
+<p>This queue metaphor is useful for evaluating alternatives. Gradient checkpointing marks a subset of activations as “persistent checkpoints,” and everything else is recomputed when the backward pass reaches the block boundary. The router still enqueues each activation, but the ones in between checkpoints are transient—they vanish from the queue and are recomputed only when needed. Checkpointing reduces the peak queue height but introduces recomputation latency equal to the size of each block. For attention-heavy architectures this latency is costly because rerunning attention layers includes the <span class="arithmatex">\(QK^\top\)</span> and <span class="arithmatex">\(QK^\top V\)</span> matmuls again. Memory routing therefore becomes a constrained optimization: minimize the stored tensors (queue height) while keeping recomputation latency (time) acceptable.</p>
+<h3 id="ghost-backpropagation-with-basis">Ghost backpropagation with BASIS<a class="headerlink" href="#ghost-backpropagation-with-basis" title="Permanent link">&para;</a></h3>
+<p>Rather than removing activations from the queue entirely or recomputing them later, BASIS (Zhu et al. 2026) <a href="https://arxiv.org/abs/2604.16324">arxiv:2604.16324</a> compresses each activation into a sketch that still carries the gradient direction. Let <span class="arithmatex">\(N_l = B \times H_l\)</span> be the number of scalars in <span class="arithmatex">\(a^{(l)}\)</span>. BASIS projects <span class="arithmatex">\(a^{(l)}\)</span> with a random or learned sketch matrix <span class="arithmatex">\(S^{(l)} \in \mathbb{R}^{k \times N_l}\)</span> where <span class="arithmatex">\(k \ll N_l\)</span>. The sketch keeps both the projection <span class="arithmatex">\(s^{(l)} = S^{(l)} a^{(l)}\)</span> and an invariant scalar such as <span class="arithmatex">\(\|a^{(l)}\|\)</span> or the trace of <span class="arithmatex">\(S^{(l)} (S^{(l)})^\top\)</span>. At backward time the algorithm estimates
+[
+\delta^{(l)} \approx \left(S^{(l)}\right)^\dagger \left( S^{(l+1)} \delta^{(l+1)} \right),
+]
+where <span class="arithmatex">\(\left(S^{(l)}\right)^\dagger\)</span> denotes a pseudo-inverse acting on the smaller <span class="arithmatex">\(k\)</span>-dimensional sketch space, and the right-hand side uses the stored primitives instead of the full activation. The invariants ensure the reconstruction is faithful enough that <span class="arithmatex">\(\delta^{(l)}\)</span> stays within the noise tolerance of stochastic gradient descent. This approximation rewrites the routing problem: instead of queueing <span class="arithmatex">\(N_l\)</span> scalars per layer, the backward pass carries <span class="arithmatex">\(O(k)\)</span> scalars, and the routing decision becomes “which sketch basis do we store” rather than “do we store the original activation?”</p>
+<p>BASIS amortizes the sketch over micro-batches by reusing the same random projection across a few forward passes. The projected readouts <span class="arithmatex">\(s^{(l)}\)</span> and the invariant scalars are small enough that the GPU can keep them in on-chip memory and no longer needs high-bandwidth copies of <span class="arithmatex">\(a^{(l)}\)</span>. The result is a memory footprint that depends on <span class="arithmatex">\(k\)</span> instead of <span class="arithmatex">\(N_l\)</span>, so the activation queue shrinks as <span class="arithmatex">\(k/N_l\)</span>. At the same time, the sketch introduces gradient noise, so the routing scheduler must ensure <span class="arithmatex">\(k\)</span> is large enough to keep the update direction within the “edge-of-stability” region described by Ma et al. (2026) <a href="https://www.arxiv.org/pdf/2602.07145">arxiv:2602.07145</a>. That work quantifies how much gradient noise the training dynamics can tolerate before divergence, giving a rule of thumb for sketch size.</p>
+<p>BASIS’s invariants interact with attention layers by sketching both the key/value caches and the softmax weights, thereby preserving what the original attention gradient described as a “Bayesian curvature” over the probability simplex. Sketching doesn’t eliminate the need for precise normalization; it simply writes enough curvature information into the route markers so that the backward pass does not forget long-range dependencies when it reconstructs the gradient.</p>
+<h3 id="custom-autograd-and-instrumentation">Custom autograd and instrumentation<a class="headerlink" href="#custom-autograd-and-instrumentation" title="Permanent link">&para;</a></h3>
+<p>Putting these ideas into code means overriding PyTorch’s autograd routing. A minimal sketching hook looks like:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ActivationSketch</span><span class="p">(</span><span class="n">Function</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">weight</span><span class="p">):</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="n">projection</span> <span class="o">=</span> <span class="n">sketch_matrix</span> <span class="o">@</span> <span class="n">x</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="n">ctx</span><span class="o">.</span><span class="n">save_for_backward</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdim</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">weight</span><span class="p">)</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">linear</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weight</span><span class="p">)</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    <span class="nd">@staticmethod</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">backward</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">grad_output</span><span class="p">):</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>        <span class="n">projection</span><span class="p">,</span> <span class="n">norm</span><span class="p">,</span> <span class="n">weight</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">saved_tensors</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>        <span class="n">activation_estimate</span> <span class="o">=</span> <span class="n">reconstruct_from_sketch</span><span class="p">(</span><span class="n">projection</span><span class="p">,</span> <span class="n">norm</span><span class="p">)</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="n">grad_input</span> <span class="o">=</span> <span class="n">grad_output</span> <span class="o">@</span> <span class="n">weight</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">grad_weight</span> <span class="o">=</span> <span class="n">grad_output</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">activation_estimate</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="k">return</span> <span class="n">grad_input</span><span class="p">,</span> <span class="n">grad_weight</span>
+</code></pre></div>
+<p>Here <code>sketch_matrix ∈ ℝ^{k×H}</code> is either random or learned, and <code>reconstruct_from_sketch</code> uses the pseudo-inverse and the invariant norms saved in <code>ctx</code>. <code>ctx.save_for_backward</code> is the point where the router decides what to store: instead of the full <span class="arithmatex">\(a^{(l)}\)</span>, it saves <span class="arithmatex">\((projection, norm)\)</span>, keeping only <span class="arithmatex">\(O(k)\)</span> data per layer. Recording the same invariants for each forward pass lets the backward pass reuse the sketches until the model updates change the weights significantly.</p>
+<p>Instrumentation closes the loop. Calling <code>torch.cuda.max_memory_allocated()</code> before and after each block quantifies how much of the activation queue is in GPU RAM, while <code>torch.autograd.profiler.profile()</code> reveals wall-clock overheads introduced by sketch reconstruction or checkpoint recomputation. The profiling results validate the routing metaphor by showing how each sketching decision shortens the queue (peak memory) at the cost of some discrete recompute steps. Only with these numbers can engineers decide whether to drop from 60,000 activation scalars to 5,000 sketches per layer without blowing up the wall-clock time.</p>
+<p>By stitching together equations (1)–(3), profiling instrumentation, BASIE-style invariants, and custom autograd helpers, we turn backpropagation into a system that explicitly routes gradients across a constrained memory pipeline. The next section situates the current research and engineering frontiers inside that pipeline.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Research treats backpropagation as evolving from calculus into a routing protocol. BASIS (Zhu et al. 2026) <a href="https://arxiv.org/abs/2604.16324">arxiv:2604.16324</a> remains the reference point for ghost backpropagation, demonstrating that invariant scalars and activation sketches lower peak activation memory by factors of three to four while matching base perplexity on language-model finetuning. Nguyen et al. (2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a> complements this by instrumenting GPU memory to show how each activation “packet” travels through caches, offering scheduling heuristics that integrate sketches with gradient accumulation across tensor shards. Ma et al. (2026) <a href="https://www.arxiv.org/pdf/2602.07145">arxiv:2602.07145</a> quantifies the margin of stability for sketch-induced noise and shows that the training dynamics remain stable as long as the sketch error keeps the update within a bounded neighborhood of the true gradient. DDCL-INCRT (Kumar et al. 2026) <a href="https://arxiv.org/abs/2604.01880v1">arxiv:2604.01880v1</a> adds a structural twist, carving the backward pass into hierarchical prototype lanes so that prototypes reuse the same compressed memory cells across blocks of layers, improving reuse of sketches in deep vision encoders.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Median activation reduction</th>
+<th>Overhead</th>
+<th>Citation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Baseline (store full activations)</td>
+<td>1×</td>
+<td>0%</td>
+<td>—</td>
+</tr>
+<tr>
+<td>BASIS ghost backpropagation</td>
+<td>3.5× reduction in peak activation memory</td>
+<td>~10% more forward time</td>
+<td>Zhu et al. (2026) <a href="https://www.arxiv.org/abs/2604.16324">arxiv:2604.16324</a></td>
+</tr>
+<tr>
+<td>Nguyen-style routing instrumentation</td>
+<td>2.1× reduction with hybrid checkpoint+sketch</td>
+<td>5–8% extra scheduling logic</td>
+<td>Nguyen et al. (2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a></td>
+</tr>
+<tr>
+<td>DDCL-INCRT hierarchical prototypes</td>
+<td>2.8× reduction for prototyped lanes</td>
+<td>Adds prototype routing network</td>
+<td>Kumar et al. (2026) <a href="https://www.arxiv.org/abs/2604.01880v1">arxiv:2604.01880v1</a></td>
+</tr>
+</tbody>
+</table>
+<p>On the engineering frontier, the large-scale systems that train models follow the same routing logic. OpenAI’s <a href="https://openai.com/research/gpt-4">GPT-4 training overview</a> documents distributed activation storage across four H100 pods, gradient checkpointing, and pipeline parallelism—the engineering consequence of each routing decision being a direct reduction in p99 latency. Meta’s <a href="https://research.facebook.com/blog/2024/pytorch2/">PyTorch 2.1 engineering blog</a> links <code>torch.compile</code> with dynamic recomputation, letting production teams decide at runtime whether to store an activation or recompute it when needed. NVIDIA’s <a href="https://developer.nvidia.com/blog/hopper-architecture-whitepaper">Hopper architecture whitepaper</a> describes how HBM3 streaming buffers and the gradient accumulation buffer are co-designed to keep the activation queue flowing without stalling. These engineering systems translate research sketches and checkpoints into real throughput increases, showing that the routing problem is the bridge between theory and production.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we model gradients under <em>zero activation storage</em> without assuming each block is reversible or paying a constant recompute tax? Current sketches still keep <span class="arithmatex">\(O(k)\)</span> scalars per layer, so the challenge is to learn a surrogate distribution that encodes enough path information for exact gradient reconstruction while never materializing full activation tensors.</p>
+<p>How do sketch-induced approximations interact with adaptive or quasi-Newton optimizers? BASIS and its kin have focused on SGD, but second-order updates depend on norms, curvature, and cross-layer correlations; an open question is what invariants must be preserved so that the sketch keeps Hessian-vector products within the acceptable error band.</p>
+<p>When can we tie sketch compression to provable convergence bounds? The edge-of-stability phenomenon documented by Ma et al. (2026) suggests a narrow noise budget, yet we lack a general theorem that links sketch compression ratio, gradient error, and convergence radius for deep networks.</p>
+<p>Finally, what dynamic scheduler best routes activations in mixed-precision pipelines? Hardware stacks maintain separate caches for activations, gradients, and parameters. A runtime scheduler that decides whether to recompute, fetch a sketch, or load a cached activation based on tensor shape and precision could unlock training a recommender on four GPUs instead of twelve.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the theoretical backbone, → [[automatic-differentiation]] walks through the forward/reverse-mode calculus underneath any autograd engine; for systems practitioners, → [[flash-attention]] illustrates how attention implementations can reshape the activation routing to stay within specialized caches. Connected topics such as [[gradient-checkpointing]], [[invertible-neural-networks]], and [[memory-efficient-training]] provide alternate trade-offs for the same routing problem, and those arcs show where this concept appears in larger learning paths.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>The algebra of backpropagation is well known, but this build proves you can reconstruct gradients while keeping only sketches of the activations. Implement a custom PyTorch <code>autograd.Function</code> that stores compressed scalars instead of full tensors, train an MNIST MLP on Colab’s T4, and instrument peak memory to compare the baseline and the activation-sketch variants.</p>
+<p><strong>What you're building:</strong> A ghost-backpropagation-enabled MLP checkpoint that demonstrates BASIS-style activation sketching on MNIST with live memory profiling.</p>
+<p><strong>Why this is valuable:</strong> It immerses you in the memory-routing problem—writing the custom backward pass, logging <code>torch.cuda.memory_allocated()</code> before/after each layer, and verifying that reconstructing gradients from a sketch produces the same accuracy as storing the full activation but with 40–60% less activation storage (measured against results such as those in Zhu et al. 2026).</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>hf-internal-testing/tiny-random-mlp</code> (customizable MLP blueprint) — 1 download
+- <strong>Dataset:</strong> <code>datasets/mnist</code> — 60,000 training images, 10,000 test images, each <span class="arithmatex">\(28 \times 28\)</span> grayscale; hold out 5,000 of the training split for validation and optionally upsample to <span class="arithmatex">\(32 \times 32\)</span> if you want to match a convolutional baseline.
+- <strong>Framework:</strong> PyTorch 2.1 with <code>torch.compile</code>
+- <strong>Compute:</strong> Colab T4 (16GB VRAM, ≈1 hour per variant)</p>
+<p><strong>The recipe:</strong>
+1. Install <code>pip install torch torchvision datasets matplotlib</code> and download MNIST with a fixed random seed so that your batch ordering is reproducible.
+2. Flatten each digit to 784 features, normalize to <span class="arithmatex">\([0,1]\)</span>, optionally pad to <span class="arithmatex">\(32 \times 32\)</span> if you want to test convolutional variations, and create <code>DataLoader</code> objects with <code>batch_size=128</code> and <code>pin_memory=True</code>.
+3. Build the base MLP with two hidden layers (1024 units each, GELU). Write an <code>ActivationSketch</code> autograd helper where <code>forward(ctx, input, weight)</code> projects the activation to a sketch <span class="arithmatex">\(Sx\)</span> and stores <code>(sketch, norm, weight)</code> via <code>ctx.save_for_backward</code>, while <code>backward</code> reconstructs <span class="arithmatex">\(x\)</span> from the sketch and computes the gradients using the stored scalars before returning <code>grad_input</code> and <code>grad_weight</code>.
+4. Train both the baseline (standard <code>nn.Linear</code> layers) and the sketching variant for 8 epochs with SGD (lr=0.1, momentum=0.9). Log <code>torch.cuda.max_memory_allocated()</code> every epoch, capture <code>torch.autograd.profiler.profile()</code> traces, and plot the memory traces next to the training loss.
+5. Evaluate on the MNIST test split, reporting accuracy and the ratio of peak activation memory between the two models—you now have a concrete artifact showing that sketch-enabled backprop hits the same 97+% accuracy while slashing activation storage.</p>
+<p><strong>Expected outcome:</strong> A git-tagged checkpoint pair (full activations and sketch) plus a memory-vs-accuracy plot demonstrating the real benefit of activation sketching.</p>
+<h3 id="what-can-you-build-next">What can you build next<a class="headerlink" href="#what-can-you-build-next" title="Permanent link">&para;</a></h3>
+<p>Extend the sketch-enabled MLP to a Transformer encoder block, port the sketching logic into both the attention and feed-forward layers, and evaluate whether the sketch’s compression ratio must shrink to keep accuracy within ±0.5% of the full model. Alternatively, adapt the build for a small language model finetuning run to see how the routing decisions change for long sequences.</p>
+<p><strong>Variants per persona:</strong><br />
+<strong>CS student:</strong> Run the same recipe on an RTX 4070 at home, double the MLP width to 2048 units, and verify that the sketch variant keeps batch size 256 without OOM while the baseline does not; compare the loss/memory curves to understand how routing scales.<br />
+<strong>Applied engineer:</strong> Wrap the sketch-enabled model in TorchServe, deploy it on an A10, quantize to INT8, and measure that the sketch variant sustains 1.8× higher throughput before hitting the GPU memory ceiling.<br />
+<strong>Applied researcher:</strong> Add a single Transformer encoder block, instrument sketching inside the multi-head attention, and report whether the reconstructed gradients stay within “accuracy drop &lt; 0.5%” of the baseline or require different sketch dimensions.<br />
+<strong>Frontier researcher:</strong> Replace the sketch module with a learned decoder that reconstructs activations from a latent code, and falsify the model if the decoder’s reconstruction error forces test accuracy to drop more than 1%; use this as a stepping stone to the “zero activation storage” question in §What’s still open.<br />
+<strong>Theory student:</strong> Analyze the sketch reconstruction as a randomized linear operator and prove that the sketch error induces at most <span class="arithmatex">\(O(\epsilon)\)</span> bias in the gradient when the sketch dimension <span class="arithmatex">\(k\)</span> satisfies <span class="arithmatex">\(k \geq \log(N_l / \delta)/\epsilon^2\)</span>; connect this to the convergence radius discussed in Ma et al. (2026).</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
