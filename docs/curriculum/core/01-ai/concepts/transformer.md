@@ -107,10 +107,3 @@ Transformers are often perceived as opaque blocks, so the best first experiment 
 ---
 
 > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
-
-## Connected topics
-
-- [Mechanistic Interpretability](../concepts/mechanistic-interpretability.md) — Mechanistic interpretability research heavily focuses on reverse-engineering the inner workings of transformers.
-- [Diffusion Models](../concepts/diffusion-models.md) — Modern diffusion models increasingly utilize transformer backbones instead of traditional U-Net architectures.
-- [Generative Adversarial Networks](../concepts/generative-adversarial-networks.md) — Transformers can be integrated into generative adversarial networks to capture long-range dependencies.
-- [Variational Autoencoders](../concepts/variational-autoencoders.md) — Transformers can serve as encoders and decoders within variational autoencoder frameworks.

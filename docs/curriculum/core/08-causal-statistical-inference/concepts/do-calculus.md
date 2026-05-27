@@ -117,10 +117,6 @@ Production-ready libraries such as DoWhy encode the ID algorithm and do-calculus
 
 After you can identify \(P(Y \mid do(X))\) in the observed graph, the natural follow-on is to learn the graph itself and then re-apply do-calculus to the learned structure, which is the goal of [[causal-representation-learning]]; simultaneously, you can apply do-calculus’ identification certificates to guide policy evaluation in [[policy-evaluation]] by restricting actions to those with verified estimands.
 
-## Connected topics
-
-The concept is tightly linked to [[structural-equations]] because the rules only operate once you know the functional form of each variable’s parents; it supports [[instrumental-variables]] when no back-door adjustment is possible; and it underlies [[transportability]] results that mix data from several environments while respecting the same graphical constraints.
-
 ## Further reading
 
 Pearl’s original proof of completeness, the Shpitser & Pearl (2006) ID algorithm [https://arxiv.org/abs/1206.2086], Bareinboim & Pearl (2012) on z-identifiability [https://arxiv.org/abs/1202.4295], and the modern generalization to causal representations by Varici et al. (2024) [https://research.google/pubs/general-identifiability-and-achievability-for-causal-representation-learning/] are essential for the theory student, while the Google Research system “Learning to induce causal structure” [https://research.google/pubs/learning-to-induce-causal-structure/] offers a contemporary engineering case study.

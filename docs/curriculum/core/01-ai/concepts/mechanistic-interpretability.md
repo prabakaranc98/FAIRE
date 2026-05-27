@@ -111,8 +111,3 @@ This build proves that a mechanistic interface can detect, reconstruct, and stee
 ---
 
 > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
-
-## Connected topics
-
-- [Diffusion Models](../concepts/diffusion-models.md) — Mechanistic interpretability helps analyze the internal representations and denoising processes of diffusion models.
-- [Variational Autoencoders](../concepts/variational-autoencoders.md) — Mechanistic interpretability techniques can explain the latent space representations learned by variational autoencoders.

@@ -736,7 +736,7 @@ def serve(host, port, interval, dry_run, run_now):
     # Step 1: Bootstrap — run supervisor immediately in background to populate sprint
     # This ensures the sprint is always fresh when the server starts, regardless
     # of whether --run-now is set.
-    _POOL.submit(_run_supervisor_background, dry_run)
+    supervisor_future = _POOL.submit(_run_supervisor_background, dry_run)
     click.echo(f"[{_server_started_at}] Supervisor bootstrapping sprint queue...")
 
     # Step 2: Set up the APScheduler for recurring cycles
@@ -752,10 +752,25 @@ def serve(host, port, interval, dry_run, run_now):
     scheduler.start()
     _scheduler = scheduler
 
-    # Step 3: Optionally run a full cycle immediately (in background so HTTP starts first)
+    # Step 3: Optionally run a full cycle immediately (in background so HTTP starts first).
+    # Chain it to fire ONLY AFTER the bootstrap supervisor finishes — otherwise the
+    # cycle's internal sprint_job can fire before the queue is populated and return
+    # zero results (the race condition that left the agent idle for 8+ minutes after
+    # boot in earlier sessions).
     if run_now:
-        click.echo("Scheduling immediate cycle (HTTP server starts first)...")
-        _POOL.submit(_run_cycle_background)
+        click.echo("Scheduling immediate cycle (waits for supervisor bootstrap first)...")
+
+        def _cycle_after_supervisor():
+            try:
+                # Cap the wait so a hung supervisor doesn't block forever.
+                supervisor_future.result(timeout=180)
+            except Exception as exc:
+                print(f"[boot] Supervisor bootstrap failed or timed out: {exc}")
+                # Fall through and run the cycle anyway — full_cycle_job runs its
+                # own supervisor pass as step 1, so we'll still get a fresh queue.
+            _run_cycle_background()
+
+        _POOL.submit(_cycle_after_supervisor)
 
     click.echo(
         f"\nFrontier Wiki agent server running — http://{host}:{port}\n"
