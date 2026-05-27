@@ -33,6 +33,7 @@ from langchain_core.messages import HumanMessage
 
 from .audit import AuditReport, audit_wiki
 from .llm import get_llm
+from .tools import display_ts
 
 
 # ── Data model ────────────────────────────────────────────────────────────────
@@ -198,7 +199,7 @@ def run_supervisor(
     llm_analysis = _llm_editorial_analysis(health, audit, actions, obs=obs, verbose=verbose)
 
     report = SupervisorReport(
-        generated_at=now.strftime("%Y-%m-%d %H:%M UTC"),
+        generated_at=display_ts(),
         health=health,
         audit=audit,
         actions=actions,

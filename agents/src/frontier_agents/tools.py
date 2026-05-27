@@ -24,6 +24,23 @@ import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from zoneinfo import ZoneInfo
+    _NYC = ZoneInfo("America/New_York")
+except Exception:
+    _NYC = timezone.utc  # graceful fallback if tzdata missing
+
+
+def display_ts() -> str:
+    """Human-readable timestamp in America/New_York time, e.g. '2026-05-27 04:45 EDT'.
+
+    All user-facing dashboards (observer.md, supervisor.md, status.md,
+    backlog.md, changelog.md) use this — keeps the wiki readable for the
+    primary maintainer. Machine timestamps in runs.jsonl stay in UTC ISO
+    format so cross-cycle math is timezone-clean.
+    """
+    return datetime.now(_NYC).strftime("%Y-%m-%d %H:%M %Z")
+
 
 APPROVED_RESEARCH_DOMAINS = [
     "arxiv.org",
@@ -1002,7 +1019,7 @@ def _rebuild_status_page(runs_path: Path, docs_system: Path) -> None:
         "",
         "# Generation Status",
         "",
-        f"> Last updated: **{datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}** "
+        f"> Last updated: **{display_ts()}** "
         f"· {total_runs} total runs",
         "",
         "## Summary",
@@ -1063,7 +1080,7 @@ def _append_changelog_entry(record: dict, now: datetime, docs_system: Path) -> N
     mvb_note = " · has MVB" if has_mvb else ""
 
     entry_lines = [
-        f"### {now.strftime('%Y-%m-%d %H:%M UTC')} — {topic}",
+        f"### {now.astimezone(_NYC).strftime('%Y-%m-%d %H:%M %Z')} — {topic}",
         "",
         f"{status_icon} **{status}** · conf={confidence:.2f}{commit_note}{mvb_note}",
         "",

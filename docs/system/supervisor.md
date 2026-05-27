@@ -5,7 +5,7 @@ description: Automated wiki health assessment and editorial priorities
 
 # Supervisor Report
 
-> Generated: **2026-05-27 08:38 UTC** by the Frontier Wiki supervising agent
+> Generated: **2026-05-27 04:44 EDT** by the Frontier Wiki supervising agent
 
 ## Wiki Health
 
@@ -50,7 +50,7 @@ Wiki has 81 pages (10 stubs). 4 pages need revision. Focus: generate stubs and i
 
 ## Audit Issues
 
-## Audit — 2026-05-27 08:38 UTC
+## Audit — 2026-05-27 04:44 EDT
 > 81 pages scanned · 0 critical · 11 warnings
 
 ### Warning

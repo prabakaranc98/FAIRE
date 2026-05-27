@@ -5,7 +5,7 @@ description: Closed-loop control system — real-time wiki quality signals
 
 # Observer Dashboard
 
-> Last observed: **2026-05-27 08:38 UTC** · [Source: `agents/runs/metrics.json`]
+> Last observed: **2026-05-27 04:44 EDT** · [Source: `agents/runs/metrics.json`]
 
 ## Control State
 

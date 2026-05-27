@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 
+from .tools import display_ts
+
 
 # Required sections — v2 narrative template (see agents/SCHEMA.md).
 # These are the section headings the writer must produce. The audit emits a
@@ -101,7 +103,7 @@ def audit_wiki(docs_dir: str | Path = "../docs") -> AuditReport:
     now = datetime.now(timezone.utc)
 
     report = AuditReport(
-        generated_at=now.strftime("%Y-%m-%d %H:%M UTC"),
+        generated_at=display_ts(),
         docs_dir=str(docs_path),
     )
 

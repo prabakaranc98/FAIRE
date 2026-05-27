@@ -499,7 +499,8 @@ def write_backlog_md(
 ) -> None:
     """Phase C — write/prepend a timestamped scrum-retrospective entry to
     docs/system/backlog.md."""
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    from .tools import display_ts
+    now = display_ts()
 
     def _bullets(items: list, prefix: str = "- ") -> list[str]:
         return [f"{prefix}{s}" for s in (items or []) if s]

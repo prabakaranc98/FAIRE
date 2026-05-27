@@ -130,7 +130,8 @@ def observe(
         Path(__file__).parent.parent.parent / runs_dir
     )
     now = datetime.now(timezone.utc)
-    obs = WikiObservation(observed_at=now.strftime("%Y-%m-%d %H:%M UTC"))
+    from .tools import display_ts
+    obs = WikiObservation(observed_at=display_ts())
 
     # ── 1. Scan curriculum filesystem ─────────────────────────────
     curriculum = docs_path / "curriculum"

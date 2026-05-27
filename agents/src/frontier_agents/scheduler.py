@@ -211,7 +211,8 @@ def write_changelog_entry(
 ) -> None:
     """Append a sprint summary to runs/changelog.md."""
     RUNS_DIR.mkdir(exist_ok=True)
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    from .tools import display_ts
+    now = display_ts()
 
     lines = [
         f"## Sprint — {now}",
