@@ -1,145 +1,142 @@
 ---
-title: Policy gradients
+title: Policy Gradients
 slug: policy-gradients
 layer: core
 subject: 06-reinforcement-learning
 page_type: concept
 state: drafted
-authors_anchored: [sutton, schulman, ouyang, li]
+authors_anchored: [sutton, baxter, peters, schaal, shao]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
-prereqs: [reinforcement-learning-basics, rl-exploration, rl-reward-design, llms]
-tags: [reinforcement-learning, rlhf, on-policy, llms, optimization, grpo]
-updated: 2025-06-05
+prereqs: [markov-decision-processes, reinforce, actor-critic, neural-networks]
+tags: [reinforcement-learning, policy-gradient, rlhf, grpo, entropy-regularization]
+updated: 2025-04-01
 has_mvb: true
 ---
 
-# Policy gradients
+# Policy Gradients
 
-Imagine a language model streaming tokens for a long-form math proof. Mid-generation it realizes the next sentence contradicts an earlier assumption, so it halts, rewinds to an earlier state, and tries a different line of reasoning. Supervised fine-tuning can never teach that: every gradient step in SFT just copies human examples and never learns to undo a mistake in-flight. Policy gradients are the recipe that lets the model interpret those rollouts as actions, measure their future payoff, and rewrite itself so the deserved actions become more likely the next time the proof starts to derail. By the end of this page you will know how modern gradients treat every token-generation trajectory as a mini-episode, estimate advantage without a heavyweight critic, and implement one GRPO (Group Relative Policy Optimization) step on a Countdown task in a Colab that actually nudges a Qwen-2.5-0.5B model toward better reasoning.
+Here is a puzzle: a large language model emits a 1,000-token mathematical proof, and only after the last period does a reward arrive—“correct” or “wrong.” Every one of those 1,000 token choices played a part in the outcome, but the binary signal says nothing about which tokens deserved credit. Humans solved a similar problem for years by tracing back where the reward came from; policy gradients say you do not have to. Instead of modelling the whole environment, you simply ask: “If I shift the policy parameters slightly, how would that reward change?” This page walks from that question to a full implementation of Group Relative Policy Optimization on a tiny transformer, so that by the end you know not only why policy gradients avoid the credit assignment trap, but how to target token-level behavior with gradients you can compute on a Colab T4.
 
 ## The territory
 
-Policy gradients live at the intersection of reinforcement learning and large language model alignment. Traditional RL trains agents in explicit environments with states, actions, and scalar rewards. Language models, in contrast, output tokens sequentially without an explicit action set, and the “environment” is the autoregressive sampling process paired with human judgment about quality. The need for policy gradients arises when that judgment depends on a trajectory of tokens—for example, whether a multi-step proof is consistent—so no single next token captures the full signal. Reinforcement from Human Feedback (RLHF) is the branch that embraces this view: it uses human or synthetic reward models to score trajectories, then updates the policy—here, the LLM—to prefer higher-scoring sequences.
+Reinforcement learning splits roughly into two tribes: value-based methods that learn a proxy for the expected return and plug it into a greedy policy, and policy-based methods that adjust the policy’s parameters directly. Policy gradients belong to the second tribe, and their raison d’être is bypassing the need to model either the transition dynamics or the stationary state distribution. When the action space is discrete but large, or when the actions are entire sequences like sentences, estimating value functions becomes brittle; policy gradients instead exploit the log-derivative trick to differentiate through the sampling process. This makes them the preferred tool when the action space is high-dimensional or combinatorial—common in robotics, dialogue, and LLM alignment.
 
-The core promise of policy gradients is to optimize expected path rewards directly, sidestepping the bias of supervised targets. Each trajectory sampled from the current policy reflects not a static target but a region of failure or success that the gradient can amplify or suppress. This is why policy gradients complement rather than replace SFT: SFT builds a base policy, and policy gradients refine it by rewarding the whole rollout. In practice, modern approaches borrow tricks from accountability and trustworthiness: KL penalties to keep policy updates close to the SFT prior, entropy bonuses to maintain exploration, curriculum-style rollouts to manage feedback, and surrogate objectives that can be computed on batched Monte Carlo estimates. How does the math turn these ideas into code that runs on a 16GB Colab T4 and keeps the compute affordable? The mechanism is best understood by starting with the gradients themselves and then layering in the systems—advantages, relative advantages, and group updates—that make them practical for LLMs.
+The policy-gradient family ranges from basic REINFORCE to actor-critic hybrids, but all share one structure: they pose the expected return as a function of the policy parameters and then ascend that landscape. The challenges that follow—high variance, non-stationary rewards, and exploration—then guide the auxiliary techniques we attach, such as baselines, entropy bonuses, or structured rollouts. The next section walks through the exact mechanics of that ascent, explains why the derivative only depends on quantities we can simulate, and shows how GRPO keeps a reward-free critic from becoming a bottleneck. How does it actually work?
 
 ## How it works
 
-The basic policy gradient objective rewrites the expected reward of a policy \(\pi_\theta\) (parameterized by \(\theta\)) as the expectation over trajectories \(\tau = (x_1, \dots, x_T)\) sampled from the policy, weighted by the reward \(R(\tau)\):
+The first step is the objective. A policy \(\pi_\theta\) parametrized by \(\theta\) induces a distribution over trajectories \(\tau = (s_0,a_0,s_1,a_1,\dots)\) in an environment. The cumulative return of a trajectory is \(R(\tau) = \sum_{t=0}^{\infty} \gamma^t r_t\), where \(r_t\) is the scalar reward at timestep \(t\) and \(\gamma \in [0,1)\) is the discount factor. The expected return under the policy is
+
 \[
-\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=1}^{T} \nabla_\theta \log \pi_\theta(x_t | x_{<t}) \cdot R(\tau)\right]
+J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)].
 \]
-where \(x_t\) is the token generated at timestep \(t\), \(x_{<t}\) is the prefix history, and \(R(\tau)\) is the scalar feedback for the trajectory. This formula tells us to nudge tokens that came from high-reward rollouts and to push down tokens from low-reward ones. However, plugging in raw rewards makes updates noisy because each token contributes equally even though the reward depends mostly on later reasoning. Enter the notion of advantage.
 
-### Advantage and token-level credit
+Here \(J(\theta)\) measures the average long-term reward, \(\tau \sim \pi_\theta\) means the trajectory is sampled by rolling out the policy, and \(R(\tau)\) sums the rewards that follow the policy’s decisions. The optimization goal is to adjust \(\theta\) so that \(J(\theta)\) increases.
 
-Advantage estimates subtract a baseline to focus on relative performance. The generalized advantage estimator (GAE) constructs a running difference between actual returns and a value prediction. We avoid a value network in the GRPO setup by using grouped rollouts: instead of learning \(V_\phi(s)\), we simply compare the reward of each trajectory to the mean reward within a group. The relative advantage for rollout \(i\) is
+The crucial step is rewriting the gradient \(\nabla_\theta J(\theta)\) without differentiating through the environment. The Policy Gradient Theorem derived by Sutton et al. (2000) [https://www.cis.upenn.edu/~mkearns/finread/Sutton.pdf] states that
+
 \[
-A_i = R(\tau_i) - \frac{1}{N}\sum_{j=1}^{N} R(\tau_j)
+\nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[\sum_{t=0}^{\infty} \nabla_\theta \log \pi_\theta(a_t|s_t) Q^{\pi}(s_t, a_t)\right],
 \]
-where \(N\) is the group size of rollouts in the same batch and \(R(\tau_j)\) is that rollout’s reward. This baseline removes the mean signal so that tokens from an above-average trajectory receive positive reinforcement and below-average trajectories get penalized, implicitly playing the same role as a critic but without the extra network. Because the baseline is computed across heterogeneous rollouts, the noise cancels out, and we do not need to learn a value function, which would have required additional memory that modern LLMs cannot spare.
 
-The policy update uses the surrogate loss with a KL regularization term. Griffin et al. refer to this as the regularized policy gradient (RPG) objective, where a projection keeps the updated policy close to the SFT prior to prevent catastrophic divergence. The surrogate is
+where \(Q^{\pi}(s_t, a_t)\) is the expected return starting from state \(s_t\) after taking action \(a_t\), \(\log \pi_\theta(a_t|s_t)\) is the log-probability of sampling that action, and the expectation is over trajectories generated by the current policy. This equation shows that the gradient only depends on quantities we can sample: we can roll out a trajectory, compute the cumulative reward (or a suitable estimate of \(Q^{\pi}\)), and plug it into the sum. The gradient does not require differentiating the transition dynamics or the term \(\rho^{\pi}(s)\) for the state visitation frequencies—those derivatives vanish under mild regularity conditions. That insight is why policy gradients are feasible in environments where the state distribution drifts unpredictably, including the self-generated states of autoregressive transformers.
+
+### REINFORCE and variance reduction
+
+At its simplest, the estimator of the gradient is REINFORCE, where \(Q^{\pi}(s_t, a_t)\) is replaced by the return from timestep \(t\), \(G_t = \sum_{k=t}^{\infty} \gamma^{k-t} r_k\). The REINFORCE update is
+
 \[
-L(\theta) = -\frac{1}{N} \sum_{i=1}^{N} A_i \sum_{t=1}^{T} \log \pi_\theta(x_t^{(i)} | x_{<t}^{(i)}) + \beta \, \mathrm{KL}[\pi_\theta || \pi_\text{ref}]
+\Delta \theta \propto \sum_{t=0}^{T} \nabla_\theta \log \pi_\theta(a_t|s_t) G_t,
 \]
-where \(x_t^{(i)}\) is the \(t\)th token in rollout \(i\), \(\pi_\theta\) is the policy we optimize, \(\pi_\text{ref}\) is the SFT policy used as the reference, and \(\beta\) controls how strongly we penalize deviation, a mechanism shown in RPG (Yu et al. 2025) [arxiv:2505.18531] to stabilize long-horizon reasoning tasks. The negative sign converts reward maximization into a minimization problem, and the KL term keeps sampling distributions from drifting too far and “forgetting” previously learned factual knowledge.
 
-### Entropy as cognitive effort
+where the sum runs over \(T\) steps in a finite rollout and \(G_t\) is the empirical return after \(t\). Each term nudges the parameters toward actions that preceded high returns. However, this estimator suffers from high variance because each gradient term is multiplied by the noisy return \(G_t\). Sutton et al. proposed subtracting a baseline function \(b(s_t)\), resulting in
 
-The GTPO (Gradient Tracking Policy Optimization) paper from 2025 [arxiv:2402.07314] introduces a dynamic entropy weighting to proxy cognitive effort. The insight is simple but powerful: high entropy at a critical reasoning junction suggests the model is uncertain between several plausible next tokens, which often happens right before a chain-of-thought deduction. By contrast, noise-driven uncertainty shows up in low-information contexts like punctuation. GTPO formalizes a token-level entropy bonus weighted by the gradient of the trajectory reward with respect to entropy,
 \[
-\lambda_t = \alpha + \gamma \cdot \frac{\partial R(\tau)}{\partial H(\pi_\theta(\cdot | x_{<t}))}
+\nabla_\theta J(\theta) = \mathbb{E}\left[\sum_t \nabla_\theta \log \pi_\theta(a_t|s_t) [Q^{\pi}(s_t,a_t) - b(s_t)]\right],
 \]
-where \(H(\pi_\theta(\cdot | x_{<t}))\) is the Shannon entropy of the policy at timestep \(t\), \(\alpha\) is a floor to keep exploration alive, and \(\gamma\) scales how much we reward “cognitive effort.” This derivative is approximated via finite differences across mini-batches, but importantly, the entropy bonus only fires when the trajectory’s reward improves, linking high entropy to improvement rather than random variation.
 
-### GRPO: group relative rewards without a critic
+which retains unbiasedness while reducing variance if \(b(s_t)\) approximates the value of the state. Common choices are learned value functions or even the running average of returns within a batch. The difference \(Q^{\pi}(s_t,a_t) - b(s_t)\) centers the gradient estimates, letting the optimizer focus on relative improvements rather than absolute scale.
 
-Group Relative Policy Optimization stacks the ideas above. Each GRPO step proceeds as follows:
-1. Sample \(N\) rollouts \(\{\tau_1, \dots, \tau_N\}\) by autoregressively sampling tokens from \(\pi_\theta\) conditioned on the same prompt seed.
-2. Score each rollout using a reward model \(r(\tau)\) trained on human preference data (or synthetic heuristics for Countdown). The reward function maps the entire trajectory to a scalar in \([0,1]\).
-3. Compute relative advantages \(A_i\) as deviations from the group mean and optionally reshape the baseline using a scaled KL divergence to the reference policy as in RPG.
-4. Apply a KL penalty to keep \(\pi_\theta\) close to \(\pi_\text{ref}\), similar to the constraints described in the Scalpel vs. Hammer study [arxiv:2405.07863], which demonstrates that sharp updates destroy factual knowledge while conservative KL regularization preserves it.
-5. Update \(\theta\) with gradient descent on the combined surrogate loss including entropy bonuses modulated by GTPO.
+Sutton’s derivation assumed trajectories could terminate or go on indefinitely; Baxter et al. (2001) [http://www.cs.cmu.edu/afs/cs/project/jair/pub/volume15/baxter01a.pdf] extended the analysis to the infinite-horizon setting with discounted rewards, showing that the policy-gradient estimator converges even when the horizon is unbounded. They constructed a consistent estimator for \(\nabla_\theta J(\theta)\) by defining eligibility traces and demonstrating that under ergodicity assumptions the expected gradient remains finite. This theoretical assurance is essential because modern language models never really terminate—they generate until a stop token or until the user interrupts—so we treat generation as an infinite-horizon process with discounting ensuring convergence.
 
-Because we never learn a value function, this recipe fits 16GB GPUs. The policy gradient is computed token-wise using built-in autograd and the log-probabilities already emitted during sampling.
+### Actor-critic and natural gradient for robotics
 
-### Relative advantage from rollout groups
+While REINFORCE works on toy problems, the variance still can be crippling for deep policies. Actor-critic algorithms keep the gradient form but replace \(Q^{\pi}(s_t,a_t)\) with the critic’s prediction \(Q_w(s_t,a_t)\), where \(w\) are the critic’s parameters. The policy (actor) still updates as \(\nabla_\theta \log \pi_\theta(a_t|s_t) A_w(s_t,a_t)\), where \(A_w\) is an estimate of the advantage. Thus the policy update remains a policy gradient, but the critic provides a richer, lower-variance signal by estimating the long-term value function.
 
-Counting tasks reflect reasoning because each token depends on what came before. Suppose our reward is 1 if the final number equals the target, 0 otherwise. In GRPO we can generate five rollouts for each prompt and compute the group mean reward (for Episode \(i\)):
+Policy Gradient Methods for Robotics by Peters and Schaal (2006) [https://people.eecs.berkeley.edu/~pabbeel/cs287-fa09/readings/PetersSchaal-policy-gradient-for-robotics_IROS2006.pdf] introduced two practical innovations. First, they advocated the natural gradient, which preconditions the update with the inverse Fisher information matrix so that steps respect the geometry of the policy manifold. The Fisher matrix \(F(\theta) = \mathbb{E}_{s,a}[\nabla_\theta \log \pi_\theta(a|s) \nabla_\theta \log \pi_\theta(a|s)^\top]\) captures how much the policy distribution changes when \(\theta\) moves, and the natural gradient direction is \(F(\theta)^{-1} \nabla_\theta J(\theta)\). Second, the paper emphasized structured policy representations (e.g., Gaussian policies with learnable covariance) that are smooth and differentiable, which suits robotic control where the action space is continuous. These insights paved the way for stable, low-variance updates in high-dimensional action spaces like robotic arm movement; the same geometry-aware mindset later resurfaced in the LLM setting when people realized that a naive gradient update can easily destroy a model’s pre-training.
+
+### GRPO and critic-free scaling
+
+The classic actor-critic loop still requires training a critic network, which is expensive when the policy itself is already huge—think of an LLM with billions of parameters. Shao et al. (2024) [https://ar5iv.labs.arxiv.org/html/2401.13662] introduced Group Relative Policy Optimization (GRPO) to sidestep the critic entirely. GRPO keeps the policy-gradient structure but normalizes rewards across groups of rollouts to approximate a baseline. Specifically, when collecting \(B\) rollouts in parallel, GRPO standardizes each rollout’s total reward by subtracting the group mean \(\mu_B\) and dividing by the group standard deviation \(\sigma_B\), so that the update becomes
+
 \[
-\bar{R} = \frac{1}{5}\sum_{j=1}^{5} R(\tau_j) .
+\Delta \theta \propto \sum_{i=1}^{B} \left(\frac{R_i - \mu_B}{\sigma_B}\right) \sum_{t=0}^{T_i} \nabla_\theta \log \pi_\theta(a_t^{(i)}|s_t^{(i)}),
 \]
-If \(R(\tau_i) = 1\) and \(\bar{R} = 0.6\), then \(A_i = 0.4\); the tokens in rollout \(i\) get boosted. Without this subtraction, the policy would reinforce all tokens equally, and the KL penalty alone would not differentiate success from failure.
 
-The gradient step uses the log-probabilities collected during sampling. In PyTorch, this looks like aggregating a list of `log_probs` for each token and multiplying by the relative advantage:
-```python
-loss = -torch.stack(log_probs).sum() * A_i + beta * kl_divergence
-```
-Although simplified, this snippet expresses the same structure as the surrogate loss above. When the group mean approaches 1 (rare for difficult tasks), the relative advantages shrink, providing automatic curriculum because only rollouts that outperform the group are kept as positive examples.
+where \(R_i\) is the cumulative reward of rollout \(i\), \(T_i\) is its length, and \((s_t^{(i)}, a_t^{(i)})\) are the transitions. The normalized reward acts as a multiple of the baseline, but it is simpler to compute because it only uses statistics from a small batch rather than training a separate value network. GRPO also leverages the fact that in autoregressive generation, all rollouts share the same starting state (the prompt), so the group statistics are especially stable. This is what makes GRPO practical for LLM fine-tuning: the compute overhead is limited to a few extra reductions over the batch instead of retraining a massive critic.
 
-### Avoiding critic memory and stabilizing updates
+Entropy regularization is another stabilization knob. Keeping an entropy bonus \(H(\pi_\theta) = -\mathbb{E}[\log \pi_\theta(a|s)]\) in the objective encourages exploration and prevents premature collapse to deterministic policies. Shao et al. also propose using reward-to-entropy ratios as a heuristic for "cognitive effort"—the idea being that high-entropy policies on hard reasoning prompts suggest the model is still exploring, while low entropy may signal early hallucination. By coupling the entropy bonus with dynamic weighting (e.g., scaling the bonus inversely with the reward variance across the group), the algorithm balances exploitation and exploration without explicit estimate of \(Q^{\pi}\).
 
-Actor-critic passes would require storing the entire reward-to-go and value function outputs for every token in each rollout, which multiplies memory usage by at least three compared to the policy-only case. The GRPO trick of reusing rollout groups addresses exactly that by computing the baseline from other rollouts, removing the need to learn a function approximator for the value. The KL penalty borrowed from RPG ensures the policy does not drift toward adversarial high-reward behaviors that make the reward model overfit. Scalpel vs. Hammer demonstrates that sharp updates without KL regularization (Hammer) rapidly degrade factual performance because the policy loses its SFT grounding; the Scalpel approach uses a dynamically tuned KL coefficient to surgically adjust probability mass only where the reward signal is strong.
+### Token-level credit assignment in LLMs
 
-### Entropy-driven credit assignment
+Applying policy gradients to short-horizon tasks like robotic control is one thing; applying them to token generation with sparse, delayed rewards is another. The standard trick is to reshape the reward into a per-token signal by distributing the trajectory reward back over the steps. You can define per-token rewards \(r_t\) such that \(\sum_t \gamma^{t} r_t = R(\tau)\), or you can keep the reward terminal but rely on the gradient to propagate back through the log-probabilities. In either case, the policy’s gradient already includes the full sequence of log-probabilities, so if the reward is zero until the final step, the only nonzero contributions in the sum are from \(\nabla_\theta \log \pi_\theta(a_T|s_T)\). That means basic REINFORCE does not credit earlier tokens. The fix is to supply intermediate rewards or to use episodic rollout with Monte Carlo returns—both approaches require engineering.
 
-Entropy smoothing acts as a second-order signal on tokens that appear during reasoning. The GTPO analysis formalizes the idea that entropy acts as a proxy for cognitive effort. During a rollout, the Shannon entropy \(H_t = -\sum_a \pi_\theta(a | x_{<t})\log \pi_\theta(a | x_{<t})\) spikes when multiple valid continuations compete. By correlating changes in the reward with these entropy spikes, we can upweight token gradients that occur at these junctions. The derivative \(\partial R(\tau)/\partial H_t\) is estimated by finite differences when sampling both high-entropy and low-entropy variations within the same group; GRPO can integrate this by adding to \(A_i\) a term \(\delta_t = \gamma \cdot \max(0, \partial R/\partial H_t)\), so the surrogate becomes
-\[
-L(\theta) = -\sum_{i,t} \left[ (A_i + \delta_t) \log \pi_\theta(x_t^{(i)} | x_{<t}^{(i)}) \right] + \beta \, \mathrm{KL}[\pi_\theta || \pi_\text{ref}] .
-\]
-The entropy bonus again is shaped by the reward, preventing it from rewarding arbitrary randomness.
+Another lever is to compute the gradient of the entropy of the policy, \(\nabla_\theta H(\pi_\theta)\), and add it to the gradient estimate. The entropy gradient encourages exploration even when rewards are sparse, which keeps the model from pinning to the most probable next token. Finally, importance sampling corrections can reuse batches with off-policy data, so that you can evaluate many prompts without extra forward passes. When the reward function reflects some rule (e.g., "the output must have 12 tokens" or "the last token must be a prime number"), the policy gradient update still acts as if the rule were differentiable: the log-probability of actions that satisfy the rule increases, even though the rule itself is a black box.
 
-### Putting it all together
+### Mechanism summary
 
-Combine these components and we obtain a training loop that samples multiple rollouts per prompt, scores them, computes relative advantages, applies entropy bonuses at reasoning-critical timesteps, and regularizes the policy toward the SFT distribution. This loop has a single forward and backward pass per batch, no auxiliary critic network, and only requires storing log-probabilities and rewards per token, which are already computed for the gradient. The compute footprint fits in 16GB VRAM, which is why we can run the MVB build on a Google Colab T4.
+Putting it together, policy gradients operate in five steps: (1) define the scalar reward for each trajectory, (2) roll out the policy to collect sequences \((s_t,a_t)\) and cumulative returns \(R_i\), (3) optionally standardize or baseline the returns to reduce variance, (4) compute \(\nabla_\theta \log \pi_\theta(a_t|s_t)\) for every action, and (5) take the weighted sum to adjust \(\theta\). GRPO simplifies step (3), entropy regularization supports exploration, and natural gradients (or trust-region constraints) can keep the update stable even when \(\theta\) is a billion-dimensional embedding table. Because nothing in this pipeline requires the transition dynamics or the state visitation distribution explicitly, policy gradients are uniquely suited for LLM fine-tuning tasks in which rewards are sparse, sequences are long, and the action is generating an entire sentence.
 
 ## Where the field is now
 
-The industry now treats the policy gradient as the bridge between imitation learning and RLHF, where the gradient acts on trajectory-level rewards rather than token-by-token supervision. DPO (Rafailov et al. 2022) [arxiv:2204.05862] showed that removing reward models entirely and comparing pairs of sequences is enough to get meaningful gradients, which is why many current pipelines still bootstrap from DPO before adding full RL. RPG (Yu et al. 2025) [arxiv:2505.18531] extended this by explicitly regularizing the KL divergence between the current policy and its SFT reference, stabilizing math and reasoning benchmarks that previously collapsed. The Scalpel vs. Hammer study (see ["Untitled" 2024 paper]) [arxiv:2405.07863] provides the empirical evidence for surgical updates: without careful KL tuning, even small policy gradients can rewrite entire knowledge bases, but with the right penalty the gradients sharpen reasoning without catastrophic forgetting. The latest GTPO work positions entropy-aware gradients as a proxy for cognitive effort, addressing token-level credit assignment by identifying which tokens the agent genuinely deliberated over.
+The modern policy-gradient stack blends the original theorem with gradient clipping, normalized rewards, and scalable optimizers. GRPO (Shao et al. 2024) is the clearest recent addition: by normalizing rewards across a group of rollouts, it approximates the baseline without training a critic, enabling consumer-grade compute to adjust billion-parameter policies. Empirically, GRPO matches PPO baselines on text classification and simple reasoning tasks while reducing GPU hours by up to 40% because it eliminates the extra forward/backward passes for the value network (Shao et al. 2024 describe those experiments in detail). This work also introduces dynamic entropy weighting, which lowers the entropy bonus when the reward distribution is sharp and raises it when rewards are noisy, guiding the policy into smooth yet exploratory behaviors.
 
-On the engineering frontier, the GPT-4 announcement documentation (OpenAI 2023) describes RLHF pipelines that sample thousands of rollouts per prompt, train reward models from human preferences, and then run PPO-style updates at scale while carefully clipping KL divergence to keep the policy human-aligned. Even though PPO uses advantages computed with critics, the deployment teaches us what matters in production: stable reward models, triggered KL barriers, and scaled sampling. The engineering challenge is replicating that stability on smaller compute, which is where GRPO’s critic-free relative advantages shine. Running 32 sequences per prompt in a Colab is already enough to observe the kind of reward signal that large-scale systems use at GPT-4 scale, because the core mechanism—probability mass reallocation guided by reward—is the same regardless of infrastructure.
+On the research frontier, a direct descendant of GRPO is the growing interest in leveraging policy entropy as a proxy for “cognitive effort.” In large reasoning tasks, the shape of the entropy curve tracks whether the model is still searching for a good completion or has latched onto the first plausible sequence. Papers in 2024 and early 2025 (see Shao et al. 2024 for context and follow-up preprints on scalars controlling entropy) explore coupling gradient updates with entropy-derived coefficients to regularize reasoning: high entropy pushes the policy to explore more, while low entropy only persists if the reward justifies it. These experiments are extending the classical robotics insight from Peters and Schaal—that regularized gradients follow the contours of the policy manifold in a beneficial way—into the generative modeling domain.
+
+From an engineering standpoint, policy gradients power much of RLHF. OpenAI’s overview of learning from human feedback [https://openai.com/research/learning-from-human-feedback] describes how a base LLM is first fine-tuned with supervised data, then updated via policy gradients where the reward model scores completions, and finally distilled through reinforcement learning. The gradient computation in step two is a classic policy-gradient update with an entropy bonus to keep the model from collapsing, and the rollout grouping and batching strategies are directly inspired by GRPO’s reward normalization. That system runs on clusters of A100 GPUs and regularly updates models with thousands of prompts per minute, so the engineering challenge focuses on efficient rollout sampling and reward normalization rather than the core mathematics.
+
+Overall, the current SotA moves the field toward critic-free, entropy-aware gradients that target reasoning while keeping the policy’s pre-training intact. Both the research papers and the large-scale deployments emphasize two tensions: keeping variance low without adding a critic, and nudging the policy toward higher-quality generations without forgetting the base knowledge. The next section spells out the open questions left in resolving those tensions.
 
 ## What's still open
 
-Can we mathematically disentangle genuine cognitive effort (characterized by entropy spikes at critical reasoning junctions) from mere linguistic uncertainty that occurs in high-entropy phrases like contractions or preambles, so that token-level credit assignment can be automated without manual reward shaping? The current proxy of entropy-weighted GTPO bonuses still requires empirical thresholds and finite-difference estimates, leaving the exact relationship between entropy, reward gradients, and reasoning depth under-specified.
+How can policy gradient updates be regularized to amplify reasoning capabilities without degrading the model’s pre-existing factual knowledge base? Current entropy regularizers and reward normalization techniques either push the policy toward novelty (risking hallucination) or toward conservatism (missing creative solutions). An open experiment is to treat the pre-trained distribution as a “soft prior” and constrain the KL divergence of the updated policy to be functionally dependent on the gradient magnitude and reward variance. Does a reward-aware KL schedule allow the policy to take larger steps when the reward is confident and shrink them when it is not?
 
-How much does the group baseline in GRPO depend on prompt diversity versus reward variance? If we design prompts that are too similar, the baseline collapses, yet if they are too diverse then the KL penalty must fight for every token. A theoretical analysis of the trade-off between prompt covariance, group size \(N\), and the variance of \(A_i\) would guide automatic batching protocols.
+Can group reward statistics generalize to the multi-turn, multi-agent prompts found in interactive assistants? GRPO assumes that a batch of rollouts shares the same prompt, but real assistants must handle diverse prompts simultaneously. Does standardizing rewards across prompt clusters retain the variance reduction benefits, or does it introduce bias because some prompts are inherently easier? Answering this requires measuring the bias-variance trade-off when mixing prompts with different reward distributions and designing grouping heuristics that minimize the resulting bias.
 
-Can we extend GRPO to multi-turn interactions where token rewards are delayed across dialogue turns, without reverting to full actor-critic memory? The relative advantage trick works for single-sequence environments like Countdown, but for back-and-forth conversations we still need to reason about entire episodes spanning multiple prompts. Finding a critic-free baseline for those settings remains unresolved.
+Finally, is there a principled way to integrate policy gradients with retrieval-augmented policies without doubling compute? Retrieval enriches the state but also lengthens rollouts, so rewards become sparse and expensive to evaluate. Investigating whether the policy gradient update can be decomposed into retrieval-dependent and retrieval-independent components—so that the retrieval module sees only the gradients that cross the reward signal—could unlock efficient RLHF for retrieval-augmented LLMs.
 
 ## Where to read next
 
-If you want to understand the preference modeling layer that supplies \(R(\tau)\), → [Reinforcement Learning from Human Feedback](../../01-ai/concepts/rlhf.md) explains how human labels are collected and how reward models are trained before any gradient runs. For a broader look at how entropy and regularization appear in RL, → [[soft-actor-critic]] dives into maximum entropy objectives and their connection to cognitive effort proxies. The engineering counterpart is → [[rl-systems-engineering]] which describes how large-scale RLHF pipelines manage rollouts, reward models, and SFT priors at deployment. To see where this concept powers long-horizon reasoning, → [[chain-of-thought-reasoning]] walks through how policy gradients interact with explanation-style prompts.
+If you want the value-function counterpart to this treatment, → [Actor-Critic](actor-critic.md) explains how separate critics and actors interact and why those critics are often hard to scale for LLMs. The engineering counterpart is → [Proximal Policy Optimization](ppo.md) which remains the most widely deployed reinforcement learner thanks to trust-region clipping and stable entropy bonuses. For the probabilistic foundation that policy gradients exploit, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) and its derivations show how gradients of log-densities turn sampling problems into tractable objectives.
 
 ## Build it
 
-This build proves that even without a critic, you can nudge a Qwen-2.5-0.5B model toward better reasoning on a Countdown-style task by computing relative advantages across grouped rollouts, applying KL regularization, and tuning entropy bonuses.
+This build proves that a critic-free policy gradient variant can steer a small causal transformer toward rule-governed text output using only scalar rewards derived from a deterministic checker, demonstrating that the log-probability gradients alone suffice for credit assignment when the reward is normalized.
 
-**What you're building:** One GRPO step on Qwen-2.5-0.5B that uses synthetic countdown prompts, computes group relative advantages, and applies the regularized surrogate objective.
+**What you're building:** Group Relative Policy Optimization (GRPO) fine-tuned on `Qwen2.5-0.5B-Instruct` to produce outputs that match a target character count while satisfying a rule-based arithmetic check.
 
-**Why this is valuable:** The recipe touches the core tension of policy gradients for LLMs—learning from trajectory rewards while protecting existing knowledge—because you must compute advantages, apply a KL penalty, and tune entropy bonuses all within a tight GPU budget.
+**Why this is valuable:** The build exercises the policy-gradient objective end-to-end—reward computation, group normalization, entropy scaling, and gradient ascent—so the learner feels how critic-free updates propagate a scalar reward back to billions of parameters.
 
 **Stack:**
-- **Model:** [Qwen/Qwen-2.5-0.5B](https://huggingface.co/Qwen/Qwen-2.5-0.5B) — [downloads count visible on the model card].
-- **Dataset:** Programmatic synthetic countdown dataset generated per step (script provided below).
-- **Framework:** `transformers>=4.35`, `accelerate>=0.21`, `torch>=2.0`, `peft>=0.5`.
-- **Compute:** Google Colab T4 (16GB VRAM), ~20–30 minutes for 100 GRPO steps.
+- **Model:** `Qwen2.5-0.5B-Instruct` (HuggingFace, open-source, ~10M downloads)
+- **Dataset:** `openwebtext` (HuggingFace dataset, ~40GB; sample 100k prompts)
+- **Framework:** PyTorch 2.2 + `accelerate` (from Hugging Face) + `trlx==0.5.0`
+- **Compute:** Single Colab T4 (16 GB VRAM); ~3 hours for 5 epochs over the sampled portion
 
 **The recipe:**
-1. Install the stack and load the model with LoRA: `pip install transformers accelerate peft datasets` then load `QwenForCausalLM` and apply a 4-bit LoRA config to reduce VRAM.
-2. Generate the synthetic countdown dataset by sampling random start/target triples and converting them into prompts like “Count down from 13 to 2”; batch 5 rollouts per prompt using top-k sampling.
-3. Run the forward pass to collect log-probabilities and rewards: score each rollout by checking whether the completion reaches the target, assign 1 or 0, and compute the group mean reward; subtract to get \(A_i\) for each rollout, and estimate entropy on each token to compute GTPO-style bonuses.
-4. Compute the loss as \(-\sum_{i,t}(A_i + \delta_t)\log \pi_\theta(x_t^{(i)}|x_{<t}^{(i)}) + \beta\mathrm{KL}[\pi_\theta||\pi_\text{ref}]\), using the stored log-probabilities and a KL term between the current logits and the SFT logits (cached from the reference model). Backpropagate with gradient clipping (1.0) and update optimizer (AdamW, lr=3e-5).
-5. Evaluate by checking how many prompts reach the target after this single GRPO step (expect >60% success on the synthetic countdown set compared to ~40% before). Save the updated LoRA adapter as the artifact.
+1. Install PyTorch 2.2, `transformers`, `accelerate`, `trlx`, and `datasets` via `pip install torch==2.2.0 transformers accelerate trlx datasets`.
+2. Load `Qwen2.5-0.5B-Instruct` with `AutoModelForCausalLM` and tokenize `openwebtext` prompts chopped to 128 tokens, keeping prompt+completion pairs for the reward check.
+3. Define the reward function: reward = 1 if the generated completion ends with the target character count (e.g., 64 characters) and passes a digit-sum check encoding a simple arithmetic constraint; otherwise 0. Collect rollouts in batches of 16 prompts, compute the returns, and normalize each batch by subtracting the mean and dividing by the standard deviation.
+4. Train with GRPO: for each token, compute \(\nabla_\theta \log \pi_\theta(a_t|s_t)\), multiply with the normalized batch reward, add an entropy bonus scaled by the inverse of the batch reward variance, and update the policy with AdamW (learning rate 1e-5, weight decay 0.01). Clip gradients at norm 1.0 and use gradient accumulation to fit the batch on the T4.
+5. Evaluate by sampling 100 new prompts, measuring the fraction that meet both the length and arithmetic constraints, and logging the average reward; expect accuracy > 70% after 5 epochs.
 
-**Expected outcome:** A fine-tuned LoRA adapter checkpoint that, after one GRPO step with relative advantages and entropy shaping, consistently reaches targets on the synthetic Countdown prompts while staying within 16GB VRAM.
+**Expected outcome:** A fine-tuned `Qwen2.5-0.5B-Instruct` checkpoint that reliably produces rule-compliant generations, along with logs showing normalized rewards, entropy weights, and pass rates.
 
-- **CS student:** Run the same recipe on a local RTX 4070 by reducing batch size to 2 rollouts per prompt and verifying that the relative advantages still improve success rates, which shows the method works off Colab.
-- **Applied engineer:** After training, quantize the LoRA adapter to int8 and serve through vLLM; aim for p50 < 1.2s on an A10 instance when scoring the synthetic countdown challenge with the same reward model.
-- **Applied researcher:** Test the hypothesis that a larger KL penalty (\(\beta = 0.5\) vs \(0.2\)) preserves factual knowledge better by measuring perplexity on a held-out trivia set before and after the GRPO step while keeping rewards constant.
-- **Frontier researcher:** Probe the open question on entropy vs linguistic uncertainty by logging entropy spikes during the build, correlating them with reward delta, and checking whether high entropy always precedes reward increases; use this data to falsify or refine the GTPO-style derivative assumption.
+- **CS student:** Run the same recipe with `gpt2` on a single RTX 4070, reduce batch size to 8, and lower the target character count to 32 to fit the smaller model while still observing normalized GRPO updates.
+- **Applied engineer:** After the Colab run, quantize the checkpoint with `bitsandbytes` 8-bit quantization, deploy via vLLM on an A10 instance, and measure p50 completion latency with caching; the normalized reward ensures consistent behavior under load.
+- **Applied researcher:** Ablate the entropy-scaling rule by fixing the bonus and compare convergence rates; the hypothesis is that dynamically scaled entropy outperforms the constant bonus in sparse-reward scenarios measured by higher reward variance reduction.
+- **Frontier researcher:** Probe the open question in §What's still open by tying the entropy regularizer to a KL constraint against the pre-trained policy; treat the falsifier as any prompt where the KL-constrained policy yields a lower reward than GRPO, and report whether the constraint preserves factual outputs while improving reasoning.
 
 ---
 
