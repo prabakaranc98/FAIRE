@@ -349,6 +349,33 @@ auto_apply=true ONLY when:
     (these guardrails are also enforced at apply-time; mark safe only when
     you have evidence all three hold from the per-track signals above)
 
+**ACTIVELY PROPOSE ARCS** when the per-track signals show a track with
+>= 3 substantive concept pages and < 2 active arcs. Arcs are the wiki's
+USP — concepts without arcs are inert. Look for tracks where the existing
+concepts cluster naturally into a learnable sequence (e.g. 02-generative-modeling
+has diffusion-models, score-matching, latent-diffusion, flow-matching,
+consistency-models — those compose into a "generative-stack" arc).
+
+Worked example of a good arc-proposal item:
+{{
+  "action": "Spin generative-stack arc on 02-generative-modeling",
+  "evidence": "Track 02 has 7 substantive concepts. The five listed steps already exist on disk and form a coherent build-up from DDPM to a distilled consistency model.",
+  "evidence_refs": ["02-generative-modeling"],
+  "risk_class": "safe",
+  "auto_apply": true,
+  "action_type": "arc-proposal",
+  "action_params": {{
+    "arc_id": "generative-stack",
+    "track": "02-generative-modeling",
+    "dest": "5 trained generative models with comparable FID, ending in a distilled consistency model",
+    "steps": ["diffusion-models", "score-matching", "latent-diffusion-models", "flow-matching", "consistency-models"]
+  }}
+}}
+
+The retro should propose 1-2 arc items per cycle when guardrails hold,
+not zero. Skip arc-proposal only when no track meets the bar — not because
+arcs feel risky.
+
 OUTPUT JSON ONLY (no preamble, no markdown fences):
 {{
   "went_well":            ["string", ...],
