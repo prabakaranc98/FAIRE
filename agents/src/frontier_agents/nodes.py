@@ -1336,10 +1336,17 @@ def link_node(state: WikiPageState) -> WikiPageState:
 
 
 def _index_existing_pages(docs_dir: Path) -> dict[str, dict]:
-    """Scan curriculum pages and return {track/slug: {title, track, slug, concepts_snippet}}.
+    """Scan curriculum pages and return {slug: {title, track, slug, abs_path}}.
 
-    Skips stub pages (no real content to link to).
-    Pure filesystem scan — no LLM needed.
+    v2-aware: pages live at docs/curriculum/core/<track>/<page_type>/<slug>.md
+    (where page_type ∈ {concepts, authors, arcs, builds}). Track is the
+    directory two levels above the file. Falls back to parent.name for the
+    legacy flat layout.
+
+    Indexed by bare slug (not "track/slug") so the writer's inline
+    [[wikilinks]] resolve cleanly without needing to know the track.
+
+    Skips stub pages — pure filesystem scan, no LLM.
     """
     curriculum = docs_dir / "curriculum"
     pages: dict[str, dict] = {}
@@ -1351,9 +1358,18 @@ def _index_existing_pages(docs_dir: Path) -> dict[str, dict]:
         if page_file.name == "index.md":
             continue
 
-        track = page_file.parent.name
+        # v2 path: .../curriculum/core/<track>/<page_type>/<slug>.md
+        # legacy:  .../curriculum/<track>/<slug>.md
+        parts = page_file.parent.parts
+        if "core" in parts:
+            ci = parts.index("core")
+            track = parts[ci + 1] if ci + 1 < len(parts) else page_file.parent.name
+            page_type = parts[ci + 2] if ci + 2 < len(parts) else "concepts"
+        else:
+            track = page_file.parent.name
+            page_type = "concepts"
+
         slug = page_file.stem
-        full_slug = f"{track}/{slug}"
 
         try:
             content = page_file.read_text(encoding="utf-8", errors="ignore")
@@ -1368,22 +1384,13 @@ def _index_existing_pages(docs_dir: Path) -> dict[str, dict]:
         if fm_title:
             title = fm_title.group(1).strip().strip("\"'")
 
-        concepts_snippet = ""
-        core_match = re.search(
-            r"## Core concepts?\s*\n+(.*?)(?:\n\n|\n#)", content, re.DOTALL
-        )
-        if core_match:
-            for line in core_match.group(1).split("\n"):
-                line = line.strip().lstrip("*-").strip()
-                if line and not line.startswith("**") and len(line) > 20:
-                    concepts_snippet = line[:200]
-                    break
-
-        pages[full_slug] = {
+        # Last-write-wins on collisions; slugs SHOULD be unique across tracks
+        pages[slug] = {
             "title": title,
             "track": track,
             "slug": slug,
-            "concepts_snippet": concepts_snippet,
+            "page_type": page_type,
+            "abs_path": page_file,
         }
 
     return pages
@@ -1396,101 +1403,59 @@ def _inject_links(
     current_topic: str,
     docs_dir: Path,
 ) -> str:
-    """Use RESEARCH_MODEL to find related existing pages and inject real links.
+    """v2 link resolver — turn the writer's inline [[wikilinks]] into real
+    relative markdown links.
 
-    Returns the draft unchanged on any error — link injection is best-effort.
+    The v2 writer prompts produce `[[slug]]` references inside the
+    "## Where to read next" paragraph (and occasionally elsewhere). This
+    function scans those, looks each one up in existing_pages (indexed by
+    bare slug), computes the correct v2 relative path from the current
+    file's location, and replaces them. References to pages that don't
+    exist on disk are stripped to plain text (no broken links).
+
+    DOES NOT add a "## Connected topics" section or any bibliography —
+    that was a v1 pattern. The v2 "Where to read next" paragraph is the
+    only connective tissue.
+
+    Best-effort: returns the draft unchanged on any error.
     """
     if not existing_pages:
         return draft
 
-    linker = get_llm("research", temperature=0.0)
+    # Current file location (v2 layout): docs/curriculum/core/<track>/concepts/<topic>.md
+    current_path = Path(DOCS_DIR) / "curriculum" / "core" / current_track / "concepts" / f"{current_topic}.md"
 
-    catalog_lines = [
-        f"- `{slug}` | {meta['title']}"
-        + (f" — {meta['concepts_snippet'][:80]}" if meta["concepts_snippet"] else "")
-        for slug, meta in list(existing_pages.items())[:60]
-    ]
-    catalog = "\n".join(catalog_lines)
+    pattern = re.compile(r"\[\[([a-z0-9][a-z0-9\-]*)\]\]")
 
-    prompt = f"""You are a knowledge graph linker for a machine learning wiki.
+    resolved_targets: list[str] = []  # for backlinks.json
 
-Current page: **{current_topic}** (track: {current_track})
-
-Existing wiki pages (slug | title — snippet):
-{catalog}
-
-Task: Identify up to 6 existing pages most directly related to "{current_topic}".
-For each, write one sentence explaining the relationship (max 15 words).
-
-Return ONLY a JSON array — no explanation, no markdown fences:
-[
-  {{"slug": "track/page-slug", "title": "Page Title", "relationship": "one sentence"}},
-  ...
-]
-
-Only use slugs from the catalog above. Never invent slugs."""
+    def _replace(match: re.Match) -> str:
+        slug = match.group(1)
+        if slug == current_topic:
+            # Self-reference — drop the brackets, keep the word
+            return slug.replace("-", " ")
+        meta = existing_pages.get(slug)
+        if not meta:
+            # Page doesn't exist yet — leave the wikilink as-is so a later
+            # generation can resolve it. Better than a broken markdown link.
+            return f"[[{slug}]]"
+        target_path: Path = meta["abs_path"]
+        try:
+            rel = os.path.relpath(target_path, start=current_path.parent)
+        except ValueError:
+            return f"[[{slug}]]"  # cross-volume on Windows
+        resolved_targets.append(slug)
+        return f"[{meta['title']}]({rel})"
 
     try:
-        response = linker.invoke([HumanMessage(content=prompt)])
-        raw = _coerce_text(response.content).strip()
-        json_match = re.search(r"\[.*?\]", raw, re.DOTALL)
-        if not json_match:
-            return draft
-        links_data = _json.loads(json_match.group(0))
+        new_draft = pattern.sub(_replace, draft)
     except Exception:
         return draft
 
-    if not links_data:
-        return draft
+    if resolved_targets:
+        _update_backlinks(docs_dir, current_track, current_topic, resolved_targets)
 
-    link_entries = []
-    backlink_targets = []
-
-    for item in links_data:
-        slug = item.get("slug", "")
-        if slug not in existing_pages:
-            continue  # never create links to pages that don't exist
-
-        meta = existing_pages[slug]
-        title = meta["title"]
-        target_track = meta["track"]
-        target_slug = meta["slug"]
-        relationship = item.get("relationship", "")
-
-        rel_path = (
-            f"./{target_slug}.md"
-            if target_track == current_track
-            else f"../{target_track}/{target_slug}.md"
-        )
-
-        link_entries.append(f"- [{title}]({rel_path}) — {relationship}")
-        backlink_targets.append(slug)
-
-    if not link_entries:
-        return draft
-
-    links_block = "\n".join(link_entries)
-
-    # Replace content of ## Connected topics section if it exists
-    connected_pattern = r"(## Connected topics?\s*\n)(.*?)(?=\n## |\Z)"
-    if re.search(connected_pattern, draft, re.DOTALL):
-        draft = re.sub(
-            connected_pattern,
-            lambda m: m.group(1) + links_block + "\n\n",
-            draft,
-            flags=re.DOTALL,
-        )
-    elif "## Further reading" in draft:
-        draft = draft.replace(
-            "## Further reading",
-            f"## Connected topics\n\n{links_block}\n\n## Further reading",
-            1,
-        )
-    else:
-        draft += f"\n\n## Connected topics\n\n{links_block}\n"
-
-    _update_backlinks(docs_dir, current_track, current_topic, backlink_targets)
-    return draft
+    return new_draft
 
 
 def _update_backlinks(
