@@ -161,6 +161,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/transformers/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -329,11 +333,19 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/connected-topics-template-09-algorithms-systems-for-ai/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/convex-optimization/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/curriculum-learning/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/curriculum-resampling/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -354,6 +366,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/flash-attention/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/gradient-bucketing/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -418,6 +434,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/reinforcement-learning-schedulers/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/tensor-cores/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
