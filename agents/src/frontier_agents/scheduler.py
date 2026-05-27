@@ -447,10 +447,44 @@ def full_cycle_job(dry_run: bool = False) -> dict:
         except Exception as e:
             retro_summary = {"error": str(e)}
 
+    # Step 6: Batched push — one push per cycle, not per page. GitHub Pages
+    # soft-caps Pages builds at 10/hour; pushing per page (20+/cycle) silently
+    # blew past it and stopped publishing for ~28 hours. Now: pages still
+    # commit individually via GIT_AUTO_COMMIT (preserves git history), but
+    # the network push is a single batched call at cycle close. This means
+    # gh-pages gets one new HEAD per cycle → exactly one Pages build per
+    # cycle → comfortably under the limit at 1-hour intervals.
+    push_summary: dict = {}
+    if not dry_run and os.getenv("GIT_BATCHED_PUSH", "true").lower() == "true":
+        try:
+            import subprocess as _sp
+            from pathlib import Path as _P
+            repo_root = _P(__file__).resolve().parent.parent.parent.parent
+            ahead = _sp.run(
+                ["git", "rev-list", "--count", "origin/main..HEAD"],
+                cwd=repo_root, capture_output=True, text=True, timeout=15,
+            )
+            n_ahead = int((ahead.stdout or "0").strip() or "0")
+            if n_ahead > 0:
+                push = _sp.run(
+                    ["git", "push", "origin", "main"],
+                    cwd=repo_root, capture_output=True, text=True, timeout=60,
+                )
+                push_summary = {
+                    "n_commits_pushed": n_ahead,
+                    "ok": push.returncode == 0,
+                    "stderr_tail": (push.stderr or "")[-200:] if push.returncode else "",
+                }
+            else:
+                push_summary = {"n_commits_pushed": 0, "ok": True, "note": "no commits ahead of origin"}
+        except Exception as e:
+            push_summary = {"ok": False, "error": str(e)}
+
     return {
         "supervisor": supervisor_summary,
         "audit": audit_summary,
         "runs": run_results,
         "changelog_updated": True,
         "retrospective": retro_summary,
+        "batched_push": push_summary,
     }
