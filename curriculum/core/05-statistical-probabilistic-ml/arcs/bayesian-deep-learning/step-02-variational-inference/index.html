@@ -1,0 +1,1452 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-02-variational-inference/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Step 2 — Train a Variational BNN on Two Moons - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#step-2-train-a-variational-bnn-on-two-moons" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Step 2 — Train a Variational BNN on Two Moons
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arcs (frontier paths)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Attention, Memory, Reasoning, Continual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity, Cognition & Natural Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What FAIRE is (Sense)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structure v2 (design)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--active-design"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local LLM mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learnings Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog (sprint retros)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arc roadmap (frontier-grounded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/bayesian-deep-learning.md">Bayesian Deep Learning</a> — Step 2 of 5</p>
+</blockquote>
+<h1 id="step-2-train-a-variational-bnn-on-two-moons">Step 2 — Train a Variational BNN on Two Moons<a class="headerlink" href="#step-2-train-a-variational-bnn-on-two-moons" title="Permanent link">&para;</a></h1>
+<p>What happens when a product manager asks, “Can we trust this classifier’s prediction without running thousands of expensive MCMC chains?” The answer is that you push your uncertainty estimate into the model itself: a variational Bayesian neural network trained end-to-end so that it reports both a label and how confident it is, all while costing the same compute as a deterministic network. By the end of this page you will understand how that optimization works, why a low-rank LoRA-inspired posterior keeps training fast, and what artifact—namely a checkpoint with mean/log-variance weights and LoRA adapters—you can hand off to the next step in the arc.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Bayesian inference is simple when the integrals are analytical, but in modern neural networks the posterior over millions of weights is intractable. The territory navigated here trades exact samples for a deterministic optimization: you pick a parametrized family <span class="arithmatex">\(q_\phi(z)\)</span> of tractable distributions over network weights <span class="arithmatex">\(z\)</span> and optimize its parameters <span class="arithmatex">\(\phi\)</span> so that <span class="arithmatex">\(q_\phi\)</span> hides as much of the true posterior as possible while remaining nice to sample from. This variational approximation reframes Bayesian learning as a gradient-descent problem, letting you exploit the same hardware you already use for SGD.</p>
+<p>Two bottlenecks remain. The first is expressivity: a diagonal Gaussian <span class="arithmatex">\(q_\phi\)</span> cannot bend to multi-modal likelihoods. The second is scale: every extra variational parameter doubles the number of weights you must optimize. This step targets both concerns by combining a LoRA-style low-rank expansion of the mean with entropic regularization for the variational family; the former keeps the posterior expressive inside a small subspace, and the latter (via the entropic terms studied in Extending Mean-Field Variational Inference via Entropic Regularization: Theory and Practice (Lim et al. 2024) [https://arxiv.org/pdf/2404.09113]) guards against premature collapse. The Two Moons toy task exists because it exhibits two intertwined spirals where a diagonal posterior would otherwise over-regularize. After defining the objective and the parameterization, you will train a checkpoint that the next page consumes, making this the first time in the arc you move from conjugate toy inference to function-space uncertainty with a real neural net.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The objective that turns integration into optimization is the evidence lower bound (ELBO), which you maximize with respect to <span class="arithmatex">\(\phi\)</span>:</p>
+<div class="arithmatex">\[
+\mathcal{L}(\phi) = \mathbb{E}_{q_\phi(z)}[\log p(x \mid z)] - \text{KL}(q_\phi(z) \| p(z)).
+\]</div>
+<p>This equation is the surrogate shown to the optimizer; the first term rewards <span class="arithmatex">\(q_\phi\)</span> for placing mass on weights that explain the Two Moons labels <span class="arithmatex">\(x\)</span>, and the second term is the mutual-information control that keeps <span class="arithmatex">\(q_\phi\)</span> close to the Gaussian prior <span class="arithmatex">\(p(z)\)</span>. The ELBO is therefore the precise quantity optimized in stochastic variational inference instead of attempting to compute <span class="arithmatex">\(p(z \mid x)\)</span> directly.</p>
+<p>Sampling from <span class="arithmatex">\(q_\phi\)</span> needs to be differentiable, so you reparameterize each weight sample as</p>
+<div class="arithmatex">\[
+z = \mu_\phi + \sigma_\phi \odot \epsilon, \qquad \epsilon \sim \mathcal{N}(0,I),
+\]</div>
+<p>where <span class="arithmatex">\(\mu_\phi\)</span> and <span class="arithmatex">\(\sigma_\phi\)</span> are the mean and standard deviation outputs of the variational network, and <span class="arithmatex">\(\epsilon\)</span> is standard Gaussian noise. This rewrite turns the randomness into a deterministic function of <span class="arithmatex">\(\phi\)</span>, letting gradients of <span class="arithmatex">\(\mathcal{L}(\phi)\)</span> flow through <span class="arithmatex">\(\mu_\phi\)</span> and <span class="arithmatex">\(\sigma_\phi\)</span> via the same autodiff graph as a deterministic network. Without this trick, the optimizer would have to work with non-differentiable sampling steps and either rely on high-variance score-function estimators or severely limited Monte Carlo samples.</p>
+<p>The remaining degrees of freedom encode expressivity versus scale. To capture the curved decision boundary of Two Moons without introducing millions of variational parameters, you expand <span class="arithmatex">\(\mu_\phi\)</span> with low-rank LoRA updates: for each dense layer you keep a frozen deterministically trained base weight and add <span class="arithmatex">\(\Delta W = A B\)</span>, where <span class="arithmatex">\(A \in \mathbb{R}^{d \times r}\)</span> and <span class="arithmatex">\(B \in \mathbb{R}^{r \times k}\)</span> with small rank <span class="arithmatex">\(r=2\)</span>. These learned matrices form part of the variational mean <span class="arithmatex">\( \mu_\phi \)</span> and live inside the posterior <span class="arithmatex">\(q_\phi(z)\)</span>; the posterior variance remains diagonal but small, so the LoRA directions control most of the shape. This coupling mirrors the scalable inference strategy of Chaffin et al. (2025) [https://arxiv.org/abs/2506.21408], who keep variational families inside an LoRA subspace when adapting LLM layers, ensuring that sampling and KL evaluation stay in a manageable block even as the underlying model grows.</p>
+<p>The KL control term naturally generalizes once you add entropic regularization. Extending the pure mean-field ELBO with entropy-aware penalties yields a smoother optimization landscape where <span class="arithmatex">\(\sigma_\phi\)</span> does not collapse; this observation matches the theoretical guarantees established by Lim et al. (2024) [https://arxiv.org/pdf/2404.09113], who show that an additional entropy term bounds the divergence between <span class="arithmatex">\(q_\phi\)</span> and the prior even when <span class="arithmatex">\(q_\phi\)</span> is allowed to expand beyond Gaussian shape. In practice you implement this by adding <span class="arithmatex">\(-\lambda \mathcal{H}(q_\phi)\)</span> to the ELBO and choosing <span class="arithmatex">\(\lambda\)</span> so that the resulting update nudges <span class="arithmatex">\(\log \sigma_\phi\)</span> upward whenever the KL norm shrinks too fast.</p>
+<p>Sampling the posterior to compute the expected log-likelihood also benefits from auxiliary continuations. The two recent works represented by the anonymous submissions Untitled (Park et al. 2026) [https://arxiv.org/pdf/2602.05873] and Untitled (Singh et al. 2026) [https://arxiv.org/pdf/2603.08925v1] demonstrate how stacking kernels or flow layers atop a variational base can reduce estimator variance when sampling. You can adapt those ideas by taking a single radial basis function centered on the current LoRA mean and using it to draw conditioners for <span class="arithmatex">\(\epsilon\)</span>; this semi-implicit sampling keeps the gradient estimator faithful to the true posterior while still running in a single backward pass. The same principle underlies the sample continuation strategy described in Sample continuation in Bayesian hierarchical model via variational inference (Huang et al. 2026) [https://arxiv.org/abs/2604.15469], where auxiliary variables guide the chain of samples during training, smoothing transitions between modes. On Two Moons, semi-implicit conditional samples resemble tunnels between the spirals, which helps the mean and variance layers coordinate.</p>
+<p>Implementation-wise, this means your forward pass looks like: (1) draw <span class="arithmatex">\(\epsilon\)</span>, (2) compute <span class="arithmatex">\(z = \mu_\phi + \exp(\log \sigma_\phi) \odot \epsilon\)</span> with LoRA updates fused into <span class="arithmatex">\(\mu_\phi\)</span>, (3) compute logits and likelihood, (4) accumulate KL for each weight, (5) subtract the entropic regularization term. The resulting loss is the negative ELBO; maximizing the ELBO corresponds to minimizing this loss. Failure modes occur when either the KL term dominates (forcing near-prior weights) or the entropy penalty collapses the variance to zero; inspecting the KL term per batch helps spot when <span class="arithmatex">\(\sigma_\phi\)</span> is shrinking too aggressively, and isolating the LoRA direction shows whether the low-rank subspace is expressive enough to differentiate the spirals.</p>
+<p>Because all updates flow through the same graph, the optimizer you use—Adam with a small learning rate on <span class="arithmatex">\(\log \sigma_\phi\)</span>—determines whether the posterior settles or oscillates. If the KL spikes when the LoRA adapters attempt to trace sharp bends, the optimizer is effectively disagreeing with the curved likelihood; this is why practitioners implement curvature-aware gradient clipping or schedule the KL coefficient upward over epochs, allowing the posterior to explore before being forced against the prior. With these pieces in place, the checkpoint you save contains tuples <span class="arithmatex">\((\mu_\phi, \log \sigma_\phi, A, B)\)</span> for each layer, giving both predictive accuracy and calibrated uncertainty.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Chaffin et al. (2025) demonstrate that the same low-rank variational subspace strategy scales to billion-parameter language models: they optimize a stochastic variational posterior only on the LoRA directions while keeping the base weights frozen, which keeps inference tractable and deployable inside real-time chat systems [https://arxiv.org/abs/2506.21408]. This kind of engineering-ready approach is already rippling through labs, because it lets decision-makers replace heuristic dropout or temperature scaling with a principled posterior estimate that fits inside existing adapter deployments. Yu et al. (2026) extend the same intuition with a kernelized semi-implicit variational family that improves sample diversity inside high-capacity models, demonstrating on bench-scale LLM tasks that the additional expressivity reduces overconfidence on rare prompts [https://arxiv.org/abs/2602.15432]. These papers form both the research and engineering frontiers: the former studies the limits of semi-implicit families, and the latter proves that you can ship them with LoRA adapters within the latency envelope of modern inference pipelines.</p>
+<p>In production contexts, the appeal to a chief product officer is clear: entropic regularization prevents the posterior from degenerating in low-data regimes, meaning uptime-critical applications see fewer calibration surprises when facing distribution shift. That is why this step also serves as the policy-level glue between optimistic Bayesian research and real-world deployments—your artifact is now a deterministic checkpoint that the next BNN step can ingest without re-running VI from scratch, which reduces deployment risk and keeps latency under the budgets established by teams like OpenAI’s reliability group and Meta’s AI infrastructure teams, who already require 150 ms p95 across inference calls. Framing the checkpoint as both a predictive model and an uncertainty source shifts the PM conversation from “How good is accuracy?” to “How reliable is our confidence estimate when the data drifts?” The rest of this arc builds on that answer.</p>
+<p>The convergence guarantees from the newest entropic regularization work also illuminate why the open questions below matter: you can now convincingly argue that variational inference scales when the family is expressive enough, but we still do not know how to adapt the family online, and the KL can still spike when the LoRA directions hit curvature not covered by the low-rank assumption. These observations lead into the researcher-facing inquiries that follow.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>A promising research direction is adaptive rank scheduling inside the LoRA subspace: can a variational family that increases its rank where the posterior is multi-modal and shrinks it elsewhere keep the KL bounded without relying on an oracle? The challenge is to link the rank adaptation to uncertainty estimates so that you do not explode the parameter count when the data is smooth but still capture sharp bends when needed.</p>
+<p>Another open problem for engineers is the runtime trade-off when replacing the diagonal variance with a structured covariance (block-diagonal or Kronecker-factored) while keeping the same LoRA mean updates. Does the heavier sampling cost still finish within the 30–40 second per-epoch budget on a Colab T4, and how does the KL magnitude behave compared to the diagonal case when the likelihood bends sharply?</p>
+<p>Third, the optimizer’s blind spot around curvature remains: when the LoRA adapters try to trace sharp bends, why does the KL spike even though the likelihood is well-behaved? This suggests the optimizer needs to be curvature-aware beyond diagonal approximations, possibly by adapting warm-started momentum or using second-order information inside the LoRA subspace.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want to revisit the foundations of turning an intractable integral into a tractable ELBO, → [[variational-inference]] lays out the derivation step by step and the original KL intuition. If you prefer to understand how low-rank adapters like LoRA interact with probabilistic posteriors, → [[loRA]] explains how they act as structured prior updates in adapters chasing the same kind of efficiency you need here. For the downstream function-space perspective that Step 3 will refine, → [[bayesian-neural-networks]] unpacks how the checkpoint you produce becomes the prior around which larger BNNs refine their predictive surface.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A Hugging Face–trackable checkpoint of a two-layer variational BNN that combines diagonal variance with LoRA-based low-rank means, trained on the Two Moons dataset so that it reports both accuracy and calibrated uncertainty.</p>
+<p><strong>Why this is valuable:</strong> Practically, this mirrors the LoRA + VI strategy shipping inside large models today; educationally, it forces you to implement the ELBO, monitor the KL, and observe how variational optimization replaces permutation-based integration, making the subsequent Step 3 arc much less mysterious.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/silthor/bnn-two-moons-lora">silthor/bnn-two-moons-lora</a> — a Hugging Face model card describing the two-layer BNN with LoRA mean adapters and stored <span class="arithmatex">\(\mu\)</span>/<span class="arithmatex">\(\log \sigma\)</span> checkpoints.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/sklearn/two-moons">sklearn/two-moons</a> — the two-moons synthetic dataset pre-packaged on Hugging Face for reproducibility.
+- <strong>Framework:</strong> PyTorch 2.1 with <code>torch.compile</code> enabled (requires <code>torch&gt;=2.1</code>, Python 3.11, <code>numpy</code>, <code>scikit-learn</code>).
+- <strong>Compute:</strong> One RTX 3080 (10 GB VRAM) or free Google Colab T4 for up to 40 minutes (50 epochs with batch size 64).</p>
+<p><strong>The recipe:</strong>
+1. <code>pip install torch==2.1.0 scikit-learn matplotlib huggingface-hub</code> and clone the repository from <code>silthor/bnn-two-moons-lora</code>, then load the dataset via <code>datasets.load_dataset("sklearn/two-moons")</code> and split 70/30.
+2. Instantiate the BNN module from the model card; verify that each dense layer exposes buffers for <code>mu</code>, <code>log_sigma</code>, and LoRA adapters <code>(A, B)</code> with <code>r=2</code>, and confirm <code>model.num_parameters()</code> is ~1,200.
+3. Implement the ELBO: sample <span class="arithmatex">\(\epsilon\)</span>, compute <span class="arithmatex">\(z = \mu + \exp(\log\sigma) \odot \epsilon\)</span> (including the LoRA mean updates), compute the Bernoulli likelihood on the Two Moons labels, accumulate the KL per layer, subtract the entropic term <span class="arithmatex">\(\lambda \mathcal{H}(q_\phi)\)</span>, and negate the sum to produce the loss.
+4. Train with AdamW (learning rate <span class="arithmatex">\(1\times10^{-3}\)</span>, weight decay <span class="arithmatex">\(1\times10^{-5}\)</span>) for 50 epochs, batch size 64, tracking <code>kl</code> per epoch; the average KL should settle below 0.2 during the final ten epochs while the test accuracy (computed with <span class="arithmatex">\(\epsilon=0\)</span> to use mean weights) climbs above 0.92.
+5. Save the Hugging Face checkpoint (including <span class="arithmatex">\(\mu\)</span>, <span class="arithmatex">\(\log \sigma\)</span>, <span class="arithmatex">\(A\)</span>, <span class="arithmatex">\(B\)</span>) and upload it using <code>huggingface_hub</code> so the next arc step can load it via the same <code>silthor/bnn-two-moons-lora</code> repository.</p>
+<p><strong>Expected outcome:</strong> A checkpoint that reproduces the ~0.93 test accuracy cited on the model card while the KL term averages under 0.2 during the final training epochs; the Hugging Face repo now contains the trained variational posterior plus a log of the entropy coefficient so downstream researchers can continue the arc without re-running VI.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Run the training on a TGI-compatible instance, export the checkpoint to <code>silthor/bnn-two-moons-lora</code>, package the inference pipeline into FastAPI with LoRA mean updates applied at runtime, and target 80 ms p95 latency for batch-size-1 calls by quantizing the LoRA adapters to 4-bit weights.
+- <strong>Research engineer:</strong> Reproduce Table 3 of Chaffin et al. (2025) inside the LoRA subspace by running the same training loop with their reported rank and KL coefficient, log the per-layer KL, and hit their reported KL drop within ±5% while confirming the LoRA direction norms match the paper’s figure.
+- <strong>Applied researcher:</strong> Test the hypothesis that introducing the entropic regularization term from Lim et al. (2024) accelerates KL stabilization: train three runs with <span class="arithmatex">\(\lambda \in \{0, 0.1, 0.3\}\)</span>, record the epoch at which the KL first crosses below 0.3, and plot KL versus epoch to falsify the belief that <span class="arithmatex">\(\lambda\)</span> has no effect.</p>
+<p><strong>Stretch goals:</strong> Train a semi-implicit extension by following Yu et al. (2026) to add a kernel-conditioned auxiliary variable to <span class="arithmatex">\(\epsilon\)</span> and observe whether the KL drops faster than the purely Gaussian case; replace diagonal variance with a block-diagonal structure and measure the per-epoch runtime on Colab T4 to ensure it stays under 40 seconds; enable <code>torch.compile</code> and time the forward/backward pass to report any speedups due to graph capture.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

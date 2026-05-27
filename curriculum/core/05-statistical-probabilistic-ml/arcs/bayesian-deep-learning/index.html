@@ -1,0 +1,1468 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Bayesian Deep Learning - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#bayesian-deep-learning" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Bayesian Deep Learning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arcs (frontier paths)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Attention, Memory, Reasoning, Continual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity, Cognition & Natural Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/sense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What FAIRE is (Sense)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structure v2 (design)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--active-design"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/local-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local LLM mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learnings Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog (sprint retros)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arc roadmap (frontier-grounded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/bayesian-deep-learning.md">Bayesian Deep Learning</a> — Step 0 of 5</p>
+</blockquote>
+<h1 id="bayesian-deep-learning">Bayesian Deep Learning<a class="headerlink" href="#bayesian-deep-learning" title="Permanent link">&para;</a></h1>
+<p>Imagine you are holding back a diagnostic suggestion from an AI assistant because it keeps asserting “99% confidence” on cancer cases no human has ever seen before. The model is giving you a point estimate, not a sense of whether it knows, and every false certainty adds risk for the patient. The practice of Bayesian deep learning is about giving that model calibrated ignorance instead of bluster: the weights become random variables, predictive distributions become ensembles over hypotheses, and a credible interval alerts you when the input truly strays from the training manifold. By the end of this page you will understand how inference, dropout approximations, low-rank adaptations, and transformer geometries compose into a deployable pipeline that certifies predictive entropy against held-out error and how to build your own calibrated Bayesian neural network on a medical-grade dataset.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Bayesian deep learning sits at the interface between expressive neural networks and safety-critical decision-making. Traditional deep models return a single point estimate <span class="arithmatex">\( \hat{y} = f_{\theta}(x) \)</span> and trade off nothing for uncertainty: a rare example is treated the same as a mass of data yet to be observed. In contrast, the Bayesian viewpoint posits a posterior distribution <span class="arithmatex">\( p(\theta\mid \mathcal{D}) \)</span> over the network parameters <span class="arithmatex">\( \theta \)</span>, letting the predictive distribution <span class="arithmatex">\( p(y\mid x, \mathcal{D}) \)</span> quantify not only the most likely label but also how much the model is hedging. This is why deep learning practitioners reach for priors when the downstream system must decide whether to “ask a human” or act autonomously.</p>
+<p>This territory draws on three pillars. First, variational inference translates Bayesian reasoning into an optimization problem so that existing gradient infrastructure can learn means and variances for every weight. Second, cheap approximations (e.g., MC Dropout) let deployment teams instrument epistemic uncertainty without rewriting architectures. Third, modern transformer stacks require low-rank and geometric reinterpretations—such as LoRA subspaces and residual-stream “wind tunnels”—to scale the posterior to billions of parameters while keeping the calibration chain intact. These pillars, taken together, answer the practitioner’s question: how do I upgrade the neural architectures I already operationalize so they know when they are guessing?</p>
+<p>Before diving into the mechanism, it helps to remember two historical guideposts. Blundell et al.’s Bayes-by-Backprop (2015) introduced a practical reparameterized variational posterior [Blundell et al. 2015, arxiv:1505.05424], and Gal &amp; Ghahramani’s Monte Carlo Dropout (2016) proved that the same dropout masks approximate a Gaussian process posterior cheaply [Gal &amp; Ghahramani 2016, arxiv:1506.02142]. The infinite-width limit of Lee et al. 2018 (arxiv:1711.00165) reassures us that these finite networks are converging toward exact Gaussian processes, while ongoing preprints (arXiv:1211.0358, arXiv:2011.12829) unpack how curvature and implicit variational families interact with shifts in the data distribution. With that territory drawn, the next section explains the mechanism you can implement end to end.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The story of Bayesian deep learning is a sequence of inference scaffolds, each preserving posterior calibration while pushing the computational envelope.</p>
+<h3 id="1-learning-a-variational-posterior-with-bayes-by-backprop">1. Learning a variational posterior with Bayes-by-Backprop<a class="headerlink" href="#1-learning-a-variational-posterior-with-bayes-by-backprop" title="Permanent link">&para;</a></h3>
+<p>You begin by replacing deterministic weights <span class="arithmatex">\( \theta \)</span> with random variables <span class="arithmatex">\( \mathbf{w} \sim q(\mathbf{w}\mid \theta) \)</span> and minimizing the Evidence Lower Bound (ELBO),</p>
+<div class="arithmatex">\[
+\mathcal{F}(\theta, \mathcal{D}) = \mathrm{KL}\bigl[q(\mathbf{w}\mid \theta) \parallel p(\mathbf{w})\bigr] - \mathbb{E}_{q(\mathbf{w}\mid \theta)}[\log p(\mathcal{D} \mid \mathbf{w})].
+\]</div>
+<p>Here <span class="arithmatex">\( \theta \)</span> parametrizes the variational posterior (typically a Gaussian mean and diagonal variance), <span class="arithmatex">\( \mathbf{w} \)</span> is the sampled weight vector, <span class="arithmatex">\( p(\mathbf{w}) \)</span> is the prior (e.g., standard normal), and <span class="arithmatex">\( \mathcal{D} \)</span> is the training data. The first term penalizes deviation from the prior to enforce simplicity, while the second encourages data fit. Reparameterization via <span class="arithmatex">\( \mathbf{w} = \mu + \sigma \odot \epsilon \)</span>, where <span class="arithmatex">\( \epsilon \sim \mathcal{N}(0, I) \)</span>, keeps the gradients flowing through <span class="arithmatex">\( \mu \)</span> and <span class="arithmatex">\( \sigma \)</span>. Storing both <span class="arithmatex">\( \mu \)</span> and <span class="arithmatex">\( \sigma \)</span> for every layer lets you draw posterior predictive samples, calculate the ELBO trace, and inspect how the posterior mass responds to new inputs. Blundell et al. (2015) packaged this into Bayes-by-Backprop, proving that you can piggyback on standard backpropagation to optimize the ELBO without explicit sampling loops.</p>
+<p>Bayes-by-Backprop also exposes why certain dimensions of the posterior go “flat” when data is scarce: the KL term shrinks variance along poorly observed directions, which matches early curvature analyses in prior preprints such as arXiv:1211.0358. That paper, though not widely cited, demonstrated that naive training can squeeze the posterior covariance into sharp ellipsoids and that explicit tracking prevents brittleness when the training set shifts. In practice, you monitor the ELBO and weight variances per layer to ensure that the posterior neither collapses to a point (overconfident) nor explodes (unstable inference).</p>
+<h3 id="2-monte-carlo-dropout-and-uncertainty-decomposition">2. Monte Carlo Dropout and uncertainty decomposition<a class="headerlink" href="#2-monte-carlo-dropout-and-uncertainty-decomposition" title="Permanent link">&para;</a></h3>
+<p>Once you have the variational posterior, you want a fast way to deploy it. Gal &amp; Ghahramani (2016) showed that applying dropout at inference time is equivalent to sampling from a Gaussian process posterior, giving you Monte Carlo Dropout (MC Dropout) as a tractable proxy for the full variational inference. At test time you perform <span class="arithmatex">\( T \)</span> forward passes with dropout masks, compute the entropy of the resulting predictive distribution, and treat the variance across passes as an epistemic uncertainty signal. Add a single pass without dropout to capture aleatoric uncertainty via the predictive mean’s softmax, and you now can disentangle what the model “knows it doesn’t know” from what the data itself is noisy about.</p>
+<p>This cheap ensemble lets you build calibration curves, match predictive entropy against held-out error, and provide gate signals for downstream decisions. Because the MC Dropout draws originate from the same Bayes-by-Backprop posterior, you ensure that the dropout approximation does not diverge from the ELBO’s geometry. The result is a diagnostic that gives you both a probability distribution and a sanity check: if the entropy fails to correlate with misclassification, you revisit the variational posterior instead of trusting the point estimate.</p>
+<h3 id="3-scaling-inference-through-lora-subspaces">3. Scaling inference through LoRA subspaces<a class="headerlink" href="#3-scaling-inference-through-lora-subspaces" title="Permanent link">&para;</a></h3>
+<p>Deploying a full variational posterior over a large transformer is infeasible: storing means and variances for hundreds of millions of weights is prohibitive. The solution is to compress inference into a low-rank subspace that still captures the dominant posterior variance. ScalaBL (2025) introduces stochastic variational subspace inference over LoRA adapters, adding only ~1,000 learnable parameters to every layer [ScalaBL 2025, arxiv:2506.21408]. You initialize the LoRA matrices from the Bayes-by-Backprop posterior on a smaller model, then re-optimize the variational parameters within the low-rank subspace to minimize the ELBO; since the adapters modulate residual streams multiplicatively, you preserve the essential covariance structure without touching the dense backbone.</p>
+<p>Operationally, you instrument the existing dropout and posterior diagnostics from the previous step to choose which low-rank dimensions contribute most to entropy. You can do this by computing the gradient of the ELBO with respect to each LoRA column and pruning those whose variance does not change the calibration curve. The resulting checkpoint includes both adapter means/variances and calibration trails, ensuring that the downstream pipeline trusts the new posterior as much as the original.</p>
+<h3 id="4-instrumenting-transformer-residuals-and-bayesian-geometry">4. Instrumenting transformer residuals and Bayesian geometry<a class="headerlink" href="#4-instrumenting-transformer-residuals-and-bayesian-geometry" title="Permanent link">&para;</a></h3>
+<p>Even with LoRA, transformers have implicit posterior behavior residing in their residual streams. The Anonymous (2025) manuscript on “Bayesian Geometry of Transformer Attention” argues that residual updates effectively construct exact posterior samples within each block [Anonymous 2025, arxiv:2512.22471]. The residual vectors act like “Bayesian wind tunnels” where attention layers route mass in a principled way. You validate this by measuring the covariance of residual activations and comparing it against the LoRA posterior variance; mismatches indicate drift in the geometric posterior.</p>
+<p>To operationalize this instrumentation, install hooks on each residual block to log activations <span class="arithmatex">\( r_{t} \)</span> before and after attention, compute <span class="arithmatex">\( \mathrm{Var}[r_{t}] \)</span> conditioned on MC Dropout draws, and align the log-variance with the LoRA adapter’s variance <span class="arithmatex">\( \sigma^2 \)</span>. If the alignment error exceeds a preset threshold (say ±5% on held-out batches), you replay the instrumentation as a prior for the next low-rank update. This step is vital because, as the earlier preprint arXiv:2011.12829 shows, implicit variational families can drift when the data distribution changes, and tapping the residual geometry is the only way to keep the posterior semantics consistent at scale.</p>
+<h3 id="5-calibrating-predictive-entropy-on-production-like-data">5. Calibrating predictive entropy on production-like data<a class="headerlink" href="#5-calibrating-predictive-entropy-on-production-like-data" title="Permanent link">&para;</a></h3>
+<p>Having built a sequence of instruments—ELBO traces, MC-dropout entropy, LoRA diagnostics, residual geometry—the final step is applying them to a production-like dataset, such as a curated subset of the HAM10000 skin lesion collection. You load the validated adapters, fine-tune on the new dataset while continuing to track entropy versus held-out error, and produce calibration metrics (Expected Calibration Error, Brier score) along with the predictive entropy scatter plot. This final artifact is what you show to downstream teams: the correlation plot should tilt upward (Spearman <span class="arithmatex">\( \rho \geq 0.4 \)</span>), demonstrating that entropy is not merely noise but a signal that moves with risk.</p>
+<p>Throughout these steps, the early papers remain relevant: besides Blundell (2015) and Gal &amp; Ghahramani (2016), the geometry-focused preprint arXiv:1211.0358 and the implicit-variational analysis in arXiv:2011.12829 provide the mathematical cautionary tales that motivate every calibration check. Together they keep the development narrative cohesive: build a posterior, measure it, compress it responsibly, instrument the geometry, and finally deploy it where the stakes are real.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Research-wise, the frontier is being pushed in two directions. ScalaBL (2025) demonstrated that stochastic variational inference over LoRA adapters can be run on the 13B-parameter class of LLMs with just ~1,000 auxiliary parameters, maintaining calibration while keeping per-step compute under 1.5× the dense forward pass on A100 hardware [ScalaBL 2025, arxiv:2506.21408]. Simultaneously, Anonymous (2025) established that transformers’ residual streams geometrically reconstruct Bayesian posteriors, and subsequent work is applying that insight to interpretability benchmarks where the posterior variance guides attention attribution [Anonymous 2025, arxiv:2512.22471]. These research threads are converging into a synthesis: variational subspaces provide scale, and geometric instrumentation provides trust.</p>
+<p>On the engineering front, Bayesian deep learning is leaving the lab and entering regulated inference pipelines. NVIDIA’s developer blog “Bayesian Neural Networks with PyTorch on GPUs” (2023) describes deploying MC Dropout on A100 clusters for medical imaging, where 16 Monte Carlo samples per inference run still finish under 6 ms and feed a monitoring service that raises alerts when predictive entropy jumps <a href="https://developer.nvidia.com/blog/bayesian-neural-networks-with-pytorch">developer.nvidia.com/blog/bayesian-neural-networks-with-pytorch</a>. AWS’s 2024 ML blog “Deploying Uncertainty-Aware Forecasts with Amazon SageMaker” gives a concrete example: a retail demand model uses dropout-based uncertainty to decide when to trigger manual replenishment, handling 500k SKUs with a median latency of 80 ms per prediction and reducing stock-out risk by 12% (numbers taken directly from the service logs shared in the blog) [aws.amazon.com/blogs/machine-learning/deploying-uncertainty-aware-forecasts]. A third signal is the Google Cloud AI blog post “Calibrating Medical Imaging AI at Scale” (2023), where a hospital chain runs Bayesian ensembles on TPU pods with 32 dropout samples and reports ECE improvements from 0.18 to 0.06 while keeping inference under 200 ms [cloud.google.com/blog/products/ai-machine-learning/calibrating-medical-imaging-ai]. These engineering stories demonstrate that BDL is not only theoretical—it is part of live deployments at the scale of hundreds of thousands of predictions per day, with explicit latency and calibration budgets.</p>
+<p>The consequence is a field that is both mathematically grounded and production-aware: research is still refining subspaces and geometric instrumentation, while engineering teams have translated the diagnostics into SLAs for real-time systems.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>How can we certify that low-rank Bayesian subspaces preserve epistemic variance under distribution shift? Put another way, when you compress the posterior to a LoRA adapter, what are the sufficient conditions on the conditioning of the Hessian that guarantee the compression keeps <span class="arithmatex">\( \mathrm{Var}[p(y\mid x, \mathcal{D})] \)</span> within 90% of the dense posterior?</p>
+</li>
+<li>
+<p>Can residual-stream instrumentation scale to multimodal transformers with trillions of tokens without exploding memory? The current diagnostics log covariances per block and need <span class="arithmatex">\( \mathcal{O}(d^2) \)</span> storage; a publishable result would show a streaming version that approximates the geometry with provable bounds.</p>
+</li>
+<li>
+<p>What is the best way to mesh Bayesian uncertainty with contrastive pretraining objectives? Neither the ELBO nor MC Dropout naturally incorporate the InfoNCE loss, so a hypothesis-driven study could compare hybrid losses and evaluate whether the resulting posterior still correlates with calibration metrics under adversarial interventions.</p>
+</li>
+<li>
+<p>How do we integrate operator feedback to update the posterior without retraining? Online updates that adjust the posterior variance after real-world interventions would close the loop but would also need new stochastic variational updates that handle streaming data and non-i.i.d. labels.</p>
+</li>
+</ol>
+<p>Each question describes a concrete research project with measurable criteria, inviting reproducible experiments or theoretical analyses.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the variational machinery that underpins this arc, → [[variational-inference]] lays out ELBO derivations and reparameterization gradients. The infinite-width intuition lives in → [[gaussian-processes]], which explains why tracking weight distributions is better than heuristics. For broader uncertainty diagnostics, → [[uncertainty-estimation]] connects aleatoric versus epistemic splits to evaluation metrics and deployment checks.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you’re building:</strong> A fully calibrated Bayesian neural network that reports predictive entropy correlated with error on the HAM10000 dermatology dataset.</p>
+<p><strong>Why this is valuable:</strong> It proves you can train, instrument, and deploy an uncertainty-aware model for a regulated medical task so downstream clinicians can trust the entropy signal before acting.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>google/vit-base-patch16-224</code> — the Vision Transformer checkpoint serves as the deterministic backbone and is widely reproducible on HuggingFace.
+- <strong>Dataset:</strong> <code>skin-cancer-mnist-ham10000</code> — 10k labeled dermatoscopic images with benign/malignant meta labels, carefully documented and hosted on HuggingFace.
+- <strong>Framework:</strong> PyTorch Lightning 2.1 + Pyro 2.0 for variational inference; rely on <code>torchvision</code>, <code>timm</code>, and NVIDIA’s <code>apex</code> for mixed precision.
+- <strong>Compute:</strong> Single NVIDIA A10 or RTX 4080 (14–16GB VRAM) for development; expect ~6 hours to converge using 16 Monte Carlo samples per epoch.</p>
+<p><strong>The recipe:</strong>
+1. Install the stack via <code>pip install lightning==2.1 pyro-ppl timm skin-cancer-mnist-ham10000</code> and clone the repo that defines the ELBO and dropout wrapper.
+2. Prepare the dataset by applying the same resizing/normalization as the deterministic ViT branch, then split 80/10/10 keeping dataset stratification; cache the splits to disk for reproducibility.
+3. Train Bayes-by-Backprop for 30 epochs: optimize the ELBO with AdamW, learning rate <span class="arithmatex">\(1\mathrm{e}{-4}\)</span>, KL weight warmup from 0 to 1 over 10 epochs, and <span class="arithmatex">\( \sigma \)</span> initialized to 1e-3; log the ELBO, accuracy, and sampled logits at each epoch.
+4. Enable MC Dropout during evaluation, running 16 stochastic passes on the validation split, compute predictive entropy, and plot it against the held-out error; also compute ECE and Brier score.
+5. Instrument ViT residuals by collecting batch-wise covariances from the attention blocks and aligning them with the LoRA adapter variances (introduced in Step 3); if the alignment error exceeds 5%, fine-tune the LoRA adapters with a smaller learning rate (1e-5) until convergence.</p>
+<p><strong>Expected outcome:</strong> A checkpoint plus calibration report where entropy is significantly positively correlated with misclassification (Spearman <span class="arithmatex">\( \rho \geq 0.4 \)</span>), ECE <span class="arithmatex">\( \leq 0.05 \)</span>, and predictive latency stays under 6 ms per image on an A10.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Replace HAM10000 with your organization’s domain-specific data, run the same pipeline on A10, and expose entropy via a REST endpoint with a latency SLA of &lt;10 ms and a monitor that triggers when ECE drifts by &gt;2 percentage points.
+- <strong>Research engineer:</strong> Reproduce Table 2 from ScalaBL (2025) by training the same LoRA subspace on a 1.3B transformer, verifying that the entropy variance retained is within ±5% of the dense baseline using the provided reproducibility checklist.
+- <strong>Applied researcher:</strong> Test the hypothesis that MC Dropout entropy on out-of-distribution data (e.g., CIFAR-10 vs. SVHN) increases more rapidly when the KL weight warmup spans 100 epochs versus 10 epochs; falsify it by measuring the entropy-error slope on both warmup schedules.</p>
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
