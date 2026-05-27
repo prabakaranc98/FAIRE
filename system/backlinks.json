@@ -82,7 +82,8 @@
       "07-attention-memory-reasoning/single-head-attention"
     ],
     "05-statistical-probabilistic-ml/bayesian-inference": [
-      "variational-inference"
+      "variational-inference",
+      "gaussian-processes"
     ],
     "05-statistical-probabilistic-ml/bayesian-nn": [
       "07-attention-memory-reasoning/single-head-attention"
@@ -284,7 +285,7 @@
     ],
     "08-causal-statistical-inference/do-calculus": [
       "structural-causal-models",
-      "causal-representation-learning"
+      "causal-discovery"
     ],
     "15-ml-theory-foundations/double-descent": [
       "15-ml-theory-foundations/bias-variance",
@@ -590,7 +591,8 @@
       "gaussian-processes"
     ],
     "05-statistical-probabilistic-ml/variational-inference": [
-      "variational-autoencoders"
+      "score-matching",
+      "bayesian-neural-networks"
     ],
     "06-reinforcement-learning/world-models": [
       "variational-autoencoders"
@@ -610,17 +612,21 @@
       "regularization"
     ],
     "05-statistical-probabilistic-ml/bayesian-neural-networks": [
-      "variational-inference"
+      "variational-inference",
+      "score-matching"
     ],
     "04-neural-networks-deep-learning/backpropagation": [
       "score-matching",
       "flow-matching"
     ],
     "09-algorithms-systems-for-ai/data-parallelism": [
-      "score-matching"
+      "model-parallelism",
+      "pipeline-parallelism"
     ],
     "09-algorithms-systems-for-ai/pipeline-parallelism": [
-      "data-parallelism"
+      "data-parallelism",
+      "flash-attention",
+      "flow-matching"
     ],
     "08-causal-statistical-inference/policy-evaluation": [
       "structural-causal-models"
@@ -640,6 +646,109 @@
     ],
     "09-algorithms-systems-for-ai/tensor-parallelism": [
       "distributed-training"
+    ],
+    "09-algorithms-systems-for-ai/attention-mechanisms": [
+      "score-matching",
+      "flash-attention"
+    ],
+    "03-representation-learning/data-augmentation": [
+      "score-matching"
+    ],
+    "09-algorithms-systems-for-ai/llm-architecture-optimizations": [
+      "flash-attention"
+    ],
+    "04-neural-networks-deep-learning/gradient-descent": [
+      "distributed-training"
+    ],
+    "09-algorithms-systems-for-ai/distributed-training-arc": [
+      "data-parallelism",
+      "model-parallelism"
+    ],
+    "09-algorithms-systems-for-ai/post-training-quantization": [
+      "score-matching",
+      "flash-attention"
+    ],
+    "08-causal-statistical-inference/potential-outcomes": [
+      "structural-causal-models"
+    ],
+    "04-neural-networks-deep-learning/transformer-architecture": [
+      "flash-attention"
+    ],
+    "04-neural-networks-deep-learning/normalization": [
+      "score-matching",
+      "flash-attention"
+    ],
+    "09-algorithms-systems-for-ai/precision-scaling": [
+      "scaling-laws",
+      "mixed-precision-training"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-optimization": [
+      "gaussian-processes"
+    ],
+    "04-neural-networks-deep-learning/adaptive-optimizers": [
+      "score-matching",
+      "distributed-training"
+    ],
+    "09-algorithms-systems-for-ai/kv-cache-management": [
+      "attention-mechanisms"
+    ],
+    "05-statistical-probabilistic-ml/probabilistic-programming": [
+      "variational-inference",
+      "bayesian-inference"
+    ],
+    "04-neural-networks-deep-learning/residual-networks": [
+      "batch-normalization",
+      "mixture-of-experts"
+    ],
+    "09-algorithms-systems-for-ai/convex-optimization": [
+      "score-matching",
+      "flash-attention",
+      "flow-matching"
+    ],
+    "09-algorithms-systems-for-ai/constrained-learning": [
+      "score-matching",
+      "flash-attention",
+      "flow-matching"
+    ],
+    "09-algorithms-systems-for-ai/automatic-differentiation": [
+      "score-matching",
+      "flash-attention",
+      "flow-matching"
+    ],
+    "09-algorithms-systems-for-ai/collective-communication": [
+      "flash-attention",
+      "distributed-training"
+    ],
+    "09-algorithms-systems-for-ai/curriculum-learning": [
+      "score-matching",
+      "flash-attention",
+      "flow-matching"
+    ],
+    "09-algorithms-systems-for-ai/policy-gradient-theory": [
+      "score-matching",
+      "flash-attention",
+      "flow-matching"
+    ],
+    "09-algorithms-systems-for-ai/long-context-models": [
+      "flash-attention",
+      "score-matching"
+    ],
+    "09-algorithms-systems-for-ai/reinforcement-learning": [
+      "reward-modeling"
+    ],
+    "09-algorithms-systems-for-ai/rlhf-infrastructure-overview": [
+      "reward-modeling"
+    ],
+    "09-algorithms-systems-for-ai/curriculum-resampling": [
+      "score-matching"
+    ],
+    "09-algorithms-systems-for-ai/gradient-bucketing": [
+      "backpropagation"
+    ],
+    "04-neural-networks-deep-learning/transformers": [
+      "score-matching",
+      "flash-attention",
+      "mixture-of-experts"
     ]
   },
   "reverse": {
@@ -1103,7 +1212,8 @@
       "02-generative-modeling/diffusion-models",
       "02-generative-modeling/latent-diffusion-models",
       "06-reinforcement-learning/world-models",
-      "05-statistical-probabilistic-ml/variational-inference"
+      "05-statistical-probabilistic-ml/variational-inference",
+      "05-statistical-probabilistic-ml/bayesian-inference"
     ],
     "transformer": [
       "02-generative-modeling/diffusion-models"
@@ -1133,7 +1243,26 @@
       "09-algorithms-systems-for-ai/data-parallelism",
       "06-reinforcement-learning/model-based-reinforcement-learning",
       "06-reinforcement-learning/policy-gradients",
-      "03-representation-learning/representation-learning"
+      "03-representation-learning/representation-learning",
+      "05-statistical-probabilistic-ml/bayesian-neural-networks",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "09-algorithms-systems-for-ai/attention-mechanisms",
+      "03-representation-learning/data-augmentation",
+      "09-algorithms-systems-for-ai/post-training-quantization",
+      "04-neural-networks-deep-learning/transformer-architecture",
+      "04-neural-networks-deep-learning/normalization",
+      "04-neural-networks-deep-learning/adaptive-optimizers",
+      "09-algorithms-systems-for-ai/convex-optimization",
+      "09-algorithms-systems-for-ai/constrained-learning",
+      "09-algorithms-systems-for-ai/automatic-differentiation",
+      "05-statistical-probabilistic-ml/probabilistic-programming",
+      "09-algorithms-systems-for-ai/curriculum-learning",
+      "09-algorithms-systems-for-ai/policy-gradient-theory",
+      "09-algorithms-systems-for-ai/long-context-models",
+      "09-algorithms-systems-for-ai/reinforcement-learning",
+      "09-algorithms-systems-for-ai/rlhf-infrastructure-overview",
+      "09-algorithms-systems-for-ai/curriculum-resampling",
+      "04-neural-networks-deep-learning/transformers"
     ],
     "flow-matching": [
       "07-attention-memory-reasoning-continual/attention",
@@ -1142,7 +1271,18 @@
       "05-statistical-probabilistic-ml/variational-inference",
       "03-representation-learning/self-supervised-learning",
       "05-statistical-probabilistic-ml/bayesian-neural-networks",
-      "04-neural-networks-deep-learning/backpropagation"
+      "04-neural-networks-deep-learning/backpropagation",
+      "09-algorithms-systems-for-ai/pipeline-parallelism",
+      "09-algorithms-systems-for-ai/attention-mechanisms",
+      "04-neural-networks-deep-learning/transformer-architecture",
+      "09-algorithms-systems-for-ai/convex-optimization",
+      "09-algorithms-systems-for-ai/constrained-learning",
+      "09-algorithms-systems-for-ai/automatic-differentiation",
+      "09-algorithms-systems-for-ai/curriculum-learning",
+      "09-algorithms-systems-for-ai/policy-gradient-theory",
+      "09-algorithms-systems-for-ai/reinforcement-learning",
+      "09-algorithms-systems-for-ai/rlhf-infrastructure-overview",
+      "09-algorithms-systems-for-ai/curriculum-resampling"
     ],
     "structural-causal-models": [
       "08-causal-statistical-inference/causal-discovery",
@@ -1150,20 +1290,23 @@
       "08-causal-statistical-inference/causal-representation-learning",
       "08-causal-statistical-inference/do-calculus",
       "08-causal-statistical-inference/counterfactuals",
-      "08-causal-statistical-inference/policy-evaluation"
+      "08-causal-statistical-inference/policy-evaluation",
+      "08-causal-statistical-inference/potential-outcomes"
     ],
     "do-calculus": [
       "08-causal-statistical-inference/counterfactuals"
     ],
     "attention": [
       "09-algorithms-systems-for-ai/kv-cache",
-      "07-attention-memory-reasoning-continual/long-context"
+      "07-attention-memory-reasoning-continual/long-context",
+      "09-algorithms-systems-for-ai/llm-architecture-optimizations"
     ],
     "kv-cache": [
       "07-attention-memory-reasoning-continual/long-context"
     ],
     "counterfactuals": [
-      "08-causal-statistical-inference/mediation-analysis"
+      "08-causal-statistical-inference/mediation-analysis",
+      "08-causal-statistical-inference/do-calculus"
     ],
     "actor-critic": [
       "06-reinforcement-learning/policy-gradient",
@@ -1177,15 +1320,20 @@
       "01-ai/rlhf"
     ],
     "gaussian-processes": [
-      "05-statistical-probabilistic-ml/uncertainty-quantification"
+      "05-statistical-probabilistic-ml/uncertainty-quantification",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-optimization"
     ],
     "variational-inference": [
       "05-statistical-probabilistic-ml/expectation-maximization",
       "05-statistical-probabilistic-ml/bayesian-inference",
-      "05-statistical-probabilistic-ml/bayesian-neural-networks"
+      "05-statistical-probabilistic-ml/bayesian-neural-networks",
+      "05-statistical-probabilistic-ml/probabilistic-programming"
     ],
     "mixture-of-experts": [
-      "05-statistical-probabilistic-ml/expectation-maximization"
+      "05-statistical-probabilistic-ml/expectation-maximization",
+      "04-neural-networks-deep-learning/residual-networks",
+      "04-neural-networks-deep-learning/transformers"
     ],
     "causal-representation-learning": [
       "08-causal-statistical-inference/do-calculus"
@@ -1205,19 +1353,91 @@
       "03-representation-learning/representation-learning"
     ],
     "data-parallelism": [
-      "09-algorithms-systems-for-ai/pipeline-parallelism"
+      "09-algorithms-systems-for-ai/pipeline-parallelism",
+      "09-algorithms-systems-for-ai/distributed-training-arc"
     ],
     "rlhf": [
-      "06-reinforcement-learning/policy-gradients"
+      "06-reinforcement-learning/policy-gradients",
+      "09-algorithms-systems-for-ai/attention-mechanisms"
     ],
     "contrastive-learning": [
       "03-representation-learning/representation-learning"
     ],
     "pipeline-parallelism": [
-      "09-algorithms-systems-for-ai/tensor-parallelism"
+      "09-algorithms-systems-for-ai/tensor-parallelism",
+      "09-algorithms-systems-for-ai/data-parallelism"
     ],
     "distributed-training": [
-      "09-algorithms-systems-for-ai/tensor-parallelism"
+      "09-algorithms-systems-for-ai/tensor-parallelism",
+      "04-neural-networks-deep-learning/gradient-descent",
+      "04-neural-networks-deep-learning/adaptive-optimizers",
+      "09-algorithms-systems-for-ai/collective-communication"
+    ],
+    "bayesian-neural-networks": [
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "model-parallelism": [
+      "09-algorithms-systems-for-ai/data-parallelism",
+      "09-algorithms-systems-for-ai/pipeline-parallelism",
+      "09-algorithms-systems-for-ai/distributed-training-arc"
+    ],
+    "causal-discovery": [
+      "08-causal-statistical-inference/do-calculus"
+    ],
+    "tensor-parallelism": [
+      "09-algorithms-systems-for-ai/pipeline-parallelism"
+    ],
+    "flash-attention": [
+      "09-algorithms-systems-for-ai/pipeline-parallelism",
+      "09-algorithms-systems-for-ai/attention-mechanisms",
+      "09-algorithms-systems-for-ai/post-training-quantization",
+      "04-neural-networks-deep-learning/transformer-architecture",
+      "04-neural-networks-deep-learning/normalization",
+      "09-algorithms-systems-for-ai/llm-architecture-optimizations",
+      "09-algorithms-systems-for-ai/convex-optimization",
+      "09-algorithms-systems-for-ai/constrained-learning",
+      "09-algorithms-systems-for-ai/automatic-differentiation",
+      "09-algorithms-systems-for-ai/collective-communication",
+      "09-algorithms-systems-for-ai/curriculum-learning",
+      "09-algorithms-systems-for-ai/policy-gradient-theory",
+      "09-algorithms-systems-for-ai/long-context-models",
+      "09-algorithms-systems-for-ai/reinforcement-learning",
+      "09-algorithms-systems-for-ai/rlhf-infrastructure-overview",
+      "04-neural-networks-deep-learning/transformers"
+    ],
+    "bayesian-inference": [
+      "05-statistical-probabilistic-ml/variational-inference",
+      "05-statistical-probabilistic-ml/probabilistic-programming"
+    ],
+    "retrieval-augmented-generation": [
+      "09-algorithms-systems-for-ai/attention-mechanisms"
+    ],
+    "attention-mechanisms": [
+      "09-algorithms-systems-for-ai/llm-architecture-optimizations",
+      "09-algorithms-systems-for-ai/kv-cache-management"
+    ],
+    "instrumental-variables": [
+      "08-causal-statistical-inference/potential-outcomes"
+    ],
+    "scaling-laws": [
+      "09-algorithms-systems-for-ai/precision-scaling"
+    ],
+    "mixed-precision-training": [
+      "09-algorithms-systems-for-ai/precision-scaling"
+    ],
+    "batch-normalization": [
+      "04-neural-networks-deep-learning/residual-networks"
+    ],
+    "backpropagation": [
+      "09-algorithms-systems-for-ai/gradient-bucketing"
+    ],
+    "reward-modeling": [
+      "09-algorithms-systems-for-ai/rlhf-infrastructure-overview",
+      "09-algorithms-systems-for-ai/reinforcement-learning"
+    ],
+    "policy-gradients": [
+      "09-algorithms-systems-for-ai/reinforcement-learning"
     ]
   }
 }

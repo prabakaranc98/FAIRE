@@ -6,35 +6,31 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Closed-loop control system — real-time wiki quality signals">
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/system/observer/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/arcs/world-models-and-imagination/step-04-world-models/">
       
       
-        <link rel="prev" href="../status/">
-      
-      
-        <link rel="next" href="../changelog/">
       
       
         
       
       
-      <link rel="icon" href="../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Observer Dashboard - Frontier Wiki</title>
+        <title>Latent World Models - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#observer-dashboard" class="md-skip">
+        <a href="#the-territory" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Observer Dashboard
+              Latent World Models
             
           </span>
         </div>
@@ -213,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -234,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../curriculum/" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -254,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,13 +266,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../about/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -312,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -342,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -421,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -449,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -477,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/01-ai/" class="md-nav__link">
+      <a href="../../../../01-ai/" class="md-nav__link">
         
   
   
@@ -505,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/02-generative-modeling/" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -533,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/03-representation-learning/" class="md-nav__link">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -561,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -589,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -617,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -645,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -673,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -701,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -729,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -816,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -844,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -876,31 +870,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -918,7 +907,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -936,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -964,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -992,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1020,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1055,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1083,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1111,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1139,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1167,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1192,37 +1181,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Observer Dashboard
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1238,81 +1200,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#control-state" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Control State
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coverage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#per-track-status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-Track Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quality-trend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quality Trend
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Budget
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1325,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1353,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1399,271 +1286,117 @@
   
 
 
-  <nav class="md-path" aria-label="Navigation" >
-    <ol class="md-path__list">
-      
-        
-  
-  
-    <li class="md-path__item">
-      <a href="../.." class="md-path__link">
-        
-  <span class="md-ellipsis">
-    Home
-  </span>
-
-      </a>
-    </li>
-  
-
-      
-      
-        
-  
-  
-    
-    
-      <li class="md-path__item">
-        <a href="../../about/" class="md-path__link">
-          
-  <span class="md-ellipsis">
-    System
-  </span>
-
-        </a>
-      </li>
-    
-  
-
-      
-    </ol>
-  </nav>
-
               
               <article class="md-content__inner md-typeset">
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">rlhf</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rssm</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">simulation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">world-models</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="observer-dashboard">Observer Dashboard<a class="headerlink" href="#observer-dashboard" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Last observed: <strong>2026-05-27 15:57 EDT</strong> · [Source: <code>agents/runs/metrics.json</code>]</p>
+<p><strong>Arc:</strong> <a href="../../arcs/world-models-and-imagination.md">World Models And Imagination</a> — Step 4 of 5</p>
 </blockquote>
-<h2 id="control-state">Control State<a class="headerlink" href="#control-state" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Signal</th>
-<th>Set Point</th>
-<th>Current</th>
-<th>Error</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Coverage</td>
-<td>80%</td>
-<td>96.6%</td>
-<td>0.0% deficit</td>
-<td>🟢</td>
-</tr>
-<tr>
-<td>Quality</td>
-<td>0.85</td>
-<td>0.76</td>
-<td>0.09 deficit</td>
-<td>🟡</td>
-</tr>
-<tr>
-<td>Stale pages</td>
-<td>0</td>
-<td>137</td>
-<td>137 pages</td>
-<td>🔴</td>
-</tr>
-<tr>
-<td>Flagged pages</td>
-<td>0</td>
-<td>9</td>
-<td>9 pages</td>
-<td>🔴</td>
-</tr>
-<tr>
-<td>Budget</td>
-<td>&gt;$1 remaining</td>
-<td>$0.26</td>
-<td>paused mode</td>
-<td>🔴</td>
-</tr>
-</tbody>
-</table>
-<h2 id="coverage">Coverage<a class="headerlink" href="#coverage" title="Permanent link">&para;</a></h2>
-<p><strong>144</strong> pages generated of <strong>149</strong> total (96.6%) · <strong>5</strong> stubs remaining · <strong>11</strong> / 10 tracks with content</p>
-<h2 id="per-track-status">Per-Track Status<a class="headerlink" href="#per-track-status" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Track</th>
-<th>Total</th>
-<th>Generated</th>
-<th>Approved</th>
-<th>Coverage</th>
-<th>Avg Conf</th>
-<th>MVB</th>
-<th>Stale</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>01-ai</td>
-<td>11</td>
-<td>11</td>
-<td>7</td>
-<td>🟢 100%</td>
-<td>🟡 0.78</td>
-<td>0</td>
-<td>11</td>
-</tr>
-<tr>
-<td>02-generative-modeling</td>
-<td>12</td>
-<td>12</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>12</td>
-</tr>
-<tr>
-<td>03-representation-learning</td>
-<td>12</td>
-<td>12</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>12</td>
-</tr>
-<tr>
-<td>04-neural-networks-deep-learning</td>
-<td>19</td>
-<td>18</td>
-<td>10</td>
-<td>🟢 95%</td>
-<td>🟡 0.75</td>
-<td>0</td>
-<td>16</td>
-</tr>
-<tr>
-<td>05-statistical-probabilistic-ml</td>
-<td>20</td>
-<td>20</td>
-<td>9</td>
-<td>🟢 100%</td>
-<td>🟡 0.77</td>
-<td>0</td>
-<td>19</td>
-</tr>
-<tr>
-<td>06-reinforcement-learning</td>
-<td>13</td>
-<td>13</td>
-<td>7</td>
-<td>🟢 100%</td>
-<td>🟡 0.75</td>
-<td>0</td>
-<td>13</td>
-</tr>
-<tr>
-<td>07-attention-memory-reasoning-continual</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.79</td>
-<td>0</td>
-<td>6</td>
-</tr>
-<tr>
-<td>08-causal-statistical-inference</td>
-<td>13</td>
-<td>13</td>
-<td>9</td>
-<td>🟢 100%</td>
-<td>🟡 0.78</td>
-<td>0</td>
-<td>13</td>
-</tr>
-<tr>
-<td>09-algorithms-systems-for-ai</td>
-<td>37</td>
-<td>33</td>
-<td>33</td>
-<td>🟢 89%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>31</td>
-</tr>
-<tr>
-<td>10-complexity-cognition-natural-intelligence</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>🟢 100%</td>
-<td>🟡 0.79</td>
-<td>0</td>
-<td>4</td>
-</tr>
-<tr>
-<td>curriculum</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>🟢 100%</td>
-<td>⚫ 0.00</td>
-<td>0</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-<h2 id="quality-trend">Quality Trend<a class="headerlink" href="#quality-trend" title="Permanent link">&para;</a></h2>
-<p>Last <strong>10</strong> runs · avg confidence <strong>0.75</strong> · first-pass approval <strong>0%</strong> · avg revisions <strong>1.5</strong> · trend <strong>↓ declining</strong> (-0.029)</p>
-<h2 id="budget">Budget<a class="headerlink" href="#budget" title="Permanent link">&para;</a></h2>
-<p>$97.7356 used of $98.00 limit · $0.26 remaining · <strong>paused mode</strong></p>
-<table>
-<thead>
-<tr>
-<th>Action</th>
-<th>Est. Cost</th>
-<th>Actions in Budget</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>generate</td>
-<td>$0.20</td>
-<td>~1 pages</td>
-</tr>
-<tr>
-<td>improve</td>
-<td>$0.15</td>
-<td>~1 pages</td>
-</tr>
-<tr>
-<td>mvb-only</td>
-<td>$0.07</td>
-<td>~3 pages</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<p><em>This dashboard is updated automatically after every agent run and at the start of each 48h cycle.</em>
-<em>Source: <code>agents/runs/metrics.json</code> · Pipeline: <code>observer.observe()</code> → <code>write_observer_page()</code></em></p>
+<p>Imagine your self-driving car has to decide whether to cut through a half-parked truck blocking a blinking crosswalk. Running the real-world experiment would be expensive and unsafe, so instead the vehicle performs a thought experiment in its latent world model: it rolls the action forward one hundred times in imagination, sees that at step 43 a cyclist clips the bumper, and settles on the safer manoeuvre before anything moves. That internal simulator—compressing sensor histories into compact latent states, predicting outcomes, and surfacing catastrophes before they happen—is the capability this page exists to explain. By the end you will understand why world models are the causal, counterfactual engines behind the latest RLHF agents, how to train a tiny RSSM yourself, how researchers are extending those models to general preferences, and what you can actually build with HuggingFace world-model checkpoints today.</p>
+<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
+<p>World models sit between raw reinforcement learning and policy deployment. Model-free agents act only on collected rewards, so they have to endure every crash or unsafe manoeuvre. Model-based agents learn a predictive model of the environment, roll hypothetical futures, and plan against them, reducing the number of real-world interactions needed. Latent world models take this one step further: instead of predicting pixels, they compress observations into a lower-dimensional latent <span class="arithmatex">\(z\)</span>, roll <span class="arithmatex">\(z\)</span> forward, and only reconstruct states when necessary. The consequence is a usable simulator that imagines thousands of trajectories per second without ever touching the safety-critical environment.</p>
+<p>This latent simulation is also what makes RL with human feedback tractable. Batch logs of preferences rarely cover every safety-critical contingency, so agents fill the gaps by imagining possible futures that agree with human-provided reward models. The newest RLHF pipelines—both the online iterative loop that updates reward models from general preference data (Anonymous et al. 2024) [https://arxiv.org/html/2402.07314] and the helpful-and-harmless assistant training in (Ouyang et al. 2022) [https://arxiv.org/pdf/2204.05862]—have adopted latent world models to interpret feedback and to test whether responses will violate norms before they reach a user. That same imagination is what keeps a car from exploring dangerous paths, a robot from knocking over a vase, or a chat assistant from hallucinating a policy.</p>
+<p>Training latent world models, especially in the context of larger foundation models, is still evolving—the preprint at arXiv:2405.07863 expands the world-model canvas to multi-agent interactions, while the successor at arXiv:2505.18531 integrates more modalities into the latent rollouts (Anonymous et al. 2025) [https://arxiv.org/pdf/2505.18531]. These pieces show that we are not merely predicting frames but building causal simulators that can talk to other models, check their work against preferences, and keep safety constraints in the loop.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The recipe you will execute is a simplified Recurrent State-Space Model (RSSM): a deterministic recurrent core <span class="arithmatex">\(h_t\)</span> paired with a stochastic latent <span class="arithmatex">\(z_t\)</span>, plus decoders that predict observations and rewards. The deterministic update is</p>
+<div class="arithmatex">\[
+h_t = \text{GRU}(h_{t-1}, [z_{t-1}; a_{t-1}]),
+\]</div>
+<p>where <span class="arithmatex">\(h_t \in \mathbb{R}^{128}\)</span> is the hidden state at time <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(z_{t-1} \in \mathbb{R}^{32}\)</span> is the previous latent, <span class="arithmatex">\(a_{t-1}\)</span> is the previous action, and <span class="arithmatex">\([z_{t-1}; a_{t-1}]\)</span> denotes concatenation. This GRU channels all of the past into <span class="arithmatex">\(h_t\)</span> so that the world model has memory. The stochastic latent is then sampled as</p>
+<div class="arithmatex">\[
+z_t \sim \mathcal{N}\left(\mu_\phi(h_t), \sigma^2_\phi(h_t)\right),
+\]</div>
+<p>where <span class="arithmatex">\(\mu_\phi\)</span> and <span class="arithmatex">\(\sigma_\phi\)</span> are separate MLPs; the softplus amplifier ensures <span class="arithmatex">\(\sigma_\phi(h_t) &gt; 0\)</span>. Sampling allows imagined futures to branch rather than deterministically reusing the same belief state, which is crucial when the agent does not know the exact transition at test time.</p>
+<p>From the latent we predict rewards and optionally the next observation:</p>
+<div class="arithmatex">\[
+\hat{r}_t = \psi_\theta(z_t, a_t)
+\]</div>
+<p>and</p>
+<div class="arithmatex">\[
+\hat{o}_t = \omega_\theta(z_t),
+\]</div>
+<p>where <span class="arithmatex">\(\psi_\theta\)</span> outputs the next reward and <span class="arithmatex">\(\omega_\theta\)</span> reconstructs sensory observations (we omit the reconstruction when only latent rollouts are needed, keeping the structure lightweight). Training minimizes the mean squared error between <span class="arithmatex">\(\hat{r}_t\)</span> and the logged reward <span class="arithmatex">\(r_t\)</span>, plus the KL divergence between the posterior <span class="arithmatex">\(q_\phi(z_t|h_t, o_t)\)</span> and the prior <span class="arithmatex">\(p_\phi(z_t|h_t)\)</span> to keep <span class="arithmatex">\(z_t\)</span> grounded:</p>
+<div class="arithmatex">\[
+\mathcal{L} = \mathbb{E}_{q_\phi(z_t|h_t, o_t)}\left[\|\hat{r}_t - r_t\|^2 + \|\hat{o}_t - o_t\|^2\right] + \beta \, \mathrm{KL}\left(q_\phi(z_t|h_t, o_t) \,\|\, p_\phi(z_t|h_t)\right),
+\]</div>
+<p>where <span class="arithmatex">\(\beta\)</span> balances fidelity against latent compression. In practice, we replace <span class="arithmatex">\(\hat{o}_t\)</span> with a smaller auxiliary loss or omit it altogether when fast rollouts are the priority.</p>
+<p>Imagined rollouts start by sampling <span class="arithmatex">\(z_t\)</span> from the posterior for a real transition, then unroll for <span class="arithmatex">\(K=5\)</span> steps by sampling actions from a log buffer or a learned policy, feeding them into the deterministic core, and sampling latents at each step. Rewards <span class="arithmatex">\(\hat{r}_{t+1:t+K}\)</span> form the imagined return. Accuracy of those imagined rewards—measured as step-wise MSE against held-out transitions—determines whether the latent dynamics preserve the environment’s causal structure. Poor accuracy indicates either a mis-specified prior (KL term too strong) or too much uncertainty (latent variance too high), so you adjust <span class="arithmatex">\(\beta\)</span> or tighten <span class="arithmatex">\(\sigma_\phi\)</span>’s output.</p>
+<p>Training an RSSM can fail in recognisable ways: collapse after two imagined steps means the latent variance explodes; observe that by logging the per-step KL term during training and clipping gradients above 5. If rewards blow up, verify that the reward predictor <span class="arithmatex">\(\psi_\theta\)</span> has enough capacity and that your dataset contains catastrophic transitions; injecting more diverse actions before training helps the model see the failure modes it is supposed to detect. When the imagined rollouts consistently under-estimate penalties, add a small auxiliary loss where the world model tries to predict whether a rollout contains any zero-reward or negative-reward steps—this pressure keeps the latent aware of the worst-case branches.</p>
+<p>Finally, make the model utile by coupling it with pretrained world models from HuggingFace. LLM-based world models (e.g., mradermacher/WorldModel-Stabletoolbench-Llama3.1-8B-i1-GGUF and mradermacher/WorldModel-Stabletoolbench-Qwen2.5-7B-i1-GGUF) can be queried to translate latent rollouts into natural-language descriptions that a reward model can score; you will do this in the build so that the latent model can inherit the richer priors encoded in language model weights without fine-tuning the entire 8B/7B stack.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>On the research frontier, RSSM-based methods continue to be the dominant architecture for latent world models. DreamerV3 (Hafner et al. 2020) [https://arxiv.org/abs/1912.01603] demonstrated that planning in latent space with an actor-critic on top can match or beat traditional planning algorithms on benchmarks such as DeepMind Control and Atari. FOUNDER (Wang et al. 2025) [https://arxiv.org/abs/2507.12496v1] now shows how to map foundation-model representations directly into the RSSM latent space, letting an open-ended policy imagine goal-conditioned rollouts without explicit rewards. Parallel preprints extend this direction: the May 2024 anonymous preprint (Anonymous et al. 2024) [https://arxiv.org/pdf/2405.07863] equips latent models with multi-agent belief tracking, and the May 2025 follow-up (Anonymous et al. 2025) [https://arxiv.org/pdf/2505.18531] blends continuous sensory channels and preferences into the same rollout. These advances bring world models closer to handling real-world complexity and to being plugged into RLHF loops where policy updates respect human directives.</p>
+<p>On the engineering frontier, production RLHF systems already rely on world-model-style rollouts. OpenAI’s original “helpful and harmless” assistant pipeline (Ouyang et al. 2022) [https://arxiv.org/pdf/2204.05862] uses Rollout Buffer, PPO, and a reward model whose outputs can be interpreted as an implicit world model: before a policy update, sampled trajectories are checked against preference-labeled data, effectively rejecting actions that would have violated the latent model’s predictions. The newer Online Iterative Reinforcement Learning From Human Feedback with General Preferences paper (Anonymous et al. 2024) [https://arxiv.org/html/2402.07314] codifies this practice into an explicit pipeline where preference datasets are continuously augmented by imagined failures, and reward models refine the world model’s belief about which actions the human judges as safe. That loop is now being shipped by teams that fine-tune world models on proprietary simulators while the same simulators feed RLHF preferences into the policy update.</p>
+<p>While RL systems deploy these world models to guard against catastrophes, they still need better tooling to measure rollout accuracy in production. One engineering challenge is to maintain the latent’s calibration when the policy distribution shifts; systems in production address this with monitoring dashboards that plot imagined reward MSE versus rollout length, giving engineers early warning of divergence. Another is serving world-model-guided agents with low latency; current deployments pair the latent RSSM (for fast rollouts) with decision caches built by lightweight LLMs from HuggingFace’s StableToolBench family, providing a steady stream of candidate actions at sub-100ms latency.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Three specific frontiers await papers. First, how can we systematically align world-model rollouts with the general-preference distributions that Online Iterative RLHF targets, especially when the human cost model changes between deployments? A formal study could treat the preference data as a constraint in the RSSM loss and prove guarantees about the resulting policy’s regret.</p>
+<p>Second, we still lack principled metrics for when a world model should defer to a learned policy instead of continuing to imagine. Current practice uses ad-hoc thresholds on rollout reward variance, but a theoretical question remains: can we define a statistical test that alerts the agent when the latent prior has drifted far enough from the true dynamics that imagined catastrophes are no longer reliable?</p>
+<p>Third, the integration with large pretrained world models (the HuggingFace StableToolBench checkpoints you will query in the build) raises questions about latent knowledge distillation: does querying an 8B world model for textual descriptions bias the RSSM’s latent space, and how does that bias interact with online human feedback? Designing experiments that systematically ablate the language-model conditioning will clarify the trustworthiness of such hybrid pipelines.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>For the mathematical underpinnings of latent dynamics and the original RSSM loss, the engineering companion is → [[model-based-reinforcement-learning]]; if you want to understand how these imaginations plug into policy updates, the practical perspective comes from → [[planning-under-uncertainty]]; the representation learning required to build robust latents is surveyed in → [[representation-learning-for-rl]] and the safety desiderata that these simulators are expected to satisfy live in → [[safety-aware-reinforcement-learning]].</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A minimalist latent world-model pipeline that trains a PyTorch RSSM on CartPole transitions, uses imagined rollouts to flag catastrophic actions, and cross-checks those rollouts with two HuggingFace world-model checkpoints so that you can compare numeric predictions with language-model summaries.</p>
+<p><strong>Why this is valuable:</strong> Instead of reading about how imagined failure might reduce risk, you now obtain a real dataset, a trained RSSM, quantitative rollout metrics, and human-interpretable summaries from pretrained world models, so that you can demonstrate the practical impact of the latent simulator before the next step in the arc.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>mradermacher/WorldModel-Stabletoolbench-Llama3.1-8B-i1-GGUF</code> (use for generating textual summaries of imagined states)
+- <strong>Model:</strong> <code>mradermacher/WorldModel-Stabletoolbench-Qwen2.5-7B-i1-GGUF</code> (use as a consensus reader to detect hallucinated catastrophes)
+- <strong>Dataset:</strong> Gymnasium <code>CartPole-v1</code> transitions collected by a random policy and stored as a HuggingFace <code>Datasets</code> arrow table
+- <strong>Framework:</strong> PyTorch 2.2 + Gymnasium 1.3.0 + HuggingFace Transformers (for the world-model query) + Datasets
+- <strong>Compute:</strong> One free Colab T4 (15 GB VRAM) or an RTX 4070 (12 GB) – the RSSM trains in ~1 hour, and the HuggingFace inference runs comfortably on 8 GB.</p>
+<p><strong>Estimated time:</strong> ~2.5 hours (30 min data collection, 60 min training, 30 min evaluation, 30 min summarizing rollouts via the world-model checkpoints).</p>
+<p><strong>Success criterion:</strong> Five-step imagined reward MSE ≤ 0.05 and per-dimension state MSE ≤ 0.02 on held-out transitions, plus concordant textual summaries from both world-model checkpoints that flag the same catastrophic timesteps you identified numerically.</p>
+<p><strong>The recipe:</strong>
+1. Collect 5,000 episodes of CartPole-v1 by running a random policy in <code>gymnasium.make("CartPole-v1")</code>, logging each tuple <span class="arithmatex">\((s_t, a_t, r_t, s_{t+1})\)</span>. Each episode is roughly 5 steps, so this yields ≥25,000 transitions—assert <code>len(dataset) &gt;= 25000</code> after stacking all episodes into a single <code>datasets.Dataset</code>.
+2. Implement the RSSM: a GRU core that processes <span class="arithmatex">\([z_{t-1}, a_{t-1}]\)</span>, two small MLPs for <span class="arithmatex">\(\mu_\phi\)</span> and <span class="arithmatex">\(\sigma_\phi\)</span>, and a reward predictor <span class="arithmatex">\(\psi_\theta\)</span>. Initialize <span class="arithmatex">\(\sigma_\phi\)</span> to output logits stabilized by softplus, and log the parameter count to ensure it stays under 2 million parameters.
+3. Train with batches of 128 sequences for 50 epochs. Each batch should compute: (a) the KL divergence between posterior <span class="arithmatex">\(q_\phi(z_t|h_t, o_t)\)</span> and prior <span class="arithmatex">\(p_\phi(z_t|h_t)\)</span>; (b) the reward MSE; and (c) the optional observation MSE. Print <code>epoch {epoch}: loss {loss:.4f}</code> and assert every batch loss tensor is finite. Include gradient clipping at 5.
+4. Evaluate by sampling a posterior latent from a held-out transition, rolling forward five actions drawn from the dataset, and computing the imagined rewards and states. Check that <code>rollout_reward_mse &lt;= 0.05</code> and <code>state_mse_per_dim &lt;= 0.02</code>.
+5. Query <code>mradermacher/WorldModel-Stabletoolbench-Llama3.1-8B-i1-GGUF</code> and <code>mradermacher/WorldModel-Stabletoolbench-Qwen2.5-7B-i1-GGUF</code> with the same initial observation and the imagined action sequence to produce two textual summaries. If both summaries mention “unstable balance” or “falling,” your numerical rollouts agree with the pretrained world models.</p>
+<p><strong>Expected outcome:</strong> A trained RSSM, a metrics report logging rollout losses, TensorBoard traces showing overlapping imagined and real trajectories, and two natural-language summaries from the HuggingFace world-model checkpoints that mention the same catastrophic timesteps.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI engineer (forward-deployed):</strong> Serve the RSSM via a Flask endpoint that, given a live CartPole observation, runs five-step rollouts and emits a danger score; benchmark response latency at p95 &lt; 120 ms on an RTX 4070 and log dangerous actions to a production metrics dashboard.
+- <strong>Research engineer:</strong> Reproduce Table 2 from Hafner et al. (2020) DreamerV3 by training the RSSM on the DeepMind Control Suite mini-walker dataset, hitting reward returns within ±5% of their numbers while still consuming ≤4 GB VRAM per GPU.
+- <strong>Applied researcher:</strong> Hypothesis: conditioning the RSSM on textual summaries from the StableToolBench checkpoints reduces rollout reward MSE by ≥0.01. Falsify by ablating the language input and plotting the imagined reward MSE before and after conditioning.</p>
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
@@ -1748,12 +1481,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

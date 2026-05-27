@@ -6,35 +6,31 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Closed-loop control system — real-time wiki quality signals">
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/system/observer/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/arcs/world-models-and-imagination/">
       
       
-        <link rel="prev" href="../status/">
-      
-      
-        <link rel="next" href="../changelog/">
       
       
         
       
       
-      <link rel="icon" href="../../img/favicon.svg">
+      <link rel="icon" href="../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Observer Dashboard - Frontier Wiki</title>
+        <title>Arc: World Models And Imagination - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#observer-dashboard" class="md-skip">
+        <a href="#arc-world-models-and-imagination" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Observer Dashboard
+              Arc: World Models And Imagination
             
           </span>
         </div>
@@ -213,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../../../.." class="md-tabs__link">
         
   
   
@@ -234,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../curriculum/" class="md-tabs__link">
+        <a href="../../../../" class="md-tabs__link">
           
   
   
@@ -254,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,13 +266,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../about/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../../../about/" class="md-tabs__link">
           
   
   
@@ -312,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -342,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../../../.." class="md-nav__link">
         
   
   
@@ -421,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/" class="md-nav__link">
+      <a href="../../../../" class="md-nav__link">
         
   
   
@@ -449,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/arcs/" class="md-nav__link">
+      <a href="../../../../arcs/" class="md-nav__link">
         
   
   
@@ -477,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/01-ai/" class="md-nav__link">
+      <a href="../../../01-ai/" class="md-nav__link">
         
   
   
@@ -505,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/02-generative-modeling/" class="md-nav__link">
+      <a href="../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -533,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/03-representation-learning/" class="md-nav__link">
+      <a href="../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -561,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -589,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -617,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   
@@ -645,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -673,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -701,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -729,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -816,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -844,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -876,31 +870,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -918,7 +907,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -936,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/" class="md-nav__link">
+      <a href="../../../../../about/" class="md-nav__link">
         
   
   
@@ -964,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sense/" class="md-nav__link">
+      <a href="../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -992,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1020,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../structure-v2/" class="md-nav__link">
+      <a href="../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1055,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../local-mode/" class="md-nav__link">
+      <a href="../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1083,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learnings-log/" class="md-nav__link">
+      <a href="../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1111,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../backlog/" class="md-nav__link">
+      <a href="../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1139,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1167,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1192,37 +1181,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Observer Dashboard
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1238,81 +1200,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#control-state" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Control State
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coverage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#per-track-status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-Track Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quality-trend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quality Trend
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Budget
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1325,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
+      <a href="../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1353,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../supervisor/" class="md-nav__link">
+      <a href="../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1399,46 +1286,6 @@
   
 
 
-  <nav class="md-path" aria-label="Navigation" >
-    <ol class="md-path__list">
-      
-        
-  
-  
-    <li class="md-path__item">
-      <a href="../.." class="md-path__link">
-        
-  <span class="md-ellipsis">
-    Home
-  </span>
-
-      </a>
-    </li>
-  
-
-      
-      
-        
-  
-  
-    
-    
-      <li class="md-path__item">
-        <a href="../../about/" class="md-path__link">
-          
-  <span class="md-ellipsis">
-    System
-  </span>
-
-        </a>
-      </li>
-    
-  
-
-      
-    </ol>
-  </nav>
-
               
               <article class="md-content__inner md-typeset">
                 
@@ -1449,221 +1296,104 @@
   
 
 
-<h1 id="observer-dashboard">Observer Dashboard<a class="headerlink" href="#observer-dashboard" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Last observed: <strong>2026-05-27 15:57 EDT</strong> · [Source: <code>agents/runs/metrics.json</code>]</p>
+<p><strong>Arc:</strong> <a href="../../arcs/world-models-and-imagination.md">World Models And Imagination</a> — Step 0 of 5</p>
 </blockquote>
-<h2 id="control-state">Control State<a class="headerlink" href="#control-state" title="Permanent link">&para;</a></h2>
+<h1 id="arc-world-models-and-imagination">Arc: World Models And Imagination<a class="headerlink" href="#arc-world-models-and-imagination" title="Permanent link">&para;</a></h1>
+<p>Imagine a professional driver pacing the pit lane before a race, eyes closed, rehearsing every drift, braking zone, and gear change without touching the wheel. The driver's brain is simulating the physics of the car and the track, which lets them anticipate the consequences of a risky overtake before it even happens. Reinforcement learning (RL) agents without this internal simulator must rely on trial-and-error in the real environment, which is why “sample efficiency” remains the obsession of every robotics team and product leader. This arc teaches how latent world models give RL policies that same internal rehearsal: they compress observations into a firm representation, simulate future states inside that latent space, and use those imagined rollouts to steer policy gradients instead of waiting for expensive ground-truth signals.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>This arc sits inside model-based reinforcement learning, at the point where perception, latent dynamics, and policy optimization meet. The core question answered here is: how can an agent learn a compact internal model of its environment (a “world model”) and then use that model to practice novel behaviors purely in imagination before touching the real simulator? The answer is a pipeline of five compounding builds—encoders, transition/reward predictors, policy/value rollouts, horizon planners, and Dreamer-style integration—where each build feeds its artifact into the next. The table below summarizes the flow so you can see how errors cascade and why maintaining fidelity is a path-dependent challenge.</p>
 <table>
 <thead>
 <tr>
-<th>Signal</th>
-<th>Set Point</th>
-<th>Current</th>
-<th>Error</th>
-<th>Status</th>
+<th>Step</th>
+<th>Artifact</th>
+<th>Why it matters for the downstream build</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Coverage</td>
-<td>80%</td>
-<td>96.6%</td>
-<td>0.0% deficit</td>
-<td>🟢</td>
+<td>1</td>
+<td>Encoder/decoder that turns pixels into a latent replay buffer</td>
+<td>Supplies stable latents for next-step transition learning without leaking observation noise</td>
 </tr>
 <tr>
-<td>Quality</td>
-<td>0.85</td>
-<td>0.76</td>
-<td>0.09 deficit</td>
-<td>🟡</td>
+<td>2</td>
+<td>Transition and reward networks trained on those latents</td>
+<td>Enables imagined futures that match real dynamics before any policy uses them</td>
 </tr>
 <tr>
-<td>Stale pages</td>
-<td>0</td>
-<td>137</td>
-<td>137 pages</td>
-<td>🔴</td>
+<td>3</td>
+<td>Policy and value networks trained inside short rollouts</td>
+<td>Confirms that imagined trajectories provide useful gradients for control</td>
 </tr>
 <tr>
-<td>Flagged pages</td>
-<td>0</td>
-<td>9</td>
-<td>9 pages</td>
-<td>🔴</td>
-</tr>
-<tr>
-<td>Budget</td>
-<td>&gt;$1 remaining</td>
-<td>$0.26</td>
-<td>paused mode</td>
-<td>🔴</td>
-</tr>
-</tbody>
-</table>
-<h2 id="coverage">Coverage<a class="headerlink" href="#coverage" title="Permanent link">&para;</a></h2>
-<p><strong>144</strong> pages generated of <strong>149</strong> total (96.6%) · <strong>5</strong> stubs remaining · <strong>11</strong> / 10 tracks with content</p>
-<h2 id="per-track-status">Per-Track Status<a class="headerlink" href="#per-track-status" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Track</th>
-<th>Total</th>
-<th>Generated</th>
-<th>Approved</th>
-<th>Coverage</th>
-<th>Avg Conf</th>
-<th>MVB</th>
-<th>Stale</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>01-ai</td>
-<td>11</td>
-<td>11</td>
-<td>7</td>
-<td>🟢 100%</td>
-<td>🟡 0.78</td>
-<td>0</td>
-<td>11</td>
-</tr>
-<tr>
-<td>02-generative-modeling</td>
-<td>12</td>
-<td>12</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>12</td>
-</tr>
-<tr>
-<td>03-representation-learning</td>
-<td>12</td>
-<td>12</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>12</td>
-</tr>
-<tr>
-<td>04-neural-networks-deep-learning</td>
-<td>19</td>
-<td>18</td>
-<td>10</td>
-<td>🟢 95%</td>
-<td>🟡 0.75</td>
-<td>0</td>
-<td>16</td>
-</tr>
-<tr>
-<td>05-statistical-probabilistic-ml</td>
-<td>20</td>
-<td>20</td>
-<td>9</td>
-<td>🟢 100%</td>
-<td>🟡 0.77</td>
-<td>0</td>
-<td>19</td>
-</tr>
-<tr>
-<td>06-reinforcement-learning</td>
-<td>13</td>
-<td>13</td>
-<td>7</td>
-<td>🟢 100%</td>
-<td>🟡 0.75</td>
-<td>0</td>
-<td>13</td>
-</tr>
-<tr>
-<td>07-attention-memory-reasoning-continual</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.79</td>
-<td>0</td>
-<td>6</td>
-</tr>
-<tr>
-<td>08-causal-statistical-inference</td>
-<td>13</td>
-<td>13</td>
-<td>9</td>
-<td>🟢 100%</td>
-<td>🟡 0.78</td>
-<td>0</td>
-<td>13</td>
-</tr>
-<tr>
-<td>09-algorithms-systems-for-ai</td>
-<td>37</td>
-<td>33</td>
-<td>33</td>
-<td>🟢 89%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>31</td>
-</tr>
-<tr>
-<td>10-complexity-cognition-natural-intelligence</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>🟢 100%</td>
-<td>🟡 0.79</td>
-<td>0</td>
 <td>4</td>
+<td>Horizon-expanded planner that compares several rollouts</td>
+<td>Measures imagination drift and gives signals on how long you can trust the latent model</td>
 </tr>
 <tr>
-<td>curriculum</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>🟢 100%</td>
-<td>⚫ 0.00</td>
-<td>0</td>
-<td>0</td>
+<td>5</td>
+<td>Dreamer-class integration that ties world, value, and policy together</td>
+<td>Demonstrates the sample-efficiency gain and delivers the checkpoint you deploy or compare</td>
 </tr>
 </tbody>
 </table>
-<h2 id="quality-trend">Quality Trend<a class="headerlink" href="#quality-trend" title="Permanent link">&para;</a></h2>
-<p>Last <strong>10</strong> runs · avg confidence <strong>0.75</strong> · first-pass approval <strong>0%</strong> · avg revisions <strong>1.5</strong> · trend <strong>↓ declining</strong> (-0.029)</p>
-<h2 id="budget">Budget<a class="headerlink" href="#budget" title="Permanent link">&para;</a></h2>
-<p>$97.7356 used of $98.00 limit · $0.26 remaining · <strong>paused mode</strong></p>
-<table>
-<thead>
-<tr>
-<th>Action</th>
-<th>Est. Cost</th>
-<th>Actions in Budget</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>generate</td>
-<td>$0.20</td>
-<td>~1 pages</td>
-</tr>
-<tr>
-<td>improve</td>
-<td>$0.15</td>
-<td>~1 pages</td>
-</tr>
-<tr>
-<td>mvb-only</td>
-<td>$0.07</td>
-<td>~3 pages</td>
-</tr>
-</tbody>
-</table>
+<p>For product leaders, the “why it matters” is crisp: every rollout in the real world or cloud simulator costs compute, time, and safety headroom. A latent imagination that can practice hundreds of trajectories internally lets you iterate policies faster, ship prototypes sooner, and meet the delivery milestone with predictable sample budgets rather than unbounded trial-and-error experiments.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The transition from reactive, model-free agents to proactive latent planners happens in stages, and the narrative follows the compounding trajectory above. Each stage inherits artifacts from the previous and mitigates the drift that accumulates when the agent imagines farther into the future.</p>
+<h3 id="step-1-latent-perception-with-vaes">Step 1: Latent perception with VAEs<a class="headerlink" href="#step-1-latent-perception-with-vaes" title="Permanent link">&para;</a></h3>
+<p>The first build learns an encoder <span class="arithmatex">\(E_\phi\)</span> and decoder <span class="arithmatex">\(D_\theta\)</span> that compress raw observations <span class="arithmatex">\(o_t\)</span> into latent states <span class="arithmatex">\(z_t = E_\phi(o_t)\)</span> and reconstruct them back <span class="arithmatex">\( \hat{o}_t = D_\theta(z_t) \)</span>. The reconstruction loss <span class="arithmatex">\(\|o_t - \hat{o}_t\|^2\)</span> keeps visible information intact while a KL divergence regularizer <span class="arithmatex">\(\operatorname{KL}(q_\phi(z_t \mid o_t) \, \| \, \mathcal{N}(0, I))\)</span> smooths the latent space. This is the same VAE backbone used upstream in World Models (Ha &amp; Schmidhuber 2018) where the authors demonstrated that policies can operate on compressed latents instead of pixels, dramatically cutting the computational cost of rollouts. Without such compression, imagining long horizons becomes impossible because high-dimensional inputs explode memory and time.</p>
+<h3 id="step-2-latent-transition-and-reward-modeling">Step 2: Latent transition and reward modeling<a class="headerlink" href="#step-2-latent-transition-and-reward-modeling" title="Permanent link">&para;</a></h3>
+<p>With latents available, the next build learns transition <span class="arithmatex">\(T_\psi(z_{t+1} \mid z_t, a_t)\)</span> and reward <span class="arithmatex">\(R_\eta(z_t, a_t)\)</span> predictors. The papers “Untitled” (2017) and “Learning model-based planning from scratch” (2017) both show the feasibility of training these components jointly from scratch: they optimize latent encoders and rollouts so that imagined rewards and states align with observed behavior before any policy is introduced. Adding these modules creates an imagination chain where the next latent is deterministic or stochastic, but always differentiable. This is the insight expanded in Dream to Control (Hafner et al. 2019): once you have differentiable rollouts, you can propagate gradients from imagined rewards back through the latent model to the policy network, eliminating the need for model-free value estimates during certain phases of training.</p>
+<h3 id="step-3-policyvalue-learning-inside-imaginations">Step 3: Policy/value learning inside imaginations<a class="headerlink" href="#step-3-policyvalue-learning-inside-imaginations" title="Permanent link">&para;</a></h3>
+<p>Now that the transition model reliably predicts short rollouts, the policy <span class="arithmatex">\( \pi_\theta(a_t \mid z_t)\)</span> and value network <span class="arithmatex">\(V_\phi(z_t)\)</span> can train purely within latent imagination. DreamerV2 (Hafner et al. 2020) provides the concrete loss used here: the policy loss optimizes expected rewards over imagined trajectories while the value network uses imagined returns to reduce variance. MuZero (Schrittwieser et al. 2020) validates this approach in the tabular domains by showing that planning in a learned latent (with no access to ground-truth rules) can still match perfect simulators, giving confidence that the gradients computed in imagination still guide real-world behavior. Imagination rollouts must stay short at this stage (5–15 steps) to avoid compounding error, and replaying the original latents ensures the transition model sees a representative distribution.</p>
+<h3 id="step-4-horizon-expansion-and-imagination-drift">Step 4: Horizon expansion and imagination drift<a class="headerlink" href="#step-4-horizon-expansion-and-imagination-drift" title="Permanent link">&para;</a></h3>
+<p>Once step 3 proves that short dreams work, step 4 stretches the horizon and surfaces “imagination drift,” where the latent model’s predictions diverge from reality. The WorldPrediction benchmark (OpenAI 2025) documents this drift empirically: competent latent models begin hallucinating high-level strategies after roughly 20 imagined steps, which produces cumulative reward errors that mislead the planner. The drift is illustrated by inserting a planning layer that samples candidate horizons <span class="arithmatex">\(H \in \{5, 10, 15\}\)</span> and evaluates imagined returns. The planner scores each horizon by comparing cumulative imagined reward with the same sequence replayed from the real environment, and it flags the point where the discrepancy exceeds a threshold (e.g., 5%). This diagnostic keeps the agent from overcommitting to fantasies that no longer track reality, and it feeds a supervised signal that the transition model uses to correct its future predictions.</p>
+<h3 id="step-5-dreamer-class-integration">Step 5: Dreamer-class integration<a class="headerlink" href="#step-5-dreamer-class-integration" title="Permanent link">&para;</a></h3>
+<p>Finally, the encoder, transition/reward networks, imagination-based policy/value, and horizon planner integrate into a Dreamer-class pipeline reminiscent of DreamerV3 (Hafner et al. 2023). Here the world model feeds imagined states into the policy and planning heuristics, while imagined returns guide the value updates. The planner picks the horizon that optimizes the trade-off between sample efficiency and fidelity, and the entire system trains end-to-end without requiring a perfect simulator. The key engineering decision is aligning the representation spaces between perception, transition, and policy so that imagination retains semantic meaning across hundreds of steps—and this is why drift in step 4 must be quantified and corrected.</p>
+<h3 id="mathematical-foundations-of-imagined-values">Mathematical foundations of imagined values<a class="headerlink" href="#mathematical-foundations-of-imagined-values" title="Permanent link">&para;</a></h3>
+<p>The value network <span class="arithmatex">\(V_\psi(z_\tau)\)</span> at start of an imagination rollout of length <span class="arithmatex">\(H\)</span> approximates the expected discounted sum of imagined rewards plus the bootstrap from the latent value at the rollout’s end:</p>
+<div class="arithmatex">\[
+V_\psi(z_\tau) \approx \mathbb{E} \left[ \sum_{t=\tau}^{\tau+H} \gamma^{t-\tau} \hat{r}_t + \gamma^H V_\psi(z_{\tau+H}) \right]
+\]</div>
+<p>where <span class="arithmatex">\(V_\psi\)</span> is the value network parameterized by <span class="arithmatex">\(\psi\)</span>, <span class="arithmatex">\(z_\tau\)</span> denotes the latent state at the start of the rollout at time step <span class="arithmatex">\(\tau\)</span>, <span class="arithmatex">\(\gamma\)</span> is the discount factor, <span class="arithmatex">\(\hat{r}_t\)</span> is the imagined reward predicted by <span class="arithmatex">\(R_\eta\)</span> at imagined time <span class="arithmatex">\(t\)</span>, and the expectation <span class="arithmatex">\(\mathbb{E}[\cdot]\)</span> is taken over the stochastic policy <span class="arithmatex">\(\pi_\theta\)</span> and transition predictions <span class="arithmatex">\(T_\psi\)</span>. This objective mirrors the Bellman backup that earned the PRML arc its foundational status, but it now executes entirely in latent imagination, meaning every term depends on parameters you can differentiate through. That is the lever the arc invests in: by training a value network that “believes” its own imagined rewards, the agent uses fewer real environments to achieve the same policy quality.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier for world models remains in extending the fidelity and generality of those latents. DreamerV3 (Hafner et al. 2023) demonstrated that a single latent imagination pipeline can scale across many domains—games, robotics, and visual control—by keeping the representation compact enough to train on minimal supervision while still providing meaningful gradients. That work sets the current benchmark for how small a world model can be before it loses control over multi-task generalization. On the engineering side, the WorldPrediction benchmark (OpenAI 2025) acts as both a test suite and a ritual: teams deploy their imaginations in parallel to the real simulator and report when the imagined rollout diverges beyond a tolerance threshold. This engineering practice confirms that operational world models require monitoring to detect drift before deployment, just like any other software service.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<ul>
+<li>How can we formalize the onset of imagination drift so that the planner’s horizon selection becomes provably safe rather than heuristic?</li>
+<li>What representation objectives encourage latent states to retain causal structure, enabling transfer across environments without retraining every module?</li>
+<li>Can we design hybrid training regimes where a small amount of real data is used to periodically “re-anchor” the imagination, and can we prove what fraction is required to stabilize the latent dynamics?</li>
+<li>How do you balance the computational budget between expanding horizon length and increasing model capacity when both dimensions aim to improve sample efficiency?</li>
+</ul>
+<p>These questions define researchable problems: each suggests an experiment (e.g., measuring horizon confidence bounds) or architectural axis (e.g., equivariant latent spaces) that could lead to publishable contributions.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the broader model-based reinforcement learning perspective, → [[model-based-reinforcement-learning]] surveys classical control and modern latent planning side by side. The engineering counterpart is → [[dreamer-v3-implementation]], which walks through the full training stack for DreamerV3-style agents on robotics benchmarks. For the foundational math behind Bellman backups and imagined value gradients, → [[bellman-equations]] gives the rigorous derivations that ground the latent-value update you just saw.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> a Dreamer-class agent that trains a latent world model on a lightweight Mujoco-like control task (HalfCheetah-v3) and uses imagined rollouts to match model-free performance while using ≥30% fewer environment steps.</p>
+<p><strong>Why this is valuable:</strong> This build gives each persona a complete pipeline—from perception to planner—so you can compare imagined rollouts directly to real outcomes, prove sample-efficiency gains, and deliver a dreamer checkpoint to downstream deployment.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>dm-haiku/dreamer-imported</code> (https://huggingface.co/dm-haiku/dreamer-imported) — the official Dreamer v2 checkpoints and codebase tuned for control tasks.
+- <strong>Dataset:</strong> <code>gymnasium/half-cheetah-v3</code> (https://huggingface.co/datasets/gymnasium/half-cheetah-v3) — a standard continuous-control environment with open-source simulators.
+- <strong>Framework:</strong> Dreamer open-source PyTorch port (https://github.com/danijar/dreamer) with <code>wandb</code> for logging.
+- <strong>Compute:</strong> One RTX 3070 (8GB VRAM) or free Colab T4, ~4 hours per persona variant (shortened by caching replay buffers).</p>
+<p><strong>The recipe:</strong>
+1. Install <code>pip install torch torchvision gymnasium tensorboardX wandb</code> and clone <code>https://github.com/danijar/dreamer</code>. Ensure <code>muju_envs</code> is available for HalfCheetah-v3.
+2. Use the provided scripts to collect 20k environment steps, store them as a replay buffer, and train the encoder/decoder VAE until reconstruction MSE stabilizes below 0.01 on the validation set.
+3. Train transition/reward models on the latent replay using the same checkpoints; run short 5-step rollouts and ensure imagined next-latents match real next-latents within MAE 0.05.
+4. Switch to policy/value training inside imagination rollouts of length 5, then extend to horizons 10 and 15 using the planner harness. Monitor cumulative reward discrepancies to detect drift and log the planner’s horizon selections.
+5. Save the Dreamer-class checkpoint and compare final sample efficiency to a SAC baseline trained on the same environment; report the number of real steps needed to reach the half-cheetah score.</p>
+<p><strong>Expected outcome:</strong> a Dreamer-class checkpoint that reaches the target control score using ≥30% fewer real environment steps than a model-free SAC baseline, plus TensorBoard logs showing imagined vs. real rollouts and a planner horizon report.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Deploy the Dreamer checkpoint inside a Docker container that serves the HalfCheetah policy via <code>mgym</code> for benchmarking; target ≤120 ms inference latency at 4 concurrent agents and showcase deployment logs.
+- <strong>Research engineer:</strong> Reproduce Table 2 from DreamerV2 (Hafner et al. 2020) with the same latent rollout lengths and matching sample-efficiency numbers within ±5%, instrumenting the training loop to record imagined return errors per horizon.
+- <strong>Applied researcher:</strong> Hypothesize that adding a periodic latent re-anchoring step (sampling real observations every 1k imagination steps) reduces drift faster than increasing horizon length; falsify it by plotting imagined cumulative reward gap with and without re-anchoring over 3 seeds.</p>
+<p>What can you build next? Iterate on the planner diagnostics to see if a simple uncertainty measure (e.g., variance across imagined trajectories) lets the agent choose its horizon adaptively, then release the tracker as a reusable monitor.</p>
 <hr />
-<p><em>This dashboard is updated automatically after every agent run and at the start of each 48h cycle.</em>
-<em>Source: <code>agents/runs/metrics.json</code> · Pipeline: <code>observer.observe()</code> → <code>write_observer_page()</code></em></p>
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
@@ -1748,12 +1478,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

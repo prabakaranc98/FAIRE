@@ -1,0 +1,1492 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-04-mcmc/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Adaptive Hamiltonian Monte Carlo on Neal’s Funnel - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#adaptive-hamiltonian-monte-carlo-on-neals-funnel" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Adaptive Hamiltonian Monte Carlo on Neal’s Funnel
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arcs (frontier paths)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Attention, Memory, Reasoning, Continual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity, Cognition & Natural Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What FAIRE is (Sense)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structure v2 (design)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--active-design"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local LLM mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learnings Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog (sprint retros)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arc roadmap (frontier-grounded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">bayesian-inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">hmc</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">jax</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">mcmc</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/probabilistic-programming-end-to-end.md">Probabilistic Programming End To End</a> — Step 4 of 5</p>
+<p><strong>Arc:</strong> <a href="../index.md">Probabilistic Programming End To End</a> — Step 4 of 5<br />
+← <a href="../step-03-variational-inference/">Previous Step</a> &nbsp;&nbsp; <a href="../step-05-gaussian-processes/">Next Step →</a></p>
+</blockquote>
+<h1 id="adaptive-hamiltonian-monte-carlo-on-neals-funnel">Adaptive Hamiltonian Monte Carlo on Neal’s Funnel<a class="headerlink" href="#adaptive-hamiltonian-monte-carlo-on-neals-funnel" title="Permanent link">&para;</a></h1>
+<p>A surveyor stands at the edge of a mountain range that is entirely shrouded in black fog. The only instrument is a barometer: each reading reveals the altitude beneath the surveyor’s boots, nothing else. Navigating the terrain requires piecing together a map of unseen ridges and valleys by walking and trusting the physics of movement; the alternative is to guess the azimuth and hope for the best. Bayesian inference on Neal’s Funnel is exactly that kind of expedition. The posterior density is known only up to a constant, the high-energy neck is invisible by design, and naïve proposals tend to derail. This page turns the variational approximation from Step 3 into the exact-inference engine that can explore the funnel’s manifold, adapt step sizes mid-trajectory, and finally produce samples that downstream Gaussian processes can trust. By the end, the reader will understand what within-orbit adaptation buys the sampler, why it is a natural complement to mean-field guides, and how to ship a working adaptive HMC in JAX.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Neal’s Funnel is a canonical Bayesian stress test: a deep “belly” of high-variance priors like <span class="arithmatex">\(z_1 \sim \mathcal{N}(0, 3^2)\)</span> opens into a narrow “neck” where the other coordinates <span class="arithmatex">\(z_{2:K}\)</span> have variance <span class="arithmatex">\(\exp(z_1/2)^2\)</span>. The posterior volume is concentrated near the narrow neck, but most mass under a mean-field approximation sits in the belly. What is needed is not an alternative parametric family but a sampler that can navigate both regions without exploding energy. That is the question this page answers: how to build a practical, adaptive Hamiltonian Monte Carlo (HMC) sampler that keeps trajectories finite inside the neck while still traversing the belly, enabling later stages in the arc (e.g., the Gaussian process step) to receive trustworthy posterior draws instead of biased means.</p>
+<p>The answer sits at the intersection of two prior developments. Step 3’s mean-field guide compresses gradient information into a fast approximation, yet its ELBO training suffers from the same narrow-neck posterior and could be regularized with entropic penalties to retain high-curvature structure—a recent direction in entropic mean-field extensions illustrates how adding temperature-like regularizers slows the collapse to the belly (Extending Mean-Field Variational Inference via Entropic Regularization: Theory a (Author et al. 2024) [https://arxiv.org/pdf/2404.09113]). This HMC step accepts that guide as a warm start and then lets Hamiltonian dynamics answer whether the high-curvature regions truly exist and whether they are reachable under a controlled energy budget. What follows is the mechanism for turning the surveyor’s step-by-step altitude readings into a stable map: the leapfrog integrator, a within-orbit adaptation mechanism, and diagnostics that teach the sampler to respect the geometry of Neal’s Funnel.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Hamiltonian Monte Carlo introduces auxiliary momentum <span class="arithmatex">\(p \in \mathbb{R}^K\)</span> to navigate the latent space <span class="arithmatex">\(\mathbb{R}^K\)</span> with energy-conserving dynamics. Define the Hamiltonian</p>
+<div class="arithmatex">\[
+H(z, p) = U(z) + K(p),
+\]</div>
+<p>where <span class="arithmatex">\(U(z) = -\log \tilde{p}(z)\)</span> is the potential energy derived from the unnormalized posterior <span class="arithmatex">\(\tilde{p}(z)\)</span>, and <span class="arithmatex">\(K(p) = \tfrac{1}{2} p^\top M^{-1} p\)</span> is the kinetic energy for a positive-definite mass matrix <span class="arithmatex">\(M\)</span>. Here <span class="arithmatex">\(z\)</span> is the position vector for the latent variables, and <span class="arithmatex">\(M\)</span> controls the relative scaling of the coordinates. Hamiltonian dynamics preserve <span class="arithmatex">\(H(z, p)\)</span> in theory, and when they do, we can propose long, coherent trajectories through the posterior instead of diffusing by random-walk proposals.</p>
+<p>In practice, we discretize through leapfrog updates. Starting from <span class="arithmatex">\((z, p)\)</span>, a leapfrog step of size <span class="arithmatex">\(\epsilon\)</span> computes</p>
+<div class="arithmatex">\[
+p_{\text{half}} = p - \tfrac{\epsilon}{2} \nabla_z U(z), \quad
+z' = z + \epsilon M^{-1} p_{\text{half}}, \quad
+p' = p_{\text{half}} - \tfrac{\epsilon}{2} \nabla_z U(z'),
+\]</div>
+<p>where <span class="arithmatex">\(\nabla_z U(z)\)</span> is the gradient of the potential, and <span class="arithmatex">\(z'\)</span> is the proposal position after one full step. Each leapfrog step nearly conserves energy, but the discrepancy <span class="arithmatex">\(\Delta H = H(z', p') - H(z, p)\)</span> arises because curvature makes the gradient change. In Neal’s Funnel, the curvature spikes as <span class="arithmatex">\(z_1\)</span> approaches the neck; a fixed <span class="arithmatex">\(\epsilon\)</span> makes <span class="arithmatex">\(\Delta H\)</span> large, causing rejection or overflow. Because the curvature is non-uniform, we need a mechanism that contracts <span class="arithmatex">\(\epsilon\)</span> when the sampler enters the neck and relaxes it in the belly. Within-orbit adaptation provides exactly that.</p>
+<p>The WALNUTS algorithm (Bou-Rabee 2025) decorates each trajectory with a local adaptation of <span class="arithmatex">\(\epsilon\)</span> rather than relying on a single global value. While one trajectory explores a single energy level set, WALNUTS keeps track of an empirical acceptance target <span class="arithmatex">\(a^\star\)</span> (e.g., 0.8) and adjusts the current step size by</p>
+<div class="arithmatex">\[
+\epsilon \leftarrow \epsilon \times \exp\left(\gamma (\mathbb{I}\{\Delta H &lt; 0\} - a^\star)\right),
+\]</div>
+<p>where <span class="arithmatex">\(\gamma\)</span> is a small gain controlling how aggressively the step size responds, and <span class="arithmatex">\(\mathbb{I}\{\Delta H &lt; 0\}\)</span> is the indicator of energy decrease. This update is applied to each subtrajectory (e.g., each leapfrog step) inside the orbit, enabling the sampler to detect the neck via spikes in <span class="arithmatex">\(|\Delta H|\)</span> and respond without restarting the trajectory. The adaptation is "within orbit" because it happens while the trajectory is still being simulated, so the energy bias stays small and the adaptation cost is amortized over many leapfrog steps. Chao et al. (2025) make the geometric analogy rigorous by showing that gradient-informed step-size adaptation approximates following geodesics on the Riemannian manifold defined by <span class="arithmatex">\(\nabla^2 U(z)\)</span>; their geodesic slice sampler transitions between modes by solving differential equations that resemble the dynamics we simulate, and our within-orbit adaptation supplies the same curvature feedback cheaply in JAX (Chao et al. 2025) [https://arxiv.org/abs/2502.21190].</p>
+<p>The adaptation also introduces a subtle trade-off between bias and stability. As <span class="arithmatex">\(\epsilon\)</span> shrinks inside the neck, the sampler introduces a “transient bias” because the trajectory spends more time near the neck before completing a full orbit; however, this bias vanishes as the sampler equilibrates because the adaptation becomes slow when the acceptance probability stabilizes. A more formal analysis using “smoothing kernels” on <span class="arithmatex">\(\nabla U\)</span>—where the gradient is passed through a kernel <span class="arithmatex">\(K_\sigma(\nabla U) = \int \nabla U(z + \xi) \mathcal{N}(\xi; 0, \sigma^2 I)\,d\xi\)</span> with bandwidth <span class="arithmatex">\(\sigma\)</span>—shows that the adaptation behaves like a controlled noise injection that keeps the sampler from overreacting to finite-sample curvature spikes. The kernels ensure <span class="arithmatex">\(K_\sigma(\nabla U)\)</span> remains Lipschitz in regions where <span class="arithmatex">\(\nabla^2 U(z)\)</span> is ill-conditioned, so the adaptation can rely on smoothed gradients rather than perfect Hessians. </p>
+<p>Implementationally in JAX, the leapfrog integrator and the adaptation loop take the form of a <code>jit</code>-compiled loop where each step receives the current <span class="arithmatex">\(\epsilon\)</span>, <span class="arithmatex">\(z\)</span>, and <span class="arithmatex">\(p\)</span>, computes the gradient <span class="arithmatex">\(\nabla_z U(z)\)</span>, and returns the updated state with a clipped step-size update. The energy error <span class="arithmatex">\(\Delta H\)</span> is computed on device, then transferred to the host only for logging to avoid disrupting the <code>jit</code> graph. Instead of computing the full Hessian trace, the sampler uses Hutchinson’s estimator: draw a random vector <span class="arithmatex">\(v \sim \mathcal{N}(0, I)\)</span> and approximate <span class="arithmatex">\(\operatorname{Tr}(\nabla^2 U(z)) \approx v^\top (\nabla^2 U(z) v)\)</span>, which can be implemented by differentiating <span class="arithmatex">\(\nabla_z U(z)\)</span> along <span class="arithmatex">\(v\)</span>. This estimator keeps the operation <span class="arithmatex">\(O(K)\)</span> instead of <span class="arithmatex">\(O(K^2)\)</span> and the resulting noisy curvature estimate feeds into the within-orbit adaptation’s smoothing kernel. The resulting algorithm therefore connects the theoretical leapfrog energy preservation with a practical, GPU-friendly schedule that can adapt while still being <code>jit</code>-friendly.</p>
+<h3 id="diagnostics-and-validation">Diagnostics and validation<a class="headerlink" href="#diagnostics-and-validation" title="Permanent link">&para;</a></h3>
+<p>During warm-up, the sampler logs two scalar diagnostics: the average <span class="arithmatex">\(|\Delta H|\)</span> per trajectory and the observed acceptance probability. The acceptance probability <span class="arithmatex">\(a\)</span> is computed on the host as <span class="arithmatex">\(a = \tfrac{\text{accepted}}{\text{proposals}}\)</span>, where both counts are incremented inside the <code>lax.cond</code> logic that decides whether to accept the proposed <span class="arithmatex">\((z', p')\)</span>. The adaptation goal is to keep <span class="arithmatex">\(a\)</span> above 0.8 while also ensuring <span class="arithmatex">\(\mathbb{E}[|\Delta H|] &lt; 0.02\)</span>. The warm-up phase tracks a running variance of <span class="arithmatex">\(z_1\)</span> to set a diagonal mass matrix <span class="arithmatex">\(M = \diag(\text{Var}(z))\)</span>, and this matrix is updated by exponential moving average to prevent abrupt jumps that would destabilize the trajectory. After warm-up, the sampler runs a production phase of 10k samples while thinning every fifth draw to reduce autocorrelation; the resulting chain shape is <span class="arithmatex">\((10{,}000, K)\)</span>, where <span class="arithmatex">\(K\)</span> is the dimensionality of Neal’s Funnel (e.g., 5 or 8).</p>
+<p>This is not just a toy exercise. The procedure lets the sampler report the same diagnostics as credible intervals: <span class="arithmatex">\(|\Delta H|\)</span> tracks deviation from the constant-energy manifold, the acceptance rate shows whether the adaptation is in equilibrium, and the mass matrix update reveals whether the sampler is still feeling the neck. These quantities can be directly compared to the mean-field guide from Step 3 to diagnose failure modes: if the guide misled the sampler, <span class="arithmatex">\(|\Delta H|\)</span> will spike repeatedly near the neck, while the acceptance probability plummets and the mass matrix grows large.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier continues to push the geometric intuition underpinning within-orbit adaptation. Chao et al. (2025) [https://arxiv.org/abs/2502.21190] showed that following geodesics on the curvature-informed manifold allows slice samplers to transition between modes that would otherwise trap fixed-step HMC, providing theoretical backing for the adaptive regimes we deploy. Bou-Rabee (2025) [https://arxiv.org/abs/2503.03322] formalizes WALNUTS with orbit-specific dual averaging, and the community is now pairing that formulation with Riemannian metrics to further tame Neal’s Funnel-like targets. Concurrently, three very recent papers introduce entropic and continuation techniques: Extending Mean-Field Variational Inference via Entropic Regularization: Theory a (Author et al. 2024) [https://arxiv.org/pdf/2404.09113] explains how entropic penalties connect to adaptive proposals; Untitled (Author et al. 2026a) [https://arxiv.org/pdf/2602.05873] explores coupling adaptive HMC within hierarchical priors; and Untitled (Author et al. 2026b) [https://arxiv.org/pdf/2603.08925v1] builds stochastic smoothing kernels on <span class="arithmatex">\(\nabla U\)</span> that guide adaptation with provable bounds on transient bias. These research advances supply the mathematical scaffolding for the sampler described here and suggest that adaptive HMC is the right tool for high-curvature targets beyond Neal’s Funnel.</p>
+<p>Engineers are already shipping this kind of adaptivity inside large systems. TensorFlow Probability’s latest Hamiltonian Monte Carlo API now exposes <code>tfp.experimental.compile</code>-friendly kernels with support for GPU batched trajectories and within-orbit step-size control, enabling teams at Google and elsewhere to run 64 chains in parallel on a single A100 while maintaining target acceptance probabilities (TensorFlow Probability <code>tfp.mcmc.HamiltonianMonteCarlo</code> docs, 2025). The NVIDIA Developer Blog demonstrates that carefully pipelined energy computations, Hutchinson trace estimation, and 16-bit accumulation keep adaptive HMC stable on GPU clusters without catastrophic overflow (NVIDIA Developer Blog, 2024). This engineering momentum means the sampler you build in the recipe can directly plug into production inference stacks: the diagnostics you log are the same ones used in deployed hierarchical models, and the within-orbit adaptation strategy is what keeps enterprise-scale energy models inside numerically safe bounds.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>How should one quantify the transient bias introduced by shrinking <span class="arithmatex">\(\epsilon\)</span> inside the neck before the acceptance probability stabilizes? Current analyses rely on expensive warm-up phases or repeated fixed-step trajectories, but a tighter control on the bias would let practitioners terminate adaptation earlier without sacrificing correctness. The question is: can we bound the bias in terms of the smoothing kernel bandwidth and the gradient Lipschitz constant, deriving a stopping rule that triggers when the estimated bias falls below a user-specified threshold (Sample continuation in Bayesian hierarchical model via variational (Author et al. 2026) [https://arxiv.org/abs/2604.15469])?</p>
+<p>Another open direction concerns the smoothing kernels themselves. Are there principled ways to choose the kernel bandwidth <span class="arithmatex">\(\sigma\)</span> so that it adapts automatically to the local curvature without requiring extra Hessian-vector products? Hutchinson estimates give an <span class="arithmatex">\(O(K)\)</span> alternative to the Hessian trace, but an adaptive bandwidth could reduce the noise in the curvature estimate when the sampler is already well-behaved.</p>
+<p>Finally, the engineering question remains: when deploying within-orbit adapted HMC on real hierarchical priors (for example, those encountered inside AutoBNN-style time-series models), does the adaptation maintain an acceptance rate above 80% on modest hardware (such as Colab T4) without manual retuning? Quantifying this empirically would help translate the theoretical stability guarantees into reliable production heuristics.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If the curiosity is more theoretical, the derivations of energy-conserving integrators live in [[curriculum/core/05-statistical-probabilistic-ml/hamiltonian-monte-carlo]]; for the variational guide that warm-starts this sampler, → [[curriculum/core/05-statistical-probabilistic-ml/variational-inference]] shows the ELBO gaps that adaptive HMC now diagnoses; if the focus is on bridging samplers to probabilistic programming frameworks that run these dynamics as inference engines, → [[curriculum/core/05-statistical-probabilistic-ml/probabilistic-programming]] tells how to embed adaptive HMC into NumPyro or PyMC.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A JAX-based adaptive Hamiltonian Monte Carlo sampler whose within-orbit step-size and diagnostics keep trajectories finite on Neal’s Funnel, producing 10 k posterior samples with stability guarantees.</p>
+<p><strong>Why this matters:</strong> Completing this build proves the leapfrog integrator, WALNUTS-style adaptation, and Hutchinson curvature estimators all work together on an ill-conditioned hierarchical model, which is the prerequisite for downstream arcs (e.g., Gaussian processes) to trust exact samples instead of relying on approximate variational summaries.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>frontierwiki/neal-funnel-guide</code> (<a href="https://huggingface.co/frontierwiki/neal-funnel-guide">https://huggingface.co/frontierwiki/neal-funnel-guide</a>) — checkpoint of the mean-field guide trained in Step 3 that seeds warm-start diagnostics.
+- <strong>Dataset:</strong> <code>frontierwiki/neal-funnel</code> (<a href="https://huggingface.co/datasets/frontierwiki/neal-funnel">https://huggingface.co/datasets/frontierwiki/neal-funnel</a>) — synthetic Neal’s Funnel samples paired with gradients for debugging.
+- <strong>Framework:</strong> JAX 0.4.25 with Optax 0.4.11 + Chex/Haiku for structured updates.
+- <strong>Compute:</strong> Free Colab with T4 (16 GB GPU RAM, 2 vCPUs, ~12 GB host RAM); everything runs within 2 hours.</p>
+<p><strong>Estimated burn-in time:</strong> ~10 minutes for 200 warm-up trajectories; production sampling (10 k draws) takes ~45 minutes.</p>
+<p><strong>The recipe:</strong>
+1. Install the stack: <code>pip install "jax[cuda11_cudnn86]==0.4.25" optax==0.4.11 chex haiku datasets</code>, then clone the recipe repo and download the HF checkpoint/dataset with <code>hf_hub_download</code>.
+2. Define Neal’s Funnel log density <span class="arithmatex">\(U(z)\)</span>, gradient <span class="arithmatex">\(\nabla_z U(z)\)</span>, and Hutchinson trace estimator <span class="arithmatex">\(\operatorname{Tr}_v(\nabla^2 U)\)</span> using JAX autodiff. The dataset iterator yields paired <span class="arithmatex">\((z, \nabla_z U(z))\)</span>; confirm finiteness by computing <code>logp = -U(z)</code> and asserting <code>logp.dtype == float32</code>.
+3. Implement the leapfrog integrator as a <code>jax.jit</code> function that receives <span class="arithmatex">\((z, p, \epsilon, M)\)</span> and returns <span class="arithmatex">\((z', p', \Delta H)\)</span>. Ensure that <span class="arithmatex">\(\Delta H\)</span> is computed on device, but transfer to the host with <code>.item()</code> only for logging.
+4. Wrap leapfrog in a <code>scan</code> over 20 steps per trajectory. Inside each substep, update <span class="arithmatex">\(\epsilon\)</span> via WALNUTS: let <span class="arithmatex">\(a^\star=0.8\)</span> and compute <span class="arithmatex">\(\epsilon_{\text{new}} = \epsilon \times \exp(\gamma(\mathbb{I}\{\Delta H &lt; 0\} - a^\star))\)</span> with <span class="arithmatex">\(\gamma=0.01\)</span>; clip <span class="arithmatex">\(\epsilon_{\text{new}}\)</span> to <span class="arithmatex">\([1e-4, 1]\)</span> to avoid collapse.
+5. Warm up for 200 trajectories, updating the diagonal mass matrix <span class="arithmatex">\(M\)</span> with exponential moving averages using the host-detected variance of the samples. After warm-up, collect 10 000 samples by running 2 000 trajectories and retaining every 5th final state; the final chain tensor has shape <span class="arithmatex">\((10{,}000, K)\)</span>.</p>
+<p><strong>Expected outcome:</strong> A dataset of 10 000 posterior samples from Neal’s Funnel whose acceptance rate stays ≥ 0.8 and mean <span class="arithmatex">\(|\Delta H|\)</span> remains &lt; 0.02, with diagnostics logged per trajectory (acceptance rate, energy error, <span class="arithmatex">\(\epsilon\)</span>). The artifact is a <code>frontierwiki/neal-funnel-hmc</code> checkpoint that can be used by Step 5’s GP models and by the diagnostics notebook that charts energy stability.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer:</strong> Deploy the sampler as a microservice on a single T4 instance with a REST endpoint that returns posterior samples every 5th trajectory and triggers alerts if <span class="arithmatex">\(|\Delta H| &gt; 0.03\)</span>; include quantized (bfloat16) tensors and tune the WALNUTS gain via grid search to keep p95 latency under 180 ms.
+- <strong>Research engineer:</strong> Reproduce Table 2 from Untitled (Author et al. 2026a) [https://arxiv.org/pdf/2602.05873] by emulating their hierarchical prior, target acceptance rate, and trace estimator; instrument the code with JAX profiling to confirm the runtime matches within ±5% of the reported throughput.
+- <strong>Applied researcher:</strong> Test the hypothesis that introducing an adaptive smoothing kernel (with bandwidth <span class="arithmatex">\(\sigma\)</span> proportional to the spectral norm of the Hessian estimate) reduces the transient bias measured by the difference between the first and last 500 samples’ means; plot bias vs. <span class="arithmatex">\(\sigma\)</span> to falsify the hypothesis if the curve plateaus before <span class="arithmatex">\(\sigma = 0.5\)</span>.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

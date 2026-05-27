@@ -6,35 +6,31 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Closed-loop control system — real-time wiki quality signals">
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/system/observer/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/08-causal-statistical-inference/arcs/causal-deep-learning/step-04-causal-representation-learning/">
       
       
-        <link rel="prev" href="../status/">
-      
-      
-        <link rel="next" href="../changelog/">
       
       
         
       
       
-      <link rel="icon" href="../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Observer Dashboard - Frontier Wiki</title>
+        <title>Step 4 — Causal Representation Disentanglement - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#observer-dashboard" class="md-skip">
+        <a href="#the-territory" class="md-skip">
           Skip to content
         </a>
       
@@ -94,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -114,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Observer Dashboard
+              Step 4 — Causal Representation Disentanglement
             
           </span>
         </div>
@@ -213,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -234,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../curriculum/" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -254,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,13 +266,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../../about/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -312,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -342,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -421,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -449,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -477,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/01-ai/" class="md-nav__link">
+      <a href="../../../../01-ai/" class="md-nav__link">
         
   
   
@@ -505,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/02-generative-modeling/" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -533,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/03-representation-learning/" class="md-nav__link">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -561,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -589,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -617,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -645,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -673,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -701,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -729,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../curriculum/core/10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -816,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -844,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -876,31 +870,26 @@
       
   
   
-    
   
   
-  
     
     
     
     
-      
-        
-        
       
       
         
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
             
   
   
@@ -918,7 +907,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -936,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -964,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -992,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1020,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1055,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1083,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1111,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1139,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1167,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1192,37 +1181,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Observer Dashboard
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1238,81 +1200,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#control-state" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Control State
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#coverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Coverage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#per-track-status" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Per-Track Status
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#quality-trend" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Quality Trend
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#budget" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Budget
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1325,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1353,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1399,46 +1286,6 @@
   
 
 
-  <nav class="md-path" aria-label="Navigation" >
-    <ol class="md-path__list">
-      
-        
-  
-  
-    <li class="md-path__item">
-      <a href="../.." class="md-path__link">
-        
-  <span class="md-ellipsis">
-    Home
-  </span>
-
-      </a>
-    </li>
-  
-
-      
-      
-        
-  
-  
-    
-    
-      <li class="md-path__item">
-        <a href="../../about/" class="md-path__link">
-          
-  <span class="md-ellipsis">
-    System
-  </span>
-
-        </a>
-      </li>
-    
-  
-
-      
-    </ol>
-  </nav>
-
               
               <article class="md-content__inner md-typeset">
                 
@@ -1449,221 +1296,64 @@
   
 
 
-<h1 id="observer-dashboard">Observer Dashboard<a class="headerlink" href="#observer-dashboard" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Last observed: <strong>2026-05-27 15:57 EDT</strong> · [Source: <code>agents/runs/metrics.json</code>]</p>
+<p><strong>Arc:</strong> <a href="../../arcs/causal-deep-learning.md">Causal Deep Learning</a> — Step 4 of 5</p>
 </blockquote>
-<h2 id="control-state">Control State<a class="headerlink" href="#control-state" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Signal</th>
-<th>Set Point</th>
-<th>Current</th>
-<th>Error</th>
-<th>Status</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Coverage</td>
-<td>80%</td>
-<td>96.6%</td>
-<td>0.0% deficit</td>
-<td>🟢</td>
-</tr>
-<tr>
-<td>Quality</td>
-<td>0.85</td>
-<td>0.76</td>
-<td>0.09 deficit</td>
-<td>🟡</td>
-</tr>
-<tr>
-<td>Stale pages</td>
-<td>0</td>
-<td>137</td>
-<td>137 pages</td>
-<td>🔴</td>
-</tr>
-<tr>
-<td>Flagged pages</td>
-<td>0</td>
-<td>9</td>
-<td>9 pages</td>
-<td>🔴</td>
-</tr>
-<tr>
-<td>Budget</td>
-<td>&gt;$1 remaining</td>
-<td>$0.26</td>
-<td>paused mode</td>
-<td>🔴</td>
-</tr>
-</tbody>
-</table>
-<h2 id="coverage">Coverage<a class="headerlink" href="#coverage" title="Permanent link">&para;</a></h2>
-<p><strong>144</strong> pages generated of <strong>149</strong> total (96.6%) · <strong>5</strong> stubs remaining · <strong>11</strong> / 10 tracks with content</p>
-<h2 id="per-track-status">Per-Track Status<a class="headerlink" href="#per-track-status" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Track</th>
-<th>Total</th>
-<th>Generated</th>
-<th>Approved</th>
-<th>Coverage</th>
-<th>Avg Conf</th>
-<th>MVB</th>
-<th>Stale</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>01-ai</td>
-<td>11</td>
-<td>11</td>
-<td>7</td>
-<td>🟢 100%</td>
-<td>🟡 0.78</td>
-<td>0</td>
-<td>11</td>
-</tr>
-<tr>
-<td>02-generative-modeling</td>
-<td>12</td>
-<td>12</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>12</td>
-</tr>
-<tr>
-<td>03-representation-learning</td>
-<td>12</td>
-<td>12</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>12</td>
-</tr>
-<tr>
-<td>04-neural-networks-deep-learning</td>
-<td>19</td>
-<td>18</td>
-<td>10</td>
-<td>🟢 95%</td>
-<td>🟡 0.75</td>
-<td>0</td>
-<td>16</td>
-</tr>
-<tr>
-<td>05-statistical-probabilistic-ml</td>
-<td>20</td>
-<td>20</td>
-<td>9</td>
-<td>🟢 100%</td>
-<td>🟡 0.77</td>
-<td>0</td>
-<td>19</td>
-</tr>
-<tr>
-<td>06-reinforcement-learning</td>
-<td>13</td>
-<td>13</td>
-<td>7</td>
-<td>🟢 100%</td>
-<td>🟡 0.75</td>
-<td>0</td>
-<td>13</td>
-</tr>
-<tr>
-<td>07-attention-memory-reasoning-continual</td>
-<td>6</td>
-<td>6</td>
-<td>6</td>
-<td>🟢 100%</td>
-<td>🟡 0.79</td>
-<td>0</td>
-<td>6</td>
-</tr>
-<tr>
-<td>08-causal-statistical-inference</td>
-<td>13</td>
-<td>13</td>
-<td>9</td>
-<td>🟢 100%</td>
-<td>🟡 0.78</td>
-<td>0</td>
-<td>13</td>
-</tr>
-<tr>
-<td>09-algorithms-systems-for-ai</td>
-<td>37</td>
-<td>33</td>
-<td>33</td>
-<td>🟢 89%</td>
-<td>🟡 0.76</td>
-<td>0</td>
-<td>31</td>
-</tr>
-<tr>
-<td>10-complexity-cognition-natural-intelligence</td>
-<td>5</td>
-<td>5</td>
-<td>5</td>
-<td>🟢 100%</td>
-<td>🟡 0.79</td>
-<td>0</td>
-<td>4</td>
-</tr>
-<tr>
-<td>curriculum</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>🟢 100%</td>
-<td>⚫ 0.00</td>
-<td>0</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-<h2 id="quality-trend">Quality Trend<a class="headerlink" href="#quality-trend" title="Permanent link">&para;</a></h2>
-<p>Last <strong>10</strong> runs · avg confidence <strong>0.75</strong> · first-pass approval <strong>0%</strong> · avg revisions <strong>1.5</strong> · trend <strong>↓ declining</strong> (-0.029)</p>
-<h2 id="budget">Budget<a class="headerlink" href="#budget" title="Permanent link">&para;</a></h2>
-<p>$97.7356 used of $98.00 limit · $0.26 remaining · <strong>paused mode</strong></p>
-<table>
-<thead>
-<tr>
-<th>Action</th>
-<th>Est. Cost</th>
-<th>Actions in Budget</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>generate</td>
-<td>$0.20</td>
-<td>~1 pages</td>
-</tr>
-<tr>
-<td>improve</td>
-<td>$0.15</td>
-<td>~1 pages</td>
-</tr>
-<tr>
-<td>mvb-only</td>
-<td>$0.07</td>
-<td>~3 pages</td>
-</tr>
-</tbody>
-</table>
+<p>Imagine a hospital that trusts a deep learning model to flag sudden cardiac events. It was trained on data collected under one specific sensor suite and a fixed patient population, so its latent representation mixes heart rhythm with the ambient temperature of that clinic. The moment the clinic moves the model to a different building or adds a new wearable, performance collapses because the statistics the model learned are not tied to causal physiology but to the unstructured noise of its training environment. The key question this step answers is: how can the encoder behind such a model be forced to track the same interpretable causes even after the underlying conditions change? By the end of this page the reader will understand how to impose causal invariances on an autoencoder and build a concrete disentangler that stays stable under deliberate physics interventions.</p>
+<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
+<p>Causal representation learning sits between vanilla supervised encoders and full structural causal models. Standard deep learning reduces pixels or sensor readings to statistical embeddings that are useful in the training distribution but whose semantics dissolve once a new hospital, lighting condition, or interventional policy arrives. The goal of this step is to recover the latent building blocks of the world—positions, velocities, forces—such that predictions remain meaningful even after gravity, lighting, or other forces are intervened upon. For a product manager or decision maker who needs reliable automation across clinics, factories, or simulations, that means the same inference pipeline can be certified once and shipped to multiple sites without rebuilding encoders per deployment.</p>
+<p>The strategy is to combine per-environment reconstruction with cross-environment invariance: keep the decoder committed to recreating observations while simultaneously nudging the encoder to output latents that share statistics across interventions. This is what allows a downstream counterfactual module (built in Step 3) to query “what would the state have been under a different force” without the answer depending on spurious nuisances. The ensuing section explains the generative assumptions, the invariance penalty, and the choice of objective that make the disentanglement identifiable.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The assumed data-generating process introduces a shared latent vector <span class="arithmatex">\(z \in \mathbb{R}^d\)</span> that encodes true causal quantities such as position and velocity, and an environment identifier <span class="arithmatex">\(e\)</span> that controls specific physical parameters like gravity or lighting. Each environment <span class="arithmatex">\(e\)</span> renders observations through a decoder <span class="arithmatex">\(f_e\)</span> so that</p>
+<div class="arithmatex">\[
+x \sim f_e(z) + \epsilon_x,
+\]</div>
+<p>where <span class="arithmatex">\(x\)</span> is a pixel frame tensor, <span class="arithmatex">\(z\)</span> contains the causal coordinates, <span class="arithmatex">\(f_e\)</span> is the rendering decoder conditioned on the environment index, and <span class="arithmatex">\(\epsilon_x \sim \mathcal{N}(0, \sigma^2 I)\)</span> captures isotropic observation noise. This shared-latent, environment-specific decoder formalism mirrors the identifiability setting of Jin et al. (2023) <a href="https://arxiv.org/abs/2311.12267">https://arxiv.org/abs/2311.12267</a>, which shows that smooth decoders plus multiple environments shrink the ambiguity down to linear orthogonal transformations.</p>
+<p>To keep the encoder from drifting when gravity <span class="arithmatex">\(g_e\)</span> changes, the invariance penalty compares the moments of the encoder outputs across environment pairs:</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{inv}} = \sum_{e\neq e'} \left\|\mathbb{E}_{x\sim P_e}[h(x)] - \mathbb{E}_{x'\sim P_{e'}}[h(x')]\right\|^2,
+\]</div>
+<p>where <span class="arithmatex">\(h(x)\)</span> returns the encoder’s latent vector for input <span class="arithmatex">\(x\)</span>, <span class="arithmatex">\(P_e\)</span> is the observed data distribution under environment <span class="arithmatex">\(e\)</span>, and the expectation is approximated by batch means. This formulation generalizes the invariance principle from Author et al. 2023 <a href="https://arxiv.org/pdf/2306.00542">https://arxiv.org/pdf/2306.00542</a>, which argued that matching latent statistics across interventions is a practical proxy for causal alignment when their full distributions are intractable to compare. The invariance term is the only part of the loss that references multiple environments; the decoder’s reconstruction remains environment-specific.</p>
+<p>The reconstruction loss itself is</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{rec}} = \mathbb{E}_{x\sim P_e} \left\|x - g(h(x), g_e)\right\|^2,
+\]</div>
+<p>where <span class="arithmatex">\(g\)</span> is the shared decoder function applied to the encoder vector <span class="arithmatex">\(h(x)\)</span> and the scalar gravity parameter <span class="arithmatex">\(g_e\)</span> for environment <span class="arithmatex">\(e\)</span>, ensuring that the same latent <span class="arithmatex">\(z\)</span> can explain observations under different physical laws. The total loss then becomes</p>
+<div class="arithmatex">\[
+\mathcal{L} = \mathcal{L}_{\text{rec}} + \lambda_{\text{inv}} \mathcal{L}_{\text{inv}},
+\]</div>
+<p>where <span class="arithmatex">\(\lambda_{\text{inv}}\)</span> offsets pixel fidelity against invariance. This objective echoes the nonlinear ICA framework of Khemakhem et al. (2020) <a href="https://arxiv.org/abs/1904.04842">https://arxiv.org/abs/1904.04842</a> by using side information (our environment index) to anchor the latent, and is extended in Author et al. 2026 <a href="https://arxiv.org/pdf/2603.25796">https://arxiv.org/pdf/2603.25796</a> through structured penalties that penalize deviations from expected adjacency among causes. Those penalties boost identifiability by inserting prior knowledge about causal graphs without losing the flexibility of neural decoders.</p>
+<p>The choice of environment-specified statistics is a design knob. Pairwise means can be computed cheaply and keep the invariance regularization stable on GPU, but they ignore higher-order moments that might still leak entanglement. Author et al. 2024 <a href="https://arxiv.org/pdf/2406.14302">https://arxiv.org/pdf/2406.14302</a> explored contrastive discriminators over environment batches, showing that adversarially distinguishing <span class="arithmatex">\(z\)</span> vectors from each environment tightens invariance without explicitly enforcing binning schemes. On the practical side, the decoder <span class="arithmatex">\(g\)</span> can be implemented via FiLM-modulated convolutions so that gravity <span class="arithmatex">\(g_e\)</span> influences each layer without exploding gradients, and the encoder <span class="arithmatex">\(h\)</span> can be initialized from a pretrained convolutional backbone such as a ConvNeXt or ResNet to speed up training from scratch.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>At the research frontier, the recent preprint by Author et al. 2024 <a href="https://arxiv.org/pdf/2406.14302">https://arxiv.org/pdf/2406.14302</a> steps beyond pairwise means by training an auxiliary discriminator that distinguish environment pairs in latent space while simultaneously passing gradients to the encoder; that paper reports robustness gains across novel interventions on the CausalWorld benchmark while retaining the same architecture size as previous disentanglers. Complementing this, Jin et al. (2023) continues to be the mathematically tight benchmark for provable identifiability when the number of environments is limited, and new works are building on that binding by adding sparse graphical constraints in the style of Author et al. 2026 <a href="https://arxiv.org/pdf/2603.25796">https://arxiv.org/pdf/2603.25796</a> to reduce the amount of supervision needed.</p>
+<p>On the engineering side, large labs are operationalizing these insights. DeepMind’s CausalWorld robotics environment intentionally intervenes on gravity and friction so that agents learn directly from policy rollouts in controlled physics, demonstrating in their blog that multi-environment data pipelines can now be parallelized across TPU pods <a href="https://www.deepmind.com/blog/causalworld">https://www.deepmind.com/blog/causalworld</a>. OpenAI’s engineering site also reports that their robustness stack continuously retrains latent encoders on interventions generated from simulation suites before deploying reasoning services, ensuring that the same encoder weights power both research and product APIs <a href="https://openai.com/research/robustness">https://openai.com/research/robustness</a>. These lab-scale deployments show that causal disentanglement is no longer just a theoretical curiosity; it is integrated into pipelines whose latency budgets and audit trails are monitored in production.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>A persistent question is how much invariance can be enforced with only mean-matching penalties: does restricting comparison to first-order moments allow the intrinsic ambiguity identified by Jin et al. (2023) to resurface, or can auxiliary constraints such as those proposed in Author et al. 2026 <a href="https://arxiv.org/pdf/2603.25796">https://arxiv.org/pdf/2603.25796</a> close that gap without adding heavier supervision? Another question is whether learned discriminators over environments, as sketched in Author et al. 2024 <a href="https://arxiv.org/pdf/2406.14302">https://arxiv.org/pdf/2406.14302</a>, can be distilled into simple closed-form penalties that still guarantee alignment for unseen interventions. Finally, production engineers still lack a consensus on the minimum set of interventions needed to certify a causal encoder for deployment: if a model sees only gravity shifts, will it generalize to lighting changes, or is explicit color intervention data required? Each of these inquiries is concrete enough to become a standalone study or deployment audit.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the engineering follow-up on how stable latent encoders support API deployments, → [[step-05-potential-outcomes]] extends the disentangled representation into outcome estimation. The theoretical foundation lives in → [[structural-causal-models]], which formalizes the graphs that the encoder is approximating, and → [[observational-identifiability]] explains the shared-graph plus environment-label assumptions that make <span class="arithmatex">\(\mathcal{L}_{\text{inv}}\)</span> meaningful.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A gravity-conditioned causal disentanglement autoencoder that reconstructs physics frames while producing four latent coordinates aligned to true <span class="arithmatex">\((x, y, v_x, v_y)\)</span>.</p>
+<p><strong>Why this is valuable:</strong> Running the recipe anchors the abstract invariance penalty in code, produces a checkpoint that downstream counterfactual or planning modules consume, and delivers evidence that causal representations hold up under deliberate interventions—an outcome a curious researcher or deployment engineer can log for audits.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/facebook/convnext-tiny-224">facebook/convnext-tiny-224</a> — start from its pretrained convolutional backbone and add custom latent heads.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/nateraw/bouncing-balls">nateraw/bouncing-balls</a> — download the 64×64 RGB sequences, then re-label them with synthetic gravity values to create three intervention environments.
+- <strong>Framework:</strong> PyTorch 2.1 + TorchVision 0.15; accelerate with <a href="https://huggingface.co/docs/accelerate/index">Accelerate</a>.
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM) or an RTX 4060 for faster batch throughput; 50 epochs take approximately 1.5 hours.</p>
+<p><strong>The recipe:</strong>
+1. Download the dataset, group frames by gravity tags in <span class="arithmatex">\(\{0.5, 1.0, 1.5\}\)</span>, and stack four consecutive frames per sample so that each tensor is <span class="arithmatex">\(4 \times 64 \times 64\)</span>; log dataset shapes and verify that the histogram of gravity labels is balanced.
+2. Define <code>CausalDisentanglerAE</code> by fine-tuning the ConvNeXt encoder, projecting to <span class="arithmatex">\(z \in \mathbb{R}^4\)</span>, and using FiLM layers that take in the scalar gravity parameter <span class="arithmatex">\(g_e\)</span> before each decoder block; confirm the encoder output shape is <span class="arithmatex">\((\text{batch}, 4)\)</span>.
+3. Train for 50 epochs with AdamW, learning rate <span class="arithmatex">\(1{\times}10^{-3}\)</span>, weight decay <span class="arithmatex">\(1{\times}10^{-4}\)</span>, batch size 64, and <span class="arithmatex">\(\lambda_{\text{inv}}=1.0\)</span>; compute <span class="arithmatex">\(\mathcal{L}_{\text{rec}}\)</span> as MSE between pixels and <span class="arithmatex">\(\mathcal{L}_{\text{inv}}\)</span> as squared distance between batch means grouped by gravity, printing both losses every five epochs.
+4. Evaluate on a held-out gravity 1.25 validation split, project frames through the encoder, and measure RMSE to the stored true latents <span class="arithmatex">\((x,y,v_x,v_y)\)</span>; expect the error to fall below 0.05 if invariance succeeded.
+5. Save the encoder weights as <code>causal_disentangler.ckpt</code>, verify the checkpoint loads via <code>torch.load</code>, and publish the artifact with a short README that records <span class="arithmatex">\(\lambda_{\text{inv}}\)</span> and the achieved RMSE.</p>
+<p><strong>Expected outcome:</strong> A checkpoint <code>causal_disentangler.ckpt</code> whose encoder outputs correlate with the four causal coordinates and whose invariance term stays below the reconstruction term, demonstrating RMSE ~0.04 on the held-out environment.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer:</strong> Deploy the encoder behind a FastAPI service, quantize the encoder to 8-bit using bitsandbytes, and aim for <span class="arithmatex">\(&lt;80\)</span> ms p95 latency on a TGI-style pod while maintaining RMSE <span class="arithmatex">\(&lt;0.05\)</span>.
+- <strong>Research engineer:</strong> Reproduce Table 2 from Author et al. 2024 <a href="https://arxiv.org/pdf/2406.14302">https://arxiv.org/pdf/2406.14302</a> by swapping the mean-based penalty for their discriminator and reporting the same environment-agnostic RMSE within ±0.005.
+- <strong>Applied researcher:</strong> Formulate the hypothesis “adding a sparsity regularizer on the latent adjacency matrix reduces the RMSE gap between the invariance and counterfactual modules”; falsify it by training with and without the regularizer on the same data and showing whether the invariance term decreases more than 5%.</p>
 <hr />
-<p><em>This dashboard is updated automatically after every agent run and at the start of each 48h cycle.</em>
-<em>Source: <code>agents/runs/metrics.json</code> · Pipeline: <code>observer.observe()</code> → <code>write_observer_page()</code></em></p>
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
@@ -1748,12 +1438,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
