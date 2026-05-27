@@ -1117,28 +1117,52 @@ PAGE TO REVIEW:
 
     # Deterministic arxiv-ID validator — catches hallucinated citations cheaply,
     # without an HTTP call. Modern arxiv IDs are YYMM.NNNNN where YYMM cannot
-    # exceed the current year-month. Anything beyond that (e.g. 2604.12345 in
-    # 2026-05) is a writer hallucination. Penalty: -0.05 per bad ID, cap -0.20.
+    # exceed the current year-month, and NNNNN is a monthly counter. arxiv
+    # publishes roughly 15-20k submissions per month across all categories
+    # (cs.* alone is ~10k/month in 2025), so a 5-digit suffix above 25000 is
+    # implausible regardless of month. Combined check rejects:
+    #   - YYMM in the future                (e.g. 2604.xxxxx in 2026-05)
+    #   - month_part outside 01-12          (e.g. 2613.xxxxx)
+    #   - suffix > 25000 for current YYMM   (e.g. 2605.21058 in 2026-05)
+    #   - suffix > 25000 for the previous   (likely fabricated current-month
+    #     citation backdated by one month)
+    # Penalty: -0.05 per bad ID, cap -0.20.
     import re as _re_arxiv
     from datetime import datetime as _dt_arxiv
     arxiv_ids = set(_re_arxiv.findall(r"\b(\d{4}\.\d{4,5})(?:v\d+)?\b", draft))
     now = _dt_arxiv.utcnow()
     current_yymm = (now.year % 100) * 100 + now.month
     bad_arxiv: list[str] = []
+    bad_reasons: dict[str, str] = {}
     for aid in arxiv_ids:
-        yymm_str = aid.split(".", 1)[0]
+        yymm_str, _, suffix_str = aid.partition(".")
         try:
             yymm = int(yymm_str)
+            suffix = int(suffix_str)
         except ValueError:
             continue
         month_part = yymm % 100
-        if month_part < 1 or month_part > 12 or yymm > current_yymm:
+        if month_part < 1 or month_part > 12:
             bad_arxiv.append(aid)
+            bad_reasons[aid] = f"month part {month_part:02d} invalid"
+            continue
+        if yymm > current_yymm:
+            bad_arxiv.append(aid)
+            bad_reasons[aid] = f"YYMM {yymm:04d} is in the future (today {now:%Y-%m})"
+            continue
+        # Implausible-counter check: arxiv monthly volume tops out around 25k.
+        # Apply to the most recent two months, where hallucinations cluster.
+        if yymm >= current_yymm - 1 and suffix > 25000:
+            bad_arxiv.append(aid)
+            bad_reasons[aid] = (
+                f"suffix {suffix} implausibly high for recent month "
+                f"(arxiv monthly volume tops ~25k)"
+            )
     if bad_arxiv:
         penalty_a = min(0.20, 0.05 * len(bad_arxiv))
         confidence = max(0.0, confidence - penalty_a)
         hallucination_msgs = [
-            f"Hallucinated arxiv ID {aid} — YYMM is in the future or malformed (today is {now:%Y-%m})"
+            f"Hallucinated arxiv ID {aid} — {bad_reasons.get(aid, 'malformed')}"
             for aid in bad_arxiv
         ]
         all_issues = list(all_issues) + hallucination_msgs
@@ -1147,6 +1171,25 @@ PAGE TO REVIEW:
             approved = False
     else:
         per_dim["arxiv_validity_score"] = 1.0
+
+    # LLM-reviewer-flagged hallucination keywords. The structured reviewer
+    # sometimes catches fake citations (implausibly-high counters for the
+    # current month, fabricated author lists, suspicious URLs) that the
+    # regex above can't detect. When the reviewer's own issues list contains
+    # those keywords, apply a hard -0.10 penalty so this can flip approval
+    # — the regex+LLM combo gives layered defense.
+    hallucination_kw = ("hallucin", "fabricat", "fake citation", "fictional",
+                        "future / fabricated", "likely hallucinated")
+    flagged_issues = [
+        iss for iss in (all_issues or [])
+        if any(kw in iss.lower() for kw in hallucination_kw)
+    ]
+    if flagged_issues:
+        confidence = max(0.0, confidence - 0.10)
+        per_dim["reviewer_hallucination_flag"] = 0.0
+        approved = False
+    else:
+        per_dim["reviewer_hallucination_flag"] = 1.0
 
     summary = (
         f"PASS: {structured.passed}\nConfidence: {confidence:.2f} "
