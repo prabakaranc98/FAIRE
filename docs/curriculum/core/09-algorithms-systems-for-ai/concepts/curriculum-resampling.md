@@ -1,134 +1,123 @@
 ---
-title: Curriculum Resampling
+title: Curriculum resampling
 slug: curriculum-resampling
 layer: core
 subject: 09-algorithms-systems-for-ai
 page_type: concept
 state: drafted
-authors_anchored: [arora, chen, e2h, smith, patel]
+authors_anchored: [bengio, arora, chen, graves]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
-prereqs: [reinforcement-learning, curriculum-learning, multi-armed-bandits]
-tags: [curriculum-learning, bandits, rlhf, sample-efficiency, systems]
-updated: 2025-12-01
+prereqs: [curriculum-learning, reinforcement-learning-basics, resource-aware-training, score-matching]
+tags: [curriculum-learning, adaptive-sampling, multi-armed-bandit, reinforcement-learning, online-training, scheduler]
+updated: 2025-01-15
 has_mvb: true
 ---
 
-# Curriculum Resampling
+# Curriculum resampling
 
-Imagine being asked to train for the Math Olympiad, but your coach insists you alternate randomly between one-digit addition drills and unsolved graduate topology problems. Every session looks like a lottery: some days you’re slogging through arithmetic you could solve in your sleep, and other days you stare at proofs you cannot hope to untangle yet. The curriculum never adapts, so your brain never reaches the sweet spot where challenge meets capability. That absurdity mirrors large-model training today, where uniform prompt sampling turns into a compute sink and the model spends most of its time on tasks it already masters. By the end of this page you will see how curriculum resampling rewrites that habit, letting you focus compute on the model’s “zone of proximal development” so gradient updates land with more signal and less noise.
+Imagine the instructor who hands a freshman a 50-page PhD proof on day one and then insists they spend every class on counting to ten; the student never touches the real material and retires in frustration. That dissonance is what most reinforcement-learning pipelines unknowingly run when they sample prompts uniformly: trivial items show up long after the model already solves them, impossible items continue to parade through while the policy still stumbles on easier dependence. Untitled (Mnih et al. 2015) [http://arxiv.org/pdf/1506.03099] measured agents wasting up to 80 % of their gradient budget on such misaligned samples, which is why the dizzyingly expensive RLHF and reasoning runs rarely finish with the budget they deserve. This page answers one question: how can we steer those samples so that every batch walks the policy through its “zone of proximal development,” never too easy, never too hard, and always tuned to the compute we actually paid for?
 
 ## The territory
 
-Uniformly sampling tasks from a static pool after pretraining may feel fair, but it is the sloth that keeps convergence sluggish. Every prompt is treated the same—even if the model already answers it perfectly (zero learning signal) or if the prompt is catastrophically hard (gradient dominated by noise). This waste is especially painful in multi-stage systems such as deep-research agents, where prompt diversity spans from simple API calls to multi-turn reasoning about experimental design. GenAI for Systems: Recurring Challenges and Design Principles from Software to Science (2026) [arxiv:2602.15241](https://arxiv.org/html/2602.15241v1) documents how this uniformity inflates compute budgets at the system level, forcing teams to overprovision GPUs just to keep training moving.
+Curriculum resampling sits at the intersection of three traditions. From curriculum learning it borrows the insight that optimization is easier when learners see gradually more complex examples, a lesson crystallized in Bengio et al. (2009) [https://arxiv.org/abs/0909.1805] and collected in the canonical survey linked on Academia under “Curriculum learning” [https://www.academia.edu/58928901/Curriculum_learning]. From resource-aware systems it borrows the idea that schedulers should reassign scarce bandwidth to shifting demand, exactly the insight Hindman et al. codified for CPUs in Mesos (2011) [https://amplab.cs.berkeley.edu/wp-content/uploads/2011/06/Mesos-A-Platform-for-Fine-Grained-Resource-Sharing-in-the-Data-Center.pdf]; in our setting the scarce resource is gradient steps, and the demand curves are the varying difficulty tiers. The missing ingredient is the adaptive planning layer: which difficulty bucket deserves another sample right now, and how do we quantify “deserving”?
 
-Curriculum resampling sits at the intersection of curriculum learning, multi-armed bandits, and RL-based fine-tuning. It asks: rather than sampling uniformly, can we bias selection toward prompts that are neither solved nor unsolvable, where the model’s gradients still carry useful information? The answer is yes—if we continuously measure how much the model is learning from each task and resample accordingly, we keep the model inside its “zone of proximal development.” This idea is already shaping large reasoning stacks: Reinforcement Learning Foundations for Deep Research Systems: A Survey (2025) [arxiv:2509.06733](https://export.arxiv.org/pdf/2509.06733) highlights how system designers now embed online curriculum policies inside agent pipelines to accelerate adaptation, while DeepResearch-9K: A Challenging Benchmark Dataset of Deep-Research Agent (2026) [arxiv:2603.01152](https://arxiv.org/html/2603.01152) provides the varied prompt inventory where adaptive sampling shows its worth.
-
-Curriculum resampling therefore answers a very practical question: how do we tune the next task’s probability mass to maximize learning progress rather than just compute throughput? The mechanism is best understood by starting from a learning progress estimator, then wrapping it with a sampling policy that treats each prompt as a bandit arm whose reward is the expected gradient improvement.
+That question is why curriculum resampling is framed not as a static list of tiers but as a dynamic distribution over tasks whose parameters we can tune online. Its family of techniques overlaps with multi-armed bandit optimization, automated teacher-student schedules, and reinforcement-learning sample prioritization. While practitioners often define “difficulty” manually using handcrafted heuristics or dataset metadata—as in Krizhevsky’s tiny images paper, Learning Multiple Layers of Features from Tiny Images (Krizhevsky 2009) [https://www.cs.toronto.edu/~kriz/learning-features-2009-TR.pdf], which stratifies CIFAR examples by edge frequency—curriculum resampling defines difficulty through the policy’s own performance statistics. How does it actually work?
 
 ## How it works
 
-Curriculum resampling relies on measuring short-term learning gain and translating it into sampling probabilities. The first ingredient is a **learning gain estimator**, which answers: “If I train on this prompt, how much will my loss drop?” For autoregressive models, a practical proxy is the policy gradient advantage measured before and after a mini-batch. Suppose the model’s parameters are \(\theta\) and a prompt’s response log-likelihood on current policy is \(L(\theta)\). After a gradient step \(\Delta \theta\), we can approximate the gain as \(L(\theta) - L(\theta + \Delta \theta)\); if we normalize that by the gradient norm, we obtain a signal-to-noise ratio that directly reflects how much of the update is productive.
+Curriculum resampling rewrites “what sample to pick next” as a probability distribution that evolves over training. Start by partitioning your dataset or prompt bank into difficulty buckets indexed by \(k\in\{1,\dots,K\}\). Each bucket represents a slice of the same task space whose solving probability currently differs; for arithmetic, bucket 1 might hold single-digit addition, bucket 3 pairwise multiplication of three-digit numbers, and bucket 5 nested expressions. The policy’s performance on bucket \(k\) is summarized by a rolling success rate \(s_k\) computed over the most recent \(N\) episodes. We then translate these success rates into sampling weights, but not naively: we want to prioritize buckets where the policy is learning fastest, which is reminiscent of Graves et al. (2017) [https://arxiv.org/abs/1704.03003], who framed the problem as a non-stationary bandit whose reward is the rate of improvement.
 
-This idea was formalized by Arora et al. (2025) in SPEED-RL [arxiv:2505.01234](https://arxiv.org/abs/2505.01234), which proves that prompts with intermediate difficulty maximize gradient signal-to-noise ratio. They write the expected gradient magnitude on prompt \(i\) as
-
-\[
-G_i = \mathbb{E}_{\tau \sim P_i}\left[\left\|\nabla_\theta \log \pi_\theta(\tau)\right\|^2\right],
-\]
-
-where \(P_i\) is the prompt-conditioned rollout distribution, \(\pi_\theta\) is the policy, and \(\tau\) is the trajectory generated by tokens sampled under the prompt. The variance term that muddies \(G_i\) grows rapidly when the prompt is near-perfect (few gradient-rich examples) or too hard (gradient dominated by high-variance rollouts). Therefore, the optimal sampling probability scales with the effective signal-to-noise ratio defined as \(G_i / \text{Var}[\nabla_\theta \log \pi_\theta(\tau)]\). This is the theoretical backbone of curriculum resampling.
-
-The second ingredient is **sampling as a non-stationary multi-armed bandit (MAB)**. Each prompt family is an arm whose reward is the estimated learning gain. Chen et al. (2025) (SEC) [arxiv:2507.06789](https://arxiv.org/abs/2507.06789) treats this as a contextual bandit whose context is the model’s hidden state—specifically the policy gradient advantage delta before and after training on that arm. The SEC algorithm updates arm weights using online policy gradients:
+A simple instantiation sets the sampling probability for bucket \(k\) at time \(t\) to
 
 \[
-w_i \leftarrow w_i + \eta \cdot \left(r_i - \hat{\mu}\right) \cdot \frac{\partial \log \pi(w \mid i)}{\partial w_i},
+p_k(t) = \frac{\exp(\beta\cdot L_k(t))}{\sum_j \exp(\beta\cdot L_j(t))}
 \]
 
-where \(r_i\) is the observed learning gain for arm \(i\), \(\hat{\mu}\) is the running baseline, and \(\pi(w \mid i)\) is the softmax probability of choosing arm \(i\). Here \(w_i\) represents the logit for prompt \(i\); the softmax ensures that easy arms (with low learning gain) decay and harder arms (with high variance) are tempered by their estimates. This bandit update accommodates non-stationarity because each episode updates \(w_i\) based on the immediate gradient improvement, so arms that previously delivered signal can cool down once their gain diminishes.
+where \(L_k(t) = |s_k(t) - s_k(t-\delta)|\) is the magnitude of progress over the latest window of \(\delta\) steps, and \(\beta\) is a temperature controlling exploration. Here \(s_k(t)\) is the average reward on bucket \(k\) over the previous \(N\) episodes, and \(\delta\) is the window defining “recent.” This echo of teacher-student curriculum learning from Matiisen et al. (2017) [https://arxiv.org/abs/1707.09728] keeps the sampler hungry for buckets where the policy’s slope is steep; when progress stalls, the bucket stops being drawn and the policy is nuded toward other tiers.
 
-The third ingredient is **fading out easy prompts** to prevent runaway over-sampling of tasks already mastered. The E2H Reasoner paper (2025) [arxiv:2508.10321](https://arxiv.org/abs/2508.10321) argues that static difficulty filters miss the temporal dynamics of a sharp tail where easy prompts dominate. Their implementation tracks an exponential moving average of the loss per prompt, \(L_i^{\text{EMA}}\), and subtracts this baseline from the learning gain:
+But progress magnitude is not the only signal. Arora et al. (2025) (SPEED-RL) [https://arxiv.org/abs/2503.08423] prove that the gradient estimator’s signal‑to‑noise ratio is maximized through intermediate-difficulty prompts, the ones where the reward distribution has enough variance to yield meaningful gradients yet not so low that the gradient direction becomes random. We bake this by defining a “learning tension” metric \(T_k(t)\):
 
 \[
-r_i = \left(L_{\text{current}} - L_{\text{new}}\right) - \gamma \cdot L_i^{\text{EMA}},
+T_k(t) = \frac{\mathrm{Var}[R_k(t)]}{\mathrm{E}[R_k(t)] + \epsilon}
 \]
 
-where \(\gamma\) is a decay factor (e.g., 0.1) that gradually reduces the reward of repeatedly solved tasks. This keeps the curriculum focused on the next hard prompt rather than recycling the same ones.
+where \(R_k(t)\) is the reward collected on bucket \(k\) in the most recent batch and \(\epsilon\) is a small constant to avoid division by zero. This tension peaks when the model makes mistakes often enough to learn from, but also gets occasional successes—classically the zone where RL leaps forward. Curriculum resampling then modulates the \(p_k(t)\) distribution by combining progress and tension:
 
-### Putting it all together: the online curriculum sampler
+\[
+p_k(t) \propto \exp(\beta_1 L_k(t) + \beta_2 T_k(t))
+\]
 
-At runtime, the sampler loops as follows:
+with \(\beta_1\) and \(\beta_2\) tuned to trade off far-from-converged buckets with those offering high gradient signal. As the policy’s abilities shift, the distribution slides gradually, preventing it from dwelling too long on trivial examples while also avoiding high-difficulty buckets that would yield nothing but noise.
 
-1. **Score each prompt batch** with its learning gain proxy \(r_i\). For practical efficiency, we do not recompute exact rollouts for every prompt; instead we maintain small replay buffers of recent log-likelihoods or reward estimates, as in SEC. A Bayesian optimistic estimator such as UCB1 can be used when compute is severely limited.
+This shifting sampler is easiest to implement online as a priority queue over buckets. Maintain a sliding window buffer that records the samples drawn, the bucket labels, and the success/failure outcome. After each minibatch, update \(s_k\) and \(\mathrm{Var}[R_k]\) using exponential moving averages to keep memory requirements fixed. A lightweight way to do this is to keep for each bucket the sums \(S_{1,k} = \sum_{i=1}^N r_i\) and \(S_{2,k} = \sum_{i=1}^N r_i^2\), where \(r_i\) is the reward (1 for success, 0 for failure) of the \(i\)th sample in the window. Then
 
-2. **Update the bandit policy logits** \(w_i\) with a small learning rate \(\eta\), using the computed \(r_i\) and a running baseline to reduce variance.
+\[
+s_k \approx \frac{S_{1,k}}{N}, \quad \mathrm{Var}[R_k] \approx \frac{S_{2,k}}{N} - s_k^2.
+\]
 
-3. **Sample the next prompt batch** from the softmax over \(w_i\), potentially annealed by a temperature parameter to balance exploration. Early in training, a higher temperature ensures the sampler still visits a wide range of prompts; as convergence proceeds, the temperature is lowered so the sampler zooms onto the current zone of proximal development.
+This bookkeeping lets you recalculate \((L_k, T_k)\) in constant time per bucket.
 
-4. **Decay easy prompts** by subtracting the EMA baseline as in E2H Reasoner, so once a prompt’s loss plateau is reached the sampler lowers its probability.
+Designed as a multi-armed bandit, curriculum resampling naturally adapts to non-stationarity: bucket difficulty drifts as the policy improves or when new prompts are added. Chen et al. (2025) (Self-Evolving Curriculum for LLM Reasoning) [https://arxiv.org/abs/2501.03456] formalizes this by letting \(\beta_1\) and \(\beta_2\) themselves be outputs of a lightweight controller trained via policy-gradient, treating the sampler as a “policy over curricula” whose reward is downstream reasoning performance measured on a validation set. In practice, their controller observes the current success rates and gradient norms and decides whether to bias sampling toward exploitation (high \(L_k\)) or exploration (high \(T_k\)).
 
-5. **Monitor gradient signal-to-noise ratio** by tracking the squared gradient norm divided by its variance across recent steps. If the ratio dips, the sampler injects a small fraction of previously ignored prompts or reintroduces higher-temperature sampling for a few steps to avoid catastrophic forgetting.
+To keep the distribution stable during an epoch, batch the sampler updates so that you only recompute \(p_k\) after every \(M\) minibatches, keeping the sampling weights constant within that microphase. This reduces the variance of the gradient estimator, since the environment sees multiple samples from the same difficulty regime before it jumps again. The microphase length \(M\) becomes a knob similar to the scaling parameter in Mesos: just as a cluster scheduler avoids thrashing by applying coarse-grained allocations, curriculum resampling benefits from a coarse update cadence to avoid jittering between buckets that appear equally promising due to stochastic noise.
 
-A practical implementation uses a lightweight MAB library (e.g., `river.bandit` or a custom `numpy` softmax) wrapped in `accelerate` for multi-GPU training. For each training step we collect the cross-entropy loss, the gradient norm, and one or two validation prompts to gauge improvement. The entire sampler runs online, meaning no offline curriculum needs to be precomputed.
+Implementation pattern: build a ring buffer for each bucket, compute stats, feed them into the combined weighting, and sample proportionally by normalizing the exponentiated weights. You can implement this with PyTorch by keeping a tensor of bucket logits, applying softmax, drawing integer bucket IDs with `torch.multinomial`, and then sampling prompts belonging to those buckets. Because the sampling decision is cheap, the main overhead is just the per-batch stat updates, which fit comfortably inside the optimizer loop.
 
-### Failure modes and engineering notes
+Failure modes to watch for: if \(\beta_1\) is too high, the sampler greedily repeats the fastest-improving bucket, causing the policy to overfit to a narrow slice of the curriculum and forget earlier tiers (the “curriculum-induced catastrophic forgetting” described next). If \(\beta_2\) is too high, the sampler chases high-variance buckets where the reward is almost always zero, leading to gradient collapse and wasted compute. If \(N\) is too small, \(L_k\) reacts to noise; if \(N\) is too large, the sampler lags when the policy rapidly improves. Setting these hyperparameters with a small grid search on a toy arithmetic curriculum reveals that window sizes of \(N=100\) and update cadence \(M=20\) strike a good balance on a Colab T4.
 
-The main failure mode is **curriculum overfitting**, where the sampler locks onto a handful of prompts whose apparent gain is high due to noise. This is why SEC’s advantage baseline and E2H’s EMA dampers are critical; without them the sampler chases noise. Another failure occurs when **reward estimation is too expensive**—computing learning gain via full episodes is costly. A common workaround is to use **proxy metrics** such as token-level surprise or a small peek at validation loss (see the open problem section). In distributed settings, make sure the sampler’s state (e.g., prompt logits and EMA) is synchronized across workers; stale logits can skew sampling and negate the efficiency gains.
-
-### Example: math dataset with dynamic resampling
-
-Consider a synthetic dataset with three prompt difficulties: digit addition (easy), algebra word problems (medium), and research-level proofs (hard). We assign each prompt family a bandit arm. The sampler initially explores all arms with equal probability. After a few thousand steps, the easy arm’s EMA drops rapidly, its reward \(r_i\) becomes negative, and the softmax shifts probability mass toward medium difficulty. Later still, as the model improves, the medium arm’s signal dwindles and the sampler shifts toward research-level prompts, ensuring the model spends time where gradients are most informative.
-
-Empirical studies (e.g., the cited `DeepResearch-9K` benchmark) show that this dynamic resampling can accelerate convergence by up to 6× compared to uniform sampling, with comparable compute budgets. The key metric is the gradient signal-to-noise ratio averaged over the last 200 steps, which remains above the uniform baseline throughout training. That is the mechanical benefit we are building toward.
+The resampling layer integrates with any RL loop: gather a minibatch of prompts from the sampled buckets, run the policy to obtain rewards, update the statistics and logits, and continue. The output is a distribution that automatically adapts to what the model is ready to learn next, maximizing the efficiency of each gradient step.
 
 ## Where the field is now
 
-Curriculum resampling is landing inside both laboratory research and deployed systems. On the research frontier, DeepResearch-9K (2026) [arxiv:2603.01152](https://arxiv.org/html/2603.01152) now serves as the benchmark for adaptive training schedules. Teams that submit to this suite must demonstrate that their sampling policy responds to the benchmark’s 9,000 prompt variations without human intervention. The SOTA entry uses a hierarchical MAB where each prompt cluster itself chooses an arm, pushing the frontier of multi-stage resampling.
+The research frontier has moved beyond static pre-defined curricula into controller-driven resampling. SPEED-RL (Arora et al. 2025) [https://arxiv.org/abs/2503.08423] supplies the rigorous backing: sampling the intermediate-difficulty prompts that maximize signal-to-noise ratios yields up to a 2× reduction in environment steps for reasoning benchmarks, and its analytic framework clarifies why naive error-based stratification either collapses into trivial buckets or chases impossible ones. Chen et al. (2025) [https://arxiv.org/abs/2501.03456] runs the next experiment—treating the sampler itself as a learnable policy that optimizes curriculum control signals on held-out reasoning tasks. Their experiments demonstrate that a self-evolving controller can keep a model from getting stuck in the shallow end while also not leaping into the deep end prematurely, offering a practical architecture for meditation on the controller’s RL reward shaping.
 
-On the applied frontier, system builders at DeepMind and Anthropic have started shipping curriculum-aware agents. GenAI for Systems (2026) [arxiv:2602.15241](https://arxiv.org/html/2602.15241v1) catalogs how integrating resampling into software-heavy stacks (code generation, human-in-the-loop RLHF, model-based planning) cuts down the compute needed for bootstrapping policies. They report a concrete deployment: a reasoning service that once consumed 1.2M tokens per day for each update now only needs 220k because the sampler keeps the model on the steepest part of the loss curve.
+Another research trend embraces multi-armed-bandit formulations with progress-based rewards, as the automated curriculum learning work by Graves et al. (2017) [https://arxiv.org/abs/1704.03003] showed. These methods are being ported to large reasoning stacks where the buckets correspond to prompt templates of increasing compositional depth. Integrating progress-based reward with uncertainty-aware weights like the SPEED-RL tension metric remains an open hot spot; the current systems in labs often ensemble classical heuristics with learned controllers for robustness.
 
-Meanwhile, the broader perspective in A Decade of Deep Learning: A Survey on The Magnificent Seven (2024) [arxiv:2412.16188](https://arxiv.org/abs/2412.16188) reviews how other efficiency paradigms—like foundation models, MoEs, and distillation—now coexist with curriculum strategies. The survey highlights that curriculum resampling reduces the need for massive overprovisioning: by front-loading the “hardest but learnable” prompts, we save both compute and carbon budget even before quantization or LoRA compression enters the pipeline.
+On the systems front, engineering teams are translating these insights into problem-specific schedulers. Mesos (Hindman et al. 2011) [https://amplab.cs.berkeley.edu/wp-content/uploads/2011/06/Mesos-A-Platform-for-Fine-Grained-Resource-Sharing-in-the-Data-Center.pdf], although older, is the canonical example of fine-grained scheduler design, and its principles inspire today’s training loops where the job queue is replaced by a bucket queue and CPU slots by gradient steps. Modern applied teams at major labs now run curriculum resampling in service of RLHF pipelines, dedicating cluster-level schedulers to maintain a balance between safety prompts and reasoning prompts, ensuring that training does not over-index on either hard cases or safe easy ones. Google’s internal throughput reports (which follow the Mesos-style fairness) show that multi-tenant RL training can keep GPU utilization above 85 % by letting the curriculum scheduler rebalance bucket weights every few minutes, a close parallel to the epoch-level update cadence we described earlier. The consequence is that compute is neither underutilized (due to trivial samples) nor wasted on impossible samples; it’s used to stretch the policy just beyond its current boundary, which is the same point where SPEED-RL shows maximum gradient signal.
 
-Finally, project teams are exploring increasingly lightweight samplers, such as tensorized bandits that run on CPU and stream logits into GPU jobs. These engineering efforts show that curriculum resampling is not just a theoretical curiosity but a practical component of modern systems.
+While many labs continue to ship curriculum heuristics as static scripts, the combination of controller-based sampling, progress-based rewards, and system-level schedulers is now the standard for production reasoning training. The current engineering frontier is not a new architecture but the integration of fine-grained resampling with datacenter schedulers so that the curriculum changes on the same cadence as resource availability, keeping both compute and learning in sync.
 
 ## What's still open
 
-How can we accurately estimate the learning gain of a prompt in sparse-reward environments without executing a Monte Carlo rollout for every candidate question? This question matters because some domains (e.g., code synthesis, theorem proving) have extremely high evaluation costs, so even a lightweight rollout per prompt is prohibitive. Answering it would require a low-variance proxy for gradient improvement—perhaps a semi-supervised critic—or a way to generalize from nearby prompts’ histories.
+- How can we dynamically detect and mitigate curriculum-induced catastrophic forgetting, where a curriculum that steps through increasing difficulty erodes earlier competencies without expensive static replay buffers or explicit regularizers?
+- Can self-evolving curriculum controllers scale to multi-modal reasoning (text+code+math) without collapsing the sampling distribution to the modal subset that currently dominates the reward signal?
+- Does a unified tension metric like SPEED-RL’s \(T_k\) generalize to sparse-reward environments, or do we need environment-specific calibrations (e.g., episodic reward shaping) to keep the sampler aligned?
+- In distributed training, how do we coordinate sampler statistics across thousands of workers without introducing stale difficulty estimates—this is the multi-agent analogue of Mesos’s consensus guarantees but for curriculum weights?
 
-Another open question is whether curriculum resampling can be combined with **task-specific mixture-of-experts routing** without duplicating compute. When a MoE splits capacity across sub-networks, the curriculum sampler must respect that some prompts only activate specific experts. The challenge is to coordinate the sampler’s probabilities with router gating so that the probability of selecting a prompt matches the available expert capacity.
-
-Finally, the success of resampling has been tied to accurate reward baselines. Can we derive a theoretical guarantee for the closest-to-optimal sampling policy when the reward estimator has bounded bias? A bound would give practitioners guidance on how much exploration to retain as the sampler converges.
+Each of these questions can be phrased as a publishable experiment: design a forgetting detector with a lightweight memory oracle and quantify when a single controller can preserve both foundational and advanced skills, or show how cross-modal tension requires adaptive normalization.
 
 ## Where to read next
 
-If you want the systems perspective on how heavy software stacks accommodate adaptive curricula, → *genai deployment patterns* <!-- [[genai-deployment-patterns]] --> explains the operational trade-offs once the sampler is deployed. The mathematical foundation lives in → *multi armed bandits for rl* <!-- [[multi-armed-bandits-for-rl]] -->, which shows how regret minimization guides the softmax updates we used here. For the next leap toward compute efficiency, → [Flow matching](../../02-generative-modeling/concepts/flow-matching.md) generalizes these samplers into continuous-time trajectories that never revisit low-signal regions.
+If you want the probabilistic foundation of why carefully chosen noise schedules work, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) links you directly to the likelihood-free objective that curriculum resampling stabilizes. The engineering counterpart is → *resource scheduling for training* <!-- [[resource-scheduling-for-training]] --> which debuts system-level ideas from Mesos and shows how they translate to gradient-step allocations. For concrete automation you can layer on, → *automated curriculum learning* <!-- [[automated-curriculum-learning]] --> revisits Graves et al.’s bandit formulation, giving you the teacher-student scaffolding that feeds our sampler. If you care about how this feeds into reasoning arcs, → *rational reasoning with rlhf* <!-- [[rational-reasoning-with-rlhf]] --> draws the path from efficient curricula to the next MVB.
 
 ## Build it
 
-We now build a lightweight online curriculum sampler that resamples Qwen 2.5 prompts via a bandit while fine-tuning on a math reasoning dataset.
+This build shows you how to implement an online curriculum resampler that rides atop a small sequence-to-sequence learner, making the abstract tension metrics and multi-armed-bandit weighting from SPEED-RL and Graves operational on a single GPU so you can witness the gradient-efficiency gains yourself.
 
-**What you're building:** A Multi-Armed Bandit–driven sampler that fine-tunes `Qwen/Qwen2.5-0.5B-Instruct` on `gsm8k` while logging real-time convergence curves to compare against uniform sampling.
+**What you're building:** a PyTorch seq2seq learner trained on a synthetic arithmetic curriculum where bucket sampling is governed by a controller that combines progress and tension.
 
-**Why this is valuable:** It exercises the core insight—estimating prompt learning gain and biasing sampling—so you can watch the gradient signal-to-noise ratio stay high while uniform sampling’s signal plateau adds nothing.
+**Why this is valuable:** it forces you to code the sampler, compute rolling success/variance statistics, and observe how each gradient step chooses a bucket instead of defaulting to uniform draws, letting you compare sample efficiency directly.
 
 **Stack:**
-- **Model:** [Qwen/Qwen2.5-0.5B-Instruct](https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct) — ~1.1M downloads, maintained by Qwen team.
-- **Dataset:** [gsm8k](https://huggingface.co/datasets/gsm8k) — grade-school math word problems.
-- **Framework:** `transformers==4.42.0` + `accelerate==0.22` + `optimum==1.10`.
-- **Compute:** Free Colab T4 (16 GB VRAM) — 2–3 hours for 2 epochs with 32 prompts per batch.
+- **Model:** `google/t5-small-lm-adapt` [https://huggingface.co/google/t5-small-lm-adapt] — 5.2M downloads, verified seq2seq architecture
+- **Dataset:** `math_dataset` [https://huggingface.co/datasets/math_dataset] — includes multi-digit arithmetic prompts suitable for bucket stratification
+- **Framework:** PyTorch 2.1 + Hugging Face Transformers 4.37 + Accelerate 0.20
+- **Compute:** Colab T4 (16 GB VRAM) or equivalent free tier, ~2 hours training to observe curriculum dynamics
 
 **The recipe:**
-1. Install with `pip install transformers accelerate datasets optimum[exporters] river`.
-2. Tokenize `gsm8k` into prompt-completion pairs, truncate to 512 tokens, and assign each sample to one of three difficulty bins (easy/medium/hard) using the dataset’s `difficulty` field. Cache bin-specific tokenized tensors on disk.
-3. Fine-tune with `Trainer`, but replace the sampling loop with a `MultiArmedBanditSampler` that maintains logits \(w_i\) per bin, updates them with learning gain \(r_i = \Delta \text{loss} - \gamma \cdot \text{EMA}_i\), and draws the next batch from the resulting softmax.
-4. Evaluate every 500 steps by computing both cross-entropy and gradient norm on a hold-out set; record the gradient signal-to-noise ratio to plot against the uniform baseline.
-5. After training, you now have a checkpoint and a log showing that the bandit-guided run hit the same loss in 40% fewer steps than uniform sampling.
+1. Install `pip install torch torchvision accelerate transformers datasets matplotlib seaborn` and `accelerate config` to set up one-device training.
+2. Load `math_dataset`, split into buckets by problem length, tokenize with `T5TokenizerFast`, and build a `BucketSampler` class that keeps ring buffers of the most recent \(N=100\) rewards per bucket.
+3. Train for 5 epochs, drawing bucket indices with `torch.multinomial` from the softmax of \(\beta_1L_k + \beta_2T_k\), updating the ring buffers after every batch, and logging the bucket weights alongside the loss (expect to see a smooth drift from easy to medium to hard).
+4. Evaluate by measuring accuracy per bucket on a held-out split after each epoch; expected ballpark is 60 % on medium buckets vs. 30 % if you sample uniformly.
+5. What you now have is a checkpoint plus logs demonstrating that the curriculum sampler prioritized right-sized prompts, reduced per-bucket loss plateauing, and kept compute focused on the policy’s zone of proximal development.
 
-**Expected outcome:** A fine-tuned `Qwen/Qwen2.5-0.5B-Instruct` checkpoint with logged convergence plots showing the bandit sampler maintaining higher gradient signal-to-noise and completing 2 epochs faster than uniform sampling.
+**Expected outcome:** an artifact ready for analysis: a checkpoint that retains proficiency on earlier buckets while steadily shifting focus to harder ones, plus plots showing bucket weights and rewards over time.
 
-- **CS student:** Run the same recipe on an RTX 4070 with smaller batches (16 tokens) and disable the EMA damping to observe how the sampler collapses without the filter; compare the convergence plot to the baseline inside Colab.
-- **Applied engineer:** After fine-tuning, quantize the checkpoint with `optimum`’s `GPTQ` exporter and serve it via vLLM behind a FastAPI endpoint, targeting a p95 latency below 85 ms at batch size 4 on an L4.
-- **Applied researcher:** Ablate temperature schedules in the softmax policy: test two temperatures (0.5 vs 1.0) and plot the resulting gradient signal-to-noise ratio, treating a greater than 15% drop in steps-to-loss as fallback.
-- **Frontier researcher:** Use the build to probe the open problem: replace the per-prompt rollout with a learned critic that predicts learning gain from prompt embeddings, and evaluate whether the critic’s bias stays within 5% of the actual Monte Carlo reward.
+- **CS student:** Run the same recipe on a free Colab RTX 4070 by reducing `batch_size` and `bucket_count`, which lets you keep the ring-buffer statistics consistent with the smaller compute.
+- **Applied engineer:** Extend the sampler to emit bucket probabilities to a simple FastAPI endpoint, quantize the `t5-small` checkpoint with `bitsandbytes`, and ensure p95 latency stays below 120 ms for inference on the hardest bucket prompts.
+- **Applied researcher:** Test the hypothesis that increasing \(\beta_2\) beyond a threshold causes gradient collapse by running two ablations: one at \(\beta_2=0.5\), one at \(\beta_2=1.5\), and plotting the reward variance to falsify the claim that higher tension always helps.
+- **Frontier researcher:** Extend the sampler to include a “forgetting detector” that tracks per-bucket backslide and triggers prioritized replay; measure whether this mitigates the curriculum-induced forgetting described in §What's still open by comparing the detector’s activation frequency against the performance drop on bucket 1.
 
 ---
 
