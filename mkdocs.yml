@@ -84,6 +84,7 @@ nav:
     - Local LLM mode: system/local-mode.md
     - Learnings Log: system/learnings-log.md
     - Backlog (sprint retros): system/backlog.md
+    - Arc roadmap (frontier-grounded): system/arc-roadmap.md
     - Generation Status: system/status.md
     - Observer Dashboard: system/observer.md
     - Agent Changelog: system/changelog.md
