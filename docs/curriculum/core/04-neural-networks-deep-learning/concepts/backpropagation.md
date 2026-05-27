@@ -5,153 +5,118 @@ layer: core
 subject: 04-neural-networks-deep-learning
 page_type: concept
 state: drafted
-authors_anchored: [lecun, sutskever, hinton, rumelhart]
+authors_anchored: [rumelhart, werbos, lecun, hinton, widrow]
 feeds_de_pillar: []
-mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher, theory-student]
-prereqs: [linear-algebra, calculus, optimization-basics, neural-networks]
-tags: [backpropagation, autodiff, gradient-checkpointing, activation-memory, pytorch, optimizer]
-updated: 2025-11-05
+mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher, curious-learner, theory-student]
+prereqs: [gradient-descent, neural-networks-intro, calculus-chain-rule]
+tags: [backpropagation, autodiff, dynamic-programming, gradient-based-learning, neural-training]
+updated: 2025-01-15
 has_mvb: true
 ---
 
 # Backpropagation
 
-Why does simply doubling the depth or width of a neural network often blow up the GPU memory instead of the theory? Backpropagation is the algorithm that rewinds the computation graph to turn a single loss number into weight updates, but every rewind step needs a copy of the activation it previously produced. In practice, the gradient isn’t a set of equations on paper anymore; it is a routing problem where the backward pass must collect a sequence of stored tensors in precise reverse order. A quick intuition you can build in a thirty-minute notebook is this: treat each layer’s activation as a lane marker, log how much memory it consumes on a handful of layers, then recompute the layers just in time to see what happens when you only keep every third marker. That feel for “how much is too much to store?” grounds the later math without requiring a forest of notation.
+How can a single scalar loss signal at the very end of a computation tell every earlier layer how to adjust itself, even when millions of parameters lie between the input and the output? Humans do this by passing blame backwards—every stage on the production line hears whether its contribution helped or hurt—while neural networks rely on backpropagation to do the same. The algorithm reverses execution, reuses cached activations, and performs a constant amount of work per layer or timestep rather than re-running the entire network from scratch; that reuse is what turns the chain rule into a dynamic-programming engine that makes modern deep and sequential training possible.
 
 ## The territory
 
-Backpropagation solves the chain rule by propagating the loss gradient backward through the computation graph, turning the same operations executed forward into local rules for updating parameters. This mechanism is automatic differentiation, and the “routing” picture recasts it as a logistics problem: the forward pass writes activations into memory, and the backward pass must fetch them in reverse order to compute \( \delta^{(l)} \), the local signal at layer \( l \). Modern attention, batching, and width inflate each activation into something like \(O(batch \times sequence \times hidden)\), so the route quickly exceeds the capacity of even high-bandwidth memory. Activation memory becomes more expensive than the weights themselves. 
+Backpropagation sits at the heart of gradient-based training because the scalar loss lives only at the very end of the composition of many affine maps and nonlinearities. The challenge is structural: most parameters appear in intermediate layers, so computing \(\partial L / \partial W\) naïvely would require replaying the entire network for each parameter. Once the forward activations and pre-activations are cached, though, the recomputation vanishes, and the chain ruling through stored partials becomes a linear backward sweep. Werbos (1990) [https://axon.cs.byu.edu/~martinez/classes/678/Papers/Werbos_BPTT.pdf] made the temporal version of this concrete by “unrolling” recurrent dynamics, proving that the same reverse pass works when time becomes depth. LeCun (1988) [https://new.math.uiuc.edu/MathMLseminar/seminarPapers/LeCunBackprop1988.pdf] and Plaut, Nowlan, and Hinton (1986) [https://www.cnbc.cmu.edu/~plaut/papers/pdf/PlautNowlanHinton86TR.backprop.pdf] later recast the procedure as constrained optimization, introducing auxiliary activations and multipliers so that minimizing the augmented Lagrangian is equivalent to executing the backward pass. Widrow (1992) [https://www-isl.stanford.edu/~widrow/papers/c1992backpropagationand.pdf] translated that same math to analog circuitry, showing that every weight update depends only on the two nodes it connects when each synapse locally stores one forward activation and the backward delta.
 
-Because of that, several core concepts sit at the heart of this page: (1) *Backpropagation* is the chain-rule plumbing that turns the final loss into parameter gradients; (2) *Activation memory* is the set of intermediate tensors that the backward pass must revisit and the dominant budget when width, sequence, and batch all expand; (3) *Gradient routing* is the scheduling perspective that asks “which tensors do we keep, recompute, or sketch?”; (4) *Checkpointing* trades compute for memory by recomputing layers between saved boundaries; and (5) *Activation sketching* (ghost backpropagation) compresses the route markers so that the backward pass can still reconstruct the necessary directions without storing the full tensors. In practice these concepts appear together in arcs such as [[scaling-transforms]] and [[memory-efficient-training]], where the goal is to train ever-larger models under fixed hardware budgets. The combination of autodiff and systems-level scheduling is the shape of the problem; next we show exactly how the math and code enforce that routing.
+### Where this concept appears
+
+Backpropagation appears wherever a long loss–parameter chain demands dynamic programming. It is the training kernel in the classification and regression arcs, the backward sweep inside transformer stacks such as the [[04-neural-networks-deep-learning/transformers]] arc, the optimizer driver for the [[04-neural-networks-deep-learning/recurrent-networks]] arc, and the constraint-aware training loop described in [[04-neural-networks-deep-learning/hardware-aware-training]]; each of those arcs relies on backpropagation’s cached activations, whether the computation runs on GPUs, inference chips, or energy-constrained analog accelerators. Having laid out the problem and where it shows up, the next section explains exactly how the backwards recurrence recovers every gradient while walking only once through the cached states.
 
 ## How it works
 
-### Equations that anchor the route
+### Forward pass, storage, and notation
 
-(1) The forward pass at layer \(l\) produces the hidden state
+Every neural net can be written as a sequence of layers \(1 \leq l \leq L\), where layer \(l\) maps input activation \(x^{(l-1)} \in \mathbb{R}^{d_{l-1}}\) to output activation \(x^{(l)} \in \mathbb{R}^{d_l}\) via a weight matrix \(W^{(l)} \in \mathbb{R}^{d_l \times d_{l-1}}\), bias \(b^{(l)} \in \mathbb{R}^{d_l}\), and nonlinearity \(f^{(l)}\):
 \[
-a^{(l)} = f^{(l)}(z^{(l)}), \qquad z^{(l)} = W^{(l)} a^{(l-1)} + b^{(l)},
+z^{(l)} = W^{(l)} x^{(l-1)} + b^{(l)}, \qquad x^{(l)} = f^{(l)}(z^{(l)}),
 \]
-where \(a^{(l-1)} \in \mathbb{R}^{B \times H_{l-1}}\) is the layer input, \(W^{(l)} \in \mathbb{R}^{H_l \times H_{l-1}}\) is the layer weight matrix, \(b^{(l)} \in \mathbb{R}^{H_l}\) is its bias, \(z^{(l)}\) is the pre-activation, and \(f^{(l)}\) is the element-wise nonlinearity that maps \(\mathbb{R}^{H_l}\) to itself. Here \(B\) is the batch size and \(H_l\) is the hidden dimensionality at layer \(l\). 
+where \(z^{(l)} \in \mathbb{R}^{d_l}\) is the pre-activation whose components each depend on the layer’s parameters and the previous activation \(x^{(l-1)}\). The scalar loss \(L\) depends on the final activation \(x^{(L)}\) and optionally a label \(y\), \(L = \ell(x^{(L)}, y)\). Every \(z^{(l)}\) and \(x^{(l)}\) is cached during the forward pass because the backward pass needs local partials such as \(\partial x^{(l)} / \partial z^{(l)} = \operatorname{diag}(f^{(l)\prime}(z^{(l)}))\). Without caching, computing \(\partial L / \partial W^{(l)}\) would require replaying layers \(l\) through \(L\) for each parameter, leading to an exponential blow-up; caching makes it a linear, constant-factor pass that visits each layer once in backward order, which is why the chain rule becomes dynamic programming.
 
-(2) The parameter gradients arise from
+### Reverse pass and gradient equations
+
+The backward sweep propagates the error signal \(\delta^{(l)} \coloneqq \partial L / \partial z^{(l)}\), and the recurrence is
 \[
-\frac{\partial \mathcal{L}}{\partial W^{(l)}} = \delta^{(l)} {a^{(l-1)}}^\top,
+\delta^{(l)} = (W^{(l+1)})^\top \delta^{(l+1)} \odot f^{(l)\prime}(z^{(l)}),
 \]
-where \(\delta^{(l)} \in \mathbb{R}^{B \times H_l}\) is the error signal at layer \(l\) and the transpose occurs across the last two tensor dimensions (batch and features). The backward pass needs \(a^{(l-1)}\) stored or reconstructible because the gradient is their outer product. 
-
-(3) The error recursively satisfies
+with \(\delta^{(L)} = \nabla_x \ell(x^{(L)}, y)\), \((W^{(l+1)})^\top\) the transpose of a \(d_{l+1} \times d_l\) weight matrix, and \(f^{(l)\prime}(z^{(l)})\) the elementwise derivative vector at the cached pre-activation \(z^{(l)}\). Each layer multiplies the next layer’s delta by the transpose and by the local derivative, reusing the cached values to compute \(\delta^{(l)}\) without re-running layers \(l+1,\dots,L\). With \(\delta^{(l)}\) in hand, the gradients of the parameters are
 \[
-\delta^{(l)} = \left(W^{(l+1)}\right)^\top \delta^{(l+1)} \odot f^{(l)\prime}(z^{(l)}),
+\frac{\partial L}{\partial W^{(l)}} = \delta^{(l)} (x^{(l-1)})^\top, \qquad \frac{\partial L}{\partial b^{(l)}} = \delta^{(l)},
 \]
-where \(f^{(l)\prime}(z^{(l)})\) is the element-wise derivative, \(\odot\) is the Hadamard product, and the matrix multiplication \( \left(W^{(l+1)}\right)^\top \delta^{(l+1)} \) needs \(W^{(l+1)}\) but not the forward activations. Missing \(z^{(l)}\) means the \(\odot\) mask cannot be computed and the chain rule collapses. Equation (3) is the bottleneck: to execute it we must visit \(z^{(l)}\) and \(a^{(l-1)}\) for every layer.
+where \(x^{(l-1)} \in \mathbb{R}^{d_{l-1}}\) is the cached input to layer \(l\). These formulas illustrate the dynamic-programming intuition: the backward sweep only recomputes each \(\delta^{(l)}\) once, every cached \(x^{(l-1)}\) is used exactly once to compute its incoming gradients, and the cost is proportional to the forward pass.
 
-### Activation memory as a routing queue
+Digital implementations require that the backward operator mirror the forward weights so that the transpose \((W^{(l+1)})^\top\) is available. Neuromorphic and analog proposals cannot always afford to store both the forward matrix and its transpose, which is the weight transport problem. Feedback alignment, as discussed by Lillicrap et al. (2016) [https://arxiv.org/abs/1509.06461], replaces the transpose with a learned backward matrix; even though this matrix does not equal the forward weights, the error signal \(\delta^{(l)}\) defined above can still emerge because the backward weights learn to align with the forward gradients. To keep this heuristic connected to the dynamic-programming narrative, observe that both the \(\delta^{(l)}\) and the Lagrange multipliers \(\lambda^{(l)}\) that we introduce below represent the same error signal, so any variant—symmetric or not—must still respect the cached activations and the local multiplier to remain consistent.
 
-The routing metaphor shows up concretely when memory profiling instruments the execution. Nguyen et al. (2026) [arxiv:2603.18168](https://www.arxiv.org/pdf/2603.18168) treat activations as packets in a GPU cache hierarchy and describe the backward pass as dequeueing the packets in reverse order. Their instrumentation shows that for a Transformer layer the activation queue length is proportional not only to depth but also to the product \(B \times S \times H\), where \(S\) is the sequence length. When the queue exceeds the on-chip storage, the scheduler incurs page faults and stalls: adding more memory to the route (e.g., by placing more activations on the queue) actually slows down forward execution because the hardware bus must maintain coherence for every stored tensor.
+### Backpropagation as constrained optimization
 
-This queue metaphor is useful for evaluating alternatives. Gradient checkpointing marks a subset of activations as “persistent checkpoints,” and everything else is recomputed when the backward pass reaches the block boundary. The router still enqueues each activation, but the ones in between checkpoints are transient—they vanish from the queue and are recomputed only when needed. Checkpointing reduces the peak queue height but introduces recomputation latency equal to the size of each block. For attention-heavy architectures this latency is costly because rerunning attention layers includes the \(QK^\top\) and \(QK^\top V\) matmuls again. Memory routing therefore becomes a constrained optimization: minimize the stored tensors (queue height) while keeping recomputation latency (time) acceptable.
-
-### Ghost backpropagation with BASIS
-
-Rather than removing activations from the queue entirely or recomputing them later, BASIS (Zhu et al. 2026) [arxiv:2604.16324](https://arxiv.org/abs/2604.16324) compresses each activation into a sketch that still carries the gradient direction. Let \(N_l = B \times H_l\) be the number of scalars in \(a^{(l)}\). BASIS projects \(a^{(l)}\) with a random or learned sketch matrix \(S^{(l)} \in \mathbb{R}^{k \times N_l}\) where \(k \ll N_l\). The sketch keeps both the projection \(s^{(l)} = S^{(l)} a^{(l)}\) and an invariant scalar such as \(\|a^{(l)}\|\) or the trace of \(S^{(l)} (S^{(l)})^\top\). At backward time the algorithm estimates
+LeCun (1988) [https://new.math.uiuc.edu/MathMLseminar/seminarPapers/LeCunBackprop1988.pdf] treated each forward equation \(z^{(l)} = W^{(l)} x^{(l-1)} + b^{(l)}\) as an equality constraint and paired it with a Lagrange multiplier \(\lambda^{(l)} \in \mathbb{R}^{d_l}\). The augmented Lagrangian is
 \[
-\delta^{(l)} \approx \left(S^{(l)}\right)^\dagger \left( S^{(l+1)} \delta^{(l+1)} \right),
+\mathcal{L} = \ell(x^{(L)}, y) + \sum_{l=1}^L \lambda^{(l)\top} \left(z^{(l)} - W^{(l)} x^{(l-1)} - b^{(l)}\right),
 \]
-where \(\left(S^{(l)}\right)^\dagger\) denotes a pseudo-inverse acting on the smaller \(k\)-dimensional sketch space, and the right-hand side uses the stored primitives instead of the full activation. The invariants ensure the reconstruction is faithful enough that \(\delta^{(l)}\) stays within the noise tolerance of stochastic gradient descent. This approximation rewrites the routing problem: instead of queueing \(N_l\) scalars per layer, the backward pass carries \(O(k)\) scalars, and the routing decision becomes “which sketch basis do we store” rather than “do we store the original activation?”
+where each \(\lambda^{(l)}\) has the same dimensionality as \(z^{(l)}\) and the sum runs over layers \(l=1\) to \(L\). Stationarity with respect to \(z^{(l)}\) yields \(\lambda^{(l)} = \partial \ell / \partial z^{(l)} = \delta^{(l)}\), and differentiating with respect to \(W^{(l)}\) and \(b^{(l)}\) reproduces the gradient formulas above. This construction explains why constrained training recipes—safety constraints, hardware energy caps, weight sharing—can still rely on backpropagation: the multipliers enforce consistency between forward dynamics and constraints, and the backward pass updates multipliers and parameters together so the cached activations continue to carry the necessary local information. Plaut, Nowlan, and Hinton (1986) [https://www.cnbc.cmu.edu/~plaut/papers/pdf/PlautNowlanHinton86TR.backprop.pdf] demonstrated this explicitly for shared constraints, showing that error signals traverse shared components exactly as they do individual weights when the multipliers track shared structure.
 
-BASIS amortizes the sketch over micro-batches by reusing the same random projection across a few forward passes. The projected readouts \(s^{(l)}\) and the invariant scalars are small enough that the GPU can keep them in on-chip memory and no longer needs high-bandwidth copies of \(a^{(l)}\). The result is a memory footprint that depends on \(k\) instead of \(N_l\), so the activation queue shrinks as \(k/N_l\). At the same time, the sketch introduces gradient noise, so the routing scheduler must ensure \(k\) is large enough to keep the update direction within the “edge-of-stability” region described by Ma et al. (2026) [arxiv:2602.07145](https://www.arxiv.org/pdf/2602.07145). That work quantifies how much gradient noise the training dynamics can tolerate before divergence, giving a rule of thumb for sketch size.
+### Backpropagation through time and memory trade-offs
 
-BASIS’s invariants interact with attention layers by sketching both the key/value caches and the softmax weights, thereby preserving what the original attention gradient described as a “Bayesian curvature” over the probability simplex. Sketching doesn’t eliminate the need for precise normalization; it simply writes enough curvature information into the route markers so that the backward pass does not forget long-range dependencies when it reconstructs the gradient.
+Sequential models such as recurrent neural networks produce outputs depending on a history of inputs. Werbos (1990) [https://axon.cs.byu.edu/~martinez/classes/678/Papers/Werbos_BPTT.pdf] demonstrated that unfolding the recurrence across timesteps turns the temporal problem into a deep feedforward network: each timestep \(t\) contributes a hidden state \(h_t\) cached during the forward sweep, the loss at final time \(T\) depends on every \(h_t\), and the backward pass propagates deltas from \(\delta^{(T)}\) down to \(\delta^{(1)}\) exactly as in the feedforward case. Caching every \(h_t\) costs memory proportional to \(T\), so truncated BPTT, gradient checkpointing, and reversible architectures trade storage for recomputation while still taking exactly one backward pass over the stored states. Those trade-offs preserve the dynamic-programming core: the cached activations remain the only frontier where recomputation is allowed, so the backward sweep is still linear in the number of (layer, timestep) pairs.
 
-### Custom autograd and instrumentation
+### Backpropagation as the engine of gradient-based learning
 
-Putting these ideas into code means overriding PyTorch’s autograd routing. A minimal sketching hook looks like:
+Widrow (1992) [https://www-isl.stanford.edu/~widrow/papers/c1992backpropagationand.pdf] mapped backpropagation onto analog multipliers and capacitors, showing that the update \(\Delta W^{(l)} = -\eta \delta^{(l)} (x^{(l-1)})^\top\) depends only on the cached input activation \(x^{(l-1)}\) and the propagated delta \(\delta^{(l)}\), with learning rate \(\eta\). This reinforces the dynamic-programming story: global loss is distilled into local context, every weight update reads two cached values, and the backward sweep—the “reuse of cached activations”—is sufficient to compute the gradient without additional global state.
 
-```python
-class ActivationSketch(Function):
-    @staticmethod
-    def forward(ctx, x, weight):
-        projection = sketch_matrix @ x
-        ctx.save_for_backward(projection, x.norm(p=2, dim=-1, keepdim=True), weight)
-        return F.linear(x, weight)
+### Failure modes and practical heuristics
 
-    @staticmethod
-    def backward(ctx, grad_output):
-        projection, norm, weight = ctx.saved_tensors
-        activation_estimate = reconstruct_from_sketch(projection, norm)
-        grad_input = grad_output @ weight
-        grad_weight = grad_output.T @ activation_estimate
-        return grad_input, grad_weight
-```
-
-Here `sketch_matrix ∈ ℝ^{k×H}` is either random or learned, and `reconstruct_from_sketch` uses the pseudo-inverse and the invariant norms saved in `ctx`. `ctx.save_for_backward` is the point where the router decides what to store: instead of the full \(a^{(l)}\), it saves \((projection, norm)\), keeping only \(O(k)\) data per layer. Recording the same invariants for each forward pass lets the backward pass reuse the sketches until the model updates change the weights significantly.
-
-Instrumentation closes the loop. Calling `torch.cuda.max_memory_allocated()` before and after each block quantifies how much of the activation queue is in GPU RAM, while `torch.autograd.profiler.profile()` reveals wall-clock overheads introduced by sketch reconstruction or checkpoint recomputation. The profiling results validate the routing metaphor by showing how each sketching decision shortens the queue (peak memory) at the cost of some discrete recompute steps. Only with these numbers can engineers decide whether to drop from 60,000 activation scalars to 5,000 sketches per layer without blowing up the wall-clock time.
-
-By stitching together equations (1)–(3), profiling instrumentation, BASIE-style invariants, and custom autograd helpers, we turn backpropagation into a system that explicitly routes gradients across a constrained memory pipeline. The next section situates the current research and engineering frontiers inside that pipeline.
+Failure modes arise when cached activations or multipliers become unreliable. Deep networks amplify or shrink deltas when weight matrices have extreme singular values, so careful initialization (Xavier, He) and batch normalization stabilize the variance that travels backward. The weight transport problem resurfaces here because physical systems may not store exact transposes; feedback alignment still works because it learns separate backward weights that produce useful gradients, but that heuristic is only meaningful once one accepts that the multipliers \(\lambda^{(l)}\) and the deltas \(\delta^{(l)}\) are the same error signal. Thinking in terms of multipliers explains why any heuristic must deliver a consistent backward signal that uses cached activations: if \(\lambda^{(l)}\) drifts away from the true \(\nabla_{z^{(l)}} \ell\), the updates no longer respect the Lagrangian stationary conditions, and the dynamic-programming efficiency collapses. This is why designing architectures with local, asymmetric updates remains challenging—the caches are the only place that contains the information needed for consistency, and once they are corrupted, every downstream gradient loses its footing.
 
 ## Where the field is now
 
-Research treats backpropagation as evolving from calculus into a routing protocol. BASIS (Zhu et al. 2026) [arxiv:2604.16324](https://arxiv.org/abs/2604.16324) remains the reference point for ghost backpropagation, demonstrating that invariant scalars and activation sketches lower peak activation memory by factors of three to four while matching base perplexity on language-model finetuning. Nguyen et al. (2026) [arxiv:2603.18168](https://www.arxiv.org/pdf/2603.18168) complements this by instrumenting GPU memory to show how each activation “packet” travels through caches, offering scheduling heuristics that integrate sketches with gradient accumulation across tensor shards. Ma et al. (2026) [arxiv:2602.07145](https://www.arxiv.org/pdf/2602.07145) quantifies the margin of stability for sketch-induced noise and shows that the training dynamics remain stable as long as the sketch error keeps the update within a bounded neighborhood of the true gradient. DDCL-INCRT (Kumar et al. 2026) [arxiv:2604.01880v1](https://arxiv.org/abs/2604.01880v1) adds a structural twist, carving the backward pass into hierarchical prototype lanes so that prototypes reuse the same compressed memory cells across blocks of layers, improving reuse of sketches in deep vision encoders.
+Recent work still revolves around the dynamic-programming core, but explores how the cached activations interact with generalization and scale. One research strand studies spectral bias and gradient flow. Rahaman et al. (2019) [https://arxiv.org/abs/1901.09491] show that neural networks preferentially fit low-frequency components, so the cached activations carry smooth gradients that evolve slowly across layers; Chizat and Bach (2018) [https://arxiv.org/abs/1712.04771] analyze alternating sparse regimes and gradient flows that revisit cached states, documenting how the stored activations continue to provide structure to guarantee convergence even when smoothness assumptions break down. These analyses keep pointing back to the same dynamic-programming intuition: the backward sweep remains a linear pass no matter how wildly the forward activations behave, because every delta only depends on what was cached directly below it.
 
-| Method | Median activation reduction | Overhead | Citation |
-| --- | --- | --- | --- |
-| Baseline (store full activations) | 1× | 0% | —
-| BASIS ghost backpropagation | 3.5× reduction in peak activation memory | ~10% more forward time | Zhu et al. (2026) [arxiv:2604.16324](https://www.arxiv.org/abs/2604.16324) |
-| Nguyen-style routing instrumentation | 2.1× reduction with hybrid checkpoint+sketch | 5–8% extra scheduling logic | Nguyen et al. (2026) [arxiv:2603.18168](https://www.arxiv.org/pdf/2603.18168) |
-| DDCL-INCRT hierarchical prototypes | 2.8× reduction for prototyped lanes | Adds prototype routing network | Kumar et al. (2026) [arxiv:2604.01880v1](https://www.arxiv.org/abs/2604.01880v1) |
+### In production
 
-On the engineering frontier, the large-scale systems that train models follow the same routing logic. OpenAI’s [GPT-4 training overview](https://openai.com/research/gpt-4) documents distributed activation storage across four H100 pods, gradient checkpointing, and pipeline parallelism—the engineering consequence of each routing decision being a direct reduction in p99 latency. Meta’s [PyTorch 2.1 engineering blog](https://research.facebook.com/blog/2024/pytorch2/) links `torch.compile` with dynamic recomputation, letting production teams decide at runtime whether to store an activation or recompute it when needed. NVIDIA’s [Hopper architecture whitepaper](https://developer.nvidia.com/blog/hopper-architecture-whitepaper) describes how HBM3 streaming buffers and the gradient accumulation buffer are co-designed to keep the activation queue flowing without stalling. These engineering systems translate research sketches and checkpoints into real throughput increases, showing that the routing problem is the bridge between theory and production.
+Engineering continues to push backpropagation to trillion-parameter regimes by distributing the caches and gradients while keeping the backward pass linear. DeepSpeed’s ZeRO stage 3 (Rasley et al. 2020) [https://arxiv.org/abs/2004.08799] and the ZeRO sharding implementation in Rajbhandari et al. (2020) [https://arxiv.org/abs/1910.02054] shard parameters, gradients, and optimizer states across ranks so that backward updates never require a single accelerator to hold the entire model or its cached activations; this keeps the backward pass computationally linear even as the caches are scattered. Hugging Face Accelerate’s distributed launch scripts [https://huggingface.co/docs/accelerate/index] and DeepSpeed’s ZeRO optimizer ensure that the gradient accumulation stage reuses the same cached activations as if they lived on one GPU, which keeps the dynamic-programming guarantees intact even when activation and optimizer footprints are squeezed to tens of gigabytes per rank. These production deployments show that backpropagation still delivers both scientific insight and deployment value, bridging the same caching principles from toy networks to huge transformers.
 
 ## What's still open
 
-Can we model gradients under *zero activation storage* without assuming each block is reversible or paying a constant recompute tax? Current sketches still keep \(O(k)\) scalars per layer, so the challenge is to learn a surrogate distribution that encodes enough path information for exact gradient reconstruction while never materializing full activation tensors.
-
-How do sketch-induced approximations interact with adaptive or quasi-Newton optimizers? BASIS and its kin have focused on SGD, but second-order updates depend on norms, curvature, and cross-layer correlations; an open question is what invariants must be preserved so that the sketch keeps Hessian-vector products within the acceptable error band.
-
-When can we tie sketch compression to provable convergence bounds? The edge-of-stability phenomenon documented by Ma et al. (2026) suggests a narrow noise budget, yet we lack a general theorem that links sketch compression ratio, gradient error, and convergence radius for deep networks.
-
-Finally, what dynamic scheduler best routes activations in mixed-precision pipelines? Hardware stacks maintain separate caches for activations, gradients, and parameters. A runtime scheduler that decides whether to recompute, fetch a sketch, or load a cached activation based on tensor shape and precision could unlock training a recommender on four GPUs instead of twelve.
+Can local learning rules that avoid symmetric weight transport match backpropagation’s sample efficiency on benchmarks such as ImageNet or LLaMA pre-training while running on analog or neuromorphic chips? The question translates to: can one design multipliers \(\lambda^{(l)}\) that stay within 1% of the baseline accuracy without accessing the exact transpose of \(W^{(l+1)}\)?  
+Do adaptive gradient caching strategies—the network dynamically choosing which intermediate activations to store and which to recompute—offer a provable trade-off between memory savings and convergence speed, or does the benefit collapse after a certain depth or nonlinearity class?  
+Is there a principled integration of hard constraints (resource budgets, safety invariants) into the Lagrangian formulation so that training enforces them automatically, without painstaking penalty tuning?
 
 ## Where to read next
 
-If you want the theoretical backbone, → [[automatic-differentiation]] walks through the forward/reverse-mode calculus underneath any autograd engine; for systems practitioners, → [[flash-attention]] illustrates how attention implementations can reshape the activation routing to stay within specialized caches. Connected topics such as [[gradient-checkpointing]], [[invertible-neural-networks]], and [[memory-efficient-training]] provide alternate trade-offs for the same routing problem, and those arcs show where this concept appears in larger learning paths.
+If you want the probabilistic foundation, → [[04-neural-networks-deep-learning/score-matching]] explains how backpropagation gradients approximate the data score function. The engineering counterpart is → [[04-neural-networks-deep-learning/gradient-checkpointing]] for reshaping cached activations when memory becomes the bottleneck, and the systems story continues in → [[04-neural-networks-deep-learning/flow-matching]] where continuous-time dynamics mimic the backward pass over noising trajectories. Connected topics include → [[04-neural-networks-deep-learning/autodiff]] for the computation-graph plumbing, → [[04-neural-networks-deep-learning/optimizer-design]] for how gradients feed parameter updates, and → [[04-neural-networks-deep-learning/hardware-aware-training]] for the constraints that originally motivated the Lagrangian formulation.
+
+## What can you build next
+
+Scale the manual engine from this page into the curriculum’s heavier arcs: → [[04-neural-networks-deep-learning/gradient-checkpointing]] shows how to recompute caches selectively and trace the runtime/accuracy trade-off, → [[04-neural-networks-deep-learning/optimizer-design]] matches the backward gradients to different optimizers, and → [[04-neural-networks-deep-learning/hardware-aware-training]] revisits the Lagrangian story with explicit energy or safety constraints so you learn how cached activations play in constrained deployments.
 
 ## Build it
 
-The algebra of backpropagation is well known, but this build proves you can reconstruct gradients while keeping only sketches of the activations. Implement a custom PyTorch `autograd.Function` that stores compressed scalars instead of full tensors, train an MNIST MLP on Colab’s T4, and instrument peak memory to compare the baseline and the activation-sketch variants.
-
-**What you're building:** A ghost-backpropagation-enabled MLP checkpoint that demonstrates BASIS-style activation sketching on MNIST with live memory profiling.
-
-**Why this is valuable:** It immerses you in the memory-routing problem—writing the custom backward pass, logging `torch.cuda.memory_allocated()` before/after each layer, and verifying that reconstructing gradients from a sketch produces the same accuracy as storing the full activation but with 40–60% less activation storage (measured against results such as those in Zhu et al. 2026).
+**Artifact:** a lightweight Hugging Face-hosted MLP with manual autograd that trains a simple Iris split, exposing every cached activation and delta.  
+**Motivation:** it highlights backpropagation’s dynamic-programming nature while producing a complete model checkpoint you can inspect, perturb, or extend to heuristics like feedback alignment.  
 
 **Stack:**
-- **Model:** `hf-internal-testing/tiny-random-mlp` (customizable MLP blueprint) — 1 download
-- **Dataset:** `datasets/mnist` — 60,000 training images, 10,000 test images, each \(28 \times 28\) grayscale; hold out 5,000 of the training split for validation and optionally upsample to \(32 \times 32\) if you want to match a convolutional baseline.
-- **Framework:** PyTorch 2.1 with `torch.compile`
-- **Compute:** Colab T4 (16GB VRAM, ≈1 hour per variant)
+- **Model:** [`hf-internal-testing/tiny-random-mlp`](https://huggingface.co/hf-internal-testing/tiny-random-mlp) as the reference architecture for exportable tensors and weights.  
+- **Dataset:** [`iris` on Hugging Face Datasets](https://huggingface.co/datasets/iris) normalized to zero mean and unit variance so caches stay order-one.  
+- **Framework:** Python 3.12 with NumPy 1.26 and scikit-learn 1.4 inside Google Colab (no PyTorch/TensorFlow).  
+- **Compute:** single Google Colab T4 (16 GB VRAM) or comparable 10 GB GPU, ~15-minute setup then ~15 minutes of training on the 120/30 train/test split.
 
 **The recipe:**
-1. Install `pip install torch torchvision datasets matplotlib` and download MNIST with a fixed random seed so that your batch ordering is reproducible.
-2. Flatten each digit to 784 features, normalize to \([0,1]\), optionally pad to \(32 \times 32\) if you want to test convolutional variations, and create `DataLoader` objects with `batch_size=128` and `pin_memory=True`.
-3. Build the base MLP with two hidden layers (1024 units each, GELU). Write an `ActivationSketch` autograd helper where `forward(ctx, input, weight)` projects the activation to a sketch \(Sx\) and stores `(sketch, norm, weight)` via `ctx.save_for_backward`, while `backward` reconstructs \(x\) from the sketch and computes the gradients using the stored scalars before returning `grad_input` and `grad_weight`.
-4. Train both the baseline (standard `nn.Linear` layers) and the sketching variant for 8 epochs with SGD (lr=0.1, momentum=0.9). Log `torch.cuda.max_memory_allocated()` every epoch, capture `torch.autograd.profiler.profile()` traces, and plot the memory traces next to the training loss.
-5. Evaluate on the MNIST test split, reporting accuracy and the ratio of peak activation memory between the two models—you now have a concrete artifact showing that sketch-enabled backprop hits the same 97+% accuracy while slashing activation storage.
+1. Install `pip install numpy scikit-learn matplotlib datasets` and start a Colab notebook. Implement a `Tensor` class that stores `.data`, `.grad`, `.creator`, `requires_grad`, and a `.backward()` method that performs an explicit stack-based topological traversal: push the loss tensor, pop creators in reverse topological order, accumulate gradients, and avoid recursion limits by using an explicit stack while marking visited tensors.  
+2. Load `datasets.load_dataset("iris")`, normalize each of the four numeric features to zero mean and unit variance (using a fixed `np.random.default_rng(seed=42)`), and split deterministically into 120 training samples and 30 test samples so accuracy expectations are reproducible.  
+3. Define a two-layer MLP (32 hidden units, tanh activation) via the custom tensor arithmetic. Use manual SGD with learning rate 0.1, batch size 16, and 80 epochs; after each forward pass compute `.backward()` to propagate gradients through the cached activations and update weights immediately so the backward sweep stays tied to new caches.  
+4. Evaluate by computing classification accuracy and loss on the static test split after every epoch; expect ~88% accuracy once the training loss dips below 0.1, which reflects the limited dataset size and the deterministic split. Plot the loss curve to show the downstream effect of cached activations.  
+5. What you now have: a reusable `Tensor` class, a working `.backward()` pass relying on stack-based traversal, recorded plots of loss and accuracy, and the ability to inspect every cached activation paired with its propagated delta.
 
-**Expected outcome:** A git-tagged checkpoint pair (full activations and sketch) plus a memory-vs-accuracy plot demonstrating the real benefit of activation sketching.
+**Expected outcome:** a reusable Colab notebook that exports the manual MLP checkpoint, visualizes the model’s decision regions, and lets you inspect how each cached activation contributes to the backward sweep and resulting gradients.
 
-### What can you build next
+**Variants per persona:**
+- **CS student:** halve the hidden size to 16, add dropout before the head, and keep the dataset loading, logging, and forward/backward passes explicit so the notebook fits within a single RTX 4070 session.  
+- **Applied engineer:** wrap the notebook into a Dockerized FastAPI service that exposes the manual MLP checkpoints, logs the cached activations for the last prediction, and records the backward sweep that produced the gradients in production-like telemetry.  
+- **Applied researcher:** implement two runs—one that caches every activation and one that checkpointing the hidden layer by recomputing it during backward passes—and measure whether the recomputation delays hurt convergence, documenting which layer depths lose accuracy.  
+- **Curious learner:** augment the visualization with animated heatmaps that show the cached activations before and after the backward pass for a sample batch, reinforcing the dynamic-programming picture.  
+- **Theory student:** derive each partial derivative in the notebook symbolically, compare the analytic gradients to the ones computed by `.backward()` for a subset of parameters, and explain any scaling factors that appear.  
+- **Frontier researcher:** replace the backward matrix multiplies with learned feedback matrices updated via a local Hebbian rule and measure whether the resulting model matches the baseline test accuracy within 1 percentage point while never using the exact transpose of \(W^{(l+1)}\).
 
-Extend the sketch-enabled MLP to a Transformer encoder block, port the sketching logic into both the attention and feed-forward layers, and evaluate whether the sketch’s compression ratio must shrink to keep accuracy within ±0.5% of the full model. Alternatively, adapt the build for a small language model finetuning run to see how the routing decisions change for long sequences.
-
-**Variants per persona:**  
-**CS student:** Run the same recipe on an RTX 4070 at home, double the MLP width to 2048 units, and verify that the sketch variant keeps batch size 256 without OOM while the baseline does not; compare the loss/memory curves to understand how routing scales.  
-**Applied engineer:** Wrap the sketch-enabled model in TorchServe, deploy it on an A10, quantize to INT8, and measure that the sketch variant sustains 1.8× higher throughput before hitting the GPU memory ceiling.  
-**Applied researcher:** Add a single Transformer encoder block, instrument sketching inside the multi-head attention, and report whether the reconstructed gradients stay within “accuracy drop < 0.5%” of the baseline or require different sketch dimensions.  
-**Frontier researcher:** Replace the sketch module with a learned decoder that reconstructs activations from a latent code, and falsify the model if the decoder’s reconstruction error forces test accuracy to drop more than 1%; use this as a stepping stone to the “zero activation storage” question in §What’s still open.  
-**Theory student:** Analyze the sketch reconstruction as a randomized linear operator and prove that the sketch error induces at most \(O(\epsilon)\) bias in the gradient when the sketch dimension \(k\) satisfies \(k \geq \log(N_l / \delta)/\epsilon^2\); connect this to the convergence radius discussed in Ma et al. (2026).
-
----
-
-> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
