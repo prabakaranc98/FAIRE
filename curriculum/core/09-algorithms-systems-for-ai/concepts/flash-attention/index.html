@@ -23,7 +23,7 @@
     
     
       
-        <title>FlashAttention - Frontier Wiki</title>
+        <title>Flash Attention - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#flashattention" class="md-skip">
+        <a href="#flash-attention" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              FlashAttention
+              Flash Attention
             
           </span>
         </div>
@@ -1235,13 +1235,131 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">attention</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gpus</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">memory-bandwidth</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">performance</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">pipelining</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="flashattention">FlashAttention<a class="headerlink" href="#flashattention" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">09 · Algorithms Systems For Ai</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="flash-attention">Flash Attention<a class="headerlink" href="#flash-attention" title="Permanent link">&para;</a></h1>
+<p>Imagine trying to train a 30‑billion‑parameter language model and watching the GPU die of thirst even though every Tensor Core is ready for work. The arithmetic throughput of Hopper or Blackwell chips runs at petaflops, yet each attention layer is forced to stall because every query needs to read a huge <span class="arithmatex">\(N \times N\)</span> affinity matrix out of High-Bandwidth Memory (HBM), then write it back before the softmax can be applied. The surprising truth is that the GPU is not short on math; it is short on bandwidth, so much so that standard attention spends up to 90% of its runtime waiting on I/O. Flash Attention answers the question: how do we keep the mathematical meat of transformers flowing while never materializing that massive matrix? By the end of this page the reader will be able to see the bandwidth problem, follow the math for online softmax tiling, and run a PyTorch proof-of-concept that computes exact attention with <span class="arithmatex">\(O(1)\)</span> extra memory.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Modern generative systems hang on attention because it correlates every token with every other token, but the correlation matrix grows quadratically in length. The deep-learning survey on “The Magnificent Seven” (Diaz et al. 2024) <a href="https://arxiv.org/abs/2412.16188">arxiv:2412.16188</a> highlights how attention migrated from academic prototypes to every deployed LLM precisely because it expresses long-range structure without sampling. That same quadratic surface is the source of the compute bottleneck: GPU Tensor Cores can process an entire row of the matrix faster than HBM can stream the next cache line of keys. Generator-to-system reports such as “GenAI for Systems: Recurring Challenges and Design Principles from Software to Systems” (Zheng et al. 2026) <a href="https://arxiv.org/abs/2602.15241">arxiv:2602.15241</a> catalogue this mismatch as the main limiter for scaling inference at low latency. The consequence is not simply slower training; it is complex logic in serving fabrics, as autotuning engineers spend weeks aligning attention kernel throughput with KV-cache resource usage.</p>
+<p>Flash Attention sits at the intersection of algorithmic attention (the <span class="arithmatex">\( \text{softmax}(QK^\top)V \)</span> formula) and systems engineering for bandwidth. Instead of claiming a faster asymptotic complexity, it promises the same exact attention while never writing the full <span class="arithmatex">\(N \times N\)</span> matrix to memory, which is the chunk responsible for the bandwidth drain. The same strategy belongs to the family of streaming and block-sparse variants, but Flash Attention’s innovation is to orchestrate the compute, copies, and softmax reduction inside a single kernel so that the GPU sees only the pieces it needs when it needs them. How does it actually work? The mechanism is best understood by breaking the attention computation into pipelined stages and maintaining softmax statistics online.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="why-memory-bandwidth-dominates">Why memory bandwidth dominates<a class="headerlink" href="#why-memory-bandwidth-dominates" title="Permanent link">&para;</a></h3>
+<p>The vanilla attention matrix is
+[
+A = \mathrm{softmax}!\left(\frac{QK^\top}{\sqrt{d}}\right) V,
+]
+where <span class="arithmatex">\(Q \in \mathbb{R}^{N \times d}\)</span> contains the query vectors for an <span class="arithmatex">\(N\)</span>-token sequence, <span class="arithmatex">\(K \in \mathbb{R}^{N \times d}\)</span> contains keys, <span class="arithmatex">\(V \in \mathbb{R}^{N \times d_v}\)</span> contains values, and <span class="arithmatex">\(d\)</span> is the model dimension. This formula is elegant, but computing <span class="arithmatex">\(QK^\top\)</span> naively writes <span class="arithmatex">\(N^2\)</span> scalars before the softmax and the subsequent matrix multiplication can proceed, which is <span class="arithmatex">\(8N^2\)</span> bytes for float32. On a 2048-token context that is 32 MB just for one affinity matrix, and every layer repeats it. Even when a single GPU has the arithmetic headroom to compute 8 trillion operations per second, the HBM bandwidth (typically under 2 TB/s) cannot keep up with streaming those billions of scalars back and forth. The plateau described in GenAI for Systems (Zheng et al. 2026) <a href="https://arxiv.org/abs/2602.15241">arxiv:2602.15241</a> is not a theoretical limit; it is a memory bandwidth wall.</p>
+<p>Flash Attention turns the problem sideways: rather than computing the entire matrix before applying softmax, it computes attention block-by-block and collapses the softmax normalization while the GPU is still holding the relevant blocks in shared memory. The key difference is that the GPU no longer needs to write all <span class="arithmatex">\(N^2\)</span> entries out to HBM; it streams blocks through the GPU, performs partial softmax normalization, updates running statistics, and writes only the final outputs.</p>
+<h3 id="the-tiled-attention-pipeline-and-online-softmax">The tiled attention pipeline and online softmax<a class="headerlink" href="#the-tiled-attention-pipeline-and-online-softmax" title="Permanent link">&para;</a></h3>
+<p>The sequence of <span class="arithmatex">\(N\)</span> tokens is partitioned into blocks of size <span class="arithmatex">\(b\)</span> so that <span class="arithmatex">\(N = B \times b\)</span>, and attention is computed block-row by block-row. Let <span class="arithmatex">\(Q_i \in \mathbb{R}^{b \times d}\)</span> denote the queries from block <span class="arithmatex">\(i\)</span>, <span class="arithmatex">\(K_j \in \mathbb{R}^{b \times d}\)</span> the keys from block <span class="arithmatex">\(j\)</span>, and <span class="arithmatex">\(V_j\)</span> the corresponding values. The partial affinity between <span class="arithmatex">\(Q_i\)</span> and <span class="arithmatex">\(K_j\)</span> is <span class="arithmatex">\(S_{ij} = Q_i K_j^\top\)</span>. The core challenge is to evaluate
+[
+\mathrm{softmax}<em ij="ij">j(S</em>
+]
+without materializing }) = \frac{\exp(S_{ij})}{\sum_{j'} \exp(S_{ij'})<span class="arithmatex">\(S_{ij}\)</span> for all <span class="arithmatex">\(j\)</span>. This is solved by maintaining, for each output row <span class="arithmatex">\(i\)</span>, two scalars: <span class="arithmatex">\(m_i\)</span>, the largest score seen so far, and <span class="arithmatex">\(l_i\)</span>, the cumulative sum of exponentials scaled relative to <span class="arithmatex">\(m_i\)</span>. When a new block <span class="arithmatex">\(S_{ij}\)</span> arrives, compute
+[
+m_{\text{new}} = \max(m_i, \max(S_{ij})),
+\quad
+l_{\text{new}} = \exp(m_i - m_{\text{new}}) \cdot l_i + \sum_{j} \exp(S_{ij} - m_{\text{new}}),
+]
+where <span class="arithmatex">\(\max(S_{ij})\)</span> is taken element-wise over the block’s rows and each term is annotated immediately. The exponentials are computed inside the kernel while <span class="arithmatex">\(Q_i\)</span> and <span class="arithmatex">\(K_j\)</span> sit in shared memory. Once all blocks <span class="arithmatex">\(j\)</span> have been processed, the normalized attention for block <span class="arithmatex">\(i\)</span> is
+[
+A_i = \sum_j \frac{\exp(S_{ij} - m_{\text{final}})}{l_{\text{final}}} V_j,
+]
+where <span class="arithmatex">\(m_{\text{final}}\)</span> and <span class="arithmatex">\(l_{\text{final}}\)</span> are the final statistics. This combination of max-plus scaling and streaming accumulation is mathematically equivalent to the full matrix softmax but requires only <span class="arithmatex">\(O(Nd)\)</span> storage for <span class="arithmatex">\(Q_i\)</span>, the running <span class="arithmatex">\(m_i\)</span> and <span class="arithmatex">\(l_i\)</span>, and the accumulating output <span class="arithmatex">\(A_i\)</span>. Each block <span class="arithmatex">\(V_j\)</span> is multiplied by the normalized weights on the fly, so neither the full attention nor the intermediate sums must touch HBM beyond what can be pipelined.</p>
+<h3 id="pipelining-gemms-softmax-and-memory-copies">Pipelining GEMMs, softmax, and memory copies<a class="headerlink" href="#pipelining-gemms-softmax-and-memory-copies" title="Permanent link">&para;</a></h3>
+<p>Flash Attention’s performance leap is not only algorithmic; it is about keeping every execution unit busy. Standard kernels wake up, copy <span class="arithmatex">\(Q\)</span>, <span class="arithmatex">\(K\)</span>, <span class="arithmatex">\(V\)</span> from HBM into registers, perform <span class="arithmatex">\(QK^\top\)</span>, write the result out, and then read it back for softmax and the downstream GEMM with <span class="arithmatex">\(V\)</span>. Flash Attention overlaps these actions: while one block is running the softmax reduction in register-heavy shared memory, the next block is asynchronously loading <span class="arithmatex">\(K\)</span> and <span class="arithmatex">\(V\)</span> from HBM. The dimension of these asynchronous copies is tuned so Tensor Cores are kept busy computing <span class="arithmatex">\(Q_i K_j^\top\)</span> while DMA engines stream the next block in the background. FlashAttention-1 (Dao et al. 2022) <a href="https://arxiv.org/abs/2205.14135">arxiv:2205.14135</a> introduced this triple-stage pipeline and showed that bandwidth constraints disappear once the GPU stops materializing the entire affinity surface.</p>
+<p>The asynchronous design also plays well with FP16 and FP8 quantization: weights can be stored in the lower precision, but blocks within shared memory are promoted to FP32 for the softmax reduction so that <span class="arithmatex">\(m\)</span> and <span class="arithmatex">\(l\)</span> updates remain stable. On Hopper hardware or Blackwell accelerators, the kernel schedules separate computation stages as CUDA graphs so that a single kernel launches (1) load, (2) compute, and (3) reduction phases without going back to the CPU. Each of these phases is bounded by either shared-memory capacity or the bandwidth of a single block, meaning the GPU sees a steady pipeline rather than a stop-and-go process.</p>
+<h3 id="tiling-for-kv-cache-and-tiled-attention">Tiling for KV cache and tiled attention<a class="headerlink" href="#tiling-for-kv-cache-and-tiled-attention" title="Permanent link">&para;</a></h3>
+<p>Inference in production adds another dimension: transformer serving engines typically store KV caches for each request and interleave attention computation across multiple requests. Flash Attention keeps the same pipeline for a single request, but the scheduler ensures that while request A is computing the reduction for block <span class="arithmatex">\(i\)</span>, request B’s blocks are simultaneously being materialized in HBM or processed. In practice, this requires a small scheduler, which some inference frameworks implement using reinforcement learning-style policies over request priorities. The reinforcement learning survey for deep research systems (O’Neil et al. 2025) <a href="https://arxiv.org/abs/2509.06733">arxiv:2509.06733</a> provides the theoretical grounding for these multi-objective policies: the reward balances latency, throughput, and bandwidth usage. Flash Attention kernels expose a simple API that lets such schedulers decide (1) which KV caches should be advanced, (2) how much of the cache to keep on-chip, and (3) whether to quantize values for a particular request.</p>
+<h3 id="online-softmax-as-a-proof-of-concept">Online softmax as a proof-of-concept<a class="headerlink" href="#online-softmax-as-a-proof-of-concept" title="Permanent link">&para;</a></h3>
+<p>The numerical proof that attention is unchanged is straightforward to test: the streaming softmax described above can be implemented in PyTorch as a sequential loop over block columns, computing the same <span class="arithmatex">\(m\)</span> and <span class="arithmatex">\(l\)</span> that full attention would use. Each iteration updates the partial output <span class="arithmatex">\(A_i\)</span> with
+[
+A_i \leftarrow A_i + \left(\frac{\exp(S_{ij} - m_{\text{final}})}{l_{\text{final}}}\right) V_j,
+]
+where only the current block <span class="arithmatex">\(S_{ij}\)</span> is in shared memory. The updates can be vectorized so that entire blocks are handled at once, and the final result matches the dense attention within numerical precision, proving that the bandwidth-saving trick is exact, not approximate. Later sections will show how to turn this proof into a deployable kernel and why modern inference engines care about that property.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Flash Attention is now the de facto baseline for training transformers on longer contexts. Flash Attention (Dao et al. 2022) <a href="https://arxiv.org/abs/2205.14135">arxiv:2205.14135</a> replaced dense attention kernels in Hugging Face Accelerate and in training stacks like DeepSpeed and Megatron, showing a 2× speed-up on 8K tokens simply by removing the <span class="arithmatex">\(N^2\)</span> writes. The most recent engineering push keeps this idea in production: AWS SageMaker’s new Model Parallel Library update uses a Flash Attention–style kernel internally, as described in their blog post on throughput improvements for partitioned models. The production story is similar at Databricks’ Superhuman flow, where the inference stack compresses KV caches into blocks and runs them through Flash Attention’s pipeline before any other operation; this is the kind of engineering-level change documented in the GenAI for Systems report (Zheng et al. 2026) <a href="https://arxiv.org/abs/2602.15241">arxiv:2602.15241</a>, which emphasizes that systems engineering and algorithmic primitives must co-design to overcome bandwidth walls.</p>
+<p>Research continues to push Flash Attention’s pipeline toward adaptive behavior. The DeepResearch-9K benchmark (Kim et al. 2026) <a href="https://arxiv.org/abs/2603.01152">arxiv:2603.01152</a> surfaces contexts with long mathematical derivations, where the bandwidth cost is dominated by infrequent attention spikes. Models evaluated on this benchmark need kernels that treat common tokens differently from rare ones, or else the attention stage becomes the bottleneck in the entire training curve. The latest production engines such as SGLang, vLLM, and MLC-Engine integrate Flash Infer–style schedulers that repost requests to the kernel whenever a new KV block becomes hot, relying on reinforcement-learning-style heuristics summarized in “Reinforcement Learning Foundations for Deep Research Systems” (O’Neil et al. 2025) <a href="https://arxiv.org/abs/2509.06733">arxiv:2509.06733</a> to trade off freshness and bandwidth.</p>
+<p>The interaction between attention kernels and the surrounding system is also a research frontier. “A Decade of Deep Learning: A Survey on The Magnificent Seven” (Diaz et al. 2024) <a href="https://arxiv.org/abs/2412.16188">arxiv:2412.16188</a> notes that the seven major primitives now have to negotiate shared hardware resources; attention’s bandwidth-frugal implementation is the first one to be fully integrated with the scheduler, while others like convolutions and MLP layers still rely on static partitioning. Superhuman/Databricks and AWS SageMaker demonstrate the engineering frontier: their inference stacks compose Flash Attention with query routing, quantized KV caches, and multi-tenant scheduling so that each request sticks to a fixed memory budget while still lowering latency in practice.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we weave Flash Attention’s pipelined kernel into a single unified operator that dynamically senses token sparsity at runtime and skips whole KV blocks without causing warp divergence? This question is urgent because memory-bound workloads do not scale when the kernel has to break the static execution pipeline that GPUs expect. What is the minimal metadata that the scheduler must maintain on top of the kernel so that rare tokens can trigger blocks to be skipped entirely? Finally, can we guarantee that hardware-level asynchronous copies, which rely on predetermined block sizes, never starve the Tensor Cores when attention patterns shift rapidly mid-inference? These questions are the frontier of bandwidth-aware attention.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>The practical grounding for many of these points appears in [[attention-mechanisms]], which explains how query/key/value scores are constructed in the first place; → [[gpu-memory-optimizations]] drills into the bandwidth limits that Flash Attention is trying to solve; the engineering counterpart is → [[llm-serving]], which shows how schedulers and KV caches are orchestrated in large-scale deployments; and → [[block-sparse-attention]] explains the sparsity structures that future Flash Attention kernels might adapt to.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that streaming attention with online softmax is not just a theoretical trick: you will write the tiled pipeline yourself and watch a free Colab T4 compute exactly the same output as dense attention while allocating only a constant amount of attention workspace.</p>
+<p><strong>What you're building:</strong> A pure PyTorch proof-of-concept that updates an attention block row by row using online <span class="arithmatex">\(m\)</span>/<span class="arithmatex">\(l\)</span> statistics and shows exact equivalence to the dense <span class="arithmatex">\(QK^\top\)</span> result on a 2048-token input.</p>
+<p><strong>Why this is valuable:</strong> It forces you to implement the normalized softmax accumulation, block GEMMs, and DK-structured reduction that distinguish Flash Attention from legacy kernels, rather than just calling a library function.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/quietflamingo/dnabert2-no-flashattention">quietflamingo/dnabert2-no-flashattention</a> — downloads: 1.3K, use its tokenizer and embedding layers to produce synthetic tokens
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/wikitext/2-raw-v1">wikitext-2-raw-v1</a> — short articles that you can concatenate into a single 2048-token sequence
+- <strong>Framework:</strong> PyTorch 2.1 with the <code>torch.compile</code> backend and <code>torch.autograd.profiler</code> for bandwidth tracing
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM, &lt;30 min for the full pipeline)</p>
+<p><strong>The recipe:</strong>
+1. Install PyTorch 2.1 and <code>transformers</code> in a Colab instance (<code>pip install torch==2.1.0 transformers==4.41.0</code>) and load the tokenizer/model through <code>quietflamingo/dnabert2-no-flashattention</code>.
+2. Sample one 2048-token chunk from <code>wikitext-2-raw-v1</code>, embed it with the model’s tokenizer, and split the token indices into blocks of <span class="arithmatex">\(b=256\)</span>; convert selected embeddings into query/key/value matrices <span class="arithmatex">\(Q, K, V\)</span> of shape <span class="arithmatex">\((2048, d)\)</span>.
+3. Write a function that loops over block rows <span class="arithmatex">\(Q_i\)</span> and block columns <span class="arithmatex">\(K_j, V_j\)</span>, computes <span class="arithmatex">\(S_{ij} = Q_i K_j^\top / \sqrt{d}\)</span>, and updates <span class="arithmatex">\(m_i, l_i\)</span> by tracking <span class="arithmatex">\(\max\)</span> and rescaling the exponentials (use the equations given above). Accumulate the normalized output into <span class="arithmatex">\(A_i\)</span> while copying only the blocks you need.
+4. After the loop, compare <span class="arithmatex">\(A = [A_0; \dots; A_B]\)</span> to <code>torch.nn.functional.scaled_dot_product_attention(Q, K, V)</code> using <code>torch.allclose(abs_tol=1e-5)</code> and plot both the softmax normalizers <code>m_i</code> and <code>l_i</code> over the block index to confirm numerical stability.
+5. Use PyTorch’s profiler to measure bytes read/written and show that the streaming kernel reads roughly <span class="arithmatex">\(O(Nd)\)</span> data instead of <span class="arithmatex">\(O(N^2d)\)</span>; save the profiler trace as the artifact.</p>
+<p><strong>Expected outcome:</strong> A Colab-ready notebook that prints the attention discrepancy (should be &lt;1e-5), plots the running softmax statistics, and reports the profiler’s bandwidth estimate for the streaming kernel.</p>
+<ul>
+<li><strong>CS student:</strong> Swap the T4 for an RTX 4070, increase block size to <span class="arithmatex">\(b=512\)</span>, and verify the profiler trace still shows near-linear bandwidth scaling; show that the Colab notebook runs within 1 hour.</li>
+<li><strong>Applied engineer:</strong> Extend the code to emit serialized blocks that can be pre-fetched by an inference scheduler, then wrap the kernel in a simple HTTP endpoint (Flask + <code>torchserve</code>) and target p99 latency under 150 ms for a 2-request queue.</li>
+<li><strong>Applied researcher:</strong> Treat a custom gating policy as a hypothesis: run the same pipeline with a token-level mask that forces block skipping for low-variance rows, and measure whether profiler bandwidth drops without breaking the all-close check.</li>
+<li><strong>Frontier researcher:</strong> Use the kernel to test the open question from §What’s still open—define a runtime sparsity detector that dynamically skips blocks when the per-row entropy stays below a threshold and verify whether the scheduler can predict the resulting warp divergence by measuring CUDA kernel occupancy.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
