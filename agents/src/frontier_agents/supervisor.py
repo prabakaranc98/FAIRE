@@ -382,6 +382,29 @@ def _build_action_list(
                 reason=f"Audit critical: {issue.check} — {issue.message[:80]}",
             ))
 
+    # Priority 2.5: Auto-spin arcs on tracks that meet the guardrails.
+    # The retro also proposes arcs, but it only fires once per cycle AFTER
+    # the sprint completes — meaning any arc it queues is consumed only on
+    # the FOLLOWING cycle. By auto-spinning at supervisor time, arcs land
+    # within the same cycle they become eligible. The same `_apply_arc_proposal`
+    # helper (with its three guardrails: >=3 substantive concepts, >=4 of
+    # the named steps exist, <2 active arcs) is reused for safety.
+    # Skipped in paused mode to conserve budget.
+    if budget_mode != "paused":
+        try:
+            from .retrospective import _apply_arc_proposal, _is_substantive_concept
+            core_dir = docs_path / "curriculum" / "core"
+            if core_dir.exists():
+                # For each track, build a candidate arc if it qualifies and none
+                # are already queued or on disk.
+                arc_candidates = _suggest_track_arcs(core_dir)
+                for arc_params in arc_candidates:
+                    # The helper itself enforces the guardrails and is idempotent;
+                    # a "skipped" return is fine and silent.
+                    _apply_arc_proposal({}, arc_params, docs_path)
+        except Exception:
+            pass  # never break the supervisor on arc-spin errors
+
     # Priority 3: Stub pages that haven't been attempted (new content gaps)
     # Skipped entirely when budget is "paused"
     if budget_mode != "paused":
@@ -556,6 +579,64 @@ def _write_report(report: SupervisorReport, docs_path: Path) -> None:
 # ── Arc proposal phase (Unit C) ───────────────────────────────────────────────
 
 ARC_PROPOSE_COVERAGE_THRESHOLD = float(os.environ.get("ARC_PROPOSE_COVERAGE_THRESHOLD", "0.60"))
+
+
+def _suggest_track_arcs(core_dir: Path) -> list[dict]:
+    """For each track, build at most one arc-proposal candidate from existing concepts.
+
+    Returns the action_params payloads expected by `retrospective._apply_arc_proposal`.
+    The helper there enforces guardrails (>=3 substantive concepts, >=4 of the named
+    steps on disk, <2 active arcs, not already queued). So we can speculatively
+    propose; rejections are silent.
+
+    Naming heuristic: pick the first 5 substantive concept slugs from the track,
+    sorted to give a stable arc_id. The arc title is "<track>-foundations" if no
+    canonical arc exists. The retro will propose better-named arcs over time;
+    this is a cheap fallback to seed each track with something.
+    """
+    from .retrospective import _is_substantive_concept
+
+    out: list[dict] = []
+    # Canonical arc seeds — preferred over the fallback naming heuristic
+    # because they line up with concept slugs that already exist in the corpus.
+    canonical = {
+        "02-generative-modeling": ("generative-stack",
+            ["diffusion-models", "score-matching", "latent-diffusion-models",
+             "flow-matching", "consistency-models"],
+            "5 trained generative models with comparable FID, ending in a distilled consistency model"),
+        "04-neural-networks-deep-learning": ("training-fundamentals",
+            ["backpropagation", "gradient-descent", "adaptive-optimizers",
+             "regularization", "batch-normalization"],
+            "a trained-from-scratch convolutional network with documented loss curves, normalization, and a learned schedule"),
+        "09-algorithms-systems-for-ai": ("serve-an-llm-efficiently",
+            ["flash-attention", "kv-cache", "kv-cache-management",
+             "quantization", "llm-inference"],
+            "a quantized 7B model served behind an endpoint with measured p95 latency under 100ms"),
+    }
+
+    for track_dir in sorted(core_dir.iterdir()):
+        if not track_dir.is_dir():
+            continue
+        track_name = track_dir.name
+        if track_name in canonical:
+            arc_id, steps, dest = canonical[track_name]
+            out.append({"arc_id": arc_id, "track": track_name, "dest": dest, "steps": steps})
+            continue
+        # Generic fallback for non-canonical tracks
+        concepts = track_dir / "concepts"
+        if not concepts.exists():
+            continue
+        slugs = sorted(p.stem for p in concepts.glob("*.md")
+                       if p.name != "index.md" and _is_substantive_concept(p))
+        if len(slugs) < 5:
+            continue
+        out.append({
+            "arc_id": f"{track_name}-foundations",
+            "track": track_name,
+            "dest": f"a working build that ties together the foundational concepts of {track_name}",
+            "steps": slugs[:5],
+        })
+    return out
 
 
 def _count_active_arcs(docs_path: Path) -> int:
