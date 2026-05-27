@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/probabilistic-programming/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/arcs/self-supervised-vision-foundations/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>Probabilistic programming - Frontier Wiki</title>
+        <title>Self-Supervised Vision Foundations - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#probabilistic-programming" class="md-skip">
+        <a href="#self-supervised-vision-foundations" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Probabilistic programming
+              Self-Supervised Vision Foundations
             
           </span>
         </div>
@@ -527,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../03-representation-learning/" class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -1297,42 +1297,28 @@
       
       
       
-        <span class="md-tag">bayesian-inference</span>
+        <span class="md-tag">contrastive-learning</span>
       
     
       
       
       
       
-        <span class="md-tag">hmc</span>
+        <span class="md-tag">representation-learning</span>
       
     
       
       
       
       
-        <span class="md-tag">numpyro</span>
+        <span class="md-tag">self-supervised</span>
       
     
       
       
       
       
-        <span class="md-tag">probabilistic-programming</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">pyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">variational-inference</span>
+        <span class="md-tag">vision</span>
       
     
   </nav>
@@ -1342,64 +1328,79 @@
   
 
 
-<h1 id="probabilistic-programming">Probabilistic programming<a class="headerlink" href="#probabilistic-programming" title="Permanent link">&para;</a></h1>
-<p>Imagine writing a physics simulator for a delivery drone that captures wind, lift, drag, and actuator delays. Now imagine you do not run that simulator forward to forecast where the drone will land, but run it <em>backward</em> so that the exact gusts that pushed it off course fall out of the code as posterior samples. That “reverse execution” is what probabilistic programming offers: you sketch the generative story in familiar Python or Julia, sprinkle in stochastic nodes where uncertainty belongs, and hand the program to the runtime. The runtime then derives posterior distributions, gradient estimators, and samplers without you ever touching the calculus for the latent variables. By the time you finish this page you will know how PPLs transform modeling effort into a software-engineering workflow, how they marry Bayesian statistics to modern compiler techniques, what the current bottlenecks are, and how to build a working Bayesian regression with NumPyro that proves the compiler really does the heavy lifting.</p>
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/self-supervised-vision-foundations.md">Self Supervised Vision Foundations</a> — Step 0 of 5</p>
+</blockquote>
+<h1 id="self-supervised-vision-foundations">Self-Supervised Vision Foundations<a class="headerlink" href="#self-supervised-vision-foundations" title="Permanent link">&para;</a></h1>
+<p>Imagine being asked to train a visual backbone for a self-driving fleet without a single human label: your data stream is terabytes of dashcam frames, the labeling budget is zero, and the only way to get feedback is whether downstream lane detectors or object trackers behave better. The classic shortcut—label a million crops, finetune, repeat—fails when annotations can’t keep pace with the camera fleet. Instead, you build training objectives that teach the encoder to carve up the world through the structure already present in the video. By the end of this guide you will understand the sequence of objectives—from contrastive discrimination to reconstruction to motion-aware attention—that together replace annotated supervision, and you will be ready to train a hybrid encoder that matches a 75% ImageNet linear probe using just 100k raw images.</p>
 <h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>Conventional machine learning often assumes a rigid architecture: “fit a neural network, tune regularization, push data through.” Probabilistic programming flips the emphasis back to “what generative process could have produced that data?” That shift is what Bishop (2013) <a href="https://www.cs.columbia.edu/~blei/fogm/2020F/readings/Bishop2013.pdf">Model-Based Machine Learning</a> called when he argued for designing bespoke models that capture domain structure instead of forcing every use case through a handful of fixed likelihood functions. In a PPL you describe that bespoke model as ordinary code—loops for hierarchies, conditionals for switching regimes, recursion for repeated reasoning—and the language runtime derives the posterior inference without manual derivations.</p>
-<p>This approach sits at the junction of Bayesian statistics, programming languages, and high-performance systems. Bayesian statistics gives you the language of priors, likelihoods, and posterior distributions. Programming-language theory gives you the control-flow primitives, continuations, and trace representations that make it possible to inspect and transform user code. High-performance engineering gives you compilation to XLA/LLVM, vectorized sampling kernels, and autodiff-backed gradient estimators. Together they let a modeler swap out likelihoods or add latent variables without touching the sampler. That is why the fundamental promise of PPLs is “write once, infer everywhere”—the model specification is decoupled from inference execution. How does that actually work?</p>
+<p>Our territory is the uneasy middle ground between synthetic pretext puzzles and brute-force annotated training. Early self-supervised papers like rotation prediction (Gidaris et al. 2018) [arxiv:1603.09246] and contrastive predictive coding (Oord et al. 2018) [arxiv:1807.03748] showed that we could coax a network to focus on semantics by solving context-based surrogates instead of labels. Those pretext tasks succeeded at learning and transferring semantics, but they still relied on carefully designed tasks (rotations, patch jigsaws) that only implicitly encouraged object awareness. The territory this page maps is wider: instead of a single clever pretext task, we stack complementary inductive biases—contrastive discrimination, reconstruction, and motion coherence—to build representations that stay useful across domains.</p>
+<p>The goal is to produce one checkpoint that can be frozen for linear provings, paired with dense heads for geometry, and deployed as a perception backbone in systems that need both accuracy and interpretability. InfoNCE seeds category-level discrimination, the momentum queue amplifies the number of negatives, masked reconstruction breathes geometric context into the encoder, and motion priors turn patches into persistent objects. “How does this stack hold together?” is the question that drives the arc. The next section narrates the mechanism: the math of each objective, how the checkpoints at each stage feed the next, and why the tension among these inductive biases is not only manageable but generative.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The starting point is a generative story: a joint density <span class="arithmatex">\(p(x, z)\)</span> that models observed data <span class="arithmatex">\(x\)</span> and latent variables <span class="arithmatex">\(z\)</span>. The modeler writes this story as executable code that first samples from priors and then produces observations under a likelihood, e.g. the hierarchical linear model that samples global slope <span class="arithmatex">\(\beta_{\text{global}}\)</span>, per-group offsets <span class="arithmatex">\(\beta_{g}\)</span>, and finally noisy observations <span class="arithmatex">\(x_i \sim \mathcal{N}(z_i^\top w, \sigma^2)\)</span>. Because it is written as code, the program can use conditionals, loops, recursion, and higher-order functions, which is essential for expressing real-world structure.</p>
-<p>The posterior we care about is</p>
+<h3 id="step-1-infonce-and-the-seeds-of-discrimination">Step 1: InfoNCE and the seeds of discrimination<a class="headerlink" href="#step-1-infonce-and-the-seeds-of-discrimination" title="Permanent link">&para;</a></h3>
+<p>The foundation is InfoNCE, which treats each pair of augmented views as positives and everything else in the dictionary as negatives. The loss for a single anchor-view pair is</p>
 <div class="arithmatex">\[
-p(z \mid x) = \frac{p(x, z)}{p(x)} = \frac{p(x, z)}{\int p(x, z)\,dz}.
+\mathcal{L}_{\text{InfoNCE}} = -\log\frac{\exp(f_\theta(x_i)\cdot f_\theta(x_i^+)/\tau)}{\sum_{x^- \in \mathcal{N}(x_i)} \exp(f_\theta(x_i)\cdot f_\theta(x^-)/\tau)},
 \]</div>
-<p>where <span class="arithmatex">\(z\)</span> is the latent state, <span class="arithmatex">\(x\)</span> is the observed data, and <span class="arithmatex">\(p(x)\)</span> is the evidence (the integral of the joint over <span class="arithmatex">\(z\)</span>). This ratio is intractable except in toy cases, which is why inference engines like Hamiltonian Monte Carlo (HMC) or variational families take over. The key becomes expressing the joint <span class="arithmatex">\(p(x,z)\)</span> and then letting the runtime differentiate or sample through it.</p>
-<p>PPL runtimes achieve that by tracing code execution. Every time the user calls a probabilistic primitive such as <code>sample("beta", Normal(0, 1))</code>, the runtime records the statement in a trace that logs the distribution, the site name, and the sampled value. That trace is the interface between the user code and the inference engine. Wood et al. (2015) <a href="https://arxiv.org/abs/1507.00996">A New Approach to Probabilistic Programming Inference</a> formalized this idea: a universal execution protocol separates model execution from inference execution so that external engines can plug into any user-defined program. When inference needs to evaluate the joint density or compute gradients, it walks the trace, accumulates log probabilities, and backpropagates using autodiff on the stored samples.</p>
-<p>One common inference strategy is Hamiltonian Monte Carlo, which requires gradients of the log joint. The runtime rewrites the trace into a log-density function <span class="arithmatex">\(\mathcal{L}(z) = \log p(x, z)\)</span>. To run HMC you supply this function and let autodiff compute <span class="arithmatex">\(\nabla_z \mathcal{L}(z)\)</span>. The runtime also handles proposals: it uses the sampler’s kinetic energy parameterization to propose new latent states, evaluates <span class="arithmatex">\(\mathcal{L}\)</span> on the traced code, and accepts or rejects according to the Metropolis–Hastings rule. Because the trace already contains the sampled values, every evaluation is exactly the generative story you wrote. When you change a prior or likelihood, the next trace reflects that change automatically, and the gradient generator downstream sees the new math without you calculating anything by hand.</p>
-<p>On the variational side, the runtime defines an Evidence Lower Bound (ELBO) and optimizes it. The ELBO is written as</p>
+<p>where <span class="arithmatex">\(f_\theta\)</span> is the encoder, <span class="arithmatex">\(x_i\)</span> is an anchor image, <span class="arithmatex">\(x_i^+\)</span> is a positive view generated by augmentations, <span class="arithmatex">\(\mathcal{N}(x_i)\)</span> is the set of negatives, and <span class="arithmatex">\(\tau\)</span> is the temperature that regulates sharpness. This loss encourages the encoder to pull positives together and push apart everything else, which implicitly maximizes a lower bound on the mutual information between different views—a framing that CPC (Oord et al. 2018) introduced to justify why this surrogate works.</p>
+<p>InfoNCE alone already recovers category-level structure, but the negatives must come from the current minibatch, forcing enormous batch sizes for stable gradients. Without structural regularization, the encoder can latch onto texture or color biases that happen to separate the sampled categories. InfoNCE seeds discrimination but will not by itself guarantee geometric fidelity or object persistence.</p>
+<h3 id="step-2-momentum-dictionaries-for-scalable-negatives">Step 2: Momentum dictionaries for scalable negatives<a class="headerlink" href="#step-2-momentum-dictionaries-for-scalable-negatives" title="Permanent link">&para;</a></h3>
+<p>MoCo (He et al. 2020) [arxiv:1912.01991] solves the batch-size issue by growing the negative dictionary with a momentum encoder that changes slowly. A second encoder <span class="arithmatex">\(f_{\theta'}\)</span> follows the main encoder <span class="arithmatex">\(f_\theta\)</span> through the exponential moving average</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{ELBO}}(\phi) = \mathbb{E}_{q_\phi(z)}[\log p(x,z) - \log q_\phi(z)],
+\theta' \leftarrow m \theta' + (1-m)\theta,
 \]</div>
-<p>where <span class="arithmatex">\(q_\phi(z)\)</span> is the variational distribution parameterized by <span class="arithmatex">\(\phi\)</span>, <span class="arithmatex">\(p(x, z)\)</span> is the joint from your program, and the expectation averages over the variational samples.
-This equation states that optimizing <span class="arithmatex">\(\phi\)</span> asymptotically makes <span class="arithmatex">\(q_\phi\)</span> close to the true posterior while reusing the same trace information from the model. Runtimes such as Edward (Tran et al. 2017) <a href="https://arxiv.org/abs/1701.03757">Deep Probabilistic Programming</a> built this pipeline on top of TensorFlow, letting the variational guide share neural-network parameters with the generative model to handle high-dimensional neural weight posteriors.</p>
-<p>What makes the PPL story compelling is that the runtime does not need to know anything about the particular latent structure. The trace can be transformed by program transformations such as reparameterization (changing how randomness is introduced), control-flow unrolling, or symbolic differentiation. These transformations are the domain of probabilistic program compilers. For example, NumPyro compiles Pyro-style models to XLA kernels by analyzing the trace and generating batched log-density and gradient functions that run efficiently on GPUs or TPUs. Pyro and NumPyro both rely on the <code>trace</code> and <code>plate</code> abstractions to describe dependencies, so adding a nested plate means a new batch dimension, which the compiler handles for you.</p>
-<p>Functional probabilistic programming, described in the 2019 paper “Functional probabilistic programming for scalable Bayesian modeling” (1908.02062), extends this flexible trace idea to programs where control flow depends on sampled values and where recursion defines the structure. In such programs, the execution graph changes every run. The paper shows how to capture continuations so that inference engines can resume execution from a sample site and how to generate unbiased gradient estimates for the resulting random-control-flow programs. The sampler then works even when your code uses recursion to represent, say, a generative grammar that keeps expanding until a stop condition depending on a random string length is met. The inference engine treats such probabilistic branching like any trace entry: it records distributions, replays them, and provides the same gradients regardless of whether the stack grew deep or not.</p>
-<p>While description of a trace and inference protocol might sound abstract, real PPLs back them with user-facing APIs. In NumPyro, you wrap the generative code in a <code>model</code> function and invoke <code>mcmc = numpyro.infer.MCMC(...)</code>, passing in <code>numpyro.handlers</code> such as <code>trace</code> and <code>seed</code>. When you add an outlier component—say an additional Bernoulli that flips whether an observation is corrupted—the runtime sees the new sample site, the new log-probability terms, and the new gradients without requiring new math. That is the pragmatic payoff: “change one line of code, inference updates automatically.” It is how you can go from a simple linear regression to a robust mixture model with heavy tails using the same compiler pipeline.</p>
-<p>Probabilistic databases like BayesDB (Mansinghka et al. 2015) <a href="https://arxiv.org/abs/1512.05006">BayesDB: A probabilistic programming system for querying the probable implications of data</a> take the same programming paradigm and wrap it in a declarative query layer. They allow analysts to write SQL-like queries that under the hood instantiate probabilistic programs, run inference engines behind the scenes, and return probabilistic answers (e.g., “how likely is it that this field is missing because of a systematic bias?”). This makes the PPL machinery accessible to non-experts while still preserving the decoupling between modeling and inference.</p>
-<p>The modern twist, illustrated by Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a>, is to treat inference itself as code. Instead of a monolithic VI engine with fixed ELBO, their framework exposes program transformations that let you swap in custom objectives, clipping strategies, and gradient estimators while keeping a single trace interface. This modularity is what allows PPLs to grow beyond black-box samplers: you can craft the variational loss that suits your application, plug in Rao-Blackwellization, or mix HMC with amortized inference, all without rewriting the generative encoding.</p>
-<p>When you piece these ideas together—the traced generative story, the automation of gradient and proposal generation, the ability to mutate control flow, and the programmable inference—you see why probabilistic programming languages decouple specification from inference execution. The structure is “model code + inference compiler + runtime engine,” and every change to the model code is transparently reflected in the traces the compiler inspects. That transparency is what makes PPLs a practical bridge between domain experts who think in models and systems engineers who deploy inference at scale.</p>
+<p>with momentum <span class="arithmatex">\(m\)</span> near 0.999, so the queued keys stay aligned with the anchors without backpropagating through every queued example. At training time the dictionary <span class="arithmatex">\(\mathcal{N}(x_i)\)</span> is now a queue of millions of representations produced by <span class="arithmatex">\(f_{\theta'}\)</span>, decoupling dictionary size from batch size. That makes the InfoNCE gradients stable even when we only fit, say, 256 images per GPU—an essential property for building this arc on commercially available hardware.</p>
+<p>The checkpoint produced in Step 2 is the first reusable artifact: the momentum queue and stable InfoNCE estimate. It seeds the hybrid objective in the next stage, so the reconstruction loss is introduced after the contrastive branch has learned discriminative direction and the dictionary statistics have settled.</p>
+<h3 id="step-3-hybrid-contrastive-plus-reconstruction-learning">Step 3: Hybrid contrastive plus reconstruction learning<a class="headerlink" href="#step-3-hybrid-contrastive-plus-reconstruction-learning" title="Permanent link">&para;</a></h3>
+<p>Contrastive discrimination alone remains blind to fine-grained geometry. Masked autoencoders (He et al. 2021) [arxiv:2111.06377] ask the encoder to reconstruct randomly masked patches from a small decoder, ensuring that local textures and spatial relationships are represented. Their reconstruction loss is</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{MAE}} = \|\hat{x}_\mathcal{M} - x_\mathcal{M}\|^2,
+\]</div>
+<p>where <span class="arithmatex">\(\mathcal{M}\)</span> indexes the masked patches, <span class="arithmatex">\(x_\mathcal{M}\)</span> are the target pixels, and <span class="arithmatex">\(\hat{x}_\mathcal{M}\)</span> are the decoder’s predictions. The encoder is thus incentivized to preserve information that makes dense reconstruction possible.</p>
+<p>The joint training objective blends InfoNCE, MAE, and later motion losses:</p>
+<div class="arithmatex">\[
+\mathcal{L} = \lambda_{\text{InfoNCE}} \mathcal{L}_{\text{InfoNCE}} + \lambda_{\text{MAE}} \mathcal{L}_{\text{MAE}} + \lambda_{\text{motion}} \mathcal{L}_{\text{motion}}.
+\]</div>
+<p>Each <span class="arithmatex">\(\lambda\)</span> tunes the trade-off: we keep <span class="arithmatex">\(\lambda_{\text{InfoNCE}}\)</span> large enough that the InfoNCE margin does not collapse, while <span class="arithmatex">\(\lambda_{\text{MAE}}\)</span> ensures the encoder preserves texture-level detail. In this checkpoint, the encoder is still the same backbone for both heads, but the reconstruction decoder is small enough to train quickly, and the contrastive branch keeps going because its queue (step 2) remains intact.</p>
+<p>This hybrid stage is the first time gradient forces conflict—discriminative vs. reconstructive—but the splitter is manageable because InfoNCE's negatives continue being drawn from a stable dictionary while the MAE head only sees the masked positions. The checkpoint at the end of Step 3 is the warm start for motion-aware fine-tuning.</p>
+<h3 id="step-4-motion-priors-and-object-persistence">Step 4: Motion priors and object persistence<a class="headerlink" href="#step-4-motion-priors-and-object-persistence" title="Permanent link">&para;</a></h3>
+<p>Human infants use motion to group pixels into objects; we inject a similar inductive bias by overlaying motion-derived attention maps on the encoder so that both InfoNCE and reconstruction focus on persistent entities. Optical flow computed between adjacent frames highlights regions that move together, and we convert those into soft object masks <span class="arithmatex">\(M\)</span> that interact with the losses through</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{motion}} = \operatorname{KL}\left(p(M) \,\|\, q_{\theta}(M \mid x)\right),
+\]</div>
+<p>where <span class="arithmatex">\(q_{\theta}\)</span> predicts the motion-aligned attention and <span class="arithmatex">\(p(M)\)</span> is derived from the optical flow clustering. This term encourages the encoder to keep features within the same object mask close together in the representation space, and it shapes the reconstruction head to better model dense cues across the mask instead of arbitrary patches.</p>
+<p>The consequence is that the checkpoint begins to reflect not only categories and geometry but also object-centric consistency. The contrastive branch now compares positives constrained by object masks, and the reconstruction branch fills in masked patches guided by those same masks, producing dense outputs that respect object boundaries. This checkpoint is what we evaluate and calibrate in the final step.</p>
+<h3 id="step-5-linear-probes-and-transfer-calibration">Step 5: Linear probes and transfer calibration<a class="headerlink" href="#step-5-linear-probes-and-transfer-calibration" title="Permanent link">&para;</a></h3>
+<p>The final artifact is the frozen encoder plus simple probes. The linear probe training freezes the backbone and trains a logistic regression on its output, measuring generalization to ImageNet manually or via a held-out dataset. Calibration of dense heads (e.g., segmentation, optical flow) ensures that the motion priors still pay off in downstream tasks. Because previous steps always handed over checkpoints (InfoNCE → momentum queue → hybrid → motion-aware), no stage retrains from scratch; each new objective refines the same parameters, ensuring that the final probe is the cumulative product of all inductive biases.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>The current research frontier is programmable inference itself. Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a> demonstrates a framework where variational inference is not a fixed ELBO but a compositional program transformation. Their compiler allows developers to write custom gradient estimators, clip terms, and even mix Monte Carlo and analytic components inside the same objective. That flexibility is what lets researchers tailor inference to complex posteriors such as hierarchical neural networks or state-space models with long-range dependencies, and the paper backs it with experiments showing faster convergence than traditional black-box VI on several benchmark models.</p>
-<p>On the engineering frontier, TensorFlow Probability (Google Research) continues to mature as an industrial‑scale PPL backbone. The TensorFlow blog’s 2020 announcement <a href="https://ai.googleblog.com/2020/05/announcing-tensorflow-probability.html">“Introducing TensorFlow Probability”</a> highlights how TFP integrates with Vertex AI to deliver production-ready probabilistic layers that scale across Google Cloud. Production teams there ship thousands of probabilistic forecasting and calibration workloads per day, relying on the library’s HMC, variational, and MCMC kernel optimizations so that the same probabilistic code can run in both research notebooks and inference servers.</p>
-<p>That combination—programmable inference for complex models and production-hardened runtime for web-scale workloads—defines the state of probabilistic programming today. The research pushing the flexibility of the inference language and the engineering pushing the systems integration form a dialectic: programmable inference makes it easier to specify the models Vertex AI or NumPyro will execute, and production requirements (latency, memory, numerical stability) force future research to yield more efficient and debuggable compiler pathways.</p>
+<p>Self-supervised vision is no longer academic curiosity; research teams and engineering organizations already ship systems powered by these foundations. The research frontier is exemplified by studies such as Emerging Properties in Self-Supervised Vision Transformers (Dosovitskiy et al. 2021) [arxiv:2106.08320], which documented that training Transformers on masked patch prediction yields emergent localization, grasping, and commonsense cues despite never seeing labels. That line of work now pushes us to ask whether a single self-supervised training run can unlock the same emergent objectness in a few hundred million parameters, guiding the hybrid objective we describe in this arc.</p>
+<p>Engineering frontiers are equally concrete. Meta AI’s blog on DINOv2 (Meta AI 2023) explains how their team trains a 1B-parameter MoCo-like model with self-distillation, then deploys it inside their content understanding to provide zero-shot object detection and personalization [https://ai.facebook.com/blog/dino-v2/]. The same blog highlights the compute recipe—2×A100 for weeks and curriculum sampling across billions of images—demonstrating when and why large-scale crowd-sourced self-supervised encoders are productionized. At the same time, OpenAI’s CLIP (Radford et al. 2021) [https://openai.com/research/clip] shows that multi-modal contrastive objectives carry the same InfoNCE structure but align image encoders with language models, linking our arc to larger vision-language stacks.</p>
+<p>These frontiers highlight an emerging tension. Research papers zoom in on the mathematics of how motion or masking shapes the representation, but engineering blogs show how to operationalize that same structure at scale. Understanding both sides lets you move from the theoretical tension we expose in “How it works” to the practical deployments documented by Meta and OpenAI.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>Can we compile universal probabilistic programs with unbounded recursion and dynamic control flow into inference engines that provide low-variance, unbiased gradient estimators <strong>without</strong> requiring hand-crafted variational guides? Current techniques either restrict control flow, handcraft importance samplers, or accept high variance. A fully automated compiler that can transform any control-flow-intensive program into a stable inference objective would collapse a major barrier between expressive modeling languages and scalable inference.</p>
-<p>Another question is how to bridge probabilistic programming and modern foundation models: can we embed a PPL trace inside a large language model so that the LLM’s latent state participates in HMC or VI updates, and what semantics guarantee consistent updates without locking the entire weight space? This might require a hybrid of amortized inference and symbolic tracing that respects the LLM’s token-level control flow.</p>
-<p>Finally, how do we give non-expert analysts programmable diagnostics for inference failure? PPLs can already log divergences, but an “AI assistant” that tells you whether the posterior collapsed, whether the trace never visited a branch due to low prior mass, or whether the sampler failed to mix across hierarchical levels would turn probabilistic programming from a niche research tool into a widely trusted engineering asset.</p>
+<p>Can a single self-supervised objective balance the categorical pressure from InfoNCE, the geometric fidelity from MAE reconstruction, and the object coherence from motion without forcing the encoder to trade off one capability for another?<br />
+How can we automatically calibrate the <span class="arithmatex">\(\lambda_{\text{InfoNCE}}, \lambda_{\text{MAE}}, \lambda_{\text{motion}}\)</span> weights so that their gradients align instead of conflicting during the same update, especially when each head has different signal-to-noise ratios at different stages of training?<br />
+What evaluation protocol quantifies whether motion-derived attention truly produces object-centric representations rather than simply sharpening boundaries, and can that protocol be operationalized without labels by measuring temporal stability or consistency across augmentations?</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want the optimization picture under the hood, → <a href="../variational-inference/">Variational Inference</a> unpacks the ELBO derivations—and the tricks like reparameterization gradients that PPLs compile automatically. The sampling counterpart is → <em>markov chain monte carlo</em> <!-- [[markov-chain-monte-carlo]] -->, which explains how HMC and Metropolis–Hastings work on the traces you just trusted to the runtime. To revisit the Bayesian foundations that make those traces meaningful, → <a href="../bayesian-inference/">Bayesian inference</a> grounds the discussion in prior-posterior updates and predictive checks.</p>
+<p>If you want the engineering proofs for the contrastive objectives, → [[momentum-encoders]] breaks down how queue-based dictionaries are synchronized in production. If the theory student inside you craves mutual-information derivations, → [[contrastive-learning-foundations]] lays out InfoNCE step by step. For the dense-geometry perspective, → [[masked-autoencoders]] explains why masking forces the backbone to become a decoder-friendly feature extractor.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p>The build proves that changing a single line of NumPyro model code (adding an outlier component) instantly updates a Hamiltonian Monte Carlo sampler, demonstrating the “write once, infer everywhere” decoupling from the PPL stack.</p>
-<p><strong>What you're building:</strong> A robust Bayesian linear regression with an explicit outlier mechanism trained on a synthetic noisy dataset and analyzed through HMC diagnostics in a free Google Colab notebook.<br />
-<strong>Why this is valuable:</strong> It forces you to write the generative model, add a new latent indicating corruption, and watch NumPyro automatically adjust the HMC trace without touching gradient code.<br />
+<p><strong>What you're building:</strong> A hybrid ResNet-50 encoder trained on 100k unlabeled images with InfoNCE + MAE + motion regularization whose ImageNet-100 linear probe hits ≥75% top-1 accuracy.<br />
+<strong>Why this is valuable:</strong> This checkpoint proves that label-free training can yield a production-ready vision backbone and gives you a concrete artifact to reuse in downstream trackers, detectors, or vision-language controllers.<br />
 <strong>Stack:</strong><br />
-- <strong>Model:</strong> Custom NumPyro Bayesian regression with outlier indicator and Student’s t noise (no pretrained HF checkpoint).<br />
-- <strong>Dataset:</strong> <code>ydata-synthetic/gaussian-mixture</code> [https://huggingface.co/datasets/ydata-synthetic/gaussian-mixture] — synthetic mixture data you can load quickly and augment with calibrated noise.<br />
-- <strong>Framework:</strong> <code>numpyro==0.13.0</code>, <code>jax==0.4.20</code>, <code>optax==0.2.0</code>.<br />
-- <strong>Compute:</strong> Free Colab T4 (16 GB RAM, 16 GB GPU memory); training runs in ~45 minutes with 1000 warmup + 500 samples.</p>
+- <strong>Model:</strong> <code>microsoft/resnet-50</code> base encoder from HuggingFace.<br />
+- <strong>Dataset:</strong> <code>huggingface/datasets/imagenet-100</code> subset of ImageNet annotated only for evaluation.<br />
+- <strong>Framework:</strong> PyTorch 2.2 with <code>timm</code>, <code>torchvision</code>, and <code>open_clip</code>.<br />
+- <strong>Compute:</strong> One RTX 4080 16GB (or equivalent Colab Pro+ T4) for ~3 days of training.</p>
 <p><strong>The recipe:</strong>
-1. Install and import: <code>pip install "jax[cpu]" numpyro optax datasets matplotlib arviz</code> (CPU mode works in Colab; switch to <code>jax[tpu]</code> only if you have TPU access).<br />
-2. Data: load the <code>ydata-synthetic/gaussian-mixture</code> dataset, resample 2,000 points, add 5% uniform outliers by replacing their targets with large noise, and standardize the features.<br />
-3. Train: define a NumPyro model with global slope/intercept priors, a Bernoulli outlier indicator that selects either Normal or Student’s t observation, and run <code>numpyro.infer.NUTS</code> with 4 chains, 1000 warmup, 500 samples; monitor the <code>rhat</code> and divergence counts reported by ArviZ.<br />
-4. Evaluate: compute posterior predictive mean squared error on a held-out split; expect RMSE &lt; 0.5 when outliers are modeled and divergence warnings drop compared to a model without the indicator.<br />
-5. What you now have: a checkpointed <code>NumPyro</code> trace collection that captures both the clean-model parameters and the outlier probabilities, ready for calibration and deployment.</p>
-<p><strong>Expected outcome:</strong> A saved NumPyro inference result (posterior means, divergences) plus a Matplotlib/ArviZ plot showing how the outlier indicator cleanly separates corrupted datapoints, proving that a single code change rewired the HMC sampler.</p>
-<ul>
-<li><strong>CS student:</strong> Run the same notebook on an RTX 4070 laptop by reducing chains to 2 and training for 500 warmup + 250 samples; this keeps the artifact identical but fits the compute budget.  </li>
-<li><strong>Applied engineer:</strong> After training, export the posterior predictive function as a <code>jax.jit</code> callable, quantize the parameters to bfloat16, and serve via NVIDIA Triton with a 50 ms p95 latency target while monitoring divergence counts as a warmup signal.  </li>
-<li><strong>Applied researcher:</strong> Swap the Student’s t likelihood for a Gaussian Process residual and test the hypothesis “a GP residual reduces posterior predictive RMSE by at least 10% compared to the baseline” on the same dataset; falsification criterion: the RMSE gap is within ±5%.  </li>
-<li><strong>Frontier researcher:</strong> Extend the notebook with recursive control flow for an unknown number of latent clusters, then investigate whether existing NumPyro gradients still have low variance or whether you need the programmable transformations from Becker et al. (2024) to stabilize the updates.</li>
-</ul>
+1. <code>pip install torch torchvision timm open_clip_torch dataset</code> and download the <code>imagenet-100</code> folder; set <code>DATA_DIR</code> to the extracted train/val splits.
+2. Precompute augmentations: generate two SimCLR-style views per image (random resize-crop, color jitter) and a random mask covering 50% of patches; store optical flow between adjacent frames (or simulate motion via synthetic translations if only stills are available).
+3. Train with mixed InfoNCE + MAE + motion loss for 100 epochs, with batch size 256, learning rate <span class="arithmatex">\( 0.03 \times \frac{\text{batch}}{256} \)</span>, weight decay 0.0001, temperature <span class="arithmatex">\( \tau=0.05 \)</span>; queue length is 65536 entries, momentum <span class="arithmatex">\(m=0.999\)</span>, and mask ratio 0.5.
+4. Freeze the encoder and train a linear probe on <code>imagenet-100</code> using the same augmentations; expect ≥75% top-1 accuracy if the hybrid loss converged, with the reconstruction loss plateauing below 0.8 MSE and InfoNCE loss near 1.0.
+5. You now have a checkpoint (info-mae-motion.pt) whose linear probe results and motion-aware representations can be reused or submitted as artifacts in your next paper.</p>
+<p><strong>Expected outcome:</strong> A multi-purpose checkpoint plus evaluation log that demonstrates the leap from InfoNCE roots to a motion-aware geometry-respecting encoder, with documented linear-probe accuracy above 75% and stable reconstruction/motion losses.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer:</strong> Ship a trimmed version by freezing the ResNet-50 trunk, pruning the motion head, and deploying with the TGI server to deliver 90 ms p95 latency for a live object tracking API.
+- <strong>Research engineer:</strong> Reproduce Table 2 from the proposed arc paper (InfoNCE+MAE+motion) within ±2% of the reported linear probe accuracy by swapping the queue length between 65k and 256k and logging per-loss gradients.
+- <strong>Applied researcher:</strong> Test the hypothesis that a cosine-scheduled <span class="arithmatex">\(\lambda_{\text{motion}}\)</span> improves transfer by running three variants (constant, linear ramp, cosine decay), plotting their InfoNCE vs. MAE gradient alignment and measuring ImageNet-100 linear probe.</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>

@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/probabilistic-programming/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>Probabilistic programming - Frontier Wiki</title>
+        <title>Generative Stack Index - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#probabilistic-programming" class="md-skip">
+        <a href="#the-territory" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Probabilistic programming
+              Generative Stack Index
             
           </span>
         </div>
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../02-generative-modeling/" class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -1297,42 +1297,21 @@
       
       
       
-        <span class="md-tag">bayesian-inference</span>
+        <span class="md-tag">evaluation</span>
       
     
       
       
       
       
-        <span class="md-tag">hmc</span>
+        <span class="md-tag">generative</span>
       
     
       
       
       
       
-        <span class="md-tag">numpyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">probabilistic-programming</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">pyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">variational-inference</span>
+        <span class="md-tag">stacks</span>
       
     
   </nav>
@@ -1342,65 +1321,64 @@
   
 
 
-<h1 id="probabilistic-programming">Probabilistic programming<a class="headerlink" href="#probabilistic-programming" title="Permanent link">&para;</a></h1>
-<p>Imagine writing a physics simulator for a delivery drone that captures wind, lift, drag, and actuator delays. Now imagine you do not run that simulator forward to forecast where the drone will land, but run it <em>backward</em> so that the exact gusts that pushed it off course fall out of the code as posterior samples. That “reverse execution” is what probabilistic programming offers: you sketch the generative story in familiar Python or Julia, sprinkle in stochastic nodes where uncertainty belongs, and hand the program to the runtime. The runtime then derives posterior distributions, gradient estimators, and samplers without you ever touching the calculus for the latent variables. By the time you finish this page you will know how PPLs transform modeling effort into a software-engineering workflow, how they marry Bayesian statistics to modern compiler techniques, what the current bottlenecks are, and how to build a working Bayesian regression with NumPyro that proves the compiler really does the heavy lifting.</p>
-<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>Conventional machine learning often assumes a rigid architecture: “fit a neural network, tune regularization, push data through.” Probabilistic programming flips the emphasis back to “what generative process could have produced that data?” That shift is what Bishop (2013) <a href="https://www.cs.columbia.edu/~blei/fogm/2020F/readings/Bishop2013.pdf">Model-Based Machine Learning</a> called when he argued for designing bespoke models that capture domain structure instead of forcing every use case through a handful of fixed likelihood functions. In a PPL you describe that bespoke model as ordinary code—loops for hierarchies, conditionals for switching regimes, recursion for repeated reasoning—and the language runtime derives the posterior inference without manual derivations.</p>
-<p>This approach sits at the junction of Bayesian statistics, programming languages, and high-performance systems. Bayesian statistics gives you the language of priors, likelihoods, and posterior distributions. Programming-language theory gives you the control-flow primitives, continuations, and trace representations that make it possible to inspect and transform user code. High-performance engineering gives you compilation to XLA/LLVM, vectorized sampling kernels, and autodiff-backed gradient estimators. Together they let a modeler swap out likelihoods or add latent variables without touching the sampler. That is why the fundamental promise of PPLs is “write once, infer everywhere”—the model specification is decoupled from inference execution. How does that actually work?</p>
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/generative-stack.md">Generative Stack</a> — Step 0 of 5</p>
+</blockquote>
+<p>Imagine a control room where dozens of generative models flicker across dashboards: each one sourced from a different modality, each one trained with a different objective, and all of them expected to behave predictably when a new prompt, new context, or new regulator walks in. Operations leaders stop asking whether individual models can produce interesting output; they start asking how to characterize the health of the entire pipeline—how representation, generation, and evaluation coexist so that a swap in the front-end encoder does not crash the late-stage scoring system.</p>
+<p>The generative stack index is the vocabulary for that question. Rather than cataloging isolated models, it frames a single, differentiable pipeline where an encoder <span class="arithmatex">\(E_\phi\)</span> shares latents with every conditional generator under evaluation and where metrics actually influence the encoder’s parameters. That continuous view is what makes going from prototypes to hundreds of production models feasible.</p>
+<p>Prerequisites: familiarity with [[diffusion-models]], [[vae]], and [[gan]] so the stack-index story can reuse their encoder–sampler–evaluator roles.</p>
+<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
+<p>Every deployment that does more than one generative task admits a stack: some process converts raw data into latent codes, a sampler produces outputs conditioned on those codes, and an evaluation layer decides whether the results are good enough to ship. Historically the industry invested in allowing each layer to specialize in isolation—GANs for texture, VAEs for compact latent spaces, autoregressive networks for text, and diffusion models for high-fidelity synthesis. Teams had to glue these specialized pipelines together, hand-tuning interfaces and keeping meticulous documentation on which encoder served which generator. That fragility is what the generative stack index dissolves.</p>
+<p>The index is not merely a dashboard; it is the disciplined view that these three layers share a common conditioning vector <span class="arithmatex">\(c\)</span>. The representation stage stops being an artifact of a single generator and instead reuses the same deep embeddings that feed downstream kernels—the convolutional hierarchies first showcased by Krizhevsky et al. 2012 [https://arxiv.org/pdf/1401.4082] already warmed up by multiple downstream decoders. The generative stage becomes a family of interchangeable samplers: GANs (Goodfellow et al. 2014, [https://arxiv.org/pdf/1406.2661]) and diffusion processes now all read the same conditioning vector <span class="arithmatex">\(c\)</span> so that swapping kernels is simply a matter of switching loss functions rather than reengineering front ends. The evaluation stage likewise becomes a differentiable scoring layer, closing the loop in a way that influences the encoder whenever the metrics deviate from expectations. In short, the territory is not “a model that generates,” it is “a continuous path from data to value.”</p>
+<p>This is also where the page sits within the larger arc: the generative-stack arc uses this index to bridge the foundational vocabulary laid out in [[generative-foundations]] with the practical sampling engines detailed in [[diffusion-models]], and it shows where core assessments of the stack happen.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The starting point is a generative story: a joint density <span class="arithmatex">\(p(x, z)\)</span> that models observed data <span class="arithmatex">\(x\)</span> and latent variables <span class="arithmatex">\(z\)</span>. The modeler writes this story as executable code that first samples from priors and then produces observations under a likelihood, e.g. the hierarchical linear model that samples global slope <span class="arithmatex">\(\beta_{\text{global}}\)</span>, per-group offsets <span class="arithmatex">\(\beta_{g}\)</span>, and finally noisy observations <span class="arithmatex">\(x_i \sim \mathcal{N}(z_i^\top w, \sigma^2)\)</span>. Because it is written as code, the program can use conditionals, loops, recursion, and higher-order functions, which is essential for expressing real-world structure.</p>
-<p>The posterior we care about is</p>
+<h3 id="representation-and-latent-conditioning">Representation and latent conditioning<a class="headerlink" href="#representation-and-latent-conditioning" title="Permanent link">&para;</a></h3>
+<p>The stack index begins with an encoder <span class="arithmatex">\(E_\phi\)</span> that maps a clean observation <span class="arithmatex">\(x_0\)</span> in modality <span class="arithmatex">\(M\)</span> (image, audio, text, or another measured vector in <span class="arithmatex">\(\mathbb{R}^d\)</span>) to a latent <span class="arithmatex">\(z\)</span>, typically conditioned by context <span class="arithmatex">\(c\)</span> representing prompts, metadata, or another modality’s embedding. The training objective for this stage is the negative evidence lower bound, which enforces that <span class="arithmatex">\(z\)</span> retains the information the sampler and evaluator will need. More precisely,</p>
 <div class="arithmatex">\[
-p(z \mid x) = \frac{p(x, z)}{p(x)} = \frac{p(x, z)}{\int p(x, z)\,dz}.
+\mathcal{L}_\text{encoder}(\phi,\theta) = -\mathbb{E}_{q_\phi(z|x_0,c)}\left[\log p_\theta(x_0|z,c)\right] + \mathrm{KL}\left(q_\phi(z|x_0,c)\,\|\,p(z)\right),
 \]</div>
-<p>where <span class="arithmatex">\(z\)</span> is the latent state, <span class="arithmatex">\(x\)</span> is the observed data, and <span class="arithmatex">\(p(x)\)</span> is the evidence (the integral of the joint over <span class="arithmatex">\(z\)</span>). This ratio is intractable except in toy cases, which is why inference engines like Hamiltonian Monte Carlo (HMC) or variational families take over. The key becomes expressing the joint <span class="arithmatex">\(p(x,z)\)</span> and then letting the runtime differentiate or sample through it.</p>
-<p>PPL runtimes achieve that by tracing code execution. Every time the user calls a probabilistic primitive such as <code>sample("beta", Normal(0, 1))</code>, the runtime records the statement in a trace that logs the distribution, the site name, and the sampled value. That trace is the interface between the user code and the inference engine. Wood et al. (2015) <a href="https://arxiv.org/abs/1507.00996">A New Approach to Probabilistic Programming Inference</a> formalized this idea: a universal execution protocol separates model execution from inference execution so that external engines can plug into any user-defined program. When inference needs to evaluate the joint density or compute gradients, it walks the trace, accumulates log probabilities, and backpropagates using autodiff on the stored samples.</p>
-<p>One common inference strategy is Hamiltonian Monte Carlo, which requires gradients of the log joint. The runtime rewrites the trace into a log-density function <span class="arithmatex">\(\mathcal{L}(z) = \log p(x, z)\)</span>. To run HMC you supply this function and let autodiff compute <span class="arithmatex">\(\nabla_z \mathcal{L}(z)\)</span>. The runtime also handles proposals: it uses the sampler’s kinetic energy parameterization to propose new latent states, evaluates <span class="arithmatex">\(\mathcal{L}\)</span> on the traced code, and accepts or rejects according to the Metropolis–Hastings rule. Because the trace already contains the sampled values, every evaluation is exactly the generative story you wrote. When you change a prior or likelihood, the next trace reflects that change automatically, and the gradient generator downstream sees the new math without you calculating anything by hand.</p>
-<p>On the variational side, the runtime defines an Evidence Lower Bound (ELBO) and optimizes it. The ELBO is written as</p>
+<p>where <span class="arithmatex">\(q_\phi(z|x_0,c)\)</span> is the approximate posterior, <span class="arithmatex">\(p_\theta(x_0|z,c)\)</span> is the decoder likelihood, <span class="arithmatex">\(p(z)\)</span> is a prior (usually standard Normal), and <span class="arithmatex">\(\mathrm{KL}\)</span> denotes the Kullback-Leibler divergence. Minimizing this loss ties the encoder, decoder, and prior together so that the latent <span class="arithmatex">\(z\)</span> becomes a reusable representation. One-shot generalization (Rezende et al. 2016, [https://arxiv.org/abs/1603.05106]) built on the same alignment between context <span class="arithmatex">\(c\)</span>, latent <span class="arithmatex">\(z\)</span>, and likelihood <span class="arithmatex">\(p_\theta\)</span> to allow conditioning on new classes with very few examples. Because the stack index keeps this ELBO as part of the pipeline, any new modality adapter only has to produce a <span class="arithmatex">\(c\)</span> value that the rest of the stack already understands.</p>
+<p>A modality adapter is therefore just another attention-augmented encoder—a lesson borrowed from Bahdanau et al. 2015 (arXiv:1503.03585). They showed that different source encoders can align via attention weights; in the stack index, each adapter aligns with the shared conditioning vector <span class="arithmatex">\(c\)</span>, letting speech, text, or graphics embeddings plug into the same generator without rebuilding the sampler.</p>
+<h3 id="composable-generative-kernels">Composable generative kernels<a class="headerlink" href="#composable-generative-kernels" title="Permanent link">&para;</a></h3>
+<p>With the conditioned latent <span class="arithmatex">\(c = E_\phi(x_0)\)</span> fixed, the next layer is a sampler <span class="arithmatex">\(G_\theta(z,c)\)</span>, and this is where the choice between GANs, diffusion, or flows becomes a decision about the loss function rather than the representation. GANs introduce a discriminator <span class="arithmatex">\(D_\psi\)</span> and optimize the minimax objective</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{ELBO}}(\phi) = \mathbb{E}_{q_\phi(z)}[\log p(x,z) - \log q_\phi(z)],
+\min_\theta\max_\psi \,\mathbb{E}_{x_0\sim p_\text{data}}[\log D_\psi(x_0,c)] + \mathbb{E}_{z\sim p(z)}[\log(1-D_\psi(G_\theta(z,c)))],
 \]</div>
-<p>where <span class="arithmatex">\(q_\phi(z)\)</span> is the variational distribution parameterized by <span class="arithmatex">\(\phi\)</span>, <span class="arithmatex">\(p(x, z)\)</span> is the joint from your program, and the expectation averages over the variational samples.
-This equation states that optimizing <span class="arithmatex">\(\phi\)</span> asymptotically makes <span class="arithmatex">\(q_\phi\)</span> close to the true posterior while reusing the same trace information from the model. Runtimes such as Edward (Tran et al. 2017) <a href="https://arxiv.org/abs/1701.03757">Deep Probabilistic Programming</a> built this pipeline on top of TensorFlow, letting the variational guide share neural-network parameters with the generative model to handle high-dimensional neural weight posteriors.</p>
-<p>What makes the PPL story compelling is that the runtime does not need to know anything about the particular latent structure. The trace can be transformed by program transformations such as reparameterization (changing how randomness is introduced), control-flow unrolling, or symbolic differentiation. These transformations are the domain of probabilistic program compilers. For example, NumPyro compiles Pyro-style models to XLA kernels by analyzing the trace and generating batched log-density and gradient functions that run efficiently on GPUs or TPUs. Pyro and NumPyro both rely on the <code>trace</code> and <code>plate</code> abstractions to describe dependencies, so adding a nested plate means a new batch dimension, which the compiler handles for you.</p>
-<p>Functional probabilistic programming, described in the 2019 paper “Functional probabilistic programming for scalable Bayesian modeling” (1908.02062), extends this flexible trace idea to programs where control flow depends on sampled values and where recursion defines the structure. In such programs, the execution graph changes every run. The paper shows how to capture continuations so that inference engines can resume execution from a sample site and how to generate unbiased gradient estimates for the resulting random-control-flow programs. The sampler then works even when your code uses recursion to represent, say, a generative grammar that keeps expanding until a stop condition depending on a random string length is met. The inference engine treats such probabilistic branching like any trace entry: it records distributions, replays them, and provides the same gradients regardless of whether the stack grew deep or not.</p>
-<p>While description of a trace and inference protocol might sound abstract, real PPLs back them with user-facing APIs. In NumPyro, you wrap the generative code in a <code>model</code> function and invoke <code>mcmc = numpyro.infer.MCMC(...)</code>, passing in <code>numpyro.handlers</code> such as <code>trace</code> and <code>seed</code>. When you add an outlier component—say an additional Bernoulli that flips whether an observation is corrupted—the runtime sees the new sample site, the new log-probability terms, and the new gradients without requiring new math. That is the pragmatic payoff: “change one line of code, inference updates automatically.” It is how you can go from a simple linear regression to a robust mixture model with heavy tails using the same compiler pipeline.</p>
-<p>Probabilistic databases like BayesDB (Mansinghka et al. 2015) <a href="https://arxiv.org/abs/1512.05006">BayesDB: A probabilistic programming system for querying the probable implications of data</a> take the same programming paradigm and wrap it in a declarative query layer. They allow analysts to write SQL-like queries that under the hood instantiate probabilistic programs, run inference engines behind the scenes, and return probabilistic answers (e.g., “how likely is it that this field is missing because of a systematic bias?”). This makes the PPL machinery accessible to non-experts while still preserving the decoupling between modeling and inference.</p>
-<p>The modern twist, illustrated by Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a>, is to treat inference itself as code. Instead of a monolithic VI engine with fixed ELBO, their framework exposes program transformations that let you swap in custom objectives, clipping strategies, and gradient estimators while keeping a single trace interface. This modularity is what allows PPLs to grow beyond black-box samplers: you can craft the variational loss that suits your application, plug in Rao-Blackwellization, or mix HMC with amortized inference, all without rewriting the generative encoding.</p>
-<p>When you piece these ideas together—the traced generative story, the automation of gradient and proposal generation, the ability to mutate control flow, and the programmable inference—you see why probabilistic programming languages decouple specification from inference execution. The structure is “model code + inference compiler + runtime engine,” and every change to the model code is transparently reflected in the traces the compiler inspects. That transparency is what makes PPLs a practical bridge between domain experts who think in models and systems engineers who deploy inference at scale.</p>
+<p>where <span class="arithmatex">\(p_\text{data}\)</span> is the empirical data distribution and <span class="arithmatex">\(p(z)\)</span> is the prior over latents. Because the generator produces samples while keeping <span class="arithmatex">\(z\)</span> and <span class="arithmatex">\(c\)</span> available, swapping in a different kernel simply means replacing the objective while keeping the encoder and evaluator untouched.</p>
+<p>Diffusion models, such as DDPM (Ho et al. 2020, [https://arxiv.org/abs/2006.11239]), replace the adversarial training signal with a sequential denoising process. The forward process corrupts <span class="arithmatex">\(x_0\)</span> into <span class="arithmatex">\(x_t\)</span> for <span class="arithmatex">\(t\in\{0,\dots,T\}\)</span> by sampling noise <span class="arithmatex">\(\epsilon\sim\mathcal{N}(0,I)\)</span> and setting <span class="arithmatex">\(x_t = \sqrt{\bar{\alpha}_t}x_0 + \sqrt{1-\bar{\alpha}_t}\epsilon\)</span>, where <span class="arithmatex">\(\bar{\alpha}_t\)</span> is derived from a beta schedule. The loss minimized is</p>
+<div class="arithmatex">\[
+\mathcal{L}_\text{diffusion} = \mathbb{E}_{t,x_0,\epsilon}\left[\|\epsilon - \epsilon_\theta(x_t,t,c)\|^2\right],
+\]</div>
+<p>where <span class="arithmatex">\(\epsilon_\theta\)</span> predicts the noise added at timestep <span class="arithmatex">\(t\)</span> conditioned on both the noisy sample <span class="arithmatex">\(x_t\)</span> and <span class="arithmatex">\(c\)</span>. Even though the GAN and diffusion objectives look different, both are ultimately trying to align the generated conditional distribution <span class="arithmatex">\(G_\theta(x|c)\)</span> with <span class="arithmatex">\(p_\text{data}(x|c)\)</span>. The GAN does so by minimizing a divergence via the discriminator, while diffusion does so by matching score functions through denoising. Because the target distribution is the same <span class="arithmatex">\(p_\text{data}(x|c)\)</span> and both objectives keep <span class="arithmatex">\(c\)</span> visible, the stack index views them as interchangeable instantiations of a general divergence minimization routine. Flows, diffusion, and GANs are therefore different “kernels” hooked to the same latent <span class="arithmatex">\(c\)</span>, and that shared latent is what lets the pipeline behave continuously when sampling strategies change.</p>
+<h3 id="evaluation-and-stack-feedback">Evaluation and stack feedback<a class="headerlink" href="#evaluation-and-stack-feedback" title="Permanent link">&para;</a></h3>
+<p>The final stage of the index tracks fidelity, diversity, and alignment. Fidelity is typically a reconstruction error or a distance in feature space such as FID (Fréchet Inception Distance). Diversity can be measured via the entropy of class predictions or mutual information between <span class="arithmatex">\(z\)</span> and the generated output. Alignment is the semantic agreement between the generated output and the conditioning context, often approximated with CLIP scores. Crucially, the stack index keeps these metrics differentiable proxies that feed back into <span class="arithmatex">\(E_\phi\)</span>, so when the alignment metric drops, the encoder is explicitly updated to capture the semantics the downstream metrics care about. This is the key inference: the same <span class="arithmatex">\(c\)</span> is observed by GANs, diffusion models, and evaluation metrics, which makes metrics actionable instead of just descriptive.</p>
+<p>Because the evaluation layer is also conditioned on <span class="arithmatex">\(c\)</span>, new modalities can be compared side by side. The stack index makes modality bridging practical by ensuring that each adapter outputs compatible <span class="arithmatex">\(c\)</span> values, so a new 3D point cloud encoder can be introduced without retraining the sampler or rewriting the evaluator. Plotting fidelity, diversity, and alignment signals together across different encoders and kernels reveals whether a change in representation actually improves the pipeline, rather than just impressing one stage at the expense of another.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>The current research frontier is programmable inference itself. Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a> demonstrates a framework where variational inference is not a fixed ELBO but a compositional program transformation. Their compiler allows developers to write custom gradient estimators, clip terms, and even mix Monte Carlo and analytic components inside the same objective. That flexibility is what lets researchers tailor inference to complex posteriors such as hierarchical neural networks or state-space models with long-range dependencies, and the paper backs it with experiments showing faster convergence than traditional black-box VI on several benchmark models.</p>
-<p>On the engineering frontier, TensorFlow Probability (Google Research) continues to mature as an industrial‑scale PPL backbone. The TensorFlow blog’s 2020 announcement <a href="https://ai.googleblog.com/2020/05/announcing-tensorflow-probability.html">“Introducing TensorFlow Probability”</a> highlights how TFP integrates with Vertex AI to deliver production-ready probabilistic layers that scale across Google Cloud. Production teams there ship thousands of probabilistic forecasting and calibration workloads per day, relying on the library’s HMC, variational, and MCMC kernel optimizations so that the same probabilistic code can run in both research notebooks and inference servers.</p>
-<p>That combination—programmable inference for complex models and production-hardened runtime for web-scale workloads—defines the state of probabilistic programming today. The research pushing the flexibility of the inference language and the engineering pushing the systems integration form a dialectic: programmable inference makes it easier to specify the models Vertex AI or NumPyro will execute, and production requirements (latency, memory, numerical stability) force future research to yield more efficient and debuggable compiler pathways.</p>
+<p>Research frontiers focus on two kinds of compositionality. Latent diffusion models (Rombach et al. 2022, [https://arxiv.org/abs/2112.10752]) demonstrated that the generative kernel can operate on a compact latent jointly learned with the encoder, letting massive generative models sample from low-dimensional spaces while evaluation leverages the same latent representation. DreamFusion 2 (Poole et al. 2024, [https://arxiv.org/abs/2401.11942]) extends that principle into NeRF-based 3D domains: the representation stage now captures lighting normals and textures, the diffusion kernel functions over the 3D latent, and the rendering engine—serving as the evaluation stage—sees the same context <span class="arithmatex">\(c\)</span> so the stack index tracks 3D fidelity and alignment without losing consistency.</p>
+<p>On the engineering frontier, the stack index is the blueprint for operating at scale. Amazon’s GenAIops playbook (AWS blog 2024) describes a centralized observability plane where every encoder’s embeddings, every generator’s outputs, and every evaluator’s metrics live in the same lake, enabling Bedrock to orchestrate inference across multiple models while policy checks and drift detection run on the identical embeddings. The same paradigm is emerging at Stability AI and Meta, where teams instrument generative pipelines so a single alert can trace an alignment drop either to a misbehaving sampler or to an undertrained encoder. These production systems measure compute, latency, and metric drift uniformly, which is precisely what the generative stack index quantifies.</p>
+<p>This page therefore appears in the [[generative-stack]] arc as the connective tissue between [[generative-foundations]] (which introduces the basic encoder–decoder vocabulary) and [[diffusion-models]] (which supplies concrete sampling engines). It is also tied to the ongoing conversation about [[evaluation-metrics-for-generative-models]], which documents the metrics that close the loop in the stack index.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>Can we compile universal probabilistic programs with unbounded recursion and dynamic control flow into inference engines that provide low-variance, unbiased gradient estimators <strong>without</strong> requiring hand-crafted variational guides? Current techniques either restrict control flow, handcraft importance samplers, or accept high variance. A fully automated compiler that can transform any control-flow-intensive program into a stable inference objective would collapse a major barrier between expressive modeling languages and scalable inference.</p>
-<p>Another question is how to bridge probabilistic programming and modern foundation models: can we embed a PPL trace inside a large language model so that the LLM’s latent state participates in HMC or VI updates, and what semantics guarantee consistent updates without locking the entire weight space? This might require a hybrid of amortized inference and symbolic tracing that respects the LLM’s token-level control flow.</p>
-<p>Finally, how do we give non-expert analysts programmable diagnostics for inference failure? PPLs can already log divergences, but an “AI assistant” that tells you whether the posterior collapsed, whether the trace never visited a branch due to low prior mass, or whether the sampler failed to mix across hierarchical levels would turn probabilistic programming from a niche research tool into a widely trusted engineering asset.</p>
+<p>One question is how to prove convergence for an index that simultaneously contains multiple generative kernels. Existing theory bounds either GANs or diffusion samplers separately, but not a mixed objective in which each kernel is trying to align the same conditional distribution <span class="arithmatex">\(p_\text{data}(x|c)\)</span>. A convergence guarantee would guide automated kernel selection and prevent chasing transient improvements in one kernel that hurt another.</p>
+<p>Another question asks what the minimal representations are for cross-modal generalization. Rezende et al. 2016 showed that compact latent spaces can capture new classes with few examples, but modern stacks operate on embeddings that are orders of magnitude larger. Determining whether reducing dimensionality stabilizes evaluation metrics (without sacrificing fidelity) would help engineers trade representational cost for robustness.</p>
+<p>Finally, there is no consensus on evaluation metrics that remain differentiable after a context switch. Alignment metrics often rely on large-scale human labels or non-differentiable classifiers, while fidelity metrics focus on reconstruction errors that do not capture semantic drift. Developing differentiable proxies that correlate with human judgment and that can backpropagate into the encoder would make the stack index a closed-loop system instead of a monitoring dashboard.</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want the optimization picture under the hood, → <a href="../variational-inference/">Variational Inference</a> unpacks the ELBO derivations—and the tricks like reparameterization gradients that PPLs compile automatically. The sampling counterpart is → <em>markov chain monte carlo</em> <!-- [[markov-chain-monte-carlo]] -->, which explains how HMC and Metropolis–Hastings work on the traces you just trusted to the runtime. To revisit the Bayesian foundations that make those traces meaningful, → <a href="../bayesian-inference/">Bayesian inference</a> grounds the discussion in prior-posterior updates and predictive checks.</p>
+<p>For the engineering story of operationalizing the stack index, → [[aws-genaiops-playbook]] examines how Amazon Bedrock orchestrates multiple embeddings and metrics via a central observability plane; for the theoretical grammar that lets different kernels share one latent, → [[score-matching]] lays out the probabilistic foundations of conditional sampling; the practical sampler you are monitoring is unraveled in → [[diffusion-models]]; and the evaluation metrics that make multisignal dashboards meaningful are distilled in → [[evaluation-metrics-for-generative-models]], which explains how to compare outputs across modalities without inventing new reporting languages.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p>The build proves that changing a single line of NumPyro model code (adding an outlier component) instantly updates a Hamiltonian Monte Carlo sampler, demonstrating the “write once, infer everywhere” decoupling from the PPL stack.</p>
-<p><strong>What you're building:</strong> A robust Bayesian linear regression with an explicit outlier mechanism trained on a synthetic noisy dataset and analyzed through HMC diagnostics in a free Google Colab notebook.<br />
-<strong>Why this is valuable:</strong> It forces you to write the generative model, add a new latent indicating corruption, and watch NumPyro automatically adjust the HMC trace without touching gradient code.<br />
-<strong>Stack:</strong><br />
-- <strong>Model:</strong> Custom NumPyro Bayesian regression with outlier indicator and Student’s t noise (no pretrained HF checkpoint).<br />
-- <strong>Dataset:</strong> <code>ydata-synthetic/gaussian-mixture</code> [https://huggingface.co/datasets/ydata-synthetic/gaussian-mixture] — synthetic mixture data you can load quickly and augment with calibrated noise.<br />
-- <strong>Framework:</strong> <code>numpyro==0.13.0</code>, <code>jax==0.4.20</code>, <code>optax==0.2.0</code>.<br />
-- <strong>Compute:</strong> Free Colab T4 (16 GB RAM, 16 GB GPU memory); training runs in ~45 minutes with 1000 warmup + 500 samples.</p>
-<p><strong>The recipe:</strong>
-1. Install and import: <code>pip install "jax[cpu]" numpyro optax datasets matplotlib arviz</code> (CPU mode works in Colab; switch to <code>jax[tpu]</code> only if you have TPU access).<br />
-2. Data: load the <code>ydata-synthetic/gaussian-mixture</code> dataset, resample 2,000 points, add 5% uniform outliers by replacing their targets with large noise, and standardize the features.<br />
-3. Train: define a NumPyro model with global slope/intercept priors, a Bernoulli outlier indicator that selects either Normal or Student’s t observation, and run <code>numpyro.infer.NUTS</code> with 4 chains, 1000 warmup, 500 samples; monitor the <code>rhat</code> and divergence counts reported by ArviZ.<br />
-4. Evaluate: compute posterior predictive mean squared error on a held-out split; expect RMSE &lt; 0.5 when outliers are modeled and divergence warnings drop compared to a model without the indicator.<br />
-5. What you now have: a checkpointed <code>NumPyro</code> trace collection that captures both the clean-model parameters and the outlier probabilities, ready for calibration and deployment.</p>
-<p><strong>Expected outcome:</strong> A saved NumPyro inference result (posterior means, divergences) plus a Matplotlib/ArviZ plot showing how the outlier indicator cleanly separates corrupted datapoints, proving that a single code change rewired the HMC sampler.</p>
-<ul>
-<li><strong>CS student:</strong> Run the same notebook on an RTX 4070 laptop by reducing chains to 2 and training for 500 warmup + 250 samples; this keeps the artifact identical but fits the compute budget.  </li>
-<li><strong>Applied engineer:</strong> After training, export the posterior predictive function as a <code>jax.jit</code> callable, quantize the parameters to bfloat16, and serve via NVIDIA Triton with a 50 ms p95 latency target while monitoring divergence counts as a warmup signal.  </li>
-<li><strong>Applied researcher:</strong> Swap the Student’s t likelihood for a Gaussian Process residual and test the hypothesis “a GP residual reduces posterior predictive RMSE by at least 10% compared to the baseline” on the same dataset; falsification criterion: the RMSE gap is within ±5%.  </li>
-<li><strong>Frontier researcher:</strong> Extend the notebook with recursive control flow for an unknown number of latent clusters, then investigate whether existing NumPyro gradients still have low variance or whether you need the programmable transformations from Becker et al. (2024) to stabilize the updates.</li>
-</ul>
-<hr />
+<p>A generative stack index notebook is the artifact: it runs a pre-trained encoder, decoder, and evaluator on CIFAR-10 while jointly capturing fidelity, diversity, and alignment metrics, giving a concrete monitor for how a representation swap affects every downstream signal.</p>
+<p>This monitor is valuable because it turns what used to be an engineer’s guess—“did the new backbone hurt quality?”—into measurable, reproducible evidence that spans encoder, generator, and evaluator simultaneously.</p>
+<p>Stack: the generator is <code>google/ddpm-cifar10-32</code>, the dataset is HuggingFace <code>cifar10</code>, the framework combines <code>diffusers</code> 0.25.1 with <code>evaluate</code>, <code>datasets</code>, and <code>torchvision</code>, and the target compute is a single NVIDIA RTX 4060 (8 GB VRAM) or Colab T4 (12 GB VRAM) for inference and metric logging; expect the full pipeline to run in about 25 minutes once the CIFAR-10 embeddings are cached.</p>
+<p>The recipe:
+1. Install the environment with <code>pip install torch torchvision diffusers[torch] evaluate datasets accelerate matplotlib open_clip_torch</code>. This ensures access to the DDPM pipeline, the Einsum-accelerated schedulers, the CIFAR-10 dataset, and CLIP for alignment measurement.
+2. Preprocess CIFAR-10: load <code>datasets.load_dataset("cifar10")</code>, resize to 32×32 if needed, and normalize images to <span class="arithmatex">\([-1,1]\)</span> because <code>google/ddpm-cifar10-32</code> was trained on that range; set the torch manual seed to 42 before generating the ResNet-18 embeddings via <code>torchvision.models.resnet18(pretrained=True)</code> so the representation stage is deterministic for the first 1,000 samples.
+3. Sample with <code>diffusers.DDPMPipeline(model_id="google/ddpm-cifar10-32")</code>, passing in the same fixed <code>generator=torch.manual_seed(42)</code> and using the pipeline’s default <code>beta_schedule="linear"</code> with <code>beta_start=0.0001</code>, <code>beta_end=0.02</code>, and <code>num_train_timesteps=1000</code> to match the model card; run 64 samples per inference pass while keeping each generated image paired with the original ResNet embedding for later fidelity comparison.
+4. Evaluate every batch: compute FID against the cached 1,000 real images, calculate ResNet prediction entropy across the CIFAR-10 classes for diversity, and run CLIP ViT-B/32 on both generated images and the text prompt “CIFAR-10 photo” to approximate alignment; log the metrics after each inference pass so their time series can be plotted together.
+5. What you now have is a complete index notebook that reports all three metrics inside one figure while storing the embeddings and samples that make replay and kernel replacement (GAN vs diffusion) straightforward.</p>
+<p>Expected outcome: a reproducible notebook that outputs the fidelity/diversity/alignment plot alongside 64 generated images, showing how swapping the encoder (ResNet-18 to CLIP) or replacing the sampler (diffusion to any other conditional kernel) updates the downstream metrics without breaking the pipeline.</p>
+<p>Variants per persona:
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Deploy the notebook as part of an AWS Bedrock inference flow, log stack index metrics to CloudWatch, and trigger an alert when the CLIP alignment score drops by more than 0.04 compared to its moving average; an alignment drop beyond that threshold should initiate a retraining or fine-tuning workflow because it signals a meaningful semantic shift.
+- <strong>Research engineer:</strong> Reproduce <code>google/ddpm-cifar10-32</code>’s reported FID (target within ±3) and CLIP score (within ±0.02) by strictly following the model card’s preprocessing, scheduler, and seed settings, then log the table of fidelity, entropy, and alignment for publication-ready reproduction.
+- <strong>Applied researcher:</strong> Hypothesis: replacing the ResNet-18 encoder with CLIP-ViT-B/32 will raise the CLIP alignment score by at least 0.05 while keeping FID degradation under 4 points; use the stack index plot to falsify that hypothesis by running both encoders over the same fixed seeds and comparing the metric trajectories.</p>
+<p>What can you build next? Extend this index to any new modality (for example, hook a NeRF encoder to the same critic) and observe how the unified metrics behave.</p>
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>

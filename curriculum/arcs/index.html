@@ -1898,146 +1898,146 @@
 <blockquote>
 <p>An arc is a <strong>diagonal</strong> learning path: from a tool you already touch, through a broader frame, to a synthesised capability, landing at the intersection of two active research areas. Each arc names a <strong>specific frontier destination</strong> you build toward. The MVB at each step is the recipe; the arc is the journey.</p>
 </blockquote>
-<p><strong>0 live · 17 ready to spin · 13 need concept seeds · 30 total</strong></p>
-<p>See the <a href="../../system/arc-roadmap/">arc roadmap</a> for the full design rationale and frontier evidence behind each one. The autonomous loop spins the <code>ready</code> ones; the <code>needs-seeds</code> ones unlock as the retro auto-seeds the missing concepts.</p>
+<p><strong>4 live · 13 designed and next-up · 13 waiting on missing concept pages · 30 total</strong></p>
+<p><em>Status meanings:</em> 🟢 <strong>live</strong> = readable on the site now. 🟡 <strong>designed · next</strong> = the arc is designed in the <a href="../../system/arc-roadmap/">roadmap</a> and all 5 concept pages it needs exist; the autonomous loop will write it next time it runs. 🟠 <strong>waiting on missing concept pages</strong> = the arc is designed but one or more of its concept pages need to be written first; those concept pages get auto-seeded by the retrospective, then the arc unlocks.</p>
 <hr />
 <h2 id="ai">AI<a class="headerlink" href="#ai" title="Permanent link">&para;</a></h2>
-<h3 id="agentic-rlvr-reasoner"><strong><code>agentic-rlvr-reasoner</code></strong><a class="headerlink" href="#agentic-rlvr-reasoner" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/01-ai/">AI</a></p>
+<h3 id="agentic-rlvr-reasoner"><a href="core/01-ai/arcs/agentic-rlvr-reasoner/">agentic-rlvr-reasoner</a><a class="headerlink" href="#agentic-rlvr-reasoner" title="Permanent link">&para;</a></h3>
+<p>🟢 live — read now · <strong>track:</strong> <a href="../core/01-ai/">AI</a></p>
 <p><strong>Destination —</strong> A small LLM (1–7B) fine-tuned with RLVR on verifiable math/code rewards, evaluated on a held-out reasoning benchmark — measured to recover the R1-Zero-style behaviour at ≥60% of the published gain</p>
 <p><code>chain-of-thought</code> → <code>in-context-learning</code> → <code>reward-modeling</code> → <code>rlhf</code> → <code>mixture-of-experts</code></p>
 <h3 id="mechanistic-interpretability-with-saes"><strong><code>mechanistic-interpretability-with-saes</code></strong><a class="headerlink" href="#mechanistic-interpretability-with-saes" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/01-ai/">AI</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/01-ai/">AI</a></p>
 <p><strong>Destination —</strong> A working sparse-autoencoder trained on a small open-weight LLM's MLP activations, extracting features that match a published circuit (induction heads / IOI / greater-than) on the same layer</p>
 <p><code>mechanistic-interpretability</code> → <code>sparse-autoencoders</code> → <code>feature-circuits</code> → <code>attention</code> → <code>mixture-of-experts</code></p>
 <h3 id="alignment-via-cot-monitoring"><strong><code>alignment-via-cot-monitoring</code></strong><a class="headerlink" href="#alignment-via-cot-monitoring" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/01-ai/">AI</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/01-ai/">AI</a></p>
 <p><strong>Destination —</strong> A working CoT monitor that flags deceptive reasoning in a frontier model's outputs, calibrated to OpenAI's published rate on the chain-of-thought-monitoring benchmark</p>
 <p><code>chain-of-thought</code> → <code>alignment-safety</code> → <code>mechanistic-interpretability</code> → <code>cot-monitoring</code> → <code>reward-modeling</code></p>
 <hr />
 <h2 id="generative-modeling">Generative Modeling<a class="headerlink" href="#generative-modeling" title="Permanent link">&para;</a></h2>
-<h3 id="generative-stack"><strong><code>generative-stack</code></strong><a class="headerlink" href="#generative-stack" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/02-generative-modeling/">Generative Modeling</a></p>
+<h3 id="generative-stack"><a href="core/02-generative-modeling/arcs/generative-stack/">generative-stack</a><a class="headerlink" href="#generative-stack" title="Permanent link">&para;</a></h3>
+<p>🟢 live — read now · <strong>track:</strong> <a href="../core/02-generative-modeling/">Generative Modeling</a></p>
 <p><strong>Destination —</strong> Five trained generative models (DDPM, score-based, latent diffusion, flow-matching, consistency distillation) compared head-to-head on the same dataset with reported FID, sample diversity, and inference latency</p>
 <p><code>diffusion-models</code> → <code>score-matching</code> → <code>latent-diffusion-models</code> → <code>flow-matching</code> → <code>consistency-models</code></p>
 <h3 id="world-models-from-video"><strong><code>world-models-from-video</code></strong><a class="headerlink" href="#world-models-from-video" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/02-generative-modeling/">Generative Modeling</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/02-generative-modeling/">Generative Modeling</a></p>
 <p><strong>Destination —</strong> A small video diffusion model conditioned on actions, trained on a driving or game dataset, producing 16-frame rollouts that respect physical conservation on a held-out test set</p>
 <p><code>diffusion-models</code> → <code>flow-matching</code> → <code>video-generation</code> → <code>world-models</code> → <code>physical-consistency</code></p>
 <h3 id="controllable-and-distilled-generation"><strong><code>controllable-and-distilled-generation</code></strong><a class="headerlink" href="#controllable-and-distilled-generation" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/02-generative-modeling/">Generative Modeling</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/02-generative-modeling/">Generative Modeling</a></p>
 <p><strong>Destination —</strong> A finetuned latent diffusion model with ControlNet-style conditioning on edge maps, distilled to single-step sampling at &lt;100 ms per image on an A10 GPU</p>
 <p><code>latent-diffusion-models</code> → <code>consistency-models</code> → <code>controlnet</code> → <code>lora-finetuning</code> → <code>variational-autoencoders</code></p>
 <hr />
 <h2 id="representation-learning">Representation Learning<a class="headerlink" href="#representation-learning" title="Permanent link">&para;</a></h2>
-<h3 id="self-supervised-vision-foundations"><strong><code>self-supervised-vision-foundations</code></strong><a class="headerlink" href="#self-supervised-vision-foundations" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/03-representation-learning/">Representation Learning</a></p>
+<h3 id="self-supervised-vision-foundations"><a href="core/03-representation-learning/arcs/self-supervised-vision-foundations/">self-supervised-vision-foundations</a><a class="headerlink" href="#self-supervised-vision-foundations" title="Permanent link">&para;</a></h3>
+<p>🟢 live — read now · <strong>track:</strong> <a href="../core/03-representation-learning/">Representation Learning</a></p>
 <p><strong>Destination —</strong> A vision encoder trained without labels on a 100k-image dataset (SimCLR + MAE hybrid) that transfers to ImageNet linear-probe ≥75% top-1</p>
 <p><code>simclr</code> → <code>contrastive-learning</code> → <code>data-augmentation</code> → <code>masked-autoencoders</code> → <code>representation-learning</code></p>
 <h3 id="world-model-representations"><strong><code>world-model-representations</code></strong><a class="headerlink" href="#world-model-representations" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/03-representation-learning/">Representation Learning</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/03-representation-learning/">Representation Learning</a></p>
 <p><strong>Destination —</strong> A JEPA-style world model on a video sequence, where the latent representations support a planner reaching a goal state with measured success rate vs a reactive baseline</p>
 <p><code>jepa</code> → <code>masked-autoencoders</code> → <code>world-models</code> → <code>model-based-reinforcement-learning</code> → <code>latent-dynamics</code></p>
 <h3 id="multimodal-encoders"><strong><code>multimodal-encoders</code></strong><a class="headerlink" href="#multimodal-encoders" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/03-representation-learning/">Representation Learning</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/03-representation-learning/">Representation Learning</a></p>
 <p><strong>Destination —</strong> A CLIP-class encoder trained on a 1M image-text dataset, evaluated by zero-shot transfer on three downstream tasks (CIFAR-10, food-101, custom domain)</p>
 <p><code>contrastive-learning</code> → <code>simclr</code> → <code>clip-architecture</code> → <code>vision-language-pretraining</code> → <code>representation-learning</code></p>
 <hr />
 <h2 id="neural-networks-deep-learning">Neural Networks &amp; Deep Learning<a class="headerlink" href="#neural-networks-deep-learning" title="Permanent link">&para;</a></h2>
-<h3 id="training-fundamentals"><strong><code>training-fundamentals</code></strong><a class="headerlink" href="#training-fundamentals" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/04-neural-networks-deep-learning/">Neural Networks &amp; Deep Learning</a></p>
+<h3 id="training-fundamentals"><a href="core/04-neural-networks-deep-learning/arcs/training-fundamentals/">training-fundamentals</a><a class="headerlink" href="#training-fundamentals" title="Permanent link">&para;</a></h3>
+<p>🟢 live — read now · <strong>track:</strong> <a href="../core/04-neural-networks-deep-learning/">Neural Networks &amp; Deep Learning</a></p>
 <p><strong>Destination —</strong> A from-scratch CNN trained on CIFAR-10 to ≥85% test accuracy with documented loss curves, normalization choices, and a learned schedule — written up like a small lab notebook</p>
 <p><code>backpropagation</code> → <code>gradient-descent</code> → <code>adaptive-optimizers</code> → <code>regularization</code> → <code>batch-normalization</code></p>
 <h3 id="scaling-and-emergence"><strong><code>scaling-and-emergence</code></strong><a class="headerlink" href="#scaling-and-emergence" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/04-neural-networks-deep-learning/">Neural Networks &amp; Deep Learning</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/04-neural-networks-deep-learning/">Neural Networks &amp; Deep Learning</a></p>
 <p><strong>Destination —</strong> A small empirical scaling study across 3 model sizes (10M, 100M, 300M params) on a fixed token budget, fitting Chinchilla-style scaling laws and reporting where emergence appears on a target task</p>
 <p><code>scaling-laws</code> → <code>optimization</code> → <code>emergence</code> → <code>double-descent</code> → <code>mixture-of-experts</code></p>
 <h3 id="efficient-large-model-training"><strong><code>efficient-large-model-training</code></strong><a class="headerlink" href="#efficient-large-model-training" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/04-neural-networks-deep-learning/">Neural Networks &amp; Deep Learning</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/04-neural-networks-deep-learning/">Neural Networks &amp; Deep Learning</a></p>
 <p><strong>Destination —</strong> A 1B-parameter model trained across 8 GPUs with mixed-precision, ZeRO-style sharding, and gradient bucketing — reporting throughput in tokens/sec/GPU and convergence curves vs the single-GPU baseline</p>
 <p><code>gradient-descent</code> → <code>adaptive-optimizers</code> → <code>mixed-precision-training</code> → <code>data-parallelism</code> → <code>tensor-parallelism</code></p>
 <hr />
 <h2 id="statistical-probabilistic-ml">Statistical &amp; Probabilistic ML<a class="headerlink" href="#statistical-probabilistic-ml" title="Permanent link">&para;</a></h2>
 <h3 id="bayesian-deep-learning"><strong><code>bayesian-deep-learning</code></strong><a class="headerlink" href="#bayesian-deep-learning" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/05-statistical-probabilistic-ml/">Statistical &amp; Probabilistic ML</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/05-statistical-probabilistic-ml/">Statistical &amp; Probabilistic ML</a></p>
 <p><strong>Destination —</strong> A Bayesian neural network on a real production-like dataset, reporting calibration error and showing the uncertainty is actionable (predictive entropy correlates with held-out errors)</p>
 <p><code>bayesian-inference</code> → <code>variational-inference</code> → <code>bayesian-neural-networks</code> → <code>uncertainty-quantification</code> → <code>gaussian-processes</code></p>
 <h3 id="probabilistic-programming-end-to-end"><strong><code>probabilistic-programming-end-to-end</code></strong><a class="headerlink" href="#probabilistic-programming-end-to-end" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/05-statistical-probabilistic-ml/">Statistical &amp; Probabilistic ML</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/05-statistical-probabilistic-ml/">Statistical &amp; Probabilistic ML</a></p>
 <p><strong>Destination —</strong> A hierarchical Bayesian model fit in Pyro / NumPyro on a real dataset, with full posterior inference (MCMC or VI), posterior predictive checks, and a credible interval that beats a frequentist baseline</p>
 <p><code>probabilistic-programming</code> → <code>bayesian-inference</code> → <code>variational-inference</code> → <code>mcmc</code> → <code>gaussian-processes</code></p>
 <h3 id="causal-bayesian-inference"><strong><code>causal-bayesian-inference</code></strong><a class="headerlink" href="#causal-bayesian-inference" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/05-statistical-probabilistic-ml/">Statistical &amp; Probabilistic ML</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/05-statistical-probabilistic-ml/">Statistical &amp; Probabilistic ML</a></p>
 <p><strong>Destination —</strong> A Bayesian instrumental-variables model fit on an observational dataset, recovering a causal effect with credible interval, compared against a naive regression baseline</p>
 <p><code>bayesian-inference</code> → <code>variational-inference</code> → <code>instrumental-variables</code> → <code>causal-discovery</code> → <code>counterfactuals</code></p>
 <hr />
 <h2 id="reinforcement-learning">Reinforcement Learning<a class="headerlink" href="#reinforcement-learning" title="Permanent link">&para;</a></h2>
 <h3 id="rl-for-post-training"><strong><code>rl-for-post-training</code></strong><a class="headerlink" href="#rl-for-post-training" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/06-reinforcement-learning/">Reinforcement Learning</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/06-reinforcement-learning/">Reinforcement Learning</a></p>
 <p><strong>Destination —</strong> A 7B open-weight LLM finetuned via GRPO with verifiable rewards on a math/code task, measured to recover ≥60% of DeepSeek R1's published gain on AIME 2024 starting from the same base</p>
 <p><code>policy-gradient</code> → <code>ppo</code> → <code>actor-critic</code> → <code>reward-modeling</code> → <code>rlhf</code></p>
 <h3 id="world-models-and-imagination"><strong><code>world-models-and-imagination</code></strong><a class="headerlink" href="#world-models-and-imagination" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/06-reinforcement-learning/">Reinforcement Learning</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/06-reinforcement-learning/">Reinforcement Learning</a></p>
 <p><strong>Destination —</strong> A Dreamer-class agent that learns a latent world model from environment rollouts and plans in imagination, beating a model-free baseline by ≥30% sample efficiency on a control task</p>
 <p><code>mdp</code> → <code>policy-gradient</code> → <code>model-based-reinforcement-learning</code> → <code>world-models</code> → <code>q-learning</code></p>
 <h3 id="agentic-rl-with-tools"><strong><code>agentic-rl-with-tools</code></strong><a class="headerlink" href="#agentic-rl-with-tools" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/06-reinforcement-learning/">Reinforcement Learning</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/06-reinforcement-learning/">Reinforcement Learning</a></p>
 <p><strong>Destination —</strong> A small LLM agent that calls a web-search + a calculator tool, learns from execution outcomes via GRPO, measured on a multi-step QA benchmark vs the no-RL baseline</p>
 <p><code>ppo</code> → <code>reward-modeling</code> → <code>rlhf</code> → <code>tool-use</code> → <code>multi-turn-rl</code></p>
 <hr />
 <h2 id="attention-memory-reasoning-continual">Attention, Memory, Reasoning, Continual<a class="headerlink" href="#attention-memory-reasoning-continual" title="Permanent link">&para;</a></h2>
 <h3 id="long-context-attention"><strong><code>long-context-attention</code></strong><a class="headerlink" href="#long-context-attention" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/07-attention-memory-reasoning-continual/">Attention, Memory, Reasoning, Continual</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/07-attention-memory-reasoning-continual/">Attention, Memory, Reasoning, Continual</a></p>
 <p><strong>Destination —</strong> A small Transformer trained with FlashAttention 2 + ring attention reaching 128K context with sub-quadratic memory, evaluated on a long-context retrieval task (needle-in-haystack ≥95%)</p>
 <p><code>attention</code> → <code>multi-head-attention</code> → <code>long-context</code> → <code>flash-attention</code> → <code>ring-attention</code></p>
 <h3 id="retrieval-and-memory"><strong><code>retrieval-and-memory</code></strong><a class="headerlink" href="#retrieval-and-memory" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/07-attention-memory-reasoning-continual/">Attention, Memory, Reasoning, Continual</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/07-attention-memory-reasoning-continual/">Attention, Memory, Reasoning, Continual</a></p>
 <p><strong>Destination —</strong> A RAG pipeline with hybrid retrieval (BM25 + dense embeddings) feeding a long-context LLM, evaluated on a domain-specific QA benchmark — measured against pure-long-context and pure-retrieval baselines</p>
 <p><code>retrieval-augmented-generation</code> → <code>in-context-learning</code> → <code>long-context</code> → <code>vector-search</code> → <code>embedding-models</code></p>
 <h3 id="reasoning-and-test-time-compute"><strong><code>reasoning-and-test-time-compute</code></strong><a class="headerlink" href="#reasoning-and-test-time-compute" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/07-attention-memory-reasoning-continual/">Attention, Memory, Reasoning, Continual</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/07-attention-memory-reasoning-continual/">Attention, Memory, Reasoning, Continual</a></p>
 <p><strong>Destination —</strong> A small reasoning model fine-tuned with CoT + self-verification, evaluated on MATH-500 — comparing test-time compute regimes (greedy / beam / majority vote / R1-style self-verify)</p>
 <p><code>chain-of-thought</code> → <code>in-context-learning</code> → <code>attention</code> → <code>self-verification</code> → <code>test-time-compute</code></p>
 <hr />
 <h2 id="causal-statistical-inference">Causal &amp; Statistical Inference<a class="headerlink" href="#causal-statistical-inference" title="Permanent link">&para;</a></h2>
 <h3 id="causal-deep-learning"><strong><code>causal-deep-learning</code></strong><a class="headerlink" href="#causal-deep-learning" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/08-causal-statistical-inference/">Causal &amp; Statistical Inference</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/08-causal-statistical-inference/">Causal &amp; Statistical Inference</a></p>
 <p><strong>Destination —</strong> A neural net trained to predict counterfactual outcomes under a hidden confounder, recovering the true treatment effect within 10% on a semi-synthetic dataset</p>
 <p><code>structural-causal-models</code> → <code>do-calculus</code> → <code>counterfactuals</code> → <code>causal-representation-learning</code> → <code>potential-outcomes</code></p>
 <h3 id="causal-rl"><strong><code>causal-rl</code></strong><a class="headerlink" href="#causal-rl" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/08-causal-statistical-inference/">Causal &amp; Statistical Inference</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/08-causal-statistical-inference/">Causal &amp; Statistical Inference</a></p>
 <p><strong>Destination —</strong> An RL agent in a structural causal environment that learns to intervene (not just observe) — measured by causal effect recovery vs an observational baseline</p>
 <p><code>counterfactuals</code> → <code>do-calculus</code> → <code>policy-gradient</code> → <code>world-models</code> → <code>causal-intervention</code></p>
 <h3 id="causal-discovery-in-practice"><strong><code>causal-discovery-in-practice</code></strong><a class="headerlink" href="#causal-discovery-in-practice" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/08-causal-statistical-inference/">Causal &amp; Statistical Inference</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/08-causal-statistical-inference/">Causal &amp; Statistical Inference</a></p>
 <p><strong>Destination —</strong> Run NOTEARS / PC algorithm on a real observational dataset (e.g. gene expression), recover a causal graph, validate against held-out interventions, report identifiability limits</p>
 <p><code>causal-discovery</code> → <code>structural-causal-models</code> → <code>instrumental-variables</code> → <code>mediation-analysis</code> → <code>potential-outcomes</code></p>
 <hr />
 <h2 id="algorithms-systems-for-ai">Algorithms &amp; Systems for AI<a class="headerlink" href="#algorithms-systems-for-ai" title="Permanent link">&para;</a></h2>
 <h3 id="serve-an-llm-efficiently"><strong><code>serve-an-llm-efficiently</code></strong><a class="headerlink" href="#serve-an-llm-efficiently" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/09-algorithms-systems-for-ai/">Algorithms &amp; Systems for AI</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/09-algorithms-systems-for-ai/">Algorithms &amp; Systems for AI</a></p>
 <p><strong>Destination —</strong> A quantized 7B model served behind an endpoint with measured p95 latency under 100 ms, with kv-cache + FlashAttention + INT8 quantization wired and benchmarked at batch sizes 1, 4, 16</p>
 <p><code>flash-attention</code> → <code>kv-cache</code> → <code>kv-cache-management</code> → <code>quantization</code> → <code>llm-inference</code></p>
 <h3 id="train-at-scale"><strong><code>train-at-scale</code></strong><a class="headerlink" href="#train-at-scale" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/09-algorithms-systems-for-ai/">Algorithms &amp; Systems for AI</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/09-algorithms-systems-for-ai/">Algorithms &amp; Systems for AI</a></p>
 <p><strong>Destination —</strong> Distributed training of a 1B-parameter model across 8 GPUs with mixed precision, ZeRO-3 sharding, and pipeline parallelism — reporting tokens/sec/GPU vs the single-GPU baseline and identifying the dominant cost (compute vs communication)</p>
 <p><code>distributed-training</code> → <code>data-parallelism</code> → <code>tensor-parallelism</code> → <code>pipeline-parallelism</code> → <code>mixed-precision-training</code></p>
 <h3 id="compiler-and-kernel-fusion"><strong><code>compiler-and-kernel-fusion</code></strong><a class="headerlink" href="#compiler-and-kernel-fusion" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/09-algorithms-systems-for-ai/">Algorithms &amp; Systems for AI</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/09-algorithms-systems-for-ai/">Algorithms &amp; Systems for AI</a></p>
 <p><strong>Destination —</strong> Take a transformer block, profile it, identify the bottleneck, write a fused kernel (Triton or CUDA) for it, and measure the speedup against the PyTorch eager baseline</p>
 <p><code>flash-attention</code> → <code>compiler-optimizations-for-ml</code> → <code>automatic-differentiation</code> → <code>triton-kernels</code> → <code>tensor-cores</code></p>
 <hr />
 <h2 id="complexity-cognition-natural-intelligence">Complexity, Cognition &amp; Natural Intelligence<a class="headerlink" href="#complexity-cognition-natural-intelligence" title="Permanent link">&para;</a></h2>
 <h3 id="scaling-laws-empirical"><strong><code>scaling-laws-empirical</code></strong><a class="headerlink" href="#scaling-laws-empirical" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/10-complexity-cognition-natural-intelligence/">Complexity, Cognition &amp; Natural Intelligence</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/10-complexity-cognition-natural-intelligence/">Complexity, Cognition &amp; Natural Intelligence</a></p>
 <p><strong>Destination —</strong> Empirically fit Chinchilla-style scaling laws on a 3-point series of model sizes (10M / 100M / 300M) on a fixed dataset, reporting the compute-optimal ratio you recover vs the published one</p>
 <p><code>scaling-laws</code> → <code>emergence</code> → <code>double-descent</code> → <code>generalization</code> → <code>scaling-collapse</code></p>
 <h3 id="emergence-and-double-descent"><strong><code>emergence-and-double-descent</code></strong><a class="headerlink" href="#emergence-and-double-descent" title="Permanent link">&para;</a></h3>
-<p>🟡 ready to spin · <strong>track:</strong> <a href="../core/10-complexity-cognition-natural-intelligence/">Complexity, Cognition &amp; Natural Intelligence</a></p>
+<p>🟡 designed · next to be written · <strong>track:</strong> <a href="../core/10-complexity-cognition-natural-intelligence/">Complexity, Cognition &amp; Natural Intelligence</a></p>
 <p><strong>Destination —</strong> An empirical demo of double descent on a small classifier (vary model width across the bias-variance frontier), AND show one emergence-style task where capability appears suddenly with scale</p>
 <p><code>double-descent</code> → <code>generalization</code> → <code>scaling-laws</code> → <code>emergence</code> → <code>compositionality</code></p>
 <h3 id="compositionality-and-generalization"><strong><code>compositionality-and-generalization</code></strong><a class="headerlink" href="#compositionality-and-generalization" title="Permanent link">&para;</a></h3>
-<p>🟠 needs seeds · <strong>track:</strong> <a href="../core/10-complexity-cognition-natural-intelligence/">Complexity, Cognition &amp; Natural Intelligence</a></p>
+<p>🟠 designed · waiting on missing concept pages · <strong>track:</strong> <a href="../core/10-complexity-cognition-natural-intelligence/">Complexity, Cognition &amp; Natural Intelligence</a></p>
 <p><strong>Destination —</strong> Train a small Transformer on a compositional task (SCAN, COGS, or CFQ), measure systematic generalization to held-out compositions — vs a recurrent baseline</p>
 <p><code>compositionality</code> → <code>generalization</code> → <code>systematic-generalization</code> → <code>attention</code> → <code>in-context-learning</code></p>
 <hr />

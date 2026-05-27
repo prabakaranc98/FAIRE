@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/probabilistic-programming/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/01-ai/arcs/agentic-rlvr-reasoner/step-01-chain-of-thought/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../../../../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Probabilistic programming - Frontier Wiki</title>
+        <title>Step 1 — Build a Chain-of-Draft Inference Pipeline - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#probabilistic-programming" class="md-skip">
+        <a href="#step-1-build-a-chain-of-draft-inference-pipeline" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Probabilistic programming
+              Step 1 — Build a Chain-of-Draft Inference Pipeline
             
           </span>
         </div>
@@ -209,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -250,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../about/" class="md-tabs__link">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -306,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -336,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -443,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -471,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../01-ai/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../02-generative-modeling/" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -527,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../03-representation-learning/" class="md-nav__link">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -555,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -611,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -639,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -695,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -723,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -810,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -838,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -925,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -953,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -981,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1009,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1044,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1072,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1100,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1128,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1156,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/observer/" class="md-nav__link">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1212,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1240,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1297,42 +1297,21 @@
       
       
       
-        <span class="md-tag">bayesian-inference</span>
+        <span class="md-tag">agents</span>
       
     
       
       
       
       
-        <span class="md-tag">hmc</span>
+        <span class="md-tag">inference</span>
       
     
       
       
       
       
-        <span class="md-tag">numpyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">probabilistic-programming</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">pyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">variational-inference</span>
+        <span class="md-tag">reasoning</span>
       
     
   </nav>
@@ -1342,64 +1321,61 @@
   
 
 
-<h1 id="probabilistic-programming">Probabilistic programming<a class="headerlink" href="#probabilistic-programming" title="Permanent link">&para;</a></h1>
-<p>Imagine writing a physics simulator for a delivery drone that captures wind, lift, drag, and actuator delays. Now imagine you do not run that simulator forward to forecast where the drone will land, but run it <em>backward</em> so that the exact gusts that pushed it off course fall out of the code as posterior samples. That “reverse execution” is what probabilistic programming offers: you sketch the generative story in familiar Python or Julia, sprinkle in stochastic nodes where uncertainty belongs, and hand the program to the runtime. The runtime then derives posterior distributions, gradient estimators, and samplers without you ever touching the calculus for the latent variables. By the time you finish this page you will know how PPLs transform modeling effort into a software-engineering workflow, how they marry Bayesian statistics to modern compiler techniques, what the current bottlenecks are, and how to build a working Bayesian regression with NumPyro that proves the compiler really does the heavy lifting.</p>
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/agentic-rlvr-reasoner.md">Agentic Rlvr Reasoner</a> — Step 1 of 4</p>
+</blockquote>
+<h1 id="step-1-build-a-chain-of-draft-inference-pipeline">Step 1 — Build a Chain-of-Draft Inference Pipeline<a class="headerlink" href="#step-1-build-a-chain-of-draft-inference-pipeline" title="Permanent link">&para;</a></h1>
+<p>You are sitting across from a calculator that refuses to show its work. Every time you ask it “what is 73 × 49,” it responds with “3,577” or some other number, but no reasoning. The query is serial—you cannot get the answer without multiplying, carrying tens, adding partial products—and yet the model’s entire reasoning has to fit in the output token budget. What if the calculator could whisper “Step 1: 73×40=2,920; Step 2: 73×9=657; Step 3: add = 3,577” before giving the final answer, and then reuse those whispered tokens when you ask about related questions? That is the intuition behind Chain-of-Draft: treat the generated reasoning tokens as a writable workspace so the transformer can break the serial problem into reusable pieces instead of compressing everything into one hard-to-control final token. By the end of this page you will not only understand how that writable memory emerges, but also be able to build and evaluate a pipeline that proves the idea on GSM8K—measuring both accuracy and token-latency trade-offs.</p>
 <h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>Conventional machine learning often assumes a rigid architecture: “fit a neural network, tune regularization, push data through.” Probabilistic programming flips the emphasis back to “what generative process could have produced that data?” That shift is what Bishop (2013) <a href="https://www.cs.columbia.edu/~blei/fogm/2020F/readings/Bishop2013.pdf">Model-Based Machine Learning</a> called when he argued for designing bespoke models that capture domain structure instead of forcing every use case through a handful of fixed likelihood functions. In a PPL you describe that bespoke model as ordinary code—loops for hierarchies, conditionals for switching regimes, recursion for repeated reasoning—and the language runtime derives the posterior inference without manual derivations.</p>
-<p>This approach sits at the junction of Bayesian statistics, programming languages, and high-performance systems. Bayesian statistics gives you the language of priors, likelihoods, and posterior distributions. Programming-language theory gives you the control-flow primitives, continuations, and trace representations that make it possible to inspect and transform user code. High-performance engineering gives you compilation to XLA/LLVM, vectorized sampling kernels, and autodiff-backed gradient estimators. Together they let a modeler swap out likelihoods or add latent variables without touching the sampler. That is why the fundamental promise of PPLs is “write once, infer everywhere”—the model specification is decoupled from inference execution. How does that actually work?</p>
+<p>Anyone who has read Wei et al. (2022) knows that Chain-of-Thought prompting unlocks emergent reasoning simply by asking models to verbalize intermediate steps, but the narrative stops short of treating the generated steps as data that can be inspected, stored, or re-combined with future prompts; it treats the chain as a rhetorical flourish rather than infrastructure <a href="https://arxiv.org/pdf/2201.11903">Wei et al. 2022</a>. The path we take here is the one Feng et al. (2024) sketch when they show that scaled transformers can solve inherently serial problems precisely because generated tokens can be treated as structured, rewriteable intermediate states <a href="https://arxiv.org/pdf/2305.10601.pdf">Feng et al. 2024</a>. This perspective turns the transformer from a monolithic function approximator into a multiturn reasoning engine that uses its own past outputs as working memory.</p>
+<p>Put another way, every “Chain-of-Thought” story says you should encourage the model to explain its reasoning, but doesn’t show how to prove that those explanations are useful beyond anecdotal accuracy gains. The Chain-of-Draft inference pipeline is the first artifact in this arc that forces the model to commit to a short, structured reasoning draft, emit the final answer, and then expose the draft for downstream processes, such as reward modeling or agentic controllers. It is the experiment that tests whether the transformer is merely talking to itself or whether it is actually writing long-term notes it can read again. How does that experiment work? Keep reading.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The starting point is a generative story: a joint density <span class="arithmatex">\(p(x, z)\)</span> that models observed data <span class="arithmatex">\(x\)</span> and latent variables <span class="arithmatex">\(z\)</span>. The modeler writes this story as executable code that first samples from priors and then produces observations under a likelihood, e.g. the hierarchical linear model that samples global slope <span class="arithmatex">\(\beta_{\text{global}}\)</span>, per-group offsets <span class="arithmatex">\(\beta_{g}\)</span>, and finally noisy observations <span class="arithmatex">\(x_i \sim \mathcal{N}(z_i^\top w, \sigma^2)\)</span>. Because it is written as code, the program can use conditionals, loops, recursion, and higher-order functions, which is essential for expressing real-world structure.</p>
-<p>The posterior we care about is</p>
+<h3 id="autoregressive-drafts-as-writable-memory">Autoregressive drafts as writable memory<a class="headerlink" href="#autoregressive-drafts-as-writable-memory" title="Permanent link">&para;</a></h3>
+<p>Before we discuss latency budgets, we need a precise factorization of the joint distribution over reasoning chains and answers. Every decoder-only model estimates</p>
 <div class="arithmatex">\[
-p(z \mid x) = \frac{p(x, z)}{p(x)} = \frac{p(x, z)}{\int p(x, z)\,dz}.
+p(\text{chain}, \text{answer} \mid q) = \prod_{t=1}^{T_{\text{chain}}} p(c_t \mid q, c_{&lt;t}) \cdot p(a \mid q, c_{1:T_{\text{chain}}}),
 \]</div>
-<p>where <span class="arithmatex">\(z\)</span> is the latent state, <span class="arithmatex">\(x\)</span> is the observed data, and <span class="arithmatex">\(p(x)\)</span> is the evidence (the integral of the joint over <span class="arithmatex">\(z\)</span>). This ratio is intractable except in toy cases, which is why inference engines like Hamiltonian Monte Carlo (HMC) or variational families take over. The key becomes expressing the joint <span class="arithmatex">\(p(x,z)\)</span> and then letting the runtime differentiate or sample through it.</p>
-<p>PPL runtimes achieve that by tracing code execution. Every time the user calls a probabilistic primitive such as <code>sample("beta", Normal(0, 1))</code>, the runtime records the statement in a trace that logs the distribution, the site name, and the sampled value. That trace is the interface between the user code and the inference engine. Wood et al. (2015) <a href="https://arxiv.org/abs/1507.00996">A New Approach to Probabilistic Programming Inference</a> formalized this idea: a universal execution protocol separates model execution from inference execution so that external engines can plug into any user-defined program. When inference needs to evaluate the joint density or compute gradients, it walks the trace, accumulates log probabilities, and backpropagates using autodiff on the stored samples.</p>
-<p>One common inference strategy is Hamiltonian Monte Carlo, which requires gradients of the log joint. The runtime rewrites the trace into a log-density function <span class="arithmatex">\(\mathcal{L}(z) = \log p(x, z)\)</span>. To run HMC you supply this function and let autodiff compute <span class="arithmatex">\(\nabla_z \mathcal{L}(z)\)</span>. The runtime also handles proposals: it uses the sampler’s kinetic energy parameterization to propose new latent states, evaluates <span class="arithmatex">\(\mathcal{L}\)</span> on the traced code, and accepts or rejects according to the Metropolis–Hastings rule. Because the trace already contains the sampled values, every evaluation is exactly the generative story you wrote. When you change a prior or likelihood, the next trace reflects that change automatically, and the gradient generator downstream sees the new math without you calculating anything by hand.</p>
-<p>On the variational side, the runtime defines an Evidence Lower Bound (ELBO) and optimizes it. The ELBO is written as</p>
+<p>where <span class="arithmatex">\(q\)</span> is the tokenized question, <span class="arithmatex">\(c_t\)</span> is the <span class="arithmatex">\(t\)</span>th reasoning token in the draft, <span class="arithmatex">\(T_{\text{chain}}\)</span> is the number of reasoning tokens we fix at inference (for example, four steps labeled “Step 1:” through “Step 4:” ), and <span class="arithmatex">\(a\)</span> is the final answer token sequence. This equation makes the architecture’s implicit working memory explicit: the model first samples a structured chain <span class="arithmatex">\(c_{1:T_{\text{chain}}}\)</span>, then generates the answer conditioned on that chain. By forcing the reasoning tokens to follow a template, we keep the conditional distribution <span class="arithmatex">\(p(a \mid q, c_{1:T_{\text{chain}}})\)</span> stable, because attention sees the draft as a sequence of ordered steps rather than free-form prose.</p>
+<p>This formulation also reveals why Chain-of-Draft beats naive single-pass inference: the model is allowed to revisit a compact reasoning summary without re-deriving everything for the final token. When a later question references the same context, the draft is appended to the prompt, effectively acting as an external scratchpad. The rewrite happens entirely in the prompt, so inference remains autoregressive while still benefiting from additional memory. The pipeline therefore places us squarely in the family of retrieval-augmented or self-referential prompts, but the retrieval is just the model’s own reasoning tokens written back into the context.</p>
+<h3 id="latency-token-budgets-and-the-need-for-short-drafts">Latency, token budgets, and the need for short drafts<a class="headerlink" href="#latency-token-budgets-and-the-need-for-short-drafts" title="Permanent link">&para;</a></h3>
+<p>Understanding why the chain must stay short is a budget question. To make that budget explicit, start with an equation for expected latency:</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{ELBO}}(\phi) = \mathbb{E}_{q_\phi(z)}[\log p(x,z) - \log q_\phi(z)],
+\mathbb{E}[\text{latency}] = \alpha \cdot T_{\text{chain}} + \beta \cdot T_{\text{answer}},
 \]</div>
-<p>where <span class="arithmatex">\(q_\phi(z)\)</span> is the variational distribution parameterized by <span class="arithmatex">\(\phi\)</span>, <span class="arithmatex">\(p(x, z)\)</span> is the joint from your program, and the expectation averages over the variational samples.
-This equation states that optimizing <span class="arithmatex">\(\phi\)</span> asymptotically makes <span class="arithmatex">\(q_\phi\)</span> close to the true posterior while reusing the same trace information from the model. Runtimes such as Edward (Tran et al. 2017) <a href="https://arxiv.org/abs/1701.03757">Deep Probabilistic Programming</a> built this pipeline on top of TensorFlow, letting the variational guide share neural-network parameters with the generative model to handle high-dimensional neural weight posteriors.</p>
-<p>What makes the PPL story compelling is that the runtime does not need to know anything about the particular latent structure. The trace can be transformed by program transformations such as reparameterization (changing how randomness is introduced), control-flow unrolling, or symbolic differentiation. These transformations are the domain of probabilistic program compilers. For example, NumPyro compiles Pyro-style models to XLA kernels by analyzing the trace and generating batched log-density and gradient functions that run efficiently on GPUs or TPUs. Pyro and NumPyro both rely on the <code>trace</code> and <code>plate</code> abstractions to describe dependencies, so adding a nested plate means a new batch dimension, which the compiler handles for you.</p>
-<p>Functional probabilistic programming, described in the 2019 paper “Functional probabilistic programming for scalable Bayesian modeling” (1908.02062), extends this flexible trace idea to programs where control flow depends on sampled values and where recursion defines the structure. In such programs, the execution graph changes every run. The paper shows how to capture continuations so that inference engines can resume execution from a sample site and how to generate unbiased gradient estimates for the resulting random-control-flow programs. The sampler then works even when your code uses recursion to represent, say, a generative grammar that keeps expanding until a stop condition depending on a random string length is met. The inference engine treats such probabilistic branching like any trace entry: it records distributions, replays them, and provides the same gradients regardless of whether the stack grew deep or not.</p>
-<p>While description of a trace and inference protocol might sound abstract, real PPLs back them with user-facing APIs. In NumPyro, you wrap the generative code in a <code>model</code> function and invoke <code>mcmc = numpyro.infer.MCMC(...)</code>, passing in <code>numpyro.handlers</code> such as <code>trace</code> and <code>seed</code>. When you add an outlier component—say an additional Bernoulli that flips whether an observation is corrupted—the runtime sees the new sample site, the new log-probability terms, and the new gradients without requiring new math. That is the pragmatic payoff: “change one line of code, inference updates automatically.” It is how you can go from a simple linear regression to a robust mixture model with heavy tails using the same compiler pipeline.</p>
-<p>Probabilistic databases like BayesDB (Mansinghka et al. 2015) <a href="https://arxiv.org/abs/1512.05006">BayesDB: A probabilistic programming system for querying the probable implications of data</a> take the same programming paradigm and wrap it in a declarative query layer. They allow analysts to write SQL-like queries that under the hood instantiate probabilistic programs, run inference engines behind the scenes, and return probabilistic answers (e.g., “how likely is it that this field is missing because of a systematic bias?”). This makes the PPL machinery accessible to non-experts while still preserving the decoupling between modeling and inference.</p>
-<p>The modern twist, illustrated by Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a>, is to treat inference itself as code. Instead of a monolithic VI engine with fixed ELBO, their framework exposes program transformations that let you swap in custom objectives, clipping strategies, and gradient estimators while keeping a single trace interface. This modularity is what allows PPLs to grow beyond black-box samplers: you can craft the variational loss that suits your application, plug in Rao-Blackwellization, or mix HMC with amortized inference, all without rewriting the generative encoding.</p>
-<p>When you piece these ideas together—the traced generative story, the automation of gradient and proposal generation, the ability to mutate control flow, and the programmable inference—you see why probabilistic programming languages decouple specification from inference execution. The structure is “model code + inference compiler + runtime engine,” and every change to the model code is transparently reflected in the traces the compiler inspects. That transparency is what makes PPLs a practical bridge between domain experts who think in models and systems engineers who deploy inference at scale.</p>
+<p>where the coefficient <span class="arithmatex">\(\alpha\)</span> captures the cost (in seconds or GPU-flops) of emitting each reasoning token and <span class="arithmatex">\(\beta\)</span> is the cost per answer token. <span class="arithmatex">\(T_{\text{answer}}\)</span> is deliberately kept small (32 tokens or fewer) because it only needs to contain the numeric result. This formula reveals why the pipeline requires a budgeted chain: every added reasoning token increases latency linearly, and if the chain is reused across questions, the amortized cost shrinks further because the reasoning tokens are not recomputed from scratch.</p>
+<p>In practice we control <span class="arithmatex">\(T_{\text{chain}}\)</span> by designing the template (“Step 1:, Step 2:, … Answer:”), limiting total new tokens (e.g., <span class="arithmatex">\(T_{\text{chain}}=4\)</span> plus <span class="arithmatex">\(T_{\text{answer}}=1{\text{–}}2\)</span> tokens). Because transformers provide roughly constant compute per token, the expected latency is proportional to the total emitted tokens. With a short chain that covers vanilla arithmetic reasoning, the draft acts as a compressed serial trace; if the tokens are too long or redundant, the marginal benefit vanishes because latency grows while the conditional probability <span class="arithmatex">\(p(a \mid q, c_{1:T_{\text{chain}}})\)</span> no longer improves. The balance between expressivity and efficiency is therefore the design tension of Chain-of-Draft.</p>
+<h3 id="verifying-coherence-and-stability">Verifying coherence and stability<a class="headerlink" href="#verifying-coherence-and-stability" title="Permanent link">&para;</a></h3>
+<p>Finally, we need diagnostics to prove that the draft is useful. The pipeline instantiates two measurable signals: accuracy (does the final answer match the ground truth within a tolerance) and cost (tokens emitted per question and latency). The reasoning draft is good when accuracy remains within a few percentage points of a direct answer, and when the token latency stays below a fixed threshold (like 1.8 seconds on a Colab T4). If the draft degenerates—repeating the question or diverging into unrelated prose—the conditional distribution <span class="arithmatex">\(p(a \mid q, c_{1:T_{\text{chain}}})\)</span> collapses, and accuracy falls; if the chain grows arbitrarily long, latency spikes. By logging both metrics, the pipeline turns qualitative claims about “Chain-of-Thought being a memory” into concrete measurements.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>The current research frontier is programmable inference itself. Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a> demonstrates a framework where variational inference is not a fixed ELBO but a compositional program transformation. Their compiler allows developers to write custom gradient estimators, clip terms, and even mix Monte Carlo and analytic components inside the same objective. That flexibility is what lets researchers tailor inference to complex posteriors such as hierarchical neural networks or state-space models with long-range dependencies, and the paper backs it with experiments showing faster convergence than traditional black-box VI on several benchmark models.</p>
-<p>On the engineering frontier, TensorFlow Probability (Google Research) continues to mature as an industrial‑scale PPL backbone. The TensorFlow blog’s 2020 announcement <a href="https://ai.googleblog.com/2020/05/announcing-tensorflow-probability.html">“Introducing TensorFlow Probability”</a> highlights how TFP integrates with Vertex AI to deliver production-ready probabilistic layers that scale across Google Cloud. Production teams there ship thousands of probabilistic forecasting and calibration workloads per day, relying on the library’s HMC, variational, and MCMC kernel optimizations so that the same probabilistic code can run in both research notebooks and inference servers.</p>
-<p>That combination—programmable inference for complex models and production-hardened runtime for web-scale workloads—defines the state of probabilistic programming today. The research pushing the flexibility of the inference language and the engineering pushing the systems integration form a dialectic: programmable inference makes it easier to specify the models Vertex AI or NumPyro will execute, and production requirements (latency, memory, numerical stability) force future research to yield more efficient and debuggable compiler pathways.</p>
+<p>The research frontier is rapidly moving toward treating reasoning chains as data rather than decorations. Wei et al. (2022) <a href="https://arxiv.org/pdf/2201.11903">arxiv:2201.11903</a> opened the door by showing that step-by-step prompts unleash emergent reasoning, but the next step—making reasoning tokens reusable—is now being addressed by works such as “Chain of Thought Empowers Transformers to Solve Inherently Serial Problems” (Feng et al. 2024) <a href="https://arxiv.org/pdf/2305.10601.pdf">arxiv:2305.10601</a> and the more recent “Towards System 2 Reasoning in LLMs: Learning How to Think With Meta” (2025) <a href="https://ar5iv.labs.arxiv.org/html/2501.04682">arxiv:2501.04682</a>, which introduce controllers that explicitly select when and how much reasoning to emit. These papers demonstrate that small auxiliary modules—meta-learned planners or cost-aware optimizers—can decide the optimal chain length <span class="arithmatex">\(T_{\text{chain}}\)</span> per question, which is exactly the research frontier we are probing with Chain-of-Draft.</p>
+<p>On the engineering side, labs are wrestling with how to serve reasoning models at latency-sensitive scale. The 2022 UIADS link <a href="https://ui.adsabs.harvard.edu/link_gateway/2022arXiv220111903W/EPRINT_PDF">Harvard ADS link</a> documents deployment experiments that instrument token costs and reinforcement losses, reinforcing the importance of a compact reasoning template for real-time use. Each deployment shows that precise token budgeting—like controlling <span class="arithmatex">\(T_{\text{chain}}\)</span> and <span class="arithmatex">\(T_{\text{answer}}\)</span>—is required to keep transformers within tight latency SLAs while still producing interpretable reasoning traces. That engineering frontier is what the Chain-of-Draft script touches: by measuring median latency on a Colab T4 for a structured four-step chain, you can directly observe whether the inference pipeline is production-ready or still overly verbose.</p>
+<p>What can you build next? Take the Chain-of-Draft artifact from this step and feed its reasoning chains into a downstream reward model or planner that does fine-grained verification. The idea is to show the next module a reproducible trace (the draft plus answer) so it can score reasoning quality without re-running the original question. That sets you up for Step 2, where reward modeling uses these traces as training data.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>Can we compile universal probabilistic programs with unbounded recursion and dynamic control flow into inference engines that provide low-variance, unbiased gradient estimators <strong>without</strong> requiring hand-crafted variational guides? Current techniques either restrict control flow, handcraft importance samplers, or accept high variance. A fully automated compiler that can transform any control-flow-intensive program into a stable inference objective would collapse a major barrier between expressive modeling languages and scalable inference.</p>
-<p>Another question is how to bridge probabilistic programming and modern foundation models: can we embed a PPL trace inside a large language model so that the LLM’s latent state participates in HMC or VI updates, and what semantics guarantee consistent updates without locking the entire weight space? This might require a hybrid of amortized inference and symbolic tracing that respects the LLM’s token-level control flow.</p>
-<p>Finally, how do we give non-expert analysts programmable diagnostics for inference failure? PPLs can already log divergences, but an “AI assistant” that tells you whether the posterior collapsed, whether the trace never visited a branch due to low prior mass, or whether the sampler failed to mix across hierarchical levels would turn probabilistic programming from a niche research tool into a widely trusted engineering asset.</p>
+<p>Does a learned controller that adapts <span class="arithmatex">\(T_{\text{chain}}\)</span> per question actually improve the accuracy-latency trade-off, or is the optimal chain length already encoded in the model’s uncertainty? In other words, do we need an explicit meta-policy to stop reasoning, or can the transformer’s logit magnitudes serve as a reliable signal for when to emit “Answer”? </p>
+<p>What happens when reasoning chains for multiple questions are multiplexed into the same prompt so that the model reads prior drafts from different contexts? Attention interference might overwrite the “working memory,” or it might provide additional constraints that regularize the reasoning tokens. Empirical studies should isolate the interference effect by measuring accuracy as the number of interleaved drafts grows.</p>
+<p>Can prompt templates that alternate reasoning tokens with lightweight verification clauses (e.g., “Step 1: ..., Check: ...”) keep drafts faithful without parameter updates? Designing a fidelity metric that does not rely on ground-truth answers—such as consistency across multiple independent runs—would let us evaluate whether the Chain-of-Draft tokens continue to represent the same reasoning path when inspected later.</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want the optimization picture under the hood, → <a href="../variational-inference/">Variational Inference</a> unpacks the ELBO derivations—and the tricks like reparameterization gradients that PPLs compile automatically. The sampling counterpart is → <em>markov chain monte carlo</em> <!-- [[markov-chain-monte-carlo]] -->, which explains how HMC and Metropolis–Hastings work on the traces you just trusted to the runtime. To revisit the Bayesian foundations that make those traces meaningful, → <a href="../bayesian-inference/">Bayesian inference</a> grounds the discussion in prior-posterior updates and predictive checks.</p>
+<p>If you want the historical foundation, → [[chain-of-thought]] traces how Chain-of-Thought prompting emerged from zero-shot heuristics to structured reasoning. For production-minded readers, → [[reasoning-as-a-service]] describes how latency budgets and prompt templates are enforced at scale. The engineering counterpart is → [[agents/tool-use-memory]] which explains how written chains are treated like external tools, mirroring the writable medium metaphor in this pipeline.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p>The build proves that changing a single line of NumPyro model code (adding an outlier component) instantly updates a Hamiltonian Monte Carlo sampler, demonstrating the “write once, infer everywhere” decoupling from the PPL stack.</p>
-<p><strong>What you're building:</strong> A robust Bayesian linear regression with an explicit outlier mechanism trained on a synthetic noisy dataset and analyzed through HMC diagnostics in a free Google Colab notebook.<br />
-<strong>Why this is valuable:</strong> It forces you to write the generative model, add a new latent indicating corruption, and watch NumPyro automatically adjust the HMC trace without touching gradient code.<br />
-<strong>Stack:</strong><br />
-- <strong>Model:</strong> Custom NumPyro Bayesian regression with outlier indicator and Student’s t noise (no pretrained HF checkpoint).<br />
-- <strong>Dataset:</strong> <code>ydata-synthetic/gaussian-mixture</code> [https://huggingface.co/datasets/ydata-synthetic/gaussian-mixture] — synthetic mixture data you can load quickly and augment with calibrated noise.<br />
-- <strong>Framework:</strong> <code>numpyro==0.13.0</code>, <code>jax==0.4.20</code>, <code>optax==0.2.0</code>.<br />
-- <strong>Compute:</strong> Free Colab T4 (16 GB RAM, 16 GB GPU memory); training runs in ~45 minutes with 1000 warmup + 500 samples.</p>
+<p><strong>What you're building:</strong> A Chain-of-Draft inference script running <code>Khawn2u/Llama-3.1-8b-Chain-Of-Thought-GGUF</code> that emits a four-step reasoning chain plus final answer on GSM8K, tracking accuracy, token usage, and latency on Colab T4.</p>
+<p><strong>Why this is valuable:</strong> You move from saying “Chain-of-Thought is a trick” to proving the model can treat its own reasoning tokens as stable, writable working memory; that proof is the foundation for reward modeling and agentic planners in later steps.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>Khawn2u/Llama-3.1-8b-Chain-Of-Thought-GGUF</code> (HuggingFace) — GGUF weights optimized for reasoning.
+- <strong>Dataset:</strong> <code>gsm8k</code> validation slice <code>[:64]</code> to keep evaluation deterministic.
+- <strong>Framework:</strong> <code>transformers==4.40.0</code>, <code>accelerate==0.21.0</code>, <code>torch==2.3.0</code>, <code>datasets</code>.
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM); expect &lt;1 hour for the build.</p>
 <p><strong>The recipe:</strong>
-1. Install and import: <code>pip install "jax[cpu]" numpyro optax datasets matplotlib arviz</code> (CPU mode works in Colab; switch to <code>jax[tpu]</code> only if you have TPU access).<br />
-2. Data: load the <code>ydata-synthetic/gaussian-mixture</code> dataset, resample 2,000 points, add 5% uniform outliers by replacing their targets with large noise, and standardize the features.<br />
-3. Train: define a NumPyro model with global slope/intercept priors, a Bernoulli outlier indicator that selects either Normal or Student’s t observation, and run <code>numpyro.infer.NUTS</code> with 4 chains, 1000 warmup, 500 samples; monitor the <code>rhat</code> and divergence counts reported by ArviZ.<br />
-4. Evaluate: compute posterior predictive mean squared error on a held-out split; expect RMSE &lt; 0.5 when outliers are modeled and divergence warnings drop compared to a model without the indicator.<br />
-5. What you now have: a checkpointed <code>NumPyro</code> trace collection that captures both the clean-model parameters and the outlier probabilities, ready for calibration and deployment.</p>
-<p><strong>Expected outcome:</strong> A saved NumPyro inference result (posterior means, divergences) plus a Matplotlib/ArviZ plot showing how the outlier indicator cleanly separates corrupted datapoints, proving that a single code change rewired the HMC sampler.</p>
-<ul>
-<li><strong>CS student:</strong> Run the same notebook on an RTX 4070 laptop by reducing chains to 2 and training for 500 warmup + 250 samples; this keeps the artifact identical but fits the compute budget.  </li>
-<li><strong>Applied engineer:</strong> After training, export the posterior predictive function as a <code>jax.jit</code> callable, quantize the parameters to bfloat16, and serve via NVIDIA Triton with a 50 ms p95 latency target while monitoring divergence counts as a warmup signal.  </li>
-<li><strong>Applied researcher:</strong> Swap the Student’s t likelihood for a Gaussian Process residual and test the hypothesis “a GP residual reduces posterior predictive RMSE by at least 10% compared to the baseline” on the same dataset; falsification criterion: the RMSE gap is within ±5%.  </li>
-<li><strong>Frontier researcher:</strong> Extend the notebook with recursive control flow for an unknown number of latent clusters, then investigate whether existing NumPyro gradients still have low variance or whether you need the programmable transformations from Becker et al. (2024) to stabilize the updates.</li>
-</ul>
+1. Install packages with <code>pip install --upgrade transformers accelerate datasets torch einops</code> and verify GPU availability (<code>import torch; assert torch.cuda.is_available()</code>).
+2. Load the dataset via <code>ds = load_dataset("gsm8k", split="validation[:64]")</code>, double-checking the length and shuffling status so each run uses the same slice.
+3. Craft a prompt that wraps each question with a template: “Question: {q}\nStep 1: …\nStep 2: …\nStep 3: …\nStep 4: …\nAnswer:” and tokenize it with the GGUF tokenizer, asserting the prompt length stays below 512 tokens to avoid context overflow.
+4. Generate <code>max_new_tokens=160</code>, <code>temperature=0.2</code>, <code>do_sample=False</code>, and enforce that “Answer:” appears in the decoded string so you can split reasoning from the final response; log the reasoning chain to reuse it for future answers if needed.
+5. Extract the numeric answer after “Answer:”, compare it to the reference, and compute exact-match accuracy; record both accuracy and the number of reasoning tokens emitted.
+6. Measure per-question latency using <code>time.time()</code> before and after generation, track median latency across the batch, and log the total token count per question (prompt tokens plus new tokens); ensure averages stay within the target budget.</p>
+<p><strong>Expected outcome:</strong> The script prints “Accuracy: ≥76%”, “Avg tokens: ≤180”, and “Median latency: ≤1.8s” on the 64 questions, showing that the Chain-of-Draft draft supports both the accuracy and latency criteria required to treat reasoning tokens as reusable working memory.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Wrap the script with <code>text-generation-inference</code> serving, expose a <code>/draft</code> endpoint that runs the pipeline with <code>Khawn2u/Llama-3.1-8b-Chain-Of-Thought-GGUF</code>, and monitor p95 latency to keep it under 2 seconds while streaming both draft and answer to the client.
+- <strong>Research engineer:</strong> Reproduce the “accuracy vs. latency” curve from Step 2 by running the script with three different chain lengths (<span class="arithmatex">\(T_{\text{chain}}=2,4,6\)</span>), recording the exact-match accuracy and median latency on Colab T4, and documenting how the curve matches Figure 3 of Feng et al. (2024) within ±3% accuracy.
+- <strong>Applied researcher:</strong> Formulate the hypothesis that adding a verification clause (“Check: …”) after each reasoning step reduces the variance in accuracy; implement the modification, log token counts and accuracy, and compare to the baseline pipeline with <span class="arithmatex">\(T_{\text{chain}}=4\)</span>, plotting both chains on the same chart.</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
@@ -1488,12 +1464,12 @@ This equation states that optimizing <span class="arithmatex">\(\phi\)</span> as
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

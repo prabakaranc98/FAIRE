@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/probabilistic-programming/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/arcs/self-supervised-vision-foundations/step-05-representation-learning/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../../../../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Probabilistic programming - Frontier Wiki</title>
+        <title>Step 5 — Train a Contrastive Representation Space - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#probabilistic-programming" class="md-skip">
+        <a href="#step-5-train-a-contrastive-representation-space" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Probabilistic programming
+              Step 5 — Train a Contrastive Representation Space
             
           </span>
         </div>
@@ -209,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -250,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../about/" class="md-tabs__link">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -306,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -336,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -443,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -471,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../01-ai/" class="md-nav__link">
+      <a href="../../../../01-ai/" class="md-nav__link">
         
   
   
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../02-generative-modeling/" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -527,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../03-representation-learning/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -555,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -611,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -639,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -695,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -723,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -810,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -838,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -925,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -953,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -981,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1009,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1044,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1072,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1100,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1128,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1156,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/observer/" class="md-nav__link">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1212,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1240,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1297,42 +1297,21 @@
       
       
       
-        <span class="md-tag">bayesian-inference</span>
+        <span class="md-tag">contrastive-learning</span>
       
     
       
       
       
       
-        <span class="md-tag">hmc</span>
+        <span class="md-tag">representation-learning</span>
       
     
       
       
       
       
-        <span class="md-tag">numpyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">probabilistic-programming</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">pyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">variational-inference</span>
+        <span class="md-tag">self-supervised-vision</span>
       
     
   </nav>
@@ -1342,64 +1321,60 @@
   
 
 
-<h1 id="probabilistic-programming">Probabilistic programming<a class="headerlink" href="#probabilistic-programming" title="Permanent link">&para;</a></h1>
-<p>Imagine writing a physics simulator for a delivery drone that captures wind, lift, drag, and actuator delays. Now imagine you do not run that simulator forward to forecast where the drone will land, but run it <em>backward</em> so that the exact gusts that pushed it off course fall out of the code as posterior samples. That “reverse execution” is what probabilistic programming offers: you sketch the generative story in familiar Python or Julia, sprinkle in stochastic nodes where uncertainty belongs, and hand the program to the runtime. The runtime then derives posterior distributions, gradient estimators, and samplers without you ever touching the calculus for the latent variables. By the time you finish this page you will know how PPLs transform modeling effort into a software-engineering workflow, how they marry Bayesian statistics to modern compiler techniques, what the current bottlenecks are, and how to build a working Bayesian regression with NumPyro that proves the compiler really does the heavy lifting.</p>
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/self-supervised-vision-foundations.md">Self Supervised Vision Foundations</a> — Step 5 of 5</p>
+<p><strong>Arc:</strong> Self Supervised Vision Foundations (../index.md) — Step 5 of 5<br />
+← <a href="../step-04-masked-autoencoders/">Previous Step</a></p>
+</blockquote>
+<h1 id="step-5-train-a-contrastive-representation-space">Step 5 — Train a Contrastive Representation Space<a class="headerlink" href="#step-5-train-a-contrastive-representation-space" title="Permanent link">&para;</a></h1>
+<p>When a masked autoencoder faithfully copies every stroke in a painting, it still lacks the sense of which themes in the portrait echo a contemporary poem; it reconstructs pixels but has no internal map that groups together related concepts. Contrastive representation learning is the critic that organizes those brushstrokes: it pulls together the latent coordinates of different but semantically equivalent views and pushes apart everything else, giving every new image a position inside a geometry that mirrors objecthood and style. After the last step you already know how to hide patches and reconstruct pixels—the encoder has learned to reproduce appearances. The next step gives that encoder meaning by reshaping its latent space so that it can serve as the foundation for transfer, retrieval, and multimodal alignment. By the end of this page you will understand why the projection head matters, how InfoNCE enforces alignment versus uniformity, where the research frontier is pushing contrastive scaling today, and how to train your own SimCLR-style checkpoint that proves the geometry is real.</p>
 <h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>Conventional machine learning often assumes a rigid architecture: “fit a neural network, tune regularization, push data through.” Probabilistic programming flips the emphasis back to “what generative process could have produced that data?” That shift is what Bishop (2013) <a href="https://www.cs.columbia.edu/~blei/fogm/2020F/readings/Bishop2013.pdf">Model-Based Machine Learning</a> called when he argued for designing bespoke models that capture domain structure instead of forcing every use case through a handful of fixed likelihood functions. In a PPL you describe that bespoke model as ordinary code—loops for hierarchies, conditionals for switching regimes, recursion for repeated reasoning—and the language runtime derives the posterior inference without manual derivations.</p>
-<p>This approach sits at the junction of Bayesian statistics, programming languages, and high-performance systems. Bayesian statistics gives you the language of priors, likelihoods, and posterior distributions. Programming-language theory gives you the control-flow primitives, continuations, and trace representations that make it possible to inspect and transform user code. High-performance engineering gives you compilation to XLA/LLVM, vectorized sampling kernels, and autodiff-backed gradient estimators. Together they let a modeler swap out likelihoods or add latent variables without touching the sampler. That is why the fundamental promise of PPLs is “write once, infer everywhere”—the model specification is decoupled from inference execution. How does that actually work?</p>
+<p>Contrastive learning sits between reconstruction-based pretraining and supervised fine-tuning. In reconstruction, we recover inputs (pixels, patches, tokens) from partial observations, which ensures that the encoder models low-level statistics but not necessarily semantics. Supervised training pins the latent space to class labels, which is expensive and brittle. Contrastive representation learning borrows the notion of a “positive pair” from supervision but without labels: two augmentations of the same image form a positive, and everything else in the minibatch is treated as a negative. This keeps computation in the self-supervised regime while still asking the encoder to recognize invariant structure. The technique therefore sits at the heart of the self-supervised vision arc, bridging the step where you learned to reconstruct patches with the downstream workflows—classification, retrieval, multimodal alignment—that crave a space organized by semantic proximity. Because the next arcs will re-use the encoder for CLIP-style joint embedding or generative fine-tuning, this step is about engineering confidence that the latent geometry is stable, transferable, and ready for the next layer of supervision. How does it do that? The mechanism is aligning positive views via InfoNCE while keeping the global distribution uniform, and we build that machinery in the next section.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The starting point is a generative story: a joint density <span class="arithmatex">\(p(x, z)\)</span> that models observed data <span class="arithmatex">\(x\)</span> and latent variables <span class="arithmatex">\(z\)</span>. The modeler writes this story as executable code that first samples from priors and then produces observations under a likelihood, e.g. the hierarchical linear model that samples global slope <span class="arithmatex">\(\beta_{\text{global}}\)</span>, per-group offsets <span class="arithmatex">\(\beta_{g}\)</span>, and finally noisy observations <span class="arithmatex">\(x_i \sim \mathcal{N}(z_i^\top w, \sigma^2)\)</span>. Because it is written as code, the program can use conditionals, loops, recursion, and higher-order functions, which is essential for expressing real-world structure.</p>
-<p>The posterior we care about is</p>
+<p>Contrastive learning applies a contrastive loss to the projected outputs of an encoder so that positive pairs move together and all other pairs spread apart. Starting from an image <span class="arithmatex">\(x\)</span>, we sample two stochastic augmentations <span class="arithmatex">\(x_i\)</span> and <span class="arithmatex">\(x_{i^+}\)</span>, pass them through the shared encoder <span class="arithmatex">\(f\)</span>, and then through a projection head <span class="arithmatex">\(g\)</span> that produces <span class="arithmatex">\(z_i = g(f(x_i))\)</span> and <span class="arithmatex">\(z_{i^+} = g(f(x_{i^+}))\)</span>; the encoder <span class="arithmatex">\(f\)</span> is what transfers, while <span class="arithmatex">\(g\)</span> is the flexibility that prevents collapse. This is the structure SimCLR introduced, and it remains the practical recipe for most contrastive architectures. The InfoNCE loss for one anchor <span class="arithmatex">\(i\)</span> over a batch of <span class="arithmatex">\(2N\)</span> total views (each image appears twice) is</p>
 <div class="arithmatex">\[
-p(z \mid x) = \frac{p(x, z)}{p(x)} = \frac{p(x, z)}{\int p(x, z)\,dz}.
+\mathcal{L}_i = -\log \frac{\exp\left(\text{sim}(z_i, z_{i^+})/\tau\right)}{\sum_{k=1}^{2N} \mathbb{1}_{[k \ne i]} \exp\left(\text{sim}(z_i, z_k)/\tau\right)},
 \]</div>
-<p>where <span class="arithmatex">\(z\)</span> is the latent state, <span class="arithmatex">\(x\)</span> is the observed data, and <span class="arithmatex">\(p(x)\)</span> is the evidence (the integral of the joint over <span class="arithmatex">\(z\)</span>). This ratio is intractable except in toy cases, which is why inference engines like Hamiltonian Monte Carlo (HMC) or variational families take over. The key becomes expressing the joint <span class="arithmatex">\(p(x,z)\)</span> and then letting the runtime differentiate or sample through it.</p>
-<p>PPL runtimes achieve that by tracing code execution. Every time the user calls a probabilistic primitive such as <code>sample("beta", Normal(0, 1))</code>, the runtime records the statement in a trace that logs the distribution, the site name, and the sampled value. That trace is the interface between the user code and the inference engine. Wood et al. (2015) <a href="https://arxiv.org/abs/1507.00996">A New Approach to Probabilistic Programming Inference</a> formalized this idea: a universal execution protocol separates model execution from inference execution so that external engines can plug into any user-defined program. When inference needs to evaluate the joint density or compute gradients, it walks the trace, accumulates log probabilities, and backpropagates using autodiff on the stored samples.</p>
-<p>One common inference strategy is Hamiltonian Monte Carlo, which requires gradients of the log joint. The runtime rewrites the trace into a log-density function <span class="arithmatex">\(\mathcal{L}(z) = \log p(x, z)\)</span>. To run HMC you supply this function and let autodiff compute <span class="arithmatex">\(\nabla_z \mathcal{L}(z)\)</span>. The runtime also handles proposals: it uses the sampler’s kinetic energy parameterization to propose new latent states, evaluates <span class="arithmatex">\(\mathcal{L}\)</span> on the traced code, and accepts or rejects according to the Metropolis–Hastings rule. Because the trace already contains the sampled values, every evaluation is exactly the generative story you wrote. When you change a prior or likelihood, the next trace reflects that change automatically, and the gradient generator downstream sees the new math without you calculating anything by hand.</p>
-<p>On the variational side, the runtime defines an Evidence Lower Bound (ELBO) and optimizes it. The ELBO is written as</p>
+<p>where <span class="arithmatex">\(\text{sim}(u,v)=u^\top v/(\|u\|\|v\|)\)</span> is cosine similarity, <span class="arithmatex">\(\tau\)</span> is the temperature hyperparameter controlling sharpness, and the indicator removes the trivial comparison of <span class="arithmatex">\(z_i\)</span> with itself. Minimizing this loss forces <span class="arithmatex">\(z_i\)</span> close to its positive pair <span class="arithmatex">\(z_{i^+}\)</span> while simultaneously pushing it away from every other <span class="arithmatex">\(z_k\)</span>. The temperature <span class="arithmatex">\(\tau\)</span> regulates how much separation is rewarded: lower <span class="arithmatex">\(\tau\)</span> makes the softmax peaky, magnifying the influence of the closest negatives.</p>
+<p>The projection head <span class="arithmatex">\(g\)</span> has a practical justification that Chen et al. (2020) made explicit. If the contrastive loss were applied directly on <span class="arithmatex">\(f(x)\)</span>, the encoder could collapse to a constant representation, since the only objective would be to maximize similarity within positives. The multilayer perceptron <span class="arithmatex">\(g\)</span> acts as a distortion layer on which InfoNCE is enforced, while <span class="arithmatex">\(f\)</span> learns to produce features that remain useful for downstream linear probes. That is why we do not transfer <span class="arithmatex">\(g\)</span>; it is only during pretraining that the latent geometry at <span class="arithmatex">\(g(f(x))\)</span> matters for the loss.</p>
+<p>Alignment and uniformity quantify the geometry that InfoNCE imposes. Following Wang &amp; Isola (2020), the alignment term</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{ELBO}}(\phi) = \mathbb{E}_{q_\phi(z)}[\log p(x,z) - \log q_\phi(z)],
+\mathcal{L}_{\text{align}} = \mathbb{E}_{(i,j)} \left[1 - \text{sim}(z_i, z_j)\right],
 \]</div>
-<p>where <span class="arithmatex">\(q_\phi(z)\)</span> is the variational distribution parameterized by <span class="arithmatex">\(\phi\)</span>, <span class="arithmatex">\(p(x, z)\)</span> is the joint from your program, and the expectation averages over the variational samples.
-This equation states that optimizing <span class="arithmatex">\(\phi\)</span> asymptotically makes <span class="arithmatex">\(q_\phi\)</span> close to the true posterior while reusing the same trace information from the model. Runtimes such as Edward (Tran et al. 2017) <a href="https://arxiv.org/abs/1701.03757">Deep Probabilistic Programming</a> built this pipeline on top of TensorFlow, letting the variational guide share neural-network parameters with the generative model to handle high-dimensional neural weight posteriors.</p>
-<p>What makes the PPL story compelling is that the runtime does not need to know anything about the particular latent structure. The trace can be transformed by program transformations such as reparameterization (changing how randomness is introduced), control-flow unrolling, or symbolic differentiation. These transformations are the domain of probabilistic program compilers. For example, NumPyro compiles Pyro-style models to XLA kernels by analyzing the trace and generating batched log-density and gradient functions that run efficiently on GPUs or TPUs. Pyro and NumPyro both rely on the <code>trace</code> and <code>plate</code> abstractions to describe dependencies, so adding a nested plate means a new batch dimension, which the compiler handles for you.</p>
-<p>Functional probabilistic programming, described in the 2019 paper “Functional probabilistic programming for scalable Bayesian modeling” (1908.02062), extends this flexible trace idea to programs where control flow depends on sampled values and where recursion defines the structure. In such programs, the execution graph changes every run. The paper shows how to capture continuations so that inference engines can resume execution from a sample site and how to generate unbiased gradient estimates for the resulting random-control-flow programs. The sampler then works even when your code uses recursion to represent, say, a generative grammar that keeps expanding until a stop condition depending on a random string length is met. The inference engine treats such probabilistic branching like any trace entry: it records distributions, replays them, and provides the same gradients regardless of whether the stack grew deep or not.</p>
-<p>While description of a trace and inference protocol might sound abstract, real PPLs back them with user-facing APIs. In NumPyro, you wrap the generative code in a <code>model</code> function and invoke <code>mcmc = numpyro.infer.MCMC(...)</code>, passing in <code>numpyro.handlers</code> such as <code>trace</code> and <code>seed</code>. When you add an outlier component—say an additional Bernoulli that flips whether an observation is corrupted—the runtime sees the new sample site, the new log-probability terms, and the new gradients without requiring new math. That is the pragmatic payoff: “change one line of code, inference updates automatically.” It is how you can go from a simple linear regression to a robust mixture model with heavy tails using the same compiler pipeline.</p>
-<p>Probabilistic databases like BayesDB (Mansinghka et al. 2015) <a href="https://arxiv.org/abs/1512.05006">BayesDB: A probabilistic programming system for querying the probable implications of data</a> take the same programming paradigm and wrap it in a declarative query layer. They allow analysts to write SQL-like queries that under the hood instantiate probabilistic programs, run inference engines behind the scenes, and return probabilistic answers (e.g., “how likely is it that this field is missing because of a systematic bias?”). This makes the PPL machinery accessible to non-experts while still preserving the decoupling between modeling and inference.</p>
-<p>The modern twist, illustrated by Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a>, is to treat inference itself as code. Instead of a monolithic VI engine with fixed ELBO, their framework exposes program transformations that let you swap in custom objectives, clipping strategies, and gradient estimators while keeping a single trace interface. This modularity is what allows PPLs to grow beyond black-box samplers: you can craft the variational loss that suits your application, plug in Rao-Blackwellization, or mix HMC with amortized inference, all without rewriting the generative encoding.</p>
-<p>When you piece these ideas together—the traced generative story, the automation of gradient and proposal generation, the ability to mutate control flow, and the programmable inference—you see why probabilistic programming languages decouple specification from inference execution. The structure is “model code + inference compiler + runtime engine,” and every change to the model code is transparently reflected in the traces the compiler inspects. That transparency is what makes PPLs a practical bridge between domain experts who think in models and systems engineers who deploy inference at scale.</p>
+<p>where the expectation is over positive pairs <span class="arithmatex">\((i, j)\)</span>, measures how close positives are. The uniformity term</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{uniform}} = \log \mathbb{E}_{i,j} \exp\left(-2\|z_i - z_j\|^2\right),
+\]</div>
+<p>where the expectation runs over all pairs, ensures the representations are spread out by penalizing overly tight clusters. InfoNCE simultaneously minimizes alignment and prevents uniformity collapse by virtue of the denominator over negatives. Monitoring both terms during training guarantees that we are not just shrinking distances but organizing the space.</p>
+<p>Data augmentation is the practical proxy for semantic invariance. RandomResizedCrop, horizontal flips, color jitter, and Gaussian blur each perturb low-level statistics while preserving semantics. The more these augmentations approximate the invariances of your downstream tasks, the better the latent alignment; this step is why we revisit the same augmentations used in Step 4 but now interpret them as stochastic synonyms. The batch size and negative sampling strategy regulate the uniformity term: a larger batch gives more hard negatives and spreads the representations wider. Practically, you will see InfoNCE loss decrease as alignment tightens and uniformity increases, and the linear probe accuracy on held-out labels should rise above the baseline established by the masked autoencoder.</p>
+<p>Contrastive learning also has allies in other formulations, such as the approximate supervised contrastive interpretation from Self-Supervised Contrastive Learning is Approximately Supervised Contrastive Learning (Author et al. 2025), which shows that the gradient signal of InfoNCE matches that of supervised contrastive losses when viewed through the lens of soft-label distributions. This perspective justifies why contrastive pretraining yields representations comparable to fully supervised training when downstream labels appear quickly. Larger-scale works—such as Untitled (Author et al. 2026) and Untitled (Author et al. 2026) (arXiv IDs 2602.02381 and 2602.24012)—extend the same InfoNCE geometry to multimodal contexts and triplet-style losses, indicating that the critic’s latent space can unify modalities without direct supervision. Untitled (Author et al. 2025) with ID 2506.13717 further shows that cosine-based contrastive learning is resilient even with patch-level self-supervision, which is the route by which we plan to align our representations with future generative steps.</p>
+<p>Failure modes appear when augmentations are too weak, batch sizes too small, or <span class="arithmatex">\(\tau\)</span> is ill-tuned, which manifests as either collapsing uniformity or a linear probe that never surpasses the random baseline. The recipes in the build section steer you through these issues with concrete diagnostics.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>The current research frontier is programmable inference itself. Becker et al. (2024) <a href="https://arxiv.org/abs/2406.15742">Probabilistic Programming with Programmable Variational Inference</a> demonstrates a framework where variational inference is not a fixed ELBO but a compositional program transformation. Their compiler allows developers to write custom gradient estimators, clip terms, and even mix Monte Carlo and analytic components inside the same objective. That flexibility is what lets researchers tailor inference to complex posteriors such as hierarchical neural networks or state-space models with long-range dependencies, and the paper backs it with experiments showing faster convergence than traditional black-box VI on several benchmark models.</p>
-<p>On the engineering frontier, TensorFlow Probability (Google Research) continues to mature as an industrial‑scale PPL backbone. The TensorFlow blog’s 2020 announcement <a href="https://ai.googleblog.com/2020/05/announcing-tensorflow-probability.html">“Introducing TensorFlow Probability”</a> highlights how TFP integrates with Vertex AI to deliver production-ready probabilistic layers that scale across Google Cloud. Production teams there ship thousands of probabilistic forecasting and calibration workloads per day, relying on the library’s HMC, variational, and MCMC kernel optimizations so that the same probabilistic code can run in both research notebooks and inference servers.</p>
-<p>That combination—programmable inference for complex models and production-hardened runtime for web-scale workloads—defines the state of probabilistic programming today. The research pushing the flexibility of the inference language and the engineering pushing the systems integration form a dialectic: programmable inference makes it easier to specify the models Vertex AI or NumPyro will execute, and production requirements (latency, memory, numerical stability) force future research to yield more efficient and debuggable compiler pathways.</p>
+<p>Recent labs are scaling contrastive learning by enlarging datasets, increasing model capacity, and integrating negatives across queues. MetaCLIP 2 (2025) pushes contrastive scaling by aligning image encoders with ever-increasing text data, reporting a 2× jump in zero-shot accuracy on OpenCLIP benchmarks thanks to a bigger queue of negatives and a more frequent momentum update. On the research frontier, Untitled (Author et al. 2026) [https://arxiv.org/pdf/2602.02381] demonstrates that adding a global consistency term to InfoNCE yields representations that transfer directly to retrieval benchmarks without any linear probe tuning. Another line of work, Untitled (Author et al. 2026) [https://arxiv.org/pdf/2602.24012], adapts contrastive objectives to multi-view video and shows that temporal negatives massively enhance alignment stability. On the engineering frontier, Meta’s internal teams now ship contrastive-pretrained encoders in production, serving recommendations at sub-20 ms p95 latency by distilling a ResNet-50-based encoder into on-device sparse networks. Stability AI’s inference stack (2024) uses quantized contrastive encoders to initialize diffusion priors, offering the same semantics at 8-bit precision while keeping a throughput of 140 tokens/sec in their multimodal ingestion pipelines. These advances illustrate that contrastive geometry is both intellectually fertile—offering clean theoretical generalizations—and practically deployable at scale with low latency.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>Can we compile universal probabilistic programs with unbounded recursion and dynamic control flow into inference engines that provide low-variance, unbiased gradient estimators <strong>without</strong> requiring hand-crafted variational guides? Current techniques either restrict control flow, handcraft importance samplers, or accept high variance. A fully automated compiler that can transform any control-flow-intensive program into a stable inference objective would collapse a major barrier between expressive modeling languages and scalable inference.</p>
-<p>Another question is how to bridge probabilistic programming and modern foundation models: can we embed a PPL trace inside a large language model so that the LLM’s latent state participates in HMC or VI updates, and what semantics guarantee consistent updates without locking the entire weight space? This might require a hybrid of amortized inference and symbolic tracing that respects the LLM’s token-level control flow.</p>
-<p>Finally, how do we give non-expert analysts programmable diagnostics for inference failure? PPLs can already log divergences, but an “AI assistant” that tells you whether the posterior collapsed, whether the trace never visited a branch due to low prior mass, or whether the sampler failed to mix across hierarchical levels would turn probabilistic programming from a niche research tool into a widely trusted engineering asset.</p>
+<p>The frontiers span both theory and systems. First, how can contrastive losses be regularized so that alignment and uniformity remain balanced even as batch sizes shrink to the regime of on-device learning, especially when negatives must be mined asynchronously? Second, can we design a projection head that automatically adapts its curvature (e.g., via meta-learning) to downstream domains while leaving the encoder stable for multiple tasks? Third, the uniformity term currently depends on pairwise distances, which grow quadratically with batch size; is there a sampled or hashed approximation that preserves the geometric properties while enabling amortized scaling to billions of negatives? Finally, the interplay between contrastive representations and generative fine-tuning remains partially unexplored: can we quantify how much contrastive geometry boosts sample quality when such encoders initialize diffusion priors, and is there a measurable boundary where the benefits taper off?</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want the optimization picture under the hood, → <a href="../variational-inference/">Variational Inference</a> unpacks the ELBO derivations—and the tricks like reparameterization gradients that PPLs compile automatically. The sampling counterpart is → <em>markov chain monte carlo</em> <!-- [[markov-chain-monte-carlo]] -->, which explains how HMC and Metropolis–Hastings work on the traces you just trusted to the runtime. To revisit the Bayesian foundations that make those traces meaningful, → <a href="../bayesian-inference/">Bayesian inference</a> grounds the discussion in prior-posterior updates and predictive checks.</p>
+<p>If you want the detailed derivation of InfoNCE and its mutual-information roots, → [[contrastive-learning]] lays that out end to end; the engineering counterpart is → [[masked-autoencoders]] which explains how the encoder learned the initial pixel-level priors before contrastive shaping; if you want to see how these representations plug into multimodal retrieval, → [[clip]] shows how contrastive latents anchor images and text.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p>The build proves that changing a single line of NumPyro model code (adding an outlier component) instantly updates a Hamiltonian Monte Carlo sampler, demonstrating the “write once, infer everywhere” decoupling from the PPL stack.</p>
-<p><strong>What you're building:</strong> A robust Bayesian linear regression with an explicit outlier mechanism trained on a synthetic noisy dataset and analyzed through HMC diagnostics in a free Google Colab notebook.<br />
-<strong>Why this is valuable:</strong> It forces you to write the generative model, add a new latent indicating corruption, and watch NumPyro automatically adjust the HMC trace without touching gradient code.<br />
-<strong>Stack:</strong><br />
-- <strong>Model:</strong> Custom NumPyro Bayesian regression with outlier indicator and Student’s t noise (no pretrained HF checkpoint).<br />
-- <strong>Dataset:</strong> <code>ydata-synthetic/gaussian-mixture</code> [https://huggingface.co/datasets/ydata-synthetic/gaussian-mixture] — synthetic mixture data you can load quickly and augment with calibrated noise.<br />
-- <strong>Framework:</strong> <code>numpyro==0.13.0</code>, <code>jax==0.4.20</code>, <code>optax==0.2.0</code>.<br />
-- <strong>Compute:</strong> Free Colab T4 (16 GB RAM, 16 GB GPU memory); training runs in ~45 minutes with 1000 warmup + 500 samples.</p>
+<p><strong>What you’re building:</strong> A mini SimCLR-style contrastive encoder trained on Fashion-MNIST whose linear probe accuracy exceeds 86% and whose representations demonstrate alignment versus uniformity after a short run.</p>
+<p><strong>Why this is valuable:</strong> You go beyond reading the theory by generating the actual representations, probing them with linear classifiers, and measuring cosine statistics to confirm your encoder forms a critic’s latent space instead of random noise—this artifact is the concrete check that lets the next arc build on a reliable base.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/facebook/resnet18">facebook/resnet18</a> encoded features with a custom 2-layer projection head (hidden 512 → output 128).
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/fashion_mnist">fashion_mnist</a> (standard training split with 60k examples).
+- <strong>Framework:</strong> PyTorch 2.1 + torchvision 0.17 + Hugging Face Datasets 2.x.
+- <strong>Compute:</strong> Free Colab T4 (16 GB GPU RAM, single GPU); expect 4–5 hours for 10 contrastive epochs and 5 linear probe epochs.</p>
 <p><strong>The recipe:</strong>
-1. Install and import: <code>pip install "jax[cpu]" numpyro optax datasets matplotlib arviz</code> (CPU mode works in Colab; switch to <code>jax[tpu]</code> only if you have TPU access).<br />
-2. Data: load the <code>ydata-synthetic/gaussian-mixture</code> dataset, resample 2,000 points, add 5% uniform outliers by replacing their targets with large noise, and standardize the features.<br />
-3. Train: define a NumPyro model with global slope/intercept priors, a Bernoulli outlier indicator that selects either Normal or Student’s t observation, and run <code>numpyro.infer.NUTS</code> with 4 chains, 1000 warmup, 500 samples; monitor the <code>rhat</code> and divergence counts reported by ArviZ.<br />
-4. Evaluate: compute posterior predictive mean squared error on a held-out split; expect RMSE &lt; 0.5 when outliers are modeled and divergence warnings drop compared to a model without the indicator.<br />
-5. What you now have: a checkpointed <code>NumPyro</code> trace collection that captures both the clean-model parameters and the outlier probabilities, ready for calibration and deployment.</p>
-<p><strong>Expected outcome:</strong> A saved NumPyro inference result (posterior means, divergences) plus a Matplotlib/ArviZ plot showing how the outlier indicator cleanly separates corrupted datapoints, proving that a single code change rewired the HMC sampler.</p>
-<ul>
-<li><strong>CS student:</strong> Run the same notebook on an RTX 4070 laptop by reducing chains to 2 and training for 500 warmup + 250 samples; this keeps the artifact identical but fits the compute budget.  </li>
-<li><strong>Applied engineer:</strong> After training, export the posterior predictive function as a <code>jax.jit</code> callable, quantize the parameters to bfloat16, and serve via NVIDIA Triton with a 50 ms p95 latency target while monitoring divergence counts as a warmup signal.  </li>
-<li><strong>Applied researcher:</strong> Swap the Student’s t likelihood for a Gaussian Process residual and test the hypothesis “a GP residual reduces posterior predictive RMSE by at least 10% compared to the baseline” on the same dataset; falsification criterion: the RMSE gap is within ±5%.  </li>
-<li><strong>Frontier researcher:</strong> Extend the notebook with recursive control flow for an unknown number of latent clusters, then investigate whether existing NumPyro gradients still have low variance or whether you need the programmable transformations from Becker et al. (2024) to stabilize the updates.</li>
-</ul>
+1. Install packages (<code>pip install torch torchvision datasets matplotlib tqdm</code>) and load the HF fashion_mnist dataset, then define a deterministic seed. Print the first sample’s shape to confirm <code>1×28×28</code>, and wrap the dataset in a <code>ContrastivePairDataset</code> that returns two augmentations per index while logging the total sample count (60,000).
+2. Define augmentations with <code>transforms.RandomResizedCrop(32, scale=(0.2, 1.0))</code>, <code>transforms.RandomHorizontalFlip(p=0.5)</code>, <code>transforms.ColorJitter(0.4,0.4,0.4,0.1)</code>, <code>transforms.RandomGrayscale(p=0.2)</code>, and normalize with Fashion-MNIST’s mean/std; these augmentations will serve as the semantic invariance approximations.
+3. Construct the encoder by taking <code>facebook/resnet18</code> (without pretrained weights), removing the final fully connected layer, and appending a projection head defined as <code>nn.Sequential(nn.Linear(512, 512), nn.ReLU(), nn.Linear(512, 128))</code>; pass a dummy batch to inspect the output shape <code>(batch_size, 128)</code> before training.
+4. Train for 10 epochs with <code>batch_size=256</code>, <code>lr=1e-3</code>, <code>weight_decay=1e-4</code>, and <code>AdamW</code> optimizer. For each iteration, compute the InfoNCE loss across the batch as described above, log the running loss, and monitor alignment/uniformity metrics; guard against NaNs by checking <code>loss.isnan().any()</code> and, if triggered, reduce augmentation strength or clip gradients instead of hard assertions.
+5. Freeze the encoder <span class="arithmatex">\(f\)</span>, add a linear probe (512 → 10), and train for 5 epochs at <code>lr=5e-3</code>. Evaluate on the HF validation split after each epoch and expect accuracy to climb past 86% if contrastive shaping worked; log the accuracy to confirm steadily increasing performance.
+6. Sample 500 positive and 500 negative pairs to compute cosine similarities of the projection outputs, then plot histograms showing the separation; you should see positive means significantly higher than negatives, indicating the alignment-cost uniformity trade-off worked.</p>
+<p><strong>Expected outcome:</strong> A Hugging Face-friendly checkpoint (encoder + projection head) whose InfoNCE loss converges to ~0.5–0.7, whose projection outputs remain <code>(batch_size, 128)</code>, and whose linear probe reports ≥ 86% accuracy, demonstrating that the learned latent geometry supports semantics better than pixel reconstruction alone.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Replace Fashion-MNIST with the <a href="https://huggingface.co/datasets/hf-internal-testing/synthetic-clothing">hf-internal-testing/synthetic-clothing</a> dataset, quantize the encoder to 8-bit with <code>torch.quantization</code>, and serve the linear probe through a FastAPI endpoint targeting 25 ms latency at p95 on an NVIDIA T4.
+- <strong>Research engineer:</strong> Reproduce Table 1 of Chen et al. (2020) on CIFAR-10 with the same architectural choices, aiming to match the reported 90% linear probe accuracy within ±2% using a 3-layer projection head and a batch size of 512; include instrumentation to log alignment/uniformity terms per epoch.
+- <strong>Applied researcher:</strong> Test the hypothesis that a cosine temperature of <span class="arithmatex">\(\tau=0.1\)</span> yields tighter alignment than <span class="arithmatex">\(\tau=0.5\)</span>; train two identical encoders for 10 epochs on Fashion-MNIST, plot alignment and uniformity over epochs, and declare the hypothesis falsified if the lower temperature leads to poorer uniformity without improving linear accuracy.</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
@@ -1488,12 +1463,12 @@ This equation states that optimizing <span class="arithmatex">\(\phi\)</span> as
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
