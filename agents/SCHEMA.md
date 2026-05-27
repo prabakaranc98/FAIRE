@@ -54,7 +54,7 @@ has_mvb: true                            # true for pivotal pages
 
 ## The non-negotiable quality bar
 
-Every `concept` page must satisfy **all three**:
+Every `concept` page must satisfy **all four**:
 
 1. **Self-contained.** A motivated reader landing cold should come away
    understanding the topic without chasing links. Substance lives ON the page.
@@ -63,6 +63,12 @@ Every `concept` page must satisfy **all three**:
    are enrichment, not skeleton.
 3. **Convergent.** Every page must hint at how the concept plugs into the
    reader's larger arc of work (the MVB or the "Where to read next" pointer).
+4. **Primer tone throughout.** Not just the first 300 words — the *whole*
+   page reads as a mentor talking through the idea. Every technical term is
+   introduced with intuition before notation; every equation lands with a
+   translation sentence on either side; no section opens with a bullet list.
+   The wiki's nudge-to-build thesis collapses if reading is hard. Enforced
+   by `agents/skills/critic-primer-quality.md` in the critic panel.
 
 If a page passes a technical check but reads like a bulleted shopping list,
 it fails. The reviewer must reject and the writer must rewrite.
@@ -422,6 +428,7 @@ The reviewer must REJECT a page if any of the following are true:
 | Any persona tag outside {applied-researcher, research-engineer, applied-ai-engineer} | Persona drift — canonical set is the 3 personas above |
 | Citation in prose without arxiv/edu/huggingface URL | Source-policy fail |
 | Hook reads as a definition rather than a question/scenario/observation | Voice fail |
+| `critic-primer-quality` score < 0.65 — page reads as definition-dump rather than mentor walk-through (equations stacked without English in between, sections opening with bullets, acronyms used before being spelled out, math notation without intuition first) | Primer-tone fail — the wiki's whole nudge-to-build thesis collapses if reading is hard |
 
 Pass = page is approvable. Send to git commit pipeline. State → `approved`.
 Fail = page is sent back to writer with the failure list. Revision count incremented.
