@@ -23,7 +23,7 @@
     
     
       
-        <title>Policy Gradient - Frontier Wiki</title>
+        <title>Policy gradient - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Policy Gradient
+              Policy gradient
             
           </span>
         </div>
@@ -1207,13 +1207,128 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">advantage-estimation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">grpo</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">llm-alignment</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">policy-gradient</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rlhf</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="policy-gradient">Policy Gradient<a class="headerlink" href="#policy-gradient" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">06 · Reinforcement Learning</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="policy-gradient">Policy gradient<a class="headerlink" href="#policy-gradient" title="Permanent link">&para;</a></h1>
+<p>Imagine grading a ten-step math proof by handing the student a single pass/fail slip at the end. The only feedback the student receives is whether the whole chain of inference succeeded, not which step was inconsistent or how they could change their next line. That is the reality classic policy-gradient algorithms face when they work with long chains of token generation in LLMs: every token is credited by the final reward signal, which makes variance skyrocket and training fragile unless elaborate critics or baselines are introduced. As the frontier shifts to instruct-tuned and RL-aligned models, the question becomes not “Can we estimate the gradient of the cumulative reward?” but “Can we deliver relative, token-level feedback that keeps the signal local enough to tinker with the policy every few tokens?” This page traces that shift, explains how modern policy gradients trade critics and trajectory-level advantages for token-wise estimates and KL regularization, and leaves you ready to train a GRPO loop on a free Colab instance so you can feel this stability difference in your own project.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Policy gradient lies at the heart of reinforcement learning because it directly optimizes the parameters of a stochastic policy using the gradient of expected return. In bandit-style settings the gradient is tractable, but once actions become sequences—like the stream of tokens an LLM emits—the variance of the log-likelihood gradients overwhelms training unless some form of credit assignment is introduced. Traditionally, the RL canon responded with critic networks: estimate the value of a trajectory, subtract that baseline from the return, and hope the reduced variance outweighs the bias. That dependency is acceptable in simulated robotics when thousands of episodes can be collected, but RLHF and instruction tuning do not afford such luxury; human preferences are expensive and sequences run into dozens of steps. The territory this page covers is the modern variant of policy gradient that abandoned monolithic critics in favor of relative, token-level advantage updates regularized by KL constraints—what the field now calls critic-free policy gradients. It borrows from classic ascent analysis but reinterprets every move through the lens of LLM alignment, where policy drift, token entropy, and KL rollback control become the levers that keep reasoning stable. How does this actually work? The next section digs into the math of token-level averages, entropy-aware rewards, and the group-relative policy optimization (GRPO) algorithms people now deploy on large language models.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The starting point remains the fundamental policy gradient theorem: the update proceeds in the direction that increases the log probability of actions that led to higher-than-expected returns. Formally, one writes the optimization objective as
+[
+\nabla_\theta J(\theta) = \mathbb{E}<em>{\tau \sim \pi</em>\theta}\left[ \sum_{t=1}^T \nabla_\theta \log \pi_\theta(a_t \mid s_t) A_t^\pi \right]
+]</p>
+<p>where <span class="arithmatex">\(\pi_\theta\)</span> is the policy parameterized by <span class="arithmatex">\(\theta\)</span>, <span class="arithmatex">\(\tau\)</span> denotes a trajectory <span class="arithmatex">\((s_1, a_1, \dots, s_T, a_T)\)</span> sampled from the current policy, <span class="arithmatex">\(A_t^\pi\)</span> is the advantage at timestep <span class="arithmatex">\(t\)</span> under policy <span class="arithmatex">\(\pi\)</span>, <span class="arithmatex">\(s_t\)</span> is the current state (in the case of LLMs the prefix of generated tokens), and <span class="arithmatex">\(a_t\)</span> is the next token. The advantage <span class="arithmatex">\(A_t^\pi\)</span> measures how much better the taken action was compared to the expected value of the state. Classic implementations estimated it via a critic network and Monte Carlo rollouts, but in long-horizon token generation the variance of a single scalar advantage per prefix swallows the training signal. With critic-free gradients, we instead build a relative advantage that lives at the token level.</p>
+<h3 id="token-level-relative-advantage">Token-level relative advantage<a class="headerlink" href="#token-level-relative-advantage" title="Permanent link">&para;</a></h3>
+<p>Token-level relative advantage replaces the trajectory-wide return with a reward that reflects the immediate impact of a token relative to a baseline derived from other tokens in the same context. We define <span class="arithmatex">\(\delta_t = r_t - \bar{r}_t\)</span> where <span class="arithmatex">\(r_t\)</span> is the reward associated with the token generated at step <span class="arithmatex">\(t\)</span> (for example, the change in preference score attributed to inserting or omitting that token) and <span class="arithmatex">\(\bar{r}_t\)</span> is a local baseline constructed from tokens that share a similar prefix or token identity. The update becomes
+[
+\nabla_\theta J_{\text{rel}}(\theta) = \mathbb{E}<em>{\tau \sim \pi</em>\theta}\left[ \sum_{t=1}^T \nabla_\theta \log \pi_\theta(a_t \mid s_t) \delta_t \right]
+]</p>
+<p>where the baseline <span class="arithmatex">\(\bar{r}_t\)</span> shrinks the variance by canceling out the broad-scale reward that every token experiences equally, leaving only the relative advantage that is indicative of the specific token choice. The critical difference for LLMs is that computing <span class="arithmatex">\(\delta_t\)</span> does not require a critic network: it leverages group statistics or adaptive entropy baselines computed from the same generation batch, avoiding the instability of training a separate value head.</p>
+<p>This formulation is the foundation of Group Relative Policy Optimization (GRPO). GRPO gathers tokens into groups (e.g., tokens sharing the same prompt or generated under the same temperature), computes the group mean reward, and assigns advantages relative to that mean. The policy gradient then nudges the model to increase the likelihood of tokens that performed better than their group mates while keeping the overall distribution stable.</p>
+<h3 id="kl-regularization-and-entropy-rewards">KL regularization and entropy rewards<a class="headerlink" href="#kl-regularization-and-entropy-rewards" title="Permanent link">&para;</a></h3>
+<p>Stability also demands explicit controls on how far the policy drifts from its initialization, especially when the reward signal is sparse. KL regularization plays that role. We augment the objective with both forward and reverse KL terms, leading to the KL-regularized RPG formulation in Yu et al. (2025) <a href="https://arxiv.org/abs/2505.17508">arxiv:2505.17508</a>. The augmented objective is
+[
+\mathcal{L}<em _pi__theta="\pi_\theta" _sim="\sim" _tau="\tau">{\text{KL}}(\theta) = -\mathbb{E}</em> \,|\, \pi_\theta\right)
+]}\left[ \sum_{t=1}^T \log \pi_\theta(a_t \mid s_t) \delta_t \right] + \lambda_{\text{F}} \text{KL}\left(\pi_\theta \,|\, \pi_{\text{ref}}\right) + \lambda_{\text{R}} \text{KL}\left(\pi_{\text{ref}</p>
+<p>where <span class="arithmatex">\(\pi_{\text{ref}}\)</span> is a frozen reference model (often the pretrained LM), <span class="arithmatex">\(\lambda_{\text{F}}\)</span> and <span class="arithmatex">\(\lambda_{\text{R}}\)</span> are coefficients for the forward and reverse KL, and <span class="arithmatex">\(\delta_t\)</span> is the token-level relative advantage. The forward KL term prevents the updated policy from straying too far, while the reverse KL encourages the policy to keep its mass concentrated on high-likelihood sequences, thus preserving coherence. The symmetry ensures that even without a critic, the policy neither collapses to deterministic degeneracy nor drifts into low-quality, high-reward regions. </p>
+<p>To provide a smoother reward for individual tokens, GTPO/GRPO-S (arXiv:2508.04349) reinterprets policy entropy as a dynamic reward signal: higher entropy indicates that the model is still exploring, so the reward encourages tokens that maintain an optimal level of uncertainty, preventing overconfidence in the face of noisy preferences. The token-level reward becomes
+[
+r_t = \alpha \cdot \text{pref}<em>t + \beta \cdot \mathcal{H}\left(\pi</em>\theta(\cdot \mid s_t)\right)
+]</p>
+<p>where <span class="arithmatex">\(\alpha\)</span> scales the preference-based reward <span class="arithmatex">\(\text{pref}_t\)</span> and <span class="arithmatex">\(\beta\)</span> scales the entropy <span class="arithmatex">\(\mathcal{H}\)</span>. The policy gradient remains relative, but the reward now tracks both preference signal and entropy, allowing the model to allocate exploration pressure adaptively.</p>
+<h3 id="critic-free-convergence-with-offline-value-separation">Critic-free convergence with offline value separation<a class="headerlink" href="#critic-free-convergence-with-offline-value-separation" title="Permanent link">&para;</a></h3>
+<p>One lingering concern is convergence without a critic. Gao et al. (2025) introduced the <span class="arithmatex">\(A^\star\)</span>-PO architecture where offline value estimation is entirely separated from online policy updates, showing that the policy gradient can converge by minimizing the KL divergence between the current policy and the distribution implied by the offline value function. The offline estimator only needs to provide a high-quality ordering of trajectories, not exact values, so it can be trained using rewards gathered from human preferences or synthetic evaluators. The online policy, using the token-level relative advantages described above, simply performs regularized gradient steps to match the offline ranking. This two-phase separation drastically reduces the compute needed for high-variance critic training because the offline estimator can be trained less frequently and on smaller data budgets.</p>
+<p>Mathematically, the convergence argument around <span class="arithmatex">\(A^\star\)</span>-PO leverages the policy update 
+[
+\theta_{k+1} = \arg\min_\theta \text{KL}\left(\pi_\theta \,|\, \pi_{\text{offline}}^{(k)} \right)
+]</p>
+<p>where <span class="arithmatex">\(\pi_{\text{offline}}^{(k)}\)</span> encapsulates the trajectory ranking produced by the offline value function at iteration <span class="arithmatex">\(k\)</span>. The token-level gradient acts as a stochastic gradient oracle for this KL minimization, and as the offline estimator improves, the policy follows suit. Importantly, the gradients only ever require the relative ordering, which is what GRPO provides.</p>
+<h3 id="convergence-safeguards">Convergence safeguards<a class="headerlink" href="#convergence-safeguards" title="Permanent link">&para;</a></h3>
+<p>Even with these mechanisms, we still need theoretical assurances, particularly for algorithms derived from PPO. “An Approximate Ascent Approach to Prove Convergence of PPO” (2026) <a href="https://arxiv.org/html/2602.03386">arxiv:2602.03386</a> introduces an ascent lemma that bounds the deviation between successive policies under clipped objectives. The same analysis carries over to RLHF-style updates: the token-level advantage can be treated as a clipped surrogate objective where <span class="arithmatex">\(\delta_t\)</span> is bounded, and the KL regularizers act as the trust-region constraint. The lemma shows that as long as the step size keeps the KL divergence below a threshold and the token-level reward is well-behaved, the expected return improves. This is the theoretical backbone that lets us train critic-free policy gradients with the same confidence as PPO but without the critic.</p>
+<p>Practical training still demands careful scheduling of <span class="arithmatex">\(\lambda_{\text{F}}\)</span>, <span class="arithmatex">\(\lambda_{\text{R}}\)</span>, entropy weights, and group sizes. Most teams use a small number of tokens per group (e.g., those sharing the same prompt batch) and compute moving averages of their preference (or synthetic reward) to derive the relative advantage. The gradient update then becomes a standard PyTorch backward pass, but the pre- and post-processing steps—advantage normalization, KL penalty tuning, entropy reward scheduling—are what keep training stable.</p>
+<h3 id="token-timing-and-inference">Token timing and inference<a class="headerlink" href="#token-timing-and-inference" title="Permanent link">&para;</a></h3>
+<p>One final mechanism worth highlighting is how these updates operate during inference. Instead of gathering a whole trajectory, the training loop collects partial sequences (few tokens) and recomputes the relative advantage after each batch. This permits “token-level” updates where only the last few generated tokens require a gradient step, enabling asynchronous parallel updates even when tokens are generated sequentially on a single device.</p>
+<p>The combination of relative advantages, KL penalties, and entropy incentives is what allows “critic-free” policy gradient training to work in practice. The next section surveys how these components appear in current research and engineering deployments.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Researchers are already coalescing around these ideas. The GRPO-S variant from arXiv:2508.04349 pairs token-level entropy rewards with dynamic KL clamps to produce models that learn more gracefully from sparse human preference data. Their benchmarks on synthetic reasoning tasks—Countdown, Climb, and synthetic math proofs—show that GRPO-S achieves higher reward per token than PPO baselines with critics. On the theoretical front, the ascent proof for PPO from arXiv:2602.03386 provides the convergence certificate that let teams replace critics without risking divergence.</p>
+<p>The anonymous 2603.21621 preprint introduces a token-level advantage regularizer that explicitly penalizes deviations from the reference policy’s token distribution, effectively replicating a per-token trust region. Combined with the KL-regularized RPG derivations of Yu et al. (2025), these tools let practitioners maintain tight control over drift while still allowing the model to explore beneficial but rare reasoning paths.</p>
+<p>On the engineering side, Meta’s “Understanding Reinforcement Learning for Model Training and Future Directions with GRAPE” article documents how teams are building tooling to support these token-level gradients in large-scale alignment stacks. The Meta system pipelines preference data into a GRPO-style optimizer, monitors per-token KL drift, and orchestrates large language models that are fine-tuned end-to-end on billions of tokens. NVIDIA’s engineering blog on NeMo-RL and Megatron-Core reports production RL training across thousands of GPUs with PPO/GRPO — the blog details how tensor and pipeline parallelism keep tokens-per-second throughput high while enforcing the KL/entropy constraints that keep policy gradients stable. These deployments illustrate an emerging engineering frontier: scaling critic-free, token-level policy gradients to commercial LLMs while the theoretical frontier chases convergence guarantees for these new loss functions. </p>
+<p>The anonymous 2604.08865 preprint explores using relative token advantages to fine-tune policies for dialogue style, while 2602.01156 adds another convergence perspective by showing how repeated relative updates behave like mirror descent with a Bregman divergence tied to the KL penalty. Together, they sketch a research frontier where theory and practice finally agree: relative, token-level policy gradients can be both efficient and provably convergent.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we mathematically guarantee convergence of token-level relative advantage updates when applied to diffusion-based language models, where generation occurs in parallel and repeated refinement rather than strict autoregressive sequencing? The standard KL-based proofs rely on the chain rule for autoregressive log-likelihoods, so new techniques are needed for dLLMs.</p>
+<p>Can we design a unified regularizer that controls both forward and reverse KL drift adaptively based on reward sparsity, removing the need for manual tuning of <span class="arithmatex">\(\lambda_{\text{F}}\)</span> and <span class="arithmatex">\(\lambda_{\text{R}}\)</span> while still providing the ascent guarantee of PPO? Evidence so far is heuristic, and a principled derivation would guide automatic scheduling.</p>
+<p>How do token-level relative advantages generalize to multi-agent preference settings, where rewards are noisy and conflicting? Existing GRPO variants assume a single reward oracle per batch; extending relative feedback to multiple, possibly contradictory reviewers is still unsolved.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want to see how these ideas relate to traditional actor-critic dynamics, → <a href="../actor-critic/">Actor-Critic</a> explains how baseline functions shape advantages and why critic avoidance is so disruptive. To understand the particular challenges of aligning LLMs via human feedback, → [[rlhf]] documents the data pipelines and reward models that feed into today’s policy gradients. For the next conceptual shift beyond sequential tokens, → [[diffusion-llms]] explores how parallel generation invites new regularizers and sampling procedures that will soon demand their own gradient estimates.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that a critic-free, token-level GRPO loop can be implemented on a free Colab instance and still stabilize training on a synthetic reasoning game, demonstrating how relative advantages and KL penalties work in practice.</p>
+<p><strong>What you're building:</strong> a bare-bones GRPO training loop that fine-tunes <code>qwen-2.5-1.5b-instruct</code> on a synthetic Countdown math task using token-level relative advantages and KL regularization.<br />
+<strong>Why this is valuable:</strong> you will touch every part of the concept—reward shaping, relative advantage normalization, entropy monitoring, and KL rollback—while observing how each term affects loss stability.<br />
+<strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/Qwen/Qwen-2.5-1.5B-Instruct">Qwen-2.5-1.5B-Instruct</a> — 15k+ downloads, instruction-tuned checkpoint with RLHF-ready tokenizer.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/math-synthetic/countdown">math-synthetic/countdown</a> (create the Countdown task locally by generating random math operations constrained to reach a target within 6 steps).
+- <strong>Framework:</strong> PyTorch 2.1 + Hugging Face <code>transformers</code> 4.45 + <code>accelerate</code> 0.25 for distributed-friendly training.
+- <strong>Compute:</strong> Colab T4 (16GB VRAM) with mixed precision, ~3 hours for full run.</p>
+<p><strong>The recipe:</strong>
+1. Install <code>pip install torch torchvision accelerate transformers datasets</code> and load <code>QwenForCausalLM</code> with <code>trust_remote_code=True</code>, enabling past-key-value caching for fast sampling.
+2. Build the Countdown dataset by generating random integer sets and measurement tokens, tokenizing both the prompt (“Reach 43 using 6 steps: …”) and the model completion; store per-token metadata for rewards computed by a synthetic validator that scores partial solutions.
+3. During training, compute the token-level reward <span class="arithmatex">\(r_t\)</span> as the difference between the validator score before and after generating token <span class="arithmatex">\(a_t\)</span>, subtract the group mean baseline per prompt batch to create <span class="arithmatex">\(\delta_t\)</span>, and clip <span class="arithmatex">\(\delta_t\)</span> to <span class="arithmatex">\([-1, +1]\)</span> for stability before calculating <span class="arithmatex">\(\nabla_\theta \log \pi_\theta(a_t \mid s_t)\)</span>.
+4. Add KL penalties after each forward pass: compute the forward KL <span class="arithmatex">\(\text{KL}(\pi_\theta \,\|\, \pi_{\text{ref}})\)</span> and reverse KL <span class="arithmatex">\(\text{KL}(\pi_{\text{ref}} \,\|\, \pi_\theta)\)</span>, scale them by <span class="arithmatex">\(\lambda_{\text{F}}=0.02\)</span> and <span class="arithmatex">\(\lambda_{\text{R}}=0.01\)</span>, and backpropagate the sum with the token-level advantage loss.
+5. Evaluate by measuring the average token advantage and the synthetic validator reward per prompt; expect the relative advantage loss to stabilize below 0.2 and cumulative reward to approach the threshold set by perfect Countdown solutions.</p>
+<p><strong>Expected outcome:</strong> a checkpoint that can reproduce the synthetic Countdown solutions with high reward per token while maintaining KL drift &lt;0.05, demonstrating the benefit of token-level GRPO.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same recipe on an RTX 4070 by reducing sequence length to 128 tokens and using gradient checkpointing; this keeps training fast while still collecting token-level relative advantage statistics.</li>
+<li><strong>Applied engineer:</strong> Package the resulting model behind a vLLM endpoint, quantize it with bitsandbytes 8-bit, and ensure the KL penalties keep inference coherence at p50 latency &lt; 600 ms on an L4 instance.</li>
+<li><strong>Applied researcher:</strong> Treat the entropy reward coefficient <span class="arithmatex">\(\beta\)</span> as a hypothesis variable—test whether doubling <span class="arithmatex">\(\beta\)</span> while keeping <span class="arithmatex">\(\lambda\)</span> fixed leads to better reaching rates on more complex Countdown instances (&gt;= 8 steps).</li>
+<li><strong>Frontier researcher:</strong> Probe the open question about non-autoregressive diffusion LLMs by rephrasing the reward signal as the difference between start and end states after a diffusion denoising pass and measuring whether the relative advantage updates still converge.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
