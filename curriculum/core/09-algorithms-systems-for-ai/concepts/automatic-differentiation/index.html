@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/probabilistic-programming/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/automatic-differentiation/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>Probabilistic programming - Frontier Wiki</title>
+        <title>Automatic Differentiation - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#probabilistic-programming" class="md-skip">
+        <a href="#automatic-differentiation" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Probabilistic programming
+              Automatic Differentiation
             
           </span>
         </div>
@@ -555,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../" class="md-nav__link">
         
   
   
@@ -1241,42 +1241,28 @@
       
       
       
-        <span class="md-tag">bayesian-inference</span>
+        <span class="md-tag">backpropagation</span>
       
     
       
       
       
       
-        <span class="md-tag">hmc</span>
+        <span class="md-tag">compilers</span>
       
     
       
       
       
       
-        <span class="md-tag">numpyro</span>
+        <span class="md-tag">gradients</span>
       
     
       
       
       
       
-        <span class="md-tag">probabilistic-programming</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">pyro</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">uncertainty</span>
+        <span class="md-tag">optimization</span>
       
     
   </nav>
@@ -1286,48 +1272,56 @@
   
 
 
-<h1 id="probabilistic-programming">Probabilistic programming<a class="headerlink" href="#probabilistic-programming" title="Permanent link">&para;</a></h1>
-<p>Imagine you are tasked with estimating global CO2 emissions from a constellation of noisy, drifting satellite sensors. This is a classic inverse problem: you observe the data, but you need to infer the hidden physical processes—atmospheric wind patterns, sensor bias, and measurement error—that generated it. You could spend months manually deriving the complex Bayesian updates, which are the mathematical steps used to refine your beliefs about parameters as new data arrives. Alternatively, you could write a simple Python simulator that describes the physical process of gas diffusion and sensor observation, and then hand that simulator to a compiler that automatically runs the process in reverse to pinpoint the emission sources. This is the core promise of probabilistic programming: it decouples the generative story of data from the grueling math of inference. By using stochastic code—code that incorporates random variables to represent uncertainty—you can define domain knowledge and watch a posterior distribution emerge without ever re-implementing the underlying Bayesian machinery yourself.</p>
+<h1 id="automatic-differentiation">Automatic Differentiation<a class="headerlink" href="#automatic-differentiation" title="Permanent link">&para;</a></h1>
+<p>When you need to optimize a complex system—whether it is a neural network with billions of parameters or a flight control algorithm for a spacecraft—you need gradients. If you rely on numerical finite-difference approximations, where you perturb inputs by a small amount to estimate the slope, you face catastrophic round-off errors and high computational costs. If you attempt to solve this using symbolic differentiation, the branching logic and iterative loops inherent in modern software trigger "expression explosion," where the symbolic representation grows exponentially in size, rendering it intractable. Automatic differentiation (AD) bypasses both traps by instrumenting the code itself. It treats the algorithm as a composition of elementary operations, applying the chain rule systematically to transform any executable program into its own exact derivative engine. By doing so, AD provides the precise gradients necessary for high-stakes optimization without the instability of numerical methods or the bloat of symbolic expansion.</p>
 <h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>Traditional machine learning often forces practitioners to map inputs to outputs using rigid, off-the-shelf architectures. Probabilistic programming (PPL) shifts the focus to the generative process: "What latent story produced the observed data?" This approach belongs to the family of model-based machine learning, a philosophy championed by Bishop (2013) <a href="https://www.cs.columbia.edu/~blei/fogm/2020F/readings/Bishop2013.pdf">Model-Based Machine Learning</a>, which argues that models should be tailored to the specific structure of the domain rather than forcing data into a generic algorithm. When a new latent variable is added to a probabilistic program, there is no need to derive a fresh optimizer; the generative code is updated, and the inference engine adapts.</p>
-<p>This field sits at the intersection of statistics, programming language theory, and high-performance computing. It borrows the rigor of Bayesian statistics while adopting the modularity of modern software engineering. The PPL stack typically consists of a modeling language—where priors, likelihoods, and stochastic dependencies are defined—and an inference backend that performs the heavy lifting of calculating the posterior. By treating inference as a programmable artifact, PPL allows for swapping between Hamiltonian Monte Carlo (HMC), variational inference, or sequential Monte Carlo without modifying the model definition. The consequence is a workflow where the modeler focuses on the "what" of the data generation, while the compiler handles the "how" of the reasoning.</p>
-<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The mechanism of a probabilistic program is best understood as a transformation of a stochastic trace. When a model is written in a PPL, it defines a joint distribution <span class="arithmatex">\(p(\mathbf{x}, \mathbf{z})\)</span> over observed data <span class="arithmatex">\(\mathbf{x}\)</span> and latent variables <span class="arithmatex">\(\mathbf{z}\)</span>. The program executes as a series of stochastic operations, where each random variable is sampled from a prior distribution. The inference engine then seeks to compute the posterior <span class="arithmatex">\(p(\mathbf{z} \mid \mathbf{x})\)</span>, which is often intractable due to the high-dimensional integral in the denominator of Bayes' rule.</p>
-<p>To make this tractable, modern PPLs like Pyro or NumPyro leverage the reparameterization trick to perform variational inference. This trick allows us to differentiate through random samples, which is necessary for gradient-based optimization. We move from the intractable posterior to an optimization objective by minimizing the Evidence Lower Bound (ELBO):</p>
-<div class="arithmatex">\[ \mathcal{L}(\phi) = \mathbb{E}_{q_\phi(\mathbf{z})} [\log p(\mathbf{x}, \mathbf{z}) - \log q_\phi(\mathbf{z})] \]</div>
-<p>where <span class="arithmatex">\(\phi\)</span> represents the variational parameters being optimized, <span class="arithmatex">\(p(\mathbf{x}, \mathbf{z})\)</span> is the joint probability of the data and latents, and <span class="arithmatex">\(q_\phi(\mathbf{z})\)</span> is the variational distribution. The term on the left captures the expected log-likelihood of the data under the model, while the term on the right penalizes the divergence between the approximation and the true posterior. Tran et al. (2017) <a href="https://www.cs.columbia.edu/~blei/papers/TranHoffmanSaurausBrevdoMurphyBlei2017.pdf">Deep Probabilistic Programming</a> demonstrated that by using neural networks to parameterize <span class="arithmatex">\(q_\phi\)</span>, these models can scale to high-dimensional datasets.</p>
-<p>The inference engine often employs Hamiltonian Monte Carlo (HMC) to explore the parameter space. HMC treats the negative log-posterior as a potential energy landscape and simulates the motion of a particle moving through this space using Hamiltonian dynamics. By calculating the gradient of the log-posterior with respect to the latent variables, the sampler can take large, informed steps. When the model is discrete or non-differentiable, the engine must fall back on techniques like surrogate modeling or program analysis to prune the search space, a frontier explored by Bowers et al. (2019) <a href="https://ar5iv.labs.arxiv.org/html/1908.02062">Functional probabilistic programming for scalable Bayesian modelling</a>, which showed that these methods can speed up inference by orders of magnitude.</p>
-<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>The state-of-the-art in probabilistic programming has moved from academic prototypes to production-grade platforms. Early systems like BUGS (Spiegelhalter et al., 1996) and Stan (Carpenter et al., 2017) established the feasibility of MCMC, but modern frameworks like Pyro (Bingham et al., 2019) and NumPyro have integrated deep learning primitives directly into the PPL workflow. The 2017 work by Tran et al. (2017) <a href="https://arxiv.org/pdf/1701.03757">arxiv:1701.03757</a> was a watershed moment, showing that variational inference could be unified with deep learning.</p>
-<p>Today, the engineering frontier is defined by systems that can handle massive, streaming data. Google's TFX platform <a href="https://research.google/pubs/tfx-a-tensorflow-based-production-scale-machine-learning-platform/">TFX: A TensorFlow-Based Production-Scale Machine Learning Platform</a> and specialized Bayesian neural network implementations (such as those described in Google's research on compositional Bayesian models <a href="https://research.google/blog/autobnn-probabilistic-time-series-forecasting-with-compositional-bayesian-neural-networks/">AutoBNN</a>) demonstrate that probabilistic methods can scale to production environments where uncertainty quantification is a safety requirement. The research frontier is currently focused on "compiling" inference; rather than running a generic sampler, the PPL compiler analyzes the program's structure to generate specialized, high-performance code, as seen in recent work on inference compilation for simulators (Bowers et al., 2025).</p>
-<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>Despite these advances, several fundamental questions remain. First, how can we automatically scale gradient-free inference to high-dimensional, non-differentiable simulators—such as global climate models—where Hamiltonian Monte Carlo fails due to discontinuous parameter spaces? Second, can we develop a universal "inference compiler" that automatically selects the optimal inference strategy based on the model's structural properties? Finally, is there a way to guarantee the convergence of variational inference in non-conjugate models without relying on the restrictive mean-field assumption? These are the barriers preventing probabilistic programming from becoming the default paradigm for scientific discovery.</p>
-<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want the probabilistic foundation, → [[bayesian-inference]] gives the likelihood-based perspective that PPLs automate. The engineering counterpart is → [[variational-inference]] explaining how we approximate the posterior when exact calculation is impossible. For the next paradigm in scalable modeling, → [[probabilistic-graphical-models]] generalizes the structural dependencies that PPLs compile into efficient execution traces.</p>
-<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A Bayesian regression model with outlier detection using NumPyro.</p>
-<p><strong>Why this is valuable:</strong> It models heavy-tailed noise that standard MSE-based regression ignores, providing robust estimates in the presence of outliers.</p>
-<p><strong>Stack:</strong>
-- <strong>Model:</strong> <code>numpyro</code> (JAX-based)
-- <strong>Dataset:</strong> <code>scikit-learn</code> synthetic regression dataset (10% outliers)
-- <strong>Framework:</strong> <code>numpyro</code> 0.15.0, <code>jax</code> 0.4.30
-- <strong>Compute:</strong> Free Google Colab (T4 GPU)</p>
-<p><strong>The recipe:</strong>
-1. Install dependencies: <code>pip install numpyro jax jaxlib scikit-learn matplotlib</code>.
-2. Generate synthetic data: Create a linear relationship <span class="arithmatex">\(y = 2x + 1\)</span> and inject 10% Gaussian noise with heavy-tailed Cauchy outliers.
-3. Define the model: Use <code>numpyro.sample</code> to define priors for slope <span class="arithmatex">\(\beta\)</span> and intercept <span class="arithmatex">\(\alpha\)</span>, and a Student-t likelihood to handle outliers.
-4. Run inference: Use <code>NUTS</code> (No-U-Turn Sampler) with 1000 warmup steps and 1000 samples. Set <code>jax.random.PRNGKey(0)</code> for reproducibility.
-5. Evaluate: Compare the posterior mean of <span class="arithmatex">\(\beta\)</span> against the ground truth; plot the posterior distribution using <code>arviz</code>.</p>
-<p><strong>Expected outcome:</strong> A posterior distribution plot showing the true slope recovered despite the presence of outliers.</p>
+<p>Automatic differentiation sits at the intersection of compiler theory and numerical analysis. It is the engine that powers modern deep learning, yet it is fundamentally distinct from the symbolic manipulation found in tools like Mathematica or the finite-difference approximations used in classical engineering. The core problem AD answers is how to compute the derivative of a function <span class="arithmatex">\(f: \mathbb{R}^n \to \mathbb{R}^m\)</span> defined by a computer program, where the program may contain arbitrary control flow, loops, and recursion.</p>
+<p>The shape of the answer is a transformation of the program's execution trace. Rather than approximating the slope of a function by perturbing inputs, AD decomposes the program into a sequence of elementary operations—additions, multiplications, and transcendental functions—whose derivatives are known. By applying the chain rule to this sequence, AD computes exact derivatives at a cost proportional to the original function evaluation. This family of techniques is broadly categorized into forward-mode and reverse-mode differentiation. Forward-mode AD propagates derivatives alongside the function values, making it efficient for functions with few inputs and many outputs. Reverse-mode AD, which is the backbone of backpropagation, propagates gradients from the output back to the inputs, making it the standard for functions with many inputs and a single scalar output, such as the loss functions in neural networks. This concept appears throughout the [[09-algorithms-systems-for-ai]] arc, serving as the foundational layer for training any differentiable model.</p>
+<h2 id="core-concepts">Core concepts<a class="headerlink" href="#core-concepts" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>CS student:</strong> Compare the posterior width of a model with Gaussian noise vs. Student-t noise; success = 20% reduction in bias on outlier-heavy data.</li>
-<li><strong>Applied engineer:</strong> Export the model parameters to a JSON file and implement a lightweight JAX-based inference function for production serving; success = &lt;10ms latency on CPU.</li>
-<li><strong>Applied researcher:</strong> Compare the ELBO of a Student-t model vs. Gaussian; success = statistically significant improvement in log-likelihood on held-out data.</li>
-<li><strong>Frontier researcher:</strong> Implement a custom gradient-free proposal distribution for a non-differentiable simulator using <code>numpyro.infer.mcmc.MCMC</code>; success = convergence on a 10D parameter space.</li>
+<li><strong>Computational Graph:</strong> A directed acyclic graph representing the sequence of operations in a program, where nodes are operations and edges are data dependencies.</li>
+<li><strong>Forward-Mode AD:</strong> A mode of differentiation that computes the derivative of the output with respect to a single input by propagating tangents through the graph.</li>
+<li><strong>Reverse-Mode AD:</strong> A mode of differentiation that computes the gradient of a scalar output with respect to all inputs by propagating adjoints backward through the graph.</li>
+<li><strong>Perturbation Confusion:</strong> A common failure mode in nested differentiation where the derivative of a derivative is incorrectly computed due to variable shadowing.</li>
+<li><strong>Define-by-Run:</strong> An AD paradigm where the computational graph is constructed dynamically during the execution of the program (e.g., early PyTorch).</li>
+<li><strong>Define-by-Transform:</strong> An AD paradigm where the program is analyzed and transformed into a static graph or optimized IR before execution (e.g., JAX).</li>
+</ul>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The mechanism of automatic differentiation relies on the observation that any computer program can be decomposed into a sequence of primitive operations. If we represent this sequence as a computational graph, each node corresponds to an elementary operation, and each edge represents the flow of data.</p>
+<p>Consider a function <span class="arithmatex">\(y = f(x)\)</span> composed of a sequence of intermediate variables <span class="arithmatex">\(v_i\)</span>. We define the function as a series of assignments <span class="arithmatex">\(v_{i} = \phi_i(v_{i-1}, \dots, v_{i-k})\)</span>, where <span class="arithmatex">\(\phi_i\)</span> is an elementary operation. In forward-mode AD, we compute the tangent <span class="arithmatex">\(\dot{v}_i = \frac{\partial v_i}{\partial x}\)</span>. By the chain rule, we have <span class="arithmatex">\(\dot{v}_i = \sum_{j &lt; i} \frac{\partial \phi_i}{\partial v_j} \dot{v}_j\)</span>, where <span class="arithmatex">\(\frac{\partial \phi_i}{\partial v_j}\)</span> is the partial derivative of the operation <span class="arithmatex">\(\phi_i\)</span> with respect to its <span class="arithmatex">\(j\)</span>-th argument. This approach is highly efficient when the number of inputs is small.</p>
+<p>Reverse-mode AD proceeds in two phases: a forward pass to compute function values and a backward pass to compute gradients. We define the adjoint <span class="arithmatex">\(\bar{v}_i = \frac{\partial y}{\partial v_i}\)</span>, representing the sensitivity of the output <span class="arithmatex">\(y\)</span> to the intermediate variable <span class="arithmatex">\(v_i\)</span>. During the backward pass, we compute <span class="arithmatex">\(\bar{v}_j = \sum_{i: j \in \text{parents}(i)} \bar{v}_i \frac{\partial \phi_i}{\partial v_j}\)</span>. This summation accumulates contributions of all downstream operations. As Baydin et al. (2018) <a href="https://arxiv.org/abs/1502.05767">https://arxiv.org/abs/1502.05767</a> detail, the choice between these modes depends on the dimensionality of the input and output spaces.</p>
+<p>To handle nested derivatives, Pearlmutter &amp; Siskind (2008) <a href="https://engineering.purdue.edu/~qobi/papers/toplas2008.pdf">https://engineering.purdue.edu/~qobi/papers/toplas2008.pdf</a> introduced a formal variable-tagging mechanism to prevent perturbation confusion. Furthermore, Werbos (1990) <a href="https://axon.cs.byu.edu/~martinez/classes/678/Papers/Werbos_BPTT.pdf">https://axon.cs.byu.edu/~martinez/classes/678/Papers/Werbos_BPTT.pdf</a> established that backpropagation through time is a specific application of reverse-mode AD. For a comprehensive guide on implementation, see the step-by-step introduction by Wang et al. (2024) <a href="https://arxiv.org/html/2402.16020v2">https://arxiv.org/html/2402.16020v2</a>, and for the automation of nested matrix derivatives, refer to the work by Tesfatsion <a href="https://faculty.sites.iastate.edu/tesfatsi/archive/tesfatsi/AutomationNestedMatrixDer.KTP.pdf">https://faculty.sites.iastate.edu/tesfatsi/archive/tesfatsi/AutomationNestedMatrixDer.KTP.pdf</a>.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The state of the art has shifted from simple graph-based implementations to compiler-integrated systems. Modern frameworks like JAX <a href="https://github.com/google/jax">https://github.com/google/jax</a> utilize a "define-by-transform" approach, operating on functional intermediate representations to enable operator fusion and XLA-based kernel compilation. This evolution represents a continuous trajectory from the early manual instrumentation of code to modern systems that treat differentiation as a first-class compiler transformation.</p>
+<p>In production, AD is the backbone of large-scale training at companies like Meta, Google, and OpenAI, where it enables the training of models with trillions of parameters. The engineering frontier is currently dominated by the challenge of "just-in-time" differentiation, where the computational graph is generated and optimized on the fly to minimize memory footprint. As discussed in the survey by Biggs (2000) <a href="https://people.cs.vt.edu/~asandu/Public/Qual2011/Optim/Biggs_2000_AD.pdf">https://people.cs.vt.edu/~asandu/Public/Qual2011/Optim/Biggs_2000_AD.pdf</a>, the integration of AD into the compiler stack is essential for achieving performance that rivals hand-optimized C++ code.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Despite the maturity of AD, several fundamental questions remain. First, can compilers automatically generate and fuse optimal, hardware-specific GPU kernels for dynamic, control-flow-heavy reverse-mode AD without relying on manual engineering? Second, how can we formalize the debugging of AD engines? When a gradient is incorrect, it is often impossible to determine whether the error lies in the user's code, the AD transformation, or the compiler optimization. Finally, is there a universal representation for AD that can bridge the gap between high-level functional languages and low-level hardware accelerators?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation, → [[score-matching]] gives the likelihood-free training perspective that AD compiles down to. The engineering counterpart is → [[flash-attention]] explaining how the operations within the computational graph are made fast enough to be trained at scale. For the next paradigm in program transformation, → [[flow-matching]] generalizes the differentiation process to arbitrary continuous paths, moving beyond the discrete steps of traditional backpropagation.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you're building:</strong> A dual-number class that computes exact derivatives of arbitrary scalar functions.</p>
+<p><strong>Why this is valuable:</strong> It forces you to implement the chain rule manually, revealing how AD "instruments" code.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> Custom Python Class
+- <strong>Dataset:</strong> Synthetic data (e.g., <code>numpy.linspace</code>)
+- <strong>Framework:</strong> Pure Python + NumPy
+- <strong>Compute:</strong> CPU (instant)</p>
+<p><strong>The recipe:</strong>
+1. Define a <code>Dual</code> class with <code>__add__</code>, <code>__mul__</code>, and <code>__pow__</code> methods that handle the <span class="arithmatex">\(a + b\epsilon\)</span> arithmetic, where <span class="arithmatex">\(\epsilon^2 = 0\)</span>.
+2. Implement the chain rule for elementary functions (sin, cos, exp) within the <code>Dual</code> class.
+3. Create a simple function: <span class="arithmatex">\(f(x) = x^2 + \sin(x)\)</span>.
+4. Use your <code>Dual</code> class to compute the derivative at <span class="arithmatex">\(x=2.0\)</span>.
+5. Verify your result against a finite-difference implementation using a small <span class="arithmatex">\(\Delta x\)</span>.</p>
+<p><strong>Expected outcome:</strong> A derivative value that matches within numerical precision for the tested functions.</p>
+<ul>
+<li><strong>CS student:</strong> Implement the <code>Dual</code> class and use it to differentiate a polynomial; verify the derivative is exact.</li>
+<li><strong>Applied engineer:</strong> Use <code>torch.autograd.grad</code> to profile the memory usage of a 7B parameter model's backward pass; identify the "activation checkpointing" threshold.</li>
+<li><strong>Applied researcher:</strong> Test if forward-mode AD is faster than reverse-mode for a function with 100 inputs and 100 outputs; plot the crossover point.</li>
+<li><strong>Frontier researcher:</strong> Implement a "second-order" AD engine by nesting your <code>Dual</code> class; test if it correctly computes the Hessian of a simple quadratic.</li>
 </ul>
 <hr />
 <blockquote>
-<p><em>If this build worked for you — a ⭐ on the <a href="https://github.com/pyro-ppl/numpyro">NumPyro GitHub</a> is the best way to support the community.</em></p>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>
 
 
