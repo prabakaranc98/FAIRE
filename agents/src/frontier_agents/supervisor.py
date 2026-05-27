@@ -216,6 +216,28 @@ def run_supervisor(
         if verbose:
             print(f"[supervisor] Updated sprint with {min(len(actions), sprint_cap)} items")
 
+    # 4.7. ARC AUTO-SPIN — runs AFTER the queue rewrite so the arc lines
+    # survive. For each qualifying track, append a canonical arc-candidate.
+    # The helper itself enforces guardrails (>=3 substantive concepts, >=4
+    # named steps on disk, <2 active arcs, not already queued).
+    budget_mode = obs.budget.mode if obs is not None else "full"
+    if not dry_run and budget_mode != "paused":
+        try:
+            from .retrospective import _apply_arc_proposal
+            core_dir = docs_path / "curriculum" / "core"
+            if core_dir.exists():
+                arc_candidates = _suggest_track_arcs(core_dir)
+                spun = 0
+                for arc_params in arc_candidates:
+                    result = _apply_arc_proposal({}, arc_params, docs_path)
+                    if result.startswith("applied"):
+                        spun += 1
+                if verbose and spun:
+                    print(f"[supervisor] Arc auto-spin queued {spun} arcs")
+        except Exception as e:
+            if verbose:
+                print(f"[supervisor] Arc auto-spin failed: {e}")
+
     # 5. REPORT — write to docs/system/supervisor.md
     _write_report(report, docs_path)
     if verbose:
@@ -382,28 +404,8 @@ def _build_action_list(
                 reason=f"Audit critical: {issue.check} — {issue.message[:80]}",
             ))
 
-    # Priority 2.5: Auto-spin arcs on tracks that meet the guardrails.
-    # The retro also proposes arcs, but it only fires once per cycle AFTER
-    # the sprint completes — meaning any arc it queues is consumed only on
-    # the FOLLOWING cycle. By auto-spinning at supervisor time, arcs land
-    # within the same cycle they become eligible. The same `_apply_arc_proposal`
-    # helper (with its three guardrails: >=3 substantive concepts, >=4 of
-    # the named steps exist, <2 active arcs) is reused for safety.
-    # Skipped in paused mode to conserve budget.
-    if budget_mode != "paused":
-        try:
-            from .retrospective import _apply_arc_proposal, _is_substantive_concept
-            core_dir = docs_path / "curriculum" / "core"
-            if core_dir.exists():
-                # For each track, build a candidate arc if it qualifies and none
-                # are already queued or on disk.
-                arc_candidates = _suggest_track_arcs(core_dir)
-                for arc_params in arc_candidates:
-                    # The helper itself enforces the guardrails and is idempotent;
-                    # a "skipped" return is fine and silent.
-                    _apply_arc_proposal({}, arc_params, docs_path)
-        except Exception:
-            pass  # never break the supervisor on arc-spin errors
+    # (Arc auto-spin moved to run_supervisor() — it runs AFTER _update_sprint
+    # writes the queue, otherwise the appended arc lines get wiped on rewrite.)
 
     # Priority 3: Stub pages that haven't been attempted (new content gaps)
     # Skipped entirely when budget is "paused"
