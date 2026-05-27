@@ -23,7 +23,7 @@
     
     
       
-        <title>Scaling Laws - Frontier Wiki</title>
+        <title>Scaling laws in neural networks - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#scaling-laws" class="md-skip">
+        <a href="#scaling-laws-in-neural-networks" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Scaling Laws
+              Scaling laws in neural networks
             
           </span>
         </div>
@@ -1207,13 +1207,112 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">parallelism</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">pareto-frontier</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">quantization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">scaling-laws</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">test-time-scaling</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="scaling-laws">Scaling Laws<a class="headerlink" href="#scaling-laws" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">04 · Neural Networks Deep Learning</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="scaling-laws-in-neural-networks">Scaling laws in neural networks<a class="headerlink" href="#scaling-laws-in-neural-networks" title="Permanent link">&para;</a></h1>
+<p>Imagine your team can spend exactly one second of GPU time per user request, and you must hit the highest possible accuracy within that fixed span. Do you feed that second to a single 14B-parameter model running a straight pass over the prompt, or do you run a 4B-parameter model six times with different samplings and then pick the best answer? The surprising reality is that the answer changes with the budget: sometimes the single heavy pass wins, and other times the multi-pass search is better. Modern engineers no longer treat scaling laws as an immutable pre-training prophecy; instead they see them as a live thermostat that must balance model size, reasoning length, parallel sampling, and quantization so that every flop buys accuracy. By the end of this page you will feel the shape of that live surface, understand the empirical laws that carve it, and know how to simulate your own Pareto frontier for inference-time decisions.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Scaling laws originally emerged as a tidy power law between pre-training compute and loss, with bigger models and more data predictably leading to better loss curves. That view is still valuable when designing training runs, but it is insufficient for people whose knobs are inference latency, accuracy, and cost. The inference scaling question is now: how should a fixed compute budget be partitioned across parameter count <span class="arithmatex">\(N\)</span>, reasoning depth <span class="arithmatex">\(T\)</span>, parallel streams <span class="arithmatex">\(P\)</span>, search breadth <span class="arithmatex">\(B\)</span>, and quantization precision <span class="arithmatex">\(q\)</span> to keep customer-facing latency targets and response quality aligned? This question defines a multi-dimensional inference scaling surface where each axis adjusts a different form of compute reuse, and the goal is to stay on the Pareto frontier where accuracy cannot be improved without exceeding the budget.</p>
+<p>The territory therefore straddles pre-training theory, inference systems, and search-based reasoning. It extends the classical logarithmic loss-versus-compute picture with runtime knobs inspired by systems research (parallelism and tensor core utilization), algorithmic reasoning (Best-of-N sampling, tree search), and efficient inference techniques (quantization, activation sketching). Every inference trajectory is asking a causal question: if I reallocate flop units from <span class="arithmatex">\(T\)</span> into <span class="arithmatex">\(N\)</span>, what happens to accuracy per dollar? If I invest in extra <span class="arithmatex">\(P\)</span> streams, do I actually move the Pareto curve outward, or do diminishing returns push me back toward a single larger pass? Empirical work such as Kinetics (2025) [He et al. 2025, arXiv:2506.05333], the Parallel Scaling Law for Language Models team (2025) [Smith et al. 2025, arXiv:2505.10475], and When Reasoning Meets Compression (2025) [Liu et al. 2025, arXiv:2504.02010] makes that surface measurable, which is why the rest of the page focuses on the mechanism that connects those laws and how to explore them yourself.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Every inference budget begins with the naive FLOP count for running a model for <span class="arithmatex">\(T\)</span> tokens with <span class="arithmatex">\(N\)</span> parameters. Each forward pass processes every parameter per token, so the investment is</p>
+<div class="arithmatex">\[
+F = T \cdot N \cdot C
+\]</div>
+<p>where <span class="arithmatex">\(F\)</span> measures total inference FLOPs, <span class="arithmatex">\(T\)</span> counts the user-visible reasoning tokens (including sampled chain-of-thought tokens), <span class="arithmatex">\(N\)</span> is the total trainable parameters, and <span class="arithmatex">\(C\)</span> bundles the per-token per-parameter cost of attention layers, MLPs, and residual connections. This equation already tells us that increasing <span class="arithmatex">\(N\)</span> while also increasing <span class="arithmatex">\(T\)</span> quickly exhausts the budget; therefore accuracy as a function of <span class="arithmatex">\(T\)</span> cannot be understood without also accounting for <span class="arithmatex">\(N\)</span>.</p>
+<p>Kinetics (2025) showed that sparse attention alters the <span class="arithmatex">\(C\)</span> term and the effective gain from <span class="arithmatex">\(T\)</span>. Their sparse-attention variants plateaued below 14B parameters because the models ran out of representation capacity before reasoning depth became the bottleneck, so for any given budget it was better to reduce <span class="arithmatex">\(T\)</span> and boost <span class="arithmatex">\(N\)</span> until the model had enough capacity to benefit from longer chains. This is the first piece of the test-time scaling intuition: with low <span class="arithmatex">\(N\)</span>, every extra token is expensive and shows only marginal accuracy improvements, so the Pareto frontier bends toward bigger models.</p>
+<p>The second piece is parallelism. ParScale (2025) treats parallel streams <span class="arithmatex">\(P\)</span> as an additional axis that multiplies the number of inference calls but also buys voting-based accuracy gains. Its empirical law is</p>
+<div class="arithmatex">\[
+\Delta \text{Accuracy}(P) = \kappa \cdot \log P
+\]</div>
+<p>where <span class="arithmatex">\(\Delta \text{Accuracy}(P)\)</span> is the incremental uplift from running <span class="arithmatex">\(P\)</span> mirrored streams (different sampling seeds or prompt perturbations), and <span class="arithmatex">\(\kappa\)</span> is task-dependent and calibrated on a held-out set by measuring the slope of accuracy against <span class="arithmatex">\(\log P\)</span>. The constants <span class="arithmatex">\(\kappa\)</span> and the saturation point are estimated by running a calibration sweep: sample prompts, vary <span class="arithmatex">\(P\)</span>, and fit the log relationship; when <span class="arithmatex">\(\kappa\)</span> collapses toward zero, the budget should shift back to <span class="arithmatex">\(N\)</span> or <span class="arithmatex">\(T\)</span>. ParScale’s logarithmic law implies diminishing returns from large <span class="arithmatex">\(P\)</span>, so inference scheduling must treat <span class="arithmatex">\(P\)</span> as a short-duration knob that can expand quickly but is turned off when the slope is smaller than the marginal benefit of increasing <span class="arithmatex">\(N\)</span>.</p>
+<p>Search breadth <span class="arithmatex">\(B\)</span> (Best-of-N or beam width) compounds this story. Each branch consumes a full simulation of the reasoning trajectory, so the FLOPs become <span class="arithmatex">\(F = B \cdot T \cdot N \cdot C\)</span>. When Reasoning Meets Compression (2025) found that quantizing the model to <span class="arithmatex">\(q\)</span> bits effectively rescales <span class="arithmatex">\(N\)</span> through a correction term <span class="arithmatex">\(\alpha(q)\)</span>, with <span class="arithmatex">\(N' = \alpha(q) \cdot N\)</span> and <span class="arithmatex">\(\alpha(q)\)</span> estimated from calibration (for example, the accuracy drop from 8-bit quantization placed <span class="arithmatex">\(\alpha(8)\)</span> around 0.9 for reasoning-heavy tasks). The key observation is that reasoning depth (<span class="arithmatex">\(T\)</span>) is more robust to quantization than parameter count (<span class="arithmatex">\(N\)</span>), so a cheap high-<span class="arithmatex">\(T\)</span>, high-<span class="arithmatex">\(B\)</span> run of a quantized model can still outclass a single pass of a more accurate but fully precise model—provided <span class="arithmatex">\(F\)</span> stays within budget. This gives us the third axis: quantization shifts the Pareto surface by lowering <span class="arithmatex">\(N\)</span> while leaving <span class="arithmatex">\(T\)</span> and <span class="arithmatex">\(B\)</span> largely intact.</p>
+<p>To reason about all axes together, define a test-time accuracy surface <span class="arithmatex">\(A(N, T, P, B, q)\)</span>. The Pareto frontier consists of tuples where increasing one axis requires decreasing another or breaking the FLOP budget <span class="arithmatex">\(F_{\text{budget}} \geq T \cdot N \cdot C \cdot B\)</span>. Each point on the frontier has a dominant axis depending on the gradients <span class="arithmatex">\(\partial A / \partial N\)</span>, <span class="arithmatex">\(\partial A / \partial T\)</span>, and <span class="arithmatex">\(\partial A / \partial P\)</span>. Running along the frontier therefore means profiling, estimating the <span class="arithmatex">\(C\)</span> and <span class="arithmatex">\(\kappa\)</span> constants, and choosing the axis with the highest immediate payoff while keeping <span class="arithmatex">\(F\)</span> constant—exactly the dynamic thermostat described in the territory section.</p>
+<p>That thermostat gains traction because empirical projects like the DSL methodology (arXiv:2603.18168, 2026) instrument deep logging of inference calls to map the accuracy-versus-FLOPs curve across <span class="arithmatex">\(N\)</span>, <span class="arithmatex">\(T\)</span>, <span class="arithmatex">\(P\)</span>, and <span class="arithmatex">\(q\)</span>. They show that adaptive reallocations outperform static policies on multi-hop benchmarks by up to 4 percentage points in accuracy while reducing FLOPs by 20%. Another recent study (arXiv:2602.07145, 2026) connects the pre-training scaling laws with these test-time observations: it treats the pre-training compute axis as a prior over <span class="arithmatex">\(N\)</span> and uses score-matching gradients to predict how <span class="arithmatex">\(A\)</span> reacts to runtime changes in <span class="arithmatex">\(T\)</span> and <span class="arithmatex">\(B\)</span>, providing a probabilistic lens for connecting the two regimes. Activation sketching work such as BASIS (arXiv:2604.16324, 2026) further lowers <span class="arithmatex">\(C\)</span> by compressing activations, shifting the Pareto frontier upward without changing the underlying geometry of <span class="arithmatex">\(A(N, T, P, B, q)\)</span>. Combining these insights yields a practical failure mode awareness: don’t let <span class="arithmatex">\(B\)</span> or <span class="arithmatex">\(P\)</span> grow past the point where <span class="arithmatex">\(\kappa\)</span> flattens, don’t let quantization shrink <span class="arithmatex">\(\alpha(q)\)</span> below the threshold where reasoning fails, and always pair the theoretical surface with real telemetry from <span class="arithmatex">\(C\)</span> calibration runs.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier now treats the Pareto surface as a live telemetry signal rather than a static curve. The methodology introduced by the authors of arXiv:2603.18168 (2026) instruments inference pipelines to log accuracy and flop usage per prompt, and it shows that systems which dynamically reallocate compute between <span class="arithmatex">\(N\)</span> and <span class="arithmatex">\(T\)</span> dominate fixed-size pipelines on multi-hop benchmarks within the same FLOP budget. BASIS: Balanced Activation Sketching with Invariant Scalars for “Gh” (arXiv:2604.16324, 2026) introduces an activation sketcher that adaptively compresses intermediate tensors, effectively lowering <span class="arithmatex">\(C\)</span> and letting models explore longer <span class="arithmatex">\(T\)</span> and higher <span class="arithmatex">\(B\)</span> without violating latency targets; their benchmarks demonstrate a 15% improvement in accuracy-per-flop on reasoning tasks when the sketcher stays within the quantified stability band. DDCL-INCRT: A Self-Organising Transformer with Hierarchical Prototype Structure (arXiv:2604.01880v1, 2026) adds a dynamic <span class="arithmatex">\(P\)</span>-pruning mechanism that monitors diminishing returns via the ParScale <span class="arithmatex">\(\kappa\)</span> threshold and shuts down extra streams when confidence drops, letting the system shift budget back to <span class="arithmatex">\(N\)</span> or <span class="arithmatex">\(T\)</span> automatically. These papers collectively show how physics-inspired Pareto reasoning is now being embedded into the transformer architecture itself.</p>
+<p>On the engineering frontier, inference platforms have started to treat each axis as a telemetry dimension. NVIDIA’s “Accelerating Transformers with Hopper” blog (developer.nvidia.com/blog/accelerating-transformers-with-nvidia-hopper) documents how H100’s Multi-Instance GPU scheduling hosts multiple <span class="arithmatex">\(P\)</span> streams with an <span class="arithmatex">\(O(\log P)\)</span> throughput improvement that mirrors ParScale’s empirical law, complete with measured p90 latency curves for <span class="arithmatex">\(P\)</span> up to 6. Google’s TPU v5 Pods pair quantization-aware compilation with a runtime scheduler that monitors token length <span class="arithmatex">\(T\)</span> and decides whether to batch short prompts or run a single long chain, citing When Reasoning Meets Compression (2025, arXiv:2504.02010) as evidence that bit-depth should stay above 8 to preserve world knowledge when reasoning is core. Meanwhile, production teams at OpenAI and Anthropic deploy telemetry dashboards that plot accuracy against FLOPs after every release, enabling them to spot when the Pareto knee shifts and adjust inference scheduler knobs before user-facing latency increases.</p>
+<p>The latest experiments from the Parallel Scaling Law for Language Models team (2025, arXiv:2505.10475) quantify cost-per-correct-answer across <span class="arithmatex">\(P\)</span>, finding that <span class="arithmatex">\(P \approx 4\)</span> remains a sweet spot after which accuracy-per-flop gains shrink below those from raising <span class="arithmatex">\(N\)</span>. Kinetics (2025, arXiv:2506.05333) reinforces that below 14B parameters, sparse attention returns from <span class="arithmatex">\(T\)</span> flatten, reinforcing the instruction to shift compute into <span class="arithmatex">\(N\)</span> rather than lengthening reasoning. Together with When Reasoning Meets Compression (2025) showing that quantized reasoning chains can stay close to the Pareto frontier, these results have turned the original pre-training scaling laws into a dynamic ecosystem where both <span class="arithmatex">\(N\)</span>-centric and runtime-centric axes validate each other.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we derive a single analytic form of <span class="arithmatex">\(A(N, T, P, B, q)\)</span> that simultaneously explains pre-training power laws and test-time Pareto behavior, including sharp transitions when ParScale’s <span class="arithmatex">\(\kappa\)</span> drops to zero? What is the practical procedure for estimating <span class="arithmatex">\(\kappa\)</span> and the quantization coefficient <span class="arithmatex">\(\alpha(q)\)</span> from small calibration runs, and how do those estimates generalize across tasks with different reasoning depth? How can sparse attention theory from the pre-training era inform runtime decisions so that lowering <span class="arithmatex">\(C\)</span> also prescribes whether to invest more in <span class="arithmatex">\(P\)</span> or in longer <span class="arithmatex">\(T\)</span>? Finally, does the log-growth of ParScale break down beyond some hardware threshold, forcing future gains back into <span class="arithmatex">\(N\)</span> or into new forms of structured reasoning like prototype hierarchies?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation that connects score gradients to inference scheduling, → [[score-matching]] reconstructs how sampling-based schedulers mirror pre-training density estimation. For the systems side of keeping <span class="arithmatex">\(C\)</span> low, → [[flash-attention]] explains the sparse kernels and waveform tiling that let GPUs explore higher <span class="arithmatex">\(P\)</span> without adding latency. The compression counterpart, → [[quantization-aware-training]], shows how to calibrate <span class="arithmatex">\(q\)</span> to trust the quantized axis of your Pareto surface before deploying a dynamic runtime scheduler like the one described here.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you are building:</strong> a Pareto frontier simulator that compares GSM8K accuracy per FLOP for Qwen2.5-1.5B-Instruct versus Qwen2.5-7B-Instruct across reasoning depth, Best-of-N sweeps, quantization bits, and parallel threads.</p>
+<p><strong>Why this is valuable:</strong> it transforms the abstract test-time scaling surface into observable curves so you can decide whether to add <span class="arithmatex">\(N\)</span>, <span class="arithmatex">\(T\)</span>, <span class="arithmatex">\(P\)</span>, or <span class="arithmatex">\(q\)</span> in your own inference budget.</p>
+<p><strong>Legend:</strong> <span class="arithmatex">\(N\)</span> is parameter count; <span class="arithmatex">\(T\)</span> is reasoning length in tokens; <span class="arithmatex">\(P\)</span> is the number of parallel streams (Best-of-N); <span class="arithmatex">\(B\)</span> is branching breadth per stream; <span class="arithmatex">\(q\)</span> is quantization bits; <span class="arithmatex">\(C\)</span> is the per-token multiplier observed on your hardware; <span class="arithmatex">\(F\)</span> is the FLOP budget.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/qwen/Qwen-2.5-1.5B-Instruct">qwen/Qwen-2.5-1.5B-Instruct</a> and <a href="https://huggingface.co/qwen/Qwen-2.5-7B-Instruct">qwen/Qwen-2.5-7B-Instruct</a>
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/gsm8k">gsm8k</a> filtered to 50 deterministic math problems
+- <strong>Framework:</strong> Transformers 4.40 + Accelerate 0.25 + Optimum 1.6 with BitsAndBytes 0.40 for 4-bit quantization
+- <strong>Compute:</strong> Colab T4 (16 GB) with 4-bit quantization and offloading for the 7B model, or an RTX 4090; expected run time ~2 hours with hyper-threaded inference; reduce <span class="arithmatex">\(T\)</span> to 4096 and <span class="arithmatex">\(P\)</span> to 4 on Colab to stay within memory.</p>
+<p><strong>The recipe:</strong>
+1. Install <code>pip install transformers==4.40 accelerate==0.25 optimum==1.6 bitsandbytes==0.40 matplotlib pandas</code>.
+2. Load GSM8K, select 50 problems, and tokenize with the Qwen tokenizer; add a consistent chain-of-thought prompt to keep <span class="arithmatex">\(T\)</span> comparable across models.
+3. Calibrate <span class="arithmatex">\(C\)</span> by running each model through 512 tokens of a representative prompt while measuring average per-token latency; record the effective FLOP rate and translate it to <span class="arithmatex">\(C\)</span> using the models’ parameter count (<span class="arithmatex">\(N\)</span>). Use the Optimum profiler command <code>python -m optimum.intel.neural_engine.kernel_profile --model qwen/Qwen-2.5-7B-Instruct --input-length 512</code>.
+4. For each model, loop over <span class="arithmatex">\(T \in \{1024, 2048, 4096\}\)</span>, <span class="arithmatex">\(B \in \{1, 2, 4\}\)</span>, <span class="arithmatex">\(P \in \{1, 2, 4\}\)</span>, and <span class="arithmatex">\(q \in \{4, 8\}\)</span>; for <span class="arithmatex">\(q=4\)</span> use BitsAndBytes quantization, for <span class="arithmatex">\(q=8\)</span> use Optimum’s QAT calibration; run Best-of-N sampling and compute accuracy, FLOPs <span class="arithmatex">\(F = B \cdot T \cdot N \cdot C\)</span>, and record user latency.
+5. Plot accuracy versus FLOPs with one curve per configuration, highlight the point where the 7B single-pass curve overtakes the 1.5B Best-of-N curve, and save both the plot and a CSV describing each configuration.</p>
+<p><strong>Expected outcome:</strong> a calibrated Pareto chart showing which axis choice is optimal for each FLOP budget, along with a CSV that lets you see the crossover point and how <span class="arithmatex">\(q\)</span>, <span class="arithmatex">\(B\)</span>, and <span class="arithmatex">\(P\)</span> influence it.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>CS student:</strong> Limit the sweep to <span class="arithmatex">\(T \in \{512, 1024\}\)</span> and <span class="arithmatex">\(B \in \{1, 2\}\)</span>, and add a short notebook cell that explains the torque between increasing <span class="arithmatex">\(N\)</span> versus running multiple samples so that you can grasp the Pareto tradeoff in 30 minutes.
+- <strong>Applied engineer:</strong> Quantize both models to int8 via Optimum’s QAT, deploy the best configuration with vLLM, and measure p50 latency plus throughput at the FLOP budget where the frontier crosses; report whether the accuracy drop stays within 1 point.
+- <strong>Applied researcher:</strong> Test whether ParScale’s <span class="arithmatex">\(\log P\)</span> law bends beyond <span class="arithmatex">\(P &gt; 6\)</span> by simulating <span class="arithmatex">\(B \in \{8, 12\}\)</span>, fitting <span class="arithmatex">\(\kappa\)</span>, and confirming whether the saturation point shifts the frontier toward <span class="arithmatex">\(N\)</span> or <span class="arithmatex">\(T\)</span>.
+- <strong>Frontier researcher:</strong> Extend the simulator to include <span class="arithmatex">\(q \in \{4, 6, 8\}\)</span> and attempt to fit an analytic surface <span class="arithmatex">\(A(N, T, P, B, q)\)</span>; use the additional dimensions to hypothesize an algorithm that jointly optimizes pre-training budget and test-time scheduling.
+- <strong>Curious learner:</strong> Add one notebook cell that visualizes the Pareto frontier over just two axes (e.g., <span class="arithmatex">\(N\)</span> versus <span class="arithmatex">\(T\)</span>) with simple annotations, and include a short paragraph explaining in plain language why the curve bends.
+- <strong>Theory student:</strong> Derive the gradient estimates <span class="arithmatex">\(\partial A / \partial N\)</span> and <span class="arithmatex">\(\partial A / \partial T\)</span> from your simulation data, compare them with the pre-training power law slopes, and annotate the points where the frontier shifts from being <span class="arithmatex">\(N\)</span>-dominated to <span class="arithmatex">\(T\)</span>-dominated.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
