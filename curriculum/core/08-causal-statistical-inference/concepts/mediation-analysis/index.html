@@ -23,7 +23,7 @@
     
     
       
-        <title>Mediation Analysis - Frontier Wiki</title>
+        <title>Mediation analysis - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Mediation Analysis
+              Mediation analysis
             
           </span>
         </div>
@@ -1207,13 +1207,119 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">causal-effects</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">causal-inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">interpretability</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">llm</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">mediation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">representation-learning</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="mediation-analysis">Mediation Analysis<a class="headerlink" href="#mediation-analysis" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">08 · Causal Statistical Inference</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="mediation-analysis">Mediation analysis<a class="headerlink" href="#mediation-analysis" title="Permanent link">&para;</a></h1>
+<p>Imagine prompting a large language model with “explain your steps,” then quietly shuffling or removing each chain-of-thought token before it reaches the user, yet the model still answers correctly. The performance boost from “think step-by-step” is real, and so is the paradox: if the reasoning tokens can be corrupted and the final answer still holds, are those tokens doing anything? Mediation analysis is the mathematical instrument that turns that observation into a testable theory. It treats each intermediate token or latent state as a candidate mediator and asks what portion of the total causal effect on the answer actually routes through that mediator. By the end of this page you will understand how to describe that routing rigorously, why the assumptions matter in practice, and how to build a toolchain that measures Natural Direct and Indirect Effects on synthetic LLM interventions using statsmodels and DoWhy.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Mechanism is the question mediation analysis was invented to answer. Traditional causal inference tells us what happens when we flip a treatment—for example, whether presenting a chain-of-thought prompt increases LLM accuracy. Mediation analysis goes further by decomposing that improvement into pieces: the part that flows directly from the prompt to the answer, and the part that filters through the intermediate representation, such as generated reasoning tokens, retrieved facts, or an internal hidden layer. This decomposition is what makes causal inference explanatory rather than descriptive; it allows researchers to attribute outcomes not just to a treatment but to the pathways the treatment opens. The mathematical language that makes this precise is a structural causal model (SCM), where nodes represent random variables and edges represent deterministic structural equations plus noise. The mediator lives on one of these edges, and mediation analysis answers whether the edge is merely decorative or the actual conduit for the effect we observe. Positioning itself between the counterfactual machinery of SCMs and the practical estimators of econometrics, mediation analysis borrows from both: it uses counterfactual definitions to describe what “direct” and “indirect” mean, and it relies on regression or representation learning to estimate those quantities from data. How does it actually work? The mechanism is best understood by tracing the decomposition inside a SCM, writing the effects in terms of nested counterfactuals, and then checking whether those nested counterfactuals can be identified from observed data.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Mediation analysis begins inside a structural causal model with three types of nodes: a treatment <span class="arithmatex">\(A\)</span> (for example, whether we prompt the model with chain-of-thought), a mediator <span class="arithmatex">\(M\)</span> (the tokens the model emits when reasoning), and an outcome <span class="arithmatex">\(Y\)</span> (the final answer accuracy). Each node is a deterministic function of its parents and an independent noise term; <span class="arithmatex">\(M = f_M(A, U_M)\)</span> and <span class="arithmatex">\(Y = f_Y(A, M, U_Y)\)</span>, where <span class="arithmatex">\(U_M\)</span> and <span class="arithmatex">\(U_Y\)</span> are exogenous noises. The treatment <span class="arithmatex">\(A\)</span> is manipulated, so there exists <span class="arithmatex">\(Y_a\)</span>, the outcome we would observe if we forced <span class="arithmatex">\(A\)</span> to take value <span class="arithmatex">\(a\)</span>, and <span class="arithmatex">\(M_a\)</span> is the mediator under that intervention. The total causal effect (TE) of changing the prompt from <span class="arithmatex">\(a'\)</span> to <span class="arithmatex">\(a\)</span> is
+[
+TE = \mathbb{E}[Y_a - Y_{a'}],
+]
+where expectations are over all randomness in the SCM, including unobserved noise. This TE captures every path from <span class="arithmatex">\(A\)</span> to <span class="arithmatex">\(Y\)</span>, but it does not tell us whether the effect transits through <span class="arithmatex">\(M\)</span>. To disentangle the pathways, Pearl (2014) defines two nested counterfactuals: the natural direct effect (NDE) modifies <span class="arithmatex">\(A\)</span> while holding the mediator at the value it would have taken under <span class="arithmatex">\(a'\)</span>, and the natural indirect effect (NIE) changes the mediator while holding the treatment fixed at <span class="arithmatex">\(a\)</span>. Their definitions are
+[
+NDE = \mathbb{E}[Y_{a, M_{a'}} - Y_{a', M_{a'}}], \quad NIE = \mathbb{E}[Y_{a, M_{a}} - Y_{a, M_{a'}}],
+]
+where <span class="arithmatex">\(Y_{a,m}\)</span> is the outcome when <span class="arithmatex">\(A\)</span> is fixed to <span class="arithmatex">\(a\)</span> and <span class="arithmatex">\(M\)</span> is fixed to <span class="arithmatex">\(m\)</span>, and <span class="arithmatex">\(M_{a'}\)</span> is the mediator under treatment <span class="arithmatex">\(a'\)</span>. These expressions are called “cross-world” because they compare outcomes across hypothetical worlds where <span class="arithmatex">\(A\)</span> and <span class="arithmatex">\(M\)</span> take values that could not coexist under a single intervention. Their sum recovers the total effect: <span class="arithmatex">\(TE = NDE + NIE\)</span>, which is true whenever the mediator is well defined.</p>
+<h3 id="identification-via-the-causal-mediation-formula">Identification via the causal mediation formula<a class="headerlink" href="#identification-via-the-causal-mediation-formula" title="Permanent link">&para;</a></h3>
+<p>To compute NDE and NIE from data, Pearl (2014) derives the causal mediation formula, which rewrites the cross-world expectation as an integral over observed variables:
+[
+\mathbb{E}[Y_{a, M_{a'}}] = \sum_m \mathbb{E}[Y \mid A=a, M=m] \Pr(M=m \mid A=a').
+]
+In this expression, <span class="arithmatex">\(A\)</span> and <span class="arithmatex">\(M\)</span> are the observed treatment and mediator; <span class="arithmatex">\(Y_{a,m}\)</span> is replaced by the conditional expectation of <span class="arithmatex">\(Y\)</span> given <span class="arithmatex">\(A=a\)</span> and <span class="arithmatex">\(M=m\)</span>, while <span class="arithmatex">\(M_{a'}\)</span> is replaced by the distribution of <span class="arithmatex">\(M\)</span> under <span class="arithmatex">\(A=a'\)</span>. This substitution is valid when we assume sequential ignorability: conditional on pre-treatment covariates <span class="arithmatex">\(X\)</span>, there are no unobserved confounders of <span class="arithmatex">\(A\)</span> and <span class="arithmatex">\(M\)</span> nor of <span class="arithmatex">\(M\)</span> and <span class="arithmatex">\(Y\)</span>, i.e., <span class="arithmatex">\(A \perp\!\!\!\perp M_{a'} \mid X\)</span> and <span class="arithmatex">\(M \perp\!\!\!\perp Y_{a,m} \mid A,X\)</span>. Annotated, <span class="arithmatex">\(\mathbb{E}[Y \mid A=a, M=m]\)</span> is a regression that predicts the outcome from treatment and mediator, and <span class="arithmatex">\(\Pr(M=m \mid A=a')\)</span> is a mediator model that estimates what mediator value would have arisen without intervention. Sequential ignorability is strong, so we typically condition on a rich set of covariates <span class="arithmatex">\(X\)</span>—for LLM reasoning this might include prompt difficulty, token frequency, or model temperature.</p>
+<p>An alternative, advocated by the interventionist approach, avoids cross-world counterfactuals altogether by defining mediation through randomized manipulations of the mediator itself. “An Interventionist Approach to Mediation Analysis” (2020) reframes the problem as estimating the effect of <span class="arithmatex">\(A\)</span> on <span class="arithmatex">\(Y\)</span> when we intervene on <span class="arithmatex">\(A\)</span> and then either allow or block the mediator from changing. That work introduces the idea of using auxiliary experiments—randomizing the mediator or its observed proxies—to isolate the direct effect. For example, to approximate <span class="arithmatex">\(Y_{a,M_{a'}}\)</span>, we can hold the mediator constant at its value under <span class="arithmatex">\(a'\)</span> while applying treatment <span class="arithmatex">\(a\)</span> by reusing cached reasoning tokens or by training a simulator that freezes the mediator embeddings. The interventionist formulation clarifies which assumptions are testable: if we can randomize <span class="arithmatex">\(M\)</span> while keeping <span class="arithmatex">\(A\)</span> fixed, we can estimate the same contrast as the cross-world definition without invoking untestable independence between unseen noise terms. That design also makes it easier to think about LLM interventions where we actively replace the mediator stream with synthetic tokens to simulate “no reasoning” conditions.</p>
+<h3 id="estimation-and-representation-learning-for-mediators">Estimation and representation learning for mediators<a class="headerlink" href="#estimation-and-representation-learning-for-mediators" title="Permanent link">&para;</a></h3>
+<p>In many applications the mediator is not a scalar but a high-dimensional latent representation—think of the continuous attention patterns or the hidden activations inside a transformer layer. The mediator models <span class="arithmatex">\(\mathbb{E}[Y \mid A=a, M=m]\)</span> and <span class="arithmatex">\(\Pr(M=m \mid A=a')\)</span> therefore must learn functions over these vectors. Learning representations for counterfactual inference (Shalit et al. 2016) [https://arxiv.org/pdf/1605.03661] provides a template: build a neural encoder that maps covariates and treatments to a balancing representation <span class="arithmatex">\(Z\)</span>, and then regress the outcome on <span class="arithmatex">\(Z\)</span> with a regularizer that penalizes discrepancies between the treatment groups in <span class="arithmatex">\(Z\)</span>. Translating this idea to mediation analysis means encoding the mediator into <span class="arithmatex">\(Z\)</span> so that the downstream regression is stable across hypothetical interventions. The representation learning step reduces variance in high-dimensional mediators, making it feasible to plug them into the mediation formula without hand-crafted features.</p>
+<p>Disentangled Representation for Causal Mediation Analysis (2023) [https://arxiv.org/html/2302.09694] pushes this idea further: instead of encoding everything into a single embedding, it learns separate latent factors for the direct and indirect pathways via variational inference. The encoder outputs two distributions, one that controls the mediator’s effect on the outcome and another that models confounding variation. During training the architecture alternates between reconstructing the mediator and predicting the outcome, which approximately enforces the structural equation <span class="arithmatex">\(Y = f_Y(A, H_d, U_Y)\)</span> where <span class="arithmatex">\(H_d\)</span> captures the indirect pathway. Applying this to LLM chain-of-thought means structuring an encoder so that one latent factor responds to interventions on the reasoning tokens and another factor captures unrelated background variation like question difficulty. The disentanglement permits targeted interventions: to estimate the mediated effect we can clamp <span class="arithmatex">\(H_d\)</span> to its distribution under <span class="arithmatex">\(A=a'\)</span> while keeping the other latent factors free, aligning with the causal mediation formula but inside a learned representation space.</p>
+<p>The upshot is that mediation analysis combines SCM-based definitions (Pearl 2014) with representation learning (Shalit et al. 2016, disentangled representations) and, when feasible, with randomized mediator interventions (An Interventionist Approach to Mediation Analysis 2020) to make the direct/indirect decomposition empirically tractable. This is why a practical toolkit for measured natural direct and indirect effects must handle three steps: (1) specify the influence diagram and collect covariates that satisfy ignorability or can be blocked via an intervention, (2) fit mediator and outcome models using classical regression or neural representations, and (3) combine those models via the mediation formula or its interventional analogue. The next section shows how the field is advancing beyond scalar mediators and into the modern demands of LLM interpretability.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier is currently shaped by efforts that both reinterpret mediation for high-dimensional mediators and apply it to large model reasoning. Disentangled Representation for Causal Mediation Analysis (Fong, Tran, and others 2023) [https://arxiv.org/html/2302.09694] demonstrates that representing direct and indirect pathways as separate latent codes lets the mediation formula operate in a learned manifold; using a dual variational objective regularized by the structural equations, that work recovers path-specific effects even when the mediator is a vector of hundreds of activations. On the LLM side, Untitled (2023) [https://arxiv.org/pdf/2305.15054], a study released alongside prompting benchmarks, perturbs chain-of-thought tokens by introducing random swap, deletion, or occlusion interventions and then applies mediation-style decompositions to quantify how much of the accuracy gain is genuinely carried by the reasoning tokens versus residual shortcuts. By combining causal mediation with synthetic mediator interventions, this line of work validates reasoning metrics that go beyond correlational attention scores.</p>
+<p>The engineering frontier, meanwhile, is the adoption of these ideas in production inference pipelines. AWS’s “Causal Inference Made Easy with DoWhy” blog (2023) [https://aws.amazon.com/blogs/machine-learning/causal-inference-made-easy-with-dowhy/] describes how data scientists inside Amazon instrument policy changes through DoWhy’s API, deploying mediation-style estimators to attribute revenue changes to feature rollouts and enabling real-time dashboards of direct and mediated effects. DoWhy, which wraps statsmodels style regressions with structural model specification and refutation tests, is now part of the Amazon SageMaker causal inference offering, providing a production-grade path from a DAG to an estimated NDE/NIE pair. This industrialization of mediation analysis — grounded in the same SCM definitions from Pearl (2014) and the interventional learning advocated by 2020’s interventionist approach — shows that mediation analysis defines not just an interpretability experiment but a measurable production signal that can be monitored.</p>
+<p>The consequence is that researchers pursuing LLM interpretability now have both a methodological toolbox and engineering scaffolding: the lens of cross-world decompositions, the practical estimator recipes in DoWhy and statsmodels, and libraries that can represent complex mediators as learned embeddings. Yet these tools are still being stress-tested for latent representations that are neither scalar nor easily perturbed, which leads us directly to the open problems below.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can mediation analysis recover path-specific effects when the mediator is a high-dimensional, continuous latent representation that changes across multiple layers? The current disentangled encoders work on fixed-size vectors, but transformers produce sequences of contextual embeddings whose structure may not factor neatly into direct and indirect components.</p>
+<p>How can we run interventional experiments on LLMs without access to the internal weights, especially when we only observe tokens? The interventionist approach proposes randomizing the mediator, but in practice researchers can only replace, mask, or simulate tokens; each of those manipulations introduces its own confounders.</p>
+<p>Is there a principled way to regularize learned mediator representations so that they satisfy sequential ignorability, or an explicit test that tells us when the mediator and outcome models are misspecified? Without such a test, the mediation formula can produce misleading decompositions that look plausible but rest on invalid independence assumptions.</p>
+<p>Finally, can we combine mediation analysis with fine-grained counterfactual representation learning (Shalit et al. 2016) to identify multiple mediators simultaneously while still providing uncertainty estimates, so that downstream explainability layers can say “this token contributed X% of the effect” with statistically sound confidence intervals?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the structural language that underpins these decompositions, → <a href="../structural-causal-models/">Structural Causal Models</a> describes how DAGs encode interventions and counterfactuals, and the probabilistic backbone for nested counterfactuals lives in → <a href="../counterfactuals/">Counterfactuals</a>. The representation perspective continues in → [[causal-representation-learning]], which shows how learned embeddings balance treatment groups and support counterfactual queries, while the applied side of identifying transportable effects is documented in → [[causal-effect-identification]].</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that mediation analysis can be operationalized as an executable pipeline: a simple script on Colab will generate a synthetic dataset of prompt interventions, encode the mediators with HuggingFace embeddings, and estimate the Natural Direct and Indirect Effects using statsmodels regressions wrapped by DoWhy.</p>
+<p><strong>What you're building:</strong> A Colab notebook that simulates chain-of-thought prompts, encodes the mediator tokens with <code>sentence-transformers/all-MiniLM-L6-v2</code>, and reports the NDE and NIE of the reasoning tokens on final answer accuracy.</p>
+<p><strong>Why this is valuable:</strong> Estimating NDE and NIE forces you to execute every part of the mediation pipeline—generate intervention data, fit mediator and outcome models, apply the causal mediation formula, and inspect the robustness diagnostics—turning the abstract decomposition into a reproducible artifact.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2</a> — 3.1M downloads, lightweight embedding model suitable for Colab T4.
+- <strong>Dataset:</strong> Synthetic chain-of-thought dataset generated inside the notebook by sampling prompts, applying interventioned reasoning tokens, and recording binary accuracy outcomes.
+- <strong>Framework:</strong> DoWhy 1.0.0 + statsmodels 0.14.2 + pandas 2.0 + scikit-learn 1.4 for preprocessing.
+- <strong>Compute:</strong> Free Colab T4 (16GB RAM, 16GB VRAM) — data generation, embeddings, and regression complete in under 20 minutes.</p>
+<p><strong>The recipe:</strong>
+1. Run <code>pip install dowhy==1.0.0 statsmodels==0.14.2 sentence-transformers==2.2.2 scikit-learn==1.4.0 wandb</code> and load DoWhy’s <code>CausalModel</code>, statsmodels <code>OLS</code>, and the HuggingFace embedding pipeline for <code>all-MiniLM-L6-v2</code>.
+2. Generate the dataset: sample 1,000 prompts (e.g., arithmetic or word puzzles), simulate two treatments <span class="arithmatex">\(A \in \{0,1\}\)</span> for “no reasoning/demoted chain-of-thought,” produce mediator vectors by embedding the generated tokens, and create <span class="arithmatex">\(Y\)</span> as a noisy binary accuracy label influenced by both <span class="arithmatex">\(A\)</span> and the mediator plus covariates like prompt-length.
+3. Fit the mediator model <span class="arithmatex">\(\Pr(M \mid A, X)\)</span> via scikit-learn’s <code>LinearRegression</code> or a shallow neural net on the embeddings, and fit the outcome model <span class="arithmatex">\(\mathbb{E}[Y \mid A, M, X]\)</span> with statsmodels <code>OLS</code> (include interaction terms between <span class="arithmatex">\(A\)</span> and the mediator representation).
+4. Use DoWhy’s <code>CausalModel.identify_effect()</code> followed by <code>estimate_effect(method_name="backdoor.linear_regression")</code> to compute NDE and NIE via the causal mediation formula, inspect the refuters (placebo treatment, random common cause) to assess sequential ignorability, and compare the results to a naive difference-in-differences.
+5. Visualize the estimated direct and indirect effects with 95% confidence intervals, plot the mediator distributions under <span class="arithmatex">\(A=0\)</span> and <span class="arithmatex">\(A=1\)</span>, and archive the notebook on GitHub or Colab so the artifact documents the entire estimand path.</p>
+<p><strong>Expected outcome:</strong> A runnable Colab notebook that prints the Natural Direct and Indirect Effects, shows the mediator distributions, logs refuter diagnostics, and stores the script for reuse across other LLM interventions.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same notebook on a 200-example subset using only CPU (drop embedding batch size to 16); the smaller dataset keeps runtime under 30 minutes on an RTX 3060 while still producing stable NDE/NIE estimates.</li>
+<li><strong>Applied engineer:</strong> Wrap the notebook in a FastAPI endpoint that accepts new prompts, applies the learnt mediator/outcome models, and responds with the estimated total, direct, and indirect effects; quantize the mediator regression with ONNX Runtime to hit p50 latency below 120ms on an NVIDIA A10.</li>
+<li><strong>Applied researcher:</strong> Replace the pre-embedded tokens with a learned latent mediator via an autoencoder, re-run the beam of mediator/outcome models, and test the hypothesis that the latent mediator explains at least 60% of the treatment effect by comparing the NIE to the TE.</li>
+<li><strong>Frontier researcher:</strong> Probe the open question of high-dimensional continuous mediators by training a disentangled VAE (as in Disentangled Representation for Causal Mediation Analysis) inside the notebook and falsify the assumption that sequential ignorability holds by constructing a simulated confounder; report when the estimated NIE deviates by more than 25% from the ground-truth path-specific effect.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
