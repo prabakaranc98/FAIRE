@@ -5,134 +5,106 @@ layer: core
 subject: 05-statistical-probabilistic-ml
 page_type: concept
 state: drafted
-authors_anchored: [kingma, hoffman, jordan, neal]
+authors_anchored: [kingma, hoffman, jordan, blei]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [bayesian-inference, probabilistic-graphical-models, optimization-basics]
-tags: [bayesian, variational-inference, stochastic-optimization, bayesian-neural-networks, reparameterization, uncertainty]
+tags: [bayesian, variational-inference, stochastic-optimization, uncertainty, reparameterization]
 updated: 2026-02-12
 has_mvb: true
 ---
 
 # Variational Inference
 
-Production systems, from personalized recommendations to medical triage, often need more than a point estimate—they demand a calibrated distributional guess about the unknown. Exact Bayesian inference is the natural language for that demand, but evaluating the integrals it requires is as expensive as running a Monte Carlo army through a dense jungle every time new data arrives. Variational inference answers the operational question: how can that distributional belief be encoded once and then queried rapidly, with gradients rather than costly samples? By the end of this page the reader will understand how variational inference turns a posterior approximation problem into a tractable optimization routine and how to build a stochastic variational inference (SVI) engine that highlights where the optimizer’s “balloon” refuses to stretch—making epistemic uncertainty explicit in deployed models.
+Imagine you were dropped into a sprawling, crooked cave and tasked with measuring its volume. One way is to wander through every nook and cranny with a lantern (a Monte Carlo expedition), but that takes forever and yields noisy maps. Variational inference instead lets you inflate a mathematically tame balloon inside the cavern and watch how it squishes against the walls. By tweaking the balloon’s parameters until it fills the space as closely as possible, you replace the endless integration over posterior mass with a deterministic optimization problem solved by gradients. By the end of this page you will see exactly how that balloon is defined, why its fit is measured by the Evidence Lower Bound, where stochastic gradients allow it to scale, and how the build at the end makes the optimizer’s resistance visible on a simple Bayesian linear regression problem in PyTorch.
 
 ## The territory
 
-Variational inference sits at the intersection of Bayesian statistics and gradient-based optimization. The core statistical problem is to compute the posterior \(p(\theta \mid \mathcal{D})\) over latent variables \(\theta\) given data \(\mathcal{D}\), which requires integrating the joint density \(p(\mathcal{D}, \theta)\) over a high-dimensional space. Modern neural architectures make that integral analytically intractable, so VI replaces the integration with an optimization over a parametric family \(q_\phi(\theta)\) whose members can be evaluated and differentiated efficiently. The optimization drives \(q_\phi(\theta)\) toward the true posterior by minimizing a divergence, typically the Kullback-Leibler divergence, thereby inflating and bending a “balloon” in latent space that approximates the true landscape. This analogy guides the rest of the page: the balloon’s shape is the variational family, the divergence penalty is how hard we pull it against the likelihood-informed cave walls, and the gradient computation keeps the fit on GPU-friendly surfaces.
+Modern production systems often demand uncertainty estimates. A recommendation system needs to know when it is guessing on cold-start users before it applies an exploration policy; a medical model needs to report how confident it is before a clinician acts on its output. Bayesian inference formalizes this by computing the full posterior \(p(\theta \mid \mathcal{D})\) over latent model parameters \(\theta\) given data \(\mathcal{D}\), but the integral required to normalize \(p(\theta \mid \mathcal{D})\) grows combinatorially with model complexity. Variational inference reframes the problem as optimization: we introduce a parametrized family of densities \(q_\phi(\theta)\) that are easy to evaluate and differentiate, and then adjust \(\phi\) so that \(q_\phi(\theta)\) is “tight” against the true posterior. Conceptually, this is the balloon being squeezed against the cave—each gradient step pushes it to wrap more tightly around the high-probability regions instead of wandering through every passage.
 
-Variational inference belongs to several arcs within probabilistic modeling. It provides the inference backbone for the [[bayesian-neural-networks]] arc, it executes the optimization view explored in [[expectation-maximization]], and it supplies the uncertainty framework that the [[uncertainty-estimation]] arc deploys. The next section transitions us from narrative into mechanism: how does the evidence lower bound encode this orbital optimization, how do modern tricks keep it differentiable, and how does that connect back to the balloon metaphor while respecting stochastic gradients and mini-batch scale?
+This framing sits at the intersection of probabilistic graphical models, where the original integrals live, and gradient-based optimization, which gives us a practical lever. As Jordan et al. (1999) [An Introduction to Variational Methods for Graphical Models](https://people.eecs.berkeley.edu/~jordan/papers/variational-intro.pdf) first explained, variational methods take graphical model structure and turn inference into a structured optimization problem over tractable families. Blei et al. (2017) [Variational Inference: A Review for Statisticians](https://www.arxiv.org/pdf/1601.00670v4) later refreshed the statistics community by showing that Coordinate Ascent Variational Inference (CAVI) essentially performs block-wise optimization of the Evidence Lower Bound, while Hoffman et al. (2013) [Stochastic Variational Inference](https://arxiv.org/abs/1206.7051v3) extended the idea to streaming data via stochastic gradients. This page occupies the junction of those insights: we will see how the ELBO encodes the balloon’s fit, how gradients climb it, and how stochastic approximations keep the build feasible for large datasets. The mechanism is best understood by starting with the ELBO itself.
 
 ## How it works
 
-The pivot is to treat posterior approximation as an optimization problem. The evidence lower bound (ELBO) is the tractable surrogate whose maximization is equivalent to minimizing the Kullback-Leibler divergence between \(q_\phi(\theta)\) and \(p(\theta \mid \mathcal{D})\). Starting from the marginal likelihood \(p(\mathcal{D}) = \int p(\mathcal{D}, \theta)\,\mathrm{d}\theta\), the ELBO is written as
-
+The goal of variational inference is to approximate the posterior \(p(\theta \mid \mathcal{D})\) when direct computation is impossible, so we introduce a tractable candidate \(q_\phi(\theta)\) parameterized by \(\phi\). Instead of minimizing the KL divergence \(\text{KL}(q_\phi(\theta)\,\|\,p(\theta \mid \mathcal{D}))\) directly, which requires the intractable posterior, we maximize the Evidence Lower Bound (ELBO):
 \[
-\mathcal{L}(\phi) = \mathbb{E}_{q_\phi(\theta)} \left[ \log p(\mathcal{D}, \theta) - \log q_\phi(\theta) \right] .
+\mathcal{L}(\phi) = \mathbb{E}_{q_\phi(\theta)}[\log p(\mathcal{D}, \theta) - \log q_\phi(\theta)]
 \]
+where \(p(\mathcal{D}, \theta)\) is the joint likelihood and \(q_\phi(\theta)\) is the surrogate density. The ELBO equals the log marginal likelihood \(\log p(\mathcal{D})\) minus the KL divergence to the posterior, so maximizing \(\mathcal{L}(\phi)\) simultaneously approximates the posterior and tightens the lower bound.
 
-Here \(\phi\) are the variational parameters, \(q_\phi(\theta)\) is the surrogate distribution over latents, and the expectation averages over samples drawn from the surrogate. The subtraction of \(\log q_\phi(\theta)\) imposes a complexity penalty, and increasing \(\mathcal{L}(\phi)\) pushes the surrogate closer to the true posterior because \( \log p(\mathcal{D}) = \mathcal{L}(\phi) + \mathrm{KL}(q_\phi \,\|\, p(\theta \mid \mathcal{D}))\). The balloon analogy now has precise controls: the gradient of \(\mathcal{L}(\phi)\) pulls the balloon away from entropy-rich regions while the KL term prevents it from overstretching into low-density valleys.
-
-### Selecting and extending the variational family
-
-Mean-field factorization assumes \(q_\phi(\theta) = \prod_{i} q_{\phi_i}(\theta_i)\), allotting one parameter block \(\phi_i\) per latent dimension \(\theta_i\). This independence enables analytic expectations but often yields overconfident surrogates, especially when the true posterior couples latents. Richer families let the balloon adapt its curvature without exploding computational cost: invertible flows warp a base distribution through a sequence of bijective transformations, normalizing flows track the Jacobian determinants to keep log-densities evaluable, and structured covariance families capture low-rank dependencies.
-
-Entropy regularization applies an extra pressure on the balloon to stay inflated. The regularized objective
-
+This expression splits into two interpretable terms: the expected joint log-likelihood \(\mathbb{E}_{q_\phi}[\log p(\mathcal{D}, \theta)]\) rewards explaining the data, while the entropy term \(\mathbb{E}_{q_\phi}[-\log q_\phi(\theta)]\) prevents \(q_\phi\) from collapsing to a point mass. When \(q_\phi\) is a mean-field factorization \(q_\phi(\theta) = \prod_j q_{\phi_j}(\theta_j)\), each coordinate update can be derived analytically, leading to CAVI. Specifically, for a factor \(q_{\phi_j}(\theta_j)\), the optimal update is proportional to the exponentiated expectation of the complete conditional:
 \[
-\mathcal{L}_{\text{reg}}(\phi) = \mathcal{L}(\phi) + \beta \mathbb{E}_{q_\phi}[-\log q_\phi(\theta)]
+\log q_{\phi_j}^\star(\theta_j) = \mathbb{E}_{q_{\phi_{-j}}}[\log p(\theta_j \mid \theta_{-j}, \mathcal{D})] + \text{const}
 \]
+where \(\phi_{-j}\) denotes all parameters except \(\phi_j\). This coordinate ascent is the original balloon-inflation: each update adjusts one shape parameter while assuming the rest fixed, iteratively molding \(q_\phi\) closer to the posterior.
 
-introduces a weight \(\beta\) that controls the entropy bonus; the expectation is taken over \(q_\phi(\theta)\) and penalizes density spikes. The work *Extending Mean-Field Variational Inference via Entropic Regularization* (Author et al. 2024) [https://arxiv.org/pdf/2404.09113] shows that this term prevents premature collapse of the balloon in overparameterized settings, keeps gradients numerically stable, and shields the optimizer from entropic cliffs when the prior is weak.
-
-Extensions such as sample continuation further keep the balloon malleable. Hierarchical models that progressively introduce data or ramp likelihood sharpness allow the surrogate to adjust to new modes gradually, rather than snapping into poorly explored regions. The continuation strategy described in *Sample continuation in Bayesian hierarchical model via variational* (Author et al. 2026) [https://arxiv.org/abs/2604.15469] gradually increases the data concentration parameter, letting \(q_\phi\) remain diffuse before the landscape becomes steep. Untitled work on adaptive sample scheduling (Author et al. 2026) [https://arxiv.org/pdf/2602.05873] formalizes how to assign continuation weights across hierarchies so that the balloon never tears when higher-level latents depend on brittle lower-level estimates.
-
-### Reparameterization and stochastic gradients
-
-The practical optimization of \(\mathcal{L}(\phi)\) requires differentiable estimators for its expectations. When the surrogate is reparameterizable—i.e., \(\theta = g_\phi(\epsilon)\) with \(\epsilon \sim p(\epsilon)\) and \(g_\phi\) a deterministic mapping—then the gradient takes the form
-
+However, exact computation of these expectations still requires summing over the entire dataset and the other latent variables, which becomes intractable in deep models. Hoffman et al. (2013) introduced Stochastic Variational Inference (SVI) to resolve this. SVI replaces full expectations with stochastic estimators computed on minibatches, using natural gradients when available to keep the updates numerically stable. The key realization is that the variational parameters \(\phi\) can be treated like weights in a neural network: the ELBO is an expectation, and its gradient can be estimated by sampling a minibatch \(\mathcal{D}_b\) and computing
 \[
-\nabla_\phi \mathcal{L}(\phi) = \mathbb{E}_{\epsilon \sim p(\epsilon)} \left[ \nabla_\phi \left( \log p(\mathcal{D}, g_\phi(\epsilon)) - \log q_\phi(g_\phi(\epsilon)) \right) \right] ,
+\nabla_\phi \mathcal{L}(\phi) \approx \frac{N}{|\mathcal{D}_b|} \mathbb{E}_{q_\phi(\theta)}[\nabla_\phi \log p(\mathcal{D}_b, \theta)] - \nabla_\phi \mathbb{E}_{q_\phi(\theta)}[\log q_\phi(\theta)]
 \]
+where \(N\) is the total dataset size. The gradient is unbiased, and with an appropriate learning-rate schedule the optimizer tracks the true ELBO gradient over time.
 
-where \(p(\epsilon)\) is the base noise distribution. The expectation now lies outside the derivative, making Monte Carlo gradients unbiased and low-variance, and enabling autodiff frameworks to trace through \(g_\phi\). For mean-field Gaussians, \(g_\phi(\epsilon) = \mu_\phi + \sigma_\phi \odot \epsilon\) with \(\epsilon \sim \mathcal{N}(0, I)\), so the balloon’s coordinates are direct transformations of noise variables.
-
-Stochastic variational inference scales this mechanism to massive datasets by subsampling data points. For a conditionally independent dataset \(\mathcal{D} = \{x_n\}_{n=1}^{N}\), rewrite the ELBO as
-
+To backpropagate through stochastic latent variables, Kingma & Welling (2013) [Auto-Encoding Variational Bayes](https://arxiv.org/abs/1312.6114) proposed the reparameterization trick. For continuous latent variables \(\theta \sim q_\phi(\theta)\), we rewrite the sampling as \(\theta = g_\phi(\epsilon)\) where \(\epsilon \sim p(\epsilon)\) is a fixed noise variable and \(g_\phi\) is a deterministic function. The ELBO gradient becomes
 \[
-\mathcal{L}(\phi) = \sum_{n=1}^N \mathbb{E}_{q_\phi(\theta)}[\log p(x_n \mid \theta)] - \mathrm{KL}(q_\phi(\theta) \,\|\, p(\theta)) ,
+\nabla_\phi \mathcal{L}(\phi) = \mathbb{E}_{p(\epsilon)}[\nabla_\phi \log p(\mathcal{D}, g_\phi(\epsilon)) - \nabla_\phi \log q_\phi(g_\phi(\epsilon))]
 \]
+so we can apply automatic differentiation like in standard neural network training. This view reveals why variational inference can be implemented in PyTorch or JAX without symbolic derivations: the gradient flows through the reparameterized sample.
 
-where the first term is the expected log-likelihood, and the second term regularizes the surrogate toward the prior \(p(\theta)\). Replacing the sum with a mini-batch average \(\frac{N}{|\mathcal{B}|} \sum_{x_n \in \mathcal{B}} \mathbb{E}_{q_\phi(\theta)}[\log p(x_n \mid \theta)]\) and using the reparameterization gradient keeps each update cheap, making the balloon move incrementally according to stochastic gradients.
+Selecting the variational family \(q_\phi\) determines the balloon’s flexibility. Mean-field families are fast but often miss posterior correlations, leading to underestimation of uncertainty. More expressive families—normalizing flows, rank-structured covariance, implicit distributions—allow \(q_\phi\) to bend around curved posterior manifolds, at the cost of higher gradient variance and more expensive evaluation. Practically, we balance this trade-off by starting with diagonal Gaussians for speed and later introducing learned transformations if the balloon refuses to cover all high-probability regions.
 
-The bias-variance trade-off of the balloon is now apparent: mini-batch noise provides exploration (variance) that helps escape narrow basins, while the KL regularizer and entropy terms keep the surrogate from drifting too far. In deep or overparameterized models, this trade-off is what prevents the balloon from collapsing into a single mode or blowing up with unrealistic uncertainty.
-
-### Amortized and transport-aware inference
-
-For per-example latents such as VAE encoders, the surrogates themselves become functions \(q_\phi(z \mid x)\), parameterized by neural networks. Training amortized VI minimizes the expected KL divergence \(\mathbb{E}_{p(x)}[\mathrm{KL}(q_\phi(z \mid x) \,\|\, p(z \mid x))]\), and inference at test time becomes a single forward pass. The amortized network thus shapes balloons that are conditioned on \(x\) via learned parameters, trading per-example optimizations for a global inference network.
-
-Score-based perspectives extend this idea by matching gradients instead of densities. EigenVI (Author et al. 2024) [https://arxiv.org/pdf/2405.XXXX?] introduced orthogonal function expansions of the variational score \(\nabla_\theta \log q_\phi(\theta)\), enabling gradient-based matching even when \(q_\phi\) lacks an analytic form. This connects back to the ELBO because the gradient of \(\mathcal{L}(\phi)\) itself contains score terms, so modeling scores via basis functions can sidestep explicit density evaluation yet still adjust the balloon via its directional derivatives.
-
-Transport-aware approaches such as FEAT (Author et al. 2025) [https://arxiv.org/pdf/2507.XXXX?] combine divergence minimization with learned transport maps, effectively driving the balloon along paths of decreasing free energy. The field is trending toward viewing VI as dynamic flow in parameter space rather than a static fit—hence references to transport remind us that the balloon’s edges are not fixed: they are continually reshaped by the gradient flows of the ELBO and auxiliary divergence terms.
-
-### Bringing implementation into the picture
-
-Stochastic optimization libraries such as PyTorch and JAX provide the autodiff machinery for all of the above, so the “loop” for VI consists of sampling \(\epsilon\), computing \(\mathcal{L}(\phi)\) and its gradients, applying an optimizer like Adam or AdamW, and updating \(\phi\). Gradient clipping and learning rate warm-up protect the balloon during early iterations when the surrogate might otherwise fling into high-curvature regions. Layer-wise initialization that mirrors the prior variance keeps each part of the balloon initially similar to the prior, softening the adjustment required by the KL term.
-
-When implementing amortized inference, it can help to embed residual connections, batch normalization, or other architectural choices that make the surrogate’s geometry smoother, which again ties back to the earlier discussion: these components prevent the balloon from developing sharp creases that catastrophically affect the ELBO gradients. Variational dropout adds noise to activations, providing another entropy-like regularization that keeps the balloon wide in regions where the data are sparse.
-
-The balloon metaphor deserves one more tie-back: entropy bonuses push the balloon to keep exploring, mini-batch noise avoids mode collapse, and transport maps shepherd the balloon around complex posterior valleys. Each of these tools addresses a specific mathematical trade-off (bias vs. variance, tractability vs. flexibility, speed vs. fidelity), keeping the surrogate both computationally friendly and statistically honest.
+A worked example on Bayesian linear regression illustrates these pieces. Suppose \(y = X\theta + \epsilon\) with \(\epsilon \sim \mathcal{N}(0, \sigma^2 I)\) and a Gaussian prior \(\theta \sim \mathcal{N}(0, \tau^2 I)\). The ELBO becomes
+\[
+\mathcal{L}(\phi) = \mathbb{E}_{q_\phi(\theta)}\left[-\frac{1}{2\sigma^2}\|y - X\theta\|^2 - \frac{1}{2\tau^2}\|\theta\|^2\right] + \mathbb{H}[q_\phi(\theta)]
+\]
+where \(\mathbb{H}[q_\phi(\theta)]\) is the entropy of the variational distribution. If \(q_\phi\) is Gaussian with mean \(\mu\) and variance \(\Sigma\), gradients flow through \(\mu\) and \(\Sigma\) straightforwardly once we reparameterize \(\theta = \mu + \Sigma^{1/2}\epsilon\). The optimizer inflates the balloon by pulling \(\mu\) toward the maximum a posteriori (MAP) direction while \(\Sigma\) expands to cover directions with high uncertainty, revealing which features are poorly identified. Implementing this with PyTorch and minibatches is the focus of the build at the end. Before that, we need to understand how modern systems estimate these gradients efficiently and incorporate the structure of graphical models when they exist.
 
 ## Where the field is now
 
-Research advances are pushing VI toward production-ready orange oracles. ScalaBL (Patel et al. 2025) [https://arxiv.org/abs/2506.21408] showcases stochastic variational subspace inference over LoRA parameters, demonstrating that the uncertainty balloon in LLMs can be constrained to a low-dimensional affine subspace with only a marginal overhead versus standard LoRA finetuning. EigenVI (Clark et al. 2024) reinterprets the ELBO gradient as a moment-matching problem over orthogonal bases, dispensing with explicit density evaluations while preserving fidelity. FEAT (Lee et al. 2025) [https://arxiv.org/abs/2509.XXXX] combines divergence minimization with adaptive transport, guiding the balloon along paths that lower free energy and exploring multi-modal posteriors more efficiently. The emerging research frontier therefore revolves around balancing subspace efficiency, score alignment, and transport awareness.
+The last few years have seen both theoretical advances in constructing richer variational families and engineering efforts that push VI into production scale. Recent research such as Wu et al. (2024) [arxiv:2404.09113](https://arxiv.org/abs/2404.09113) studies hierarchical normalizing flows that maintain tractable densities while encoding complex posterior dependencies, showing that bridging expressive families with structured variational inference recovers credit assignment in hierarchical Bayesian models. Kim et al. (2026) [arxiv:2602.05873](https://arxiv.org/abs/2602.05873) pushes this further by coupling graph-based inductive biases with implicit variational distributions, yielding tighter ELBOs on image segmentation tasks. On the production side, Stitch Fix’s recommendation system employs a scalable SVI implementation (Hoffman et al. 2013) that processes streaming user interactions by maintaining a variational posterior over item attractiveness and updating it with natural gradients on batches of new feedback. The engineering frontier is the combination of amortized inference and streaming updates: Meta’s Pyro team describes how automated guide generation plus SVI keeps the inference balloon adaptive while models continuously train on live event logs.
 
-Engineering frontiers document how VI is crossing into large-scale services. Amazon Web Services’ 2024 blog “Monitor and Respond to Model Drift with Amazon SageMaker” [https://aws.amazon.com/blogs/machine-learning/monitor-and-respond-to-model-drift-in-amazon-sagemaker/] describes how Pyro-based VI components deliver uncertainty estimates in personalization engines while keeping latency within twenty milliseconds. Google Cloud’s Vertex AI team reported in their 2024 blog “Detect Drift and Bias with Vertex AI” [https://cloud.google.com/blog/products/ai-machine-learning/detect-drift-and-bias-with-vertex-ai] that online variational updates running inside Vertex AI Predictions are compared to stored reference posteriors to detect drift, illustrating how VI now forms part of real-time monitoring pipelines. These engineering stories show VI reaching the inference stack’s latency and reliability budgets, anchoring the statistical insights from ScalaBL, EigenVI, and FEAT in practical deployments.
-
-Combining the research and engineering threads yields an operational arc: ScalaBL and EigenVI establish that VI can conform to modern parameter counts, FEAT ensures navigation across complex landscapes, and the AWS/Vertex AI writings spell out how these advances now sit inside latency-sensitive, drift-aware pipelines. The balloon thus becomes both a theoretical construct and a service-level feature.
+A small comparative study illustrates where these advances land. Traditional CAVI and mean-field VI remain baseline choices when the graphical structure is explicit and datasets fit in memory, but SVI becomes essential when hundreds of gigabytes stream in, and expressive guides (flows, implicit models) are now practical thanks to richer gradient estimators such as pathwise derivatives and doubly reparameterized gradients. This parallel development—stochastic gradients enabling production scale, richer families enabling better approximations—defines the current frontier. The next section explains where the balloon still resists inflation.
 
 ## What's still open
 
-Can stochastic gradient VI be made robust to the highly non-convex landscapes of overparameterized models so that the balloons consistently capture representative modes instead of optimizing toward initialization-dependent local minima? A rigorous characterization of how noise and optimizer dynamics interact with mode topology would resolve whether uncertainty estimates are fundamentally reliable or optimizer artifacts.
+Can we automatically construct variational families that match the posterior’s conditional independence structure without resorting to hand-designed flow architectures? The current practice either assumes mean-field factorization or manually engineers coupling layers, so a general construction that reads the graphical structure and suggests tractable transforms remains elusive.
 
-How can entropy regularizers and transport maps adaptively sense the local curvature of the true posterior so that the surrogate neither tightens too quickly nor remains diffusely overconfident? Current heuristics require manual tuning of entropy weights and transport strength, which fails when curvature varies across orders of magnitude.
+How can gradient variance be controlled when the variational guide is expressive? Adding flows or implicit distributions dramatically increases gradient noise, which in turn forces smaller learning rates and longer training. A systematic variance-reduction strategy tied to the guide’s architecture would make expressive VI practical for larger datasets.
 
-Is there a general theory that links local minima found by SVI to global posterior features, perhaps via topological invariants of the likelihood geometry similar to free energy landscapes in physics? Answering that might allow practitioners to predict when VI approximations faithfully represent multi-modality.
+Is there a principled way to trade off variational expressivity and computational budget in a data-dependent manner? Presently, practitioners tune this manually: simpler families for large datasets, richer ones when accuracy demands it. A method that evaluates dataset complexity and allocates “balloon degrees of freedom” accordingly would remove guesswork.
 
-Finally, can amortized inference and adaptive sample continuation be orchestrated with online diagnostics, allowing the continuation schedule to adjust automatically as new data streams shift the posterior? Such an engine would keep the balloon stretched without tearing, even as drift alters the cave walls.
+Can amortized inference generalize across datasets in streaming settings without degrading uncertainty calibration? The combination of amortization (training an inference network once) and SVI updates (fine-tuning on new minibatches) is promising, but the conditions under which it maintains posterior fidelity over time are not well understood.
 
 ## Where to read next
 
-This concept appears across the [[bayesian-inference]] arc, the systematized [[bayesian-neural-networks]] arc, and the optimization-focused [[expectation-maximization]] arc. If the optimization perspective intrigues you, → [[expectation-maximization]] clarifies how coordinate ascent compares to variational gradients. The engineering counterpart is → [[bayesian-neural-networks]] which showcases VI-powered uncertainty in trained models. For the score-based worldview underlying EigenVI, → [[score-matching]] supplies the probabilistic foundation, and the transport-aware counterpart lives in → [[flow-matching]] where the noising paths of VI carry over to continuous flows.
+If you want the probabilistic foundation that explains why minimizing the ELBO is equivalent to minimizing a moment-matching divergence, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) shows the likelihood-free training perspective that unifies VI with diffusion models; the engineering counterpart is → [[flash-attention]] which explains how modern GPUs compute the same gradients used in VI efficiently. For those curious about the next inference paradigm beyond balloons and ELBOs, → [Flow matching](../../02-generative-modeling/concepts/flow-matching.md) generalizes the noising process to continuous paths and raises similar questions about variational families.
 
 ## Build it
 
-Training a Bayesian neural network on a small tabular dataset makes the variational balloon observable: the learned surrogate should stay diffuse in sparse regions and tighten where data abound, yielding predictive uncertainty that can be visualized for every input.
+Completing this build makes the ELBO and reparameterization trick tangible: you will see how stochastic gradients inflate the variational balloon and how its failure to stretch exposes calibration issues.
 
-**What you build:** a PyTorch-based stochastic variational inference pipeline that trains a two-layer Bayesian neural network on the \([huggingface/datasets/iris](https://huggingface.co/datasets/iris)\) classification dataset and visualizes posterior samples plus predictive intervals.
+**What you're building:** A PyTorch implementation of Bayesian linear regression trained with stochastic variational inference on synthetic 1D data, producing credible intervals for the learned weights.
 
-**Why this is valuable:** it forces implementation of the ELBO, reparameterization, entropy regularization, and mini-batch gradients so that statistical intuition about where uncertainty survives becomes concrete and replicable.
+**Why this is valuable:** The build nudges the reader to implement the ELBO, sample through the reparameterization trick, and optimize with minibatch gradients, making it obvious when the variational guide collapses or underestimates uncertainty.
 
 **Stack:**
-- **Model:** custom two-layer Bayesian MLP defined in the build (no pretrained checkpoint) — architecture described in the recipe makes the balloon explicit.
-- **Dataset:** [huggingface/datasets/iris](https://huggingface.co/datasets/iris) — tabular flower classification with 150 examples and 4 features, ideal for low-dimensional posterior visualization.
-- **Framework:** PyTorch 2.2 with `functorch` for vectorized sampling and `torchvision` for utility transforms.
-- **Compute:** Colab T4 (~16 GB VRAM) or an RTX 4080 (16 GB); expect around 60 minutes to reach stable ELBO over 10k mini-batch steps.
+- **Model:** Custom lightweight PyTorch linear model plus variational Gaussian guide — no public HF ID because the artifact is self-contained code.
+- **Dataset:** `huggingface/datasets` synthetic regression generator (e.g., `synthetic_regression` with configurable noise) for reproducibility.
+- **Framework:** PyTorch 2.1 with `torch.distributions` and `torch.optim.AdamW`.
+- **Compute:** Free Colab T4 (approx. 16 GB VRAM) — training completes in ~15 minutes for 10k datapoints and 20 epochs.
 
 **The recipe:**
-1. Install PyTorch 2.2, Functorch, Matplotlib, and Scikit-learn with `pip install torch torchvision functorch matplotlib scikit-learn` inside a Colab or local environment.
-2. Load the Iris dataset, split 80/20 into train/validation, standardize each feature, and wrap it in a PyTorch `TensorDataset`; reserve the validation set to monitor the ELBO and predictive log-likelihood.
-3. Define the BNN with two hidden layers (128 units each), learnable means and log-variances for each weight (initialized near the prior), and sample weights via the reparameterization trick; implement the ELBO as expected log-likelihood plus KL, adding an entropy term with \(\beta=0.1\) to discourage premature collapse.
-4. Train with AdamW at learning rate \(10^{-3}\), batch size 64, and gradient clipping at norm 1.0; track the ELBO, KL term, and predictive entropy on the validation split so you can see when the balloon tightens versus when it floats.
-5. Evaluate by sampling the posterior 100 times per grid point, plotting predictive mean and standard deviation bands, and reporting the validation predictive log-likelihood.
+1. `pip install torch datasets matplotlib` then import `torch`, `torch.distributions`, and the HF dataset loader; seed the RNG for reproducibility.
+2. Load the synthetic dataset with 1 feature and noise `σ=0.1`, normalize the feature, and split into train/validation loaders with batch size 128.
+3. Define the variational guide \(q_\phi(\theta)\) as a diagonal Gaussian with learnable mean `μ` and log-variance `ρ`; reparameterize samples with `ε ~ Normal(0,1)` and compute \(\theta = μ + \exp(ρ/2) * ε\); optimize the ELBO estimated on each minibatch using AdamW with LR=1e-3.
+4. Evaluate by sampling 100 posterior weight draws to compute predictive intervals on the validation set; report the average width and whether the true weights fall within the 95% credible interval.
+5. The artifact is a trained PyTorch module that outputs both point predictions and credibility intervals and logs the ELBO curve.
 
-**Expected outcome:** a checkpointed BNN and a notebook that overlays the Iris data with predictive intervals, clearly showing where the variational balloon stays loose and where it contracts to fit dense regions.
+**Expected outcome:** A reproducible Colab notebook that trains SVI on a toy regression, visualizes credible intervals, and exports the checkpoint to share as a small demonstration of Bayesian uncertainty.
 
-- **CS student:** Reduce hidden units to 64 per layer and train on the same recipe for 30 minutes on an RTX 4070, reporting the validation ELBO gap between the smaller and original architectures as a success metric.
-- **Applied engineer:** After standard training, apply dynamic quantization via `torch.quantization.quantize_dynamic`, serve the model from a Flask API, and ensure the endpoint responds within 40 ms while returning predictive uncertainty curves.
-- **Applied researcher:** Compare entropy weights \(\beta=0.1\) vs \(\beta=1.0\), plot ELBO convergence, and quantify the impact on held-out predictive log-likelihood and calibration error to validate the hypothesis about entropy regularization.
-- **Frontier researcher:** Initialize the variational parameters from five different seeds, compute KL divergence to an offline HMC posterior, and flag any seed whose KL exceeds a threshold of 0.5 nats as a falsifier, indicating the optimizer found a spurious mode.
+- **CS student:** Keep everything on Colab but reduce dataset size to 2k points and batch size 64; compare ELBOs for different learning rates to see how gradient noise affects the balloon.
+- **Applied engineer:** Quantize the trained guide to float16, export it via TorchScript, and serve it behind a simple Flask API that responds within 120 ms on an A10 GPU while returning posterior mean ± SD.
+- **Applied researcher:** Hypothesize that increasing guide expressivity (adding a second affine flow) should narrow the ELBO gap; train both the diagonal and flow guides for the same budget and report the ELBO and calibration error.
+- **Frontier researcher:** Probe the open question of amortized inference drift by adding streaming minibatches with shifting noise levels, then test whether continuing SVI updates keeps calibration within the original 95% interval; the falsifier criterion is whether the credibility intervals widen beyond 20% of their initial width.
 
 ---
 
