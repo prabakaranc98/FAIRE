@@ -421,9 +421,35 @@ def full_cycle_job(dry_run: bool = False) -> dict:
     run_results = sprint_job(dry_run=dry_run)
     write_changelog_entry(sprint_tasks, confidence_before, run_results)
 
+    # Step 5: Retrospective — backlog agent closes the loop. Aggregates patterns
+    # from this cycle's runs, runs an LLM scrum-style retrospective, auto-applies
+    # safe proposals (stub seeds), writes everything to docs/system/backlog.md
+    # for the next cycle to consume.
+    retro_summary: dict = {}
+    if not dry_run:
+        try:
+            from .retrospective import retrospective_job
+            retro_result = retrospective_job()
+            retro_summary = {
+                "n_proposals": sum(
+                    len(retro_result.get("retro", {}).get(k, []))
+                    for k in ("went_well", "went_wrong", "needs_depth", "new_to_add", "process_improvements")
+                ),
+                "n_new_to_add": len(retro_result.get("retro", {}).get("new_to_add", [])),
+                "n_auto_applied": sum(
+                    1 for a in retro_result.get("applied", [])
+                    if isinstance(a, dict) and a.get("status", "").startswith("applied")
+                ),
+                "backlog_path": retro_result.get("backlog_path", ""),
+                "error": retro_result.get("error"),
+            }
+        except Exception as e:
+            retro_summary = {"error": str(e)}
+
     return {
         "supervisor": supervisor_summary,
         "audit": audit_summary,
         "runs": run_results,
         "changelog_updated": True,
+        "retrospective": retro_summary,
     }

@@ -83,6 +83,7 @@ nav:
     - Structure v2 (design): system/structure-v2.md
     - Local LLM mode: system/local-mode.md
     - Learnings Log: system/learnings-log.md
+    - Backlog (sprint retros): system/backlog.md
     - Generation Status: system/status.md
     - Observer Dashboard: system/observer.md
     - Agent Changelog: system/changelog.md
