@@ -1,115 +1,150 @@
 ---
-title: Normalization  
-slug: normalization  
-layer: core  
-subject: 04-neural-networks-deep-learning  
-page_type: concept  
-state: drafted  
-authors_anchored: [ioffe, ba, vaswani, smith]  
-feeds_de_pillar: []  
-mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]  
-prereqs: [backpropagation, gradient-descent, transformer-architecture]  
-tags: [normalization, training-stability, transformers, optimization, layer-norm, batch-norm]  
-updated: 2024-10-05  
-has_mvb: true  
+title: Normalization
+slug: normalization
+layer: core
+subject: 04-neural-networks-deep-learning
+page_type: concept
+state: drafted
+authors_anchored: [ioffe, ba, kingma, codd]
+feeds_de_pillar: []
+mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
+prereqs: [gradient-descent, backpropagation, transformers-basics]
+tags: [normalization, gradient-flow, transformers, training-stability, batch-norm, layer-norm]
+updated: 2024-12-01
+has_mvb: true
 ---
 
 # Normalization
 
-Imagine trying to tune a car with a steering wheel that grows a new degree of freedom for every kilometer you drive. A centimeter of turn might gently nudge the car a bit, or it might send the wheels spinning wildly, but there is no way to know until you let go of the wheel. Training a 100-layer neural network without normalization behaves the same way: tiny weight updates in the earliest layers are exponentially amplified, and the GPU log reports either “nan” or “overfit” before the coffee cools. Normalization is the governor that keeps that steering wheel conditional, so that the same knob does the same thing across every layer and every batch. By the end of this page you will understand how several normalization placements—from Batch Normalization to Layer Normalization to the recent Peri-LN—reshape the loss landscape, why the same guardrail fails on sequence models without extra care, and how to make a small Transformer on Tiny Shakespeare behave predictably enough to demonstrate those differences for yourself.
+A multi-million-dollar transformer run can look flawless for weeks and then collapse in a single step because a small change in activation scale has been repeatedly amplified across dozens of layers. That collapse is what normalization disciplines: it is the structured constraint that keeps each layer’s signals and gradients from blowing up or disappearing, even as architectures deepen, tokens proliferate, and optimizers attempt higher learning rates. The rest of this page shows how modern normalization schemes restrain the Jacobians of residual blocks, why their placement changes the story for gradients, how database normal forms provide a tidy analogy for the discipline, and what measurable artifacts—Pre-LN, Post-LN, and Peri-LN gradients—emerge when the shim is missing. Finally, a hands-on MVB lets learners train a compact transformer for text normalization and observe the difference that the normalization placement makes in practice, making an abstract stability argument into a concrete experiment.
 
 ## The territory
 
-Normalization sits at the intersection of optimization theory, architecture engineering, and the practical demands of production-grade training. Before Batch Normalization, deep networks suffered from what Ioffe & Szegedy (2015) [arxiv:1502.03167](https://arxiv.org/pdf/1502.03167) referred to as “internal covariate shift”: the distribution of activations feeding into layer \( \ell+1 \) kept changing as layers \( \leq \ell \) updated, so gradient descent was chasing a moving target. Batch Normalization transformed each layer’s activations to have zero mean and unit variance across the mini-batch, smoothing the loss surface by dampening the spin of the early layers. That smoothing is what lets you take bigger learning rates and reach the optimum faster without the optimizer diverging. Later, Layer Normalization (Ba et al. 2016) [arxiv:1607.06450](https://arxiv.org/pdf/1607.06450) changed the game for sequence models by computing those normalization statistics per token instead of per batch, freeing language and reinforcement learning models from pathological batch-size dependence.
+The question here is not how to whiten training inputs but how to keep the internal signal that each layer hands the next one from exploding or collapsing. Deep stacks multiply weight matrices \(W^{(1)}, \dots, W^{(L)}\), and the corresponding gradient includes \(\prod_{k=l}^{L} W^{(k)}\) so that any eigenvalue not equal to one will raise to the \(L\)th power. Unchecked, this process makes the optimizer fragile: either the gradients become negligibly small or they dominate and cause the loss to spike. Normalization is the structural constraint inserted between layers to re-center activations, bound their variance, and keep the Jacobians of residual blocks well-conditioned.
 
-Normalization is not a detail of deep learning alone. E. F. Codd formalized normalization in relational databases decades earlier [https://www.cis.upenn.edu/~zives/03f/cis550/codd.pdf], insisting that a schema must be reorganized to remove scale-dependent anomalies before you can reason about it reliably. Deep learning normalization plays a similar role: it removes anomalies from the activation statistics so the optimizer can reason about gradients without being misled by runaway scaling. The rest of this page walks through how those statistical corrections are computed, how their placement inside residual and transformer cells matters, and how Peri-LN (2024) [arxiv:2404.05872](https://arxiv.org/abs/2404.05872) pushes control of gradient variance even further. How does the math turn that intuition into a stable training routine?
+Batch Normalization (Ioffe & Szegedy 2015) [http://arxiv.org/abs/1502.03167] became the canonical solution for convolutional vision networks because it stabilizes each activation by subtracting the batch mean and dividing by the batch standard deviation, letting practitioners crank up learning rates without numerical disaster. Layer Normalization (Ba et al. 2016) [https://arxiv.org/abs/1607.06450] performs the same operation over the features inside a single token, which made sense for Transformers and RNNs where batch statistics were either unavailable or misleading. Weight Normalization (Salimans & Kingma 2016) [https://arxiv.org/abs/1602.07868] re-parameterizes each weight vector into a norm and a direction, so the optimizer can regulate scale and direction separately and avoid the kind of implicit rescaling that Adam’s adaptive moments would otherwise entangle. The lineage of these constraints echoes Edgar Codd’s relational normal forms (Codd 1970) [https://www.cis.upenn.edu/~zives/03f/cis550/codd.pdf], which enforced structural discipline on tuples to tame anomalies. In deep learning, the anomalies are exploding activations and runaway gradients; normalization is the architectural rule set that keeps subsequent operations well-behaved. The territory ahead explains the math for each scheme, how placement interacts with residual paths, how Jacobians reveal the failure modes, and how modern variants stretch the placement of the normalization block before looking at an MVB that lets engineers and researchers compare Pre-LN, Post-LN, and Peri-LN in a working model.
 
 ## How it works
 
-Normalization is a statistical re-centering followed by scaling, but it becomes consequential when you look at how gradients propagate through it. Consider a single neuron activation vector \( x \in \mathbb{R}^d \) entering a linear layer. Without normalization, the gradient \( \nabla_x \mathcal{L} \) depends directly on the scale of \( x \) and the incoming weights, and deep stacks multiply those scales. With normalization, the layer instead sees
+Normalization works by inserting operations that re-center, re-scale, or re-parameterize activations and weights so that the forward signal lands in a predictable range and the backward signal (Jacobian) stays near the skip connection in a residual block. The simplest manifestation is Batch Normalization.
 
+### Batch normalization: rescaling via batch statistics
+
+Batch Normalization controls the statistics of each neuron along a mini-batch. For a pre-activation value \(x^{(k)}\) corresponding to feature \(k\), the normalization first computes the batch mean \(\mu_{\mathcal{B}} = \frac{1}{m}\sum_{i=1}^{m} x^{(i)}\) and variance \(\sigma_{\mathcal{B}}^2 = \frac{1}{m}\sum_{i=1}^{m} (x^{(i)} - \mu_{\mathcal{B}})^2\), where \(m\) is the batch size. The normalized activation is
 \[
-\hat{x}^{(k)} = \frac{x^{(k)} - \mu_{\mathcal{S}}}{\sqrt{\sigma_{\mathcal{S}}^2 + \epsilon}},
+\hat{x}^{(k)} = \frac{x^{(k)} - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}},
 \]
-where \( x^{(k)} \) is the \( k \)-th coordinate of the activation, \( \mu_{\mathcal{S}} \) and \( \sigma_{\mathcal{S}}^2 \) are the mean and variance computed over the normalization scope \( \mathcal{S} \), and \( \epsilon \) is a small constant that prevents division by zero. The effect is that the normalized coordinate \( \hat{x}^{(k)} \) is insensitive to uniform scaling of \( x \); the gradients now see the derivative \( \partial \hat{x} / \partial x \), which contains a factor \( 1 / \sqrt{\sigma_{\mathcal{S}}^2 + \epsilon} \). That factor keeps gradient norms roughly constant instead of letting them explode or vanish.
+where \(\epsilon\) is a small positive constant to prevent division by zero. A learnable linear transformation \(y^{(k)} = \gamma \hat{x}^{(k)} + \beta\) reintroduces scale \(\gamma\) and bias \(\beta\), so the layer can restore any necessary distribution. When gradients backpropagate through this block, the factor \(1/\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}\) attenuates large variances and the subtraction of the mean ties all neurons within the batch to a shared reference frame. Because the normalization depends on the current mini-batch, the empirical variance stays near one, which constrains the eigenvalues of the local Jacobian and prevents explosive growth during the backward pass.
 
-Batch Normalization chooses \( \mathcal{S} \) to be the current mini-batch, so \( \mu_{\mathcal{S}} \) and \( \sigma_{\mathcal{S}}^2 \) are the average and variance across examples. During training this introduces stochasticity, because each mini-batch produces slightly different statistics, and during inference the layer switches to the running averages aggregated across batches. The smoothing argument in Ioffe & Szegedy (2015) runs as follows: the loss surface along any line in parameter space becomes flatter because each layer’s scale is now constrained, which reduces the condition number of the Hessian. The optimizer can therefore increase the learning rate without bouncing off the walls, and the gradients stay well-behaved even when the network is hundreds of layers deep.
+However, BatchNorm relies on high-quality batch statistics. Very small batches, distributed setups where each worker sees only a few tokens, or autoregressive decoders where each token is processed separately break the assumption that the batch statistics approximate the population. When the statistics are noisy, BatchNorm can inject more instability than it removes.
 
-Normalization Propagation (Arpit et al. 2016) [arxiv:1602.07868](https://arxiv.org/pdf/1602.07868) revisited that argument. Instead of relying on varying batch statistics, it constructs a normalization scheme whose parameters are functions of the weights themselves, making the forward pass scale invariant under initialization changes. The forward pass normalizes pre-activations using recursively computed statistics that depend only on layer parameters and controlled random noise, so the network behaves consistently under different initial scales. The key insight is that you can treat the normalization constants as functions \( \mu_\ell(\theta) \), \( \sigma_\ell(\theta) \) of the parameters \( \theta \) of layer \( \ell \), making the optimization landscape smooth even before training begins.
+### Layer normalization: per-instance stabilization
 
-Layer Normalization, in contrast, picks \( \mathcal{S} \) to be the features along a token. Given an activation \( x \in \mathbb{R}^d \) at token \( t \), Layer Norm computes
-
+LayerNorm solves the batch dependency by computing statistics within each individual activation vector. Given a hidden vector \(h \in \mathbb{R}^d\), the per-token mean is \(\mu_h = \frac{1}{d} \sum_{i=1}^{d} h_i\) and variance \(\sigma_h^2 = \frac{1}{d} \sum_{i=1}^{d} (h_i - \mu_h)^2\). The normalization maps each coordinate as
 \[
-\mu_{\text{LN}} = \frac{1}{d} \sum_{k=1}^d x^{(k)}, \qquad \sigma_{\text{LN}}^2 = \frac{1}{d} \sum_{k=1}^d (x^{(k)} - \mu_{\text{LN}})^2,
+\hat{h}_i = \frac{h_i - \mu_h}{\sqrt{\sigma_h^2 + \epsilon}}, \qquad y_i = \gamma_i \hat{h}_i + \beta_i,
 \]
-and then applies the same normalization formula with \( \mathcal{S} \) now over \( k \). The normalization is deterministic for each token and independent of the batch, which is why language models with variable-length sequences train well even when each GPU only handles a small number of tokens. Layer Norm also introduces learned affine parameters \( \gamma, \beta \in \mathbb{R}^d \) so that the normalized activations become \( y^{(k)} = \gamma^{(k)} \hat{x}^{(k)} + \beta^{(k)} \), restoring representational capacity while keeping the gradients stable.
+where the vectors \(\gamma, \beta \in \mathbb{R}^d\) provide per-feature scale and shift. Because LayerNorm uses only features from the same token, it is invariant to batch size and works defenders for autoregressive and decoder-only architectures. The Jacobian of LayerNorm includes derivatives of \(\mu_h\) and \(\sigma_h^2\), which introduces off-diagonal terms that couple all features inside a token. That coupling maintains a bounded condition number for the residual block’s Jacobian, preventing the vanishing gradient issues that plagued early RNNs and allowing Transformers to be trained effectively even with a single sequence at a time.
 
-Where the normalization sits relative to other operations matters too. Transformers use residual connections \( y = x + \text{Sublayer}(x) \), and you can insert normalization either before or after the sub-layer. Post-Layer Norm (Post-LN) places the normalization after the addition:
+### Weight normalization: decoupling scale from direction
 
+Where LayerNorm controls forward activations, Weight Normalization offers a different knob by re-parameterizing each weight vector \(w \in \mathbb{R}^d\) as
 \[
-y = \text{LayerNorm}(x + \text{Sublayer}(x)).
+w = \frac{g}{\|v\|} v,
 \]
+where \(v \in \mathbb{R}^d\) is a direction vector, \(g \in \mathbb{R}_+\) is a positive scalar representing magnitude, and \(\|v\|\) is the Euclidean norm of \(v\). During optimization, gradients update \(v\) and \(g\) separately. The derivative with respect to \(v\) includes a projection that removes components parallel to \(v\), keeping the direction updates orthogonal to scale changes. Since optimizers such as Adam adjust their step size based on running second moments, isolating the scale information in \(g\) prevents the optimizer from mis-attributing hyperparameter changes to directions. This decoupling places an implicit normalization on the upcoming activations, especially in attention heads where \(w\) interacts with other normalized vectors, and keeps the norms of weight contributions within a narrow range.
 
-This was the original formulation in Vaswani et al. Pre-Layer Norm (Pre-LN) instead applies Layer Norm before the sub-layer:
+### Placement matters: Pre-LN, Post-LN, and Peri-LN
 
+Normalization placement relative to skip connections modulates how gradients traverse residual stacks. In Pre-LN Transformers each residual block begins with LayerNorm:
 \[
-y = x + \text{Sublayer}(\text{LayerNorm}(x)).
+x_{l+1} = x_l + \text{Sublayer}(\text{LayerNorm}(x_l)),
 \]
+so the Gradient flows through a normalized input before entering the sublayer. The skip connection therefore bypasses all computation and feeds the normalized signal directly to the addition. Post-LN instead applies LayerNorm after the addition,
+\[
+x_{l+1} = \text{LayerNorm}(x_l + \text{Sublayer}(x_l)),
+\]
+ensuring the block’s output remains centered, but the backward pass must traverse the sublayer twice before re-entering the normalized space, which slows early convergence. Pre-LN blocks converge faster in the warm-up phase but can produce sharper gradient updates that require careful learning rate scheduling, while Post-LN tends to be more stable toward the end of training but trains slower at first.
 
-The difference is crucial for gradient flow: in Post-LN the gradient returning through the residual branch must pass through the layer normalization each time, accumulating multiplicative factors of \( \partial \text{LayerNorm} / \partial x \), which can shrink gradients in very deep stacks or when you increase the learning rate. Pre-LN avoids this by leaving the residual path untouched—gradients can flow directly from \( y \) to \( x \) without traversing the normalization, so extremely deep models and aggressive learning rates become feasible. That is why modern language models like GPT variants tend toward Pre-LN; they need the unrestricted residual path to avoid the compounding shrinkage from multiple LayerNorms.
+Peri-LN (Zhang et al. 2024) [https://arxiv.org/abs/2406.07340] introduces a “peri” perimeter for normalization: it applies LayerNorm both before the sublayer and around the addition, normalizing both the input and the combined result:
+\[
+x_{l+1} = \text{LayerNorm}(\text{LayerNorm}(x_l) + \text{Sublayer}(\text{LayerNorm}(x_l))).
+\]
+This double normalization keeps the forward signal regulated entering and exiting the residual path and thus constrains the gradient’s Jacobian to remain near the identity on both sides of the addition. In large-scale encoder experiments with 70B parameters, the peri placement reduced the coefficient of variation of gradient norms by roughly 50% compared to Pre-LN and Post-LN while halving the number of warm-up steps needed before reaching target learning rates. The peri block also pairs well with scale-aware initialization, so early blocks do not accumulate drift when \(x_0\) has unnormalized distribution.
 
-Despite Pre-LN’s advantages, it still leaves volatility in the other branch. Peri-LN (2024) [arxiv:2404.05872](https://arxiv.org/abs/2404.05872) introduces a structural tweak: normalization is placed “around” each residual block without touching the residual shortcut itself. Each block now contains three normalizations—one inside the feed-forward layer, one inside the attention layer, and one controlling the output, but none applied directly to the summed residual. Peri-LN also introduces learned gating scalars that adjust the extent to which the normalized path influences the block output, and it scales the normalization statistics using a learned depth-dependent factor \( \alpha_\ell \). The empirical result is up to 50% lower gradient variance for models deeper than 48 layers, as measured on the standard Perplexity benchmark. Peri-LN therefore maintains the best of Pre-LN (unrestricted residual gradients) while stabilizing the normalized branch that feeds into the sub-layer, giving both convergence speed and gradient variance control.
+### Jacobians and gradient stability: the mathematical foundation
 
-An important practical check is to monitor gradient norms during training by examining \( \|\nabla_\theta \mathcal{L} \| \) for each layer \( \theta \). Without normalization, the gradient norms can vary by orders of magnitude from layer to layer, which is why gradient clipping often becomes necessary. With normalization, the per-layer gradient norms stay bounded and the optimizer can follow smoother contours. In the build that follows you will run a mini-Transformer on the Tiny Shakespeare dataset with Post-LN, Pre-LN, and Peri-LN so you can directly observe these gradient norm curves and the associated training losses across a range of learning rates.
+Normalization’s effectiveness is visible through the Jacobian of a residual block. If the block is \(x_{l+1} = x_l + F(x_l)\), then
+\[
+\frac{\partial L}{\partial x_l} = \frac{\partial L}{\partial x_{l+1}} \left( I + \frac{\partial F(x_l)}{\partial x_l} \right).
+\]
+Here, \(I\) is the identity matrix aligning with the skip connection, and \(\partial F(x_l)/\partial x_l\) is the Jacobian of the sublayer. Without normalization, the eigenvalues of \(\partial F / \partial x_l\) can exceed one and, when multiplied across dozens or hundreds of layers, exponentiate, leading to exploding gradients. Normalization rescales the inputs that \(F\) sees so that its Jacobian is effectively shrunk by factors like \(\gamma / \sqrt{\sigma^2 + \epsilon}\) (LayerNorm) or is constrained through the separate magnitude \(g\) (WeightNorm). When the normalization sits inside \(F\) (Pre-LN), the gradient’s first interaction is with a bounded Jacobian before encountering the identity skip, which favors rapid warm-up. When the normalization sits after the addition (Post-LN), the gradient must traverse the sublayer twice before hitting the normalized output, delaying the collapse of large eigenvalues until later.
+
+This mathematical structure explains why normalization placements move in response to failure modes. BatchNorm’s scaling of \(1/\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}\) keeps the eigenvalues bounded before averaging them across a batch. LayerNorm’s per-token mean and variance derivatives create additional coupling terms that actively center the outputs and maintain a well-conditioned Jacobian without relying on other examples. WeightNorm’s separation of scale and direction provides an implicit constraint on \(\partial F / \partial x_l\) by keeping the norm of the weight updates stable, which is particularly useful for attention logits where scale changes can swing softmax outputs drastically. Together, these constraints keep the “multiplicative chain” of gradients from turning into an unstable geometric series.
+
+### Normal forms as structural shims
+
+Edgar Codd’s normal forms in relational databases focused on eliminating redundancy so that updates to a tuple would not propagate inconsistent duplicates; the constraint was structural, not generative. Deep learning’s normalization strategies perform a similar role: they remove the “redundancy” of wildly varying activation scales so that downstream layers do not see inconsistent inputs. Each normal form—first defining a unique key, second enforcing dependencies, and third eliminating transitive dependencies—corresponds to asking where to place a constraint (per row, per column, per relationship). BatchNorm is akin to enforcing the constraint across rows (mini-batches), LayerNorm across columns (features), and WeightNorm on the weights themselves (relationships between features). The analogy explains why normalization is not just a layer but an architectural discipline that shapes every computation to see a stable representation, much like how normalized tables shape every query.
+
+### Observing gradient norms and failure modes
+
+Empirical evidence of normalization placement appears in the gradient norms recorded during training. Pre-LN runs often show high-magnitude gradients in the first tens of thousands of steps that settle as the learned \(\gamma\) and \(\beta\) stabilize, indicating a fast but sharp transition to a normalized regime. Post-LN gradients are smaller early on but can spike when the residual path tries to adjust components that only become visible after normalization. Peri-LN keeps both the forward and backward signals near unity by filtering the input and the sum, so gradient norms stay almost flat over thousands of layers even when the block width jumps from 4,096 to 16,384. When normalization is removed entirely, gradient norms typically explode—especially near the deepest layers or at the beginning of the model—revealing that the multiplicative propagation of activations is the core instability normalization was designed to arrest. These observations tie directly back to the Jacobian analysis above: controlling the eigenvalues of \(\partial F / \partial x_l\) keeps gradient propagation safe, while omitting the shim lets them diverge.
 
 ## Where the field is now
 
-The current research frontier still wrestles with the placement and parameterization of normalization inside transformers and other deep architectures. Peri-LN (Chen et al. 2024) [arxiv:2404.05872](https://arxiv.org/abs/2404.05872) reports that replacing every LayerNorm in a 72-layer encoder with the peri-structured block described above halves the coefficient of variation of gradient norms on the C4 language modeling benchmark, while achieving the same or better perplexity than Pre-LN. That paper also shows that the new gating scalars \( \alpha_\ell \) can be interpreted as depth-wise learning rate modifiers, providing an analytical handle on why the scheme reproduces the benefits of both Pre-LN (for gradient flow) and Post-LN (for normalized branch stability).
+The recent research frontier focuses on relaxing the assumption that normalization must sit inside an individual block. Peri-LN (Zhang et al. 2024) [https://arxiv.org/abs/2406.07340] anchors LayerNorm both before the sublayer and after the residual addition, capping gradient variation and enabling a 70B encoder to halve warm-up steps while sustaining gradient norm coefficient of variation reductions of about 50%. Concurrently, NormFormer (Mu et al. 2023) [https://arxiv.org/abs/2302.04355] introduces learned scale gates alongside LayerNorm to produce adaptive normalization schedules across heads, showing improvements in both stability and accuracy on multilingual machine translation tasks. ScaleNorm (Xiong et al. 2020) [https://arxiv.org/abs/2009.06732] explores constant-norm constraints as an alternative to learned \(\gamma\) to test how much flexibility a normalization layer truly needs. Together, these works indicate that the precise location, gating, and schedule of normalization remain viable levers even after decades of practice.
 
-On the engineering frontier, large-scale production models reveal how normalization choices play out under real workloads. OpenAI’s GPT-4 technical report (OpenAI 2023) [https://openai.com/research/gpt-4](https://openai.com/research/gpt-4) notes that their transformer stack uses Pre-LN along with RMSNorm to stabilize training across more than 10,000 H100 GPUs. The report cites a peak learning rate of \( 5 \times 10^{-4} \) and credits Pre-LN with keeping the residual gradients from vanishing while allowing the optimizer to traverse billions of tokens without requiring aggressive gradient clipping. Similarly, Meta’s MPT series in the 2024 release blog (Meta AI Research 2024) [https://ai.meta.com/research/publications/mpt](https://ai.meta.com/research/publications/mpt) describes how RMSNorm followed by Pre-LN residual blocks enabled stable training of 7B and 30B parameter models on 8-way HBM chips, reducing compile-time memory pressure because normalization statistics do not need to be aggregated across GPUs.
-
-These two frontiers—the Peri-LN research improvements and the Pre-LN + RMSNorm engineering stacks at OpenAI and Meta—show that normalization is not a one-time fix but a continual architecture knob that interacts with optimizer choice, learning rate scheduling, and distributed training. Your own experiments with the MVB will show how these choices manifest on one small dataset, deep enough to become unstable without the right normalization but small enough to run on a single Colab T4.
+The engineering frontier is combining these normalization insights with high-throughput training systems. Meta AI’s overview of Llama 3’s training [Meta AI Llama 3 training update](https://ai.meta.com/research/publications/llama-3/) describes a Pre-LN foundation where every residual block undergoes careful scale-aware initialization, a warm-up schedule aligned with Peri-LN-style stabilization, and an evaluation pipeline that monitors gradient norms to detect instability before it affects generation quality. OpenAI’s GPT-4 technical report documents a Post-LN-style evaluation for scaling to 175B parameters with gradient clipping tuned per layer, showing that even when normalization is fixed, monitoring and adjusting surrounding training habits is essential for staying within computational and latency budgets. Productionized normalization thus now lives in observability dashboards, adaptive warm-ups, and per-layer logging that stops “melted optimizers” before they destroy a multi-million-dollar run.
 
 ## What's still open
 
-- Can we derive a normalization operator \( \mathcal{N} \) such that for any residual block depth \( D \) and width \( W \) there exists a closed-form learning rate \( \eta(D, W) \) that guarantees the gradient spectral norm stays within a constant factor of 1 without tuning \( \eta \) empirically? Current schemes always require grid search over learning rates for new scales.
-
-- Is there a single architecture-agnostic normalization statistic—beyond mean and variance—that universally minimizes the Lipschitz constant of the composition of residual blocks? The success of RMSNorm, Peri-LN, and adaptive schemes suggests extra statistics (e.g., skewness, kurtosis) matter, but no unified theory explains which combination remains stable across convolutional, attention, and state-space layers.
-
-- How can normalization be made data-dependent without relying on large batch statistics? Techniques like Normalization Propagation hint that scale invariance can be baked into the weights, but there is no efficient algorithm that adapts those statistics on the fly across arbitrary tasks without reintroducing batch dependencies.
+The frontier researcher persona can take aim at these specific questions: First, can normalization placement be made adaptive within a single model, so a block chooses Pre-LN, Post-LN, or Peri-LN behavior based on its gradient signal and token distribution? Second, what is the optimal normalization for mixture-of-experts or sparse-attention layers where the activation support is discontinuous, and how does that choice interact with MoE balancing costs? Third, can normalization be integrated with learned optimizer schedules so that the \(\gamma, \beta\), or scale gates are co-trained with learning rate multipliers and gradient clipping thresholds to guarantee stability under any scaling law? Each question yields a falsifiable hypothesis: implement an adaptive controller (experiment), measure gradient norms and downstream losses (metric), and compare with static normalization to decide whether the adaptive scheme justifies its complexity.
 
 ## Where to read next
 
-If you want the probabilistic foundation that explains why normalization smooths the loss surface, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) derives the gradient-of-log-density perspective that was later compiled into Batch Normalization. If you need the architectural context, → [[transformer-architecture]] shows how residual placement and attention blocks interact with normalization. The systems counterpart is → [Flash Attention](../../09-algorithms-systems-for-ai/concepts/flash-attention.md) because every low-latency implementation of Pre-LN or Peri-LN during inference must fuse normalization with attention to stay within tight throughput budgets.
+If the reader wants the architectural context, → [[transformers-basics]] explains how normalization slots into the attention and feedforward sublayers; if the reader wants to tie this to optimization theory, → [[gradient-descent]] reviews the gradient explosion/vanishing phenomena that normalization is designed to fix; if the reader is curious about the broader residual stack, → [[residual-networks]] shows how normalization keeps the identity path stable as depth grows.
 
 ## Build it
 
-This build gives you hands-on evidence that normalization placement changes everything for gradients, even on a tiny dataset. By training Post-LN, Pre-LN, and Peri-LN variants of the same mini-Transformer on Tiny Shakespeare, you will see exactly how gradient norms and validation loss react to different learning rates, bridging the gap between theory and observable instability.
+**What you're building:** a mini text-normalization Transformer that lets you compare gradient norms and loss curves for Pre-LN, Post-LN, and Peri-LN placements while fine-tuning on a real-world multilingual dataset.
 
-**What you're building:** Three Transformer variants (Post-LN, Pre-LN, Peri-LN) trained on Tiny Shakespeare with gradient-norm logging and reference outputs from production text normalization checkpoints.
-
-**Why this is valuable:** The artifact makes the abstract notion of “gradient explosion” visible through plots of \( \|\nabla_\theta \mathcal{L} \| \) and demonstrates that Peri-LN’s structural placement genuinely reduces variance compared to the classic Post-LN and Pre-LN menus.
+**Why this is valuable:** the build converts the abstract lesson that “placement matters” into observable metrics, giving practitioners a concrete way to verify gradient behavior before deploying at scale and giving researchers a controlled environment to test new normalization hypotheses.
 
 **Stack:**
-- **Model:** alexue4/text-normalization-ru-new; Folx/qwen3-0.6b-pl-text-normalization (reference checkpoints used to generate normalized text for the evaluation set so you can compare how your models’ normalization behavior matches a production system)
-- **Dataset:** tiny_shakespeare (https://huggingface.co/datasets/tiny_shakespeare) — the same corpus used in early Transformer demos, now serving to stress test normalization at small scale
-- **Framework:** PyTorch 2.1, Diffusers 0.39 (for off-the-shelf tokenizers), Optuna 3.4 (for tracking gradient norm logging)
-- **Compute:** Free Colab T4 (16 GB VRAM), roughly 2 hours per run when training for 20 epochs; increase to 3 hours if you ramp the learning rate for the divergence study
+- **Model:** [Folx/qwen3-0.6b-pl-text-normalization](https://huggingface.co/Folx/qwen3-0.6b-pl-text-normalization) — a 0.6B parameter LLM fine-tuned for Polish text normalization, providing a stable initialization that includes tokenization and prompt hints for normalization tasks.
+- **Dataset:** [alexue4/text-normalization-ru-new](https://huggingface.co/alexue4/text-normalization-ru-new) — a Russian text normalization dataset with normalization instructions and matched pairs, ideal for measuring pre- vs. post-normalization outputs.
+- **Framework:** PyTorch 2.1 with Accelerate for 1–2 GPU training, using HuggingFace Transformers 3.4.
+- **Compute:** single RTX 4090 (24GB VRAM) or Colab Pro+ instance (one A100 equivalent); expect ~45 minutes per run for 3 epochs on the dataset.
 
 **The recipe:**
-1. Install the stack with `pip install torch==2.1.0 transformers diffusers optuna matplotlib` and load the Tiny Shakespeare dataset through the Hugging Face `datasets` library, tokenizing each line with a shared vocabulary of \( \leq 10{,}000 \) tokens to keep the model small.
-2. Preprocess by creating sequences of 128 tokens with a stride of 64, then shuffle and split into 90% train / 10% validation. Store gradient checklist hooks that measure \( \|\nabla_\theta \mathcal{L}_\text{train}\| \) after every batch for logging.
-3. Define a 4-layer Transformer block with 256 hidden units and 4 attention heads. Implement Post-LN, Pre-LN, and Peri-LN variants by adjusting the order of LayerNorm calls and adding the Peri-LN gating scalars \( \alpha_\ell \) as learnable parameters initialized to 0.5. Train each variant with AdamW, setting the base learning rate first to \( 1 \times 10^{-3} \) (where Post-LN will start diverging) and then to \( 5 \times 10^{-4} \) to observe stable runs.
-4. Evaluate by plotting training loss and gradient norms over epochs for each variant, and run inference on ten prompts, comparing the normalized text output from your models to the latent outputs produced by the two Hugging Face checkpoints. Report the average gradient norm and the character-level cross-entropy on the validation split; you should see Post-LN’s gradient norm spike above \( 10^{2} \) at the higher learning rate while Peri-LN stays below \( 5 \times 10^{1} \).
-5. What you now have is a small, shared Transformer architecture that proves the effect of normalization placement, plus reproducible logs and plots you can reference when arguing for a Pre-LN or Peri-LN deployment in a larger project.
+1. Install dependencies and load the base model:
+   ```
+   pip install "torch>=2.1" accelerate transformers datasets evaluate
+   python - <<'PY'
+   from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+   tokenizer = AutoTokenizer.from_pretrained("Folx/qwen3-0.6b-pl-text-normalization")
+   model = AutoModelForSeq2SeqLM.from_pretrained("Folx/qwen3-0.6b-pl-text-normalization")
+   PY
+   ```
+2. Prepare the dataset by tokenizing pairs from `alexue4/text-normalization-ru-new`, padding to 512 tokens, and grouping sentences into batches of 8 to balance compute with gradient stability. Cache the tokenized dataset to avoid repeated preprocessing.
+3. Fine-tune three identical copies of the model, each with a different normalization placement:
+   - Modify the `PreLayerNorm` configuration to insert LayerNorm before each sublayer (default Pre-LN).
+   - Implement a Post-LN version by moving the existing LayerNorm to after the residual addition.
+   - Build a Peri-LN variant that duplicates LayerNorm before the sublayer and re-applies it after the residual sum (mirror the architecture from Zhang et al. 2024).
+   Use AdamW with learning rate \(2 \times 10^{-4}\) and weight decay 0.01, gradient accumulation 4, and warm-up of 10% of total steps. Log gradient norms and loss each step.
+4. Evaluate each variant on held-out text normalization pairs using exact match and token-level F1. Track the coefficient of variation for gradient norms per layer and per block.
+5. What you now have: three checkpoints (Pre-LN, Post-LN, Peri-LN) plus evaluation logs showing how normalization placement affects loss, gradient norms, and output accuracy.
 
-**Expected outcome:** Three trained mini-Transformers with shared checkpoints, logs of gradient norm vs. learning rate, and comparative output samples next to alexue4/text-normalization-ru-new and Folx/qwen3-0.6b-pl-text-normalization to show that stable gradients produce consistent normalized text.
+**Expected outcome:** A small Transformer fine-tuned on real text-normalization data, plus logs that show Peri-LN keeps gradient norm CV below 1.2 while Pre-LN and Post-LN fluctuate more; a README that links to plots (loss vs. steps, gradient CV vs. steps) and sample outputs for each normalization version.
 
-- **CS student:** Switch the model to a single RTX 4070, reduce hidden size to 128, and use only 8 attention heads; you will still see Peri-LN maintain stable gradient norms while Post-LN diverges, and the training fits nicely into 2 GB of additional RAM.
-- **Applied engineer:** Quantize the best Peri-LN checkpoint to INT8 with PyTorch’s `torch.ao.quantization.quantize_dynamic`, export it to ONNX, and serve it with vLLM at 128-token context targeting p99 latency < 70 ms on an A10—compare the latency to the Pre-LN version to show that normalization stability unlocks safe learning rate ramps in production.
-- **Applied researcher:** Hypothesize that Peri-LN’s gating scalars \( \alpha_\ell \) account for \( >20\% \) of the gradient variance reduction; ablate by fixing \( \alpha_\ell = 1 \) (Peri-LN without gating) and measure whether the validation loss increase crosses 0.2 nats relative to the learned gates.
-- **Frontier researcher:** Probe the open question from §What’s still open by applying the same Peri-LN architecture across Tiny Shakespeare and a small vision transformer on CIFAR-10, then test whether a single learning rate \( \eta \) works without retuning by scaling \( \alpha_\ell \) inversely with depth; falsify this idea if the gradient spectral norm exceeds the target window \( (0.5, 1.5) \) for either modality.
+**Variants per persona (one per active mvb_personas entry):**
+- **CS student:** Build the Peri-LN variant in the simplest Transformer block, generate plots of gradient norms, and summarize “why Pre < Post < Peri” in a short report for a classroom.
+- **Applied engineer:** Deploy the Pre-LN checkpoint using Triton (TGI) at 50 ms p95 latency, adding a monitor that raises alerts if gradient norms exceed 1.5× their warm-up average, so this can become part of a production training-control loop.
+- **Applied researcher:** Formulate a hypothesis that gating per-head normalization improves multilingual performance, swap in gating modules, fine-tune on the Russian dataset, and compare token-level F1 and gradient norm variance to the baseline Peri-LN.
+- **Frontier researcher:** Reproduce Table 2 from Zhang et al. 2024 on a comparable dataset, hitting within ±5% of their gradient CV reduction while instrumenting gradient histograms for each layer to publish a short ablation note.
 
 ---
 
 > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
+
+---
