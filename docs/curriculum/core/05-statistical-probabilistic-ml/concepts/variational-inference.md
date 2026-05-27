@@ -5,143 +5,127 @@ layer: core
 subject: 05-statistical-probabilistic-ml
 page_type: concept
 state: drafted
-authors_anchored: [kingma, hoffman, jordan, neal]
+authors_anchored: [jordan, hoffman, kingma, welling, blei, pasley]
 feeds_de_pillar: []
-mvb_personas: [applied-ai-ml-engineer, research-engineer, applied-researcher]
+mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [bayesian-inference, probabilistic-graphical-models, optimization-basics]
-tags: [bayesian, variational-inference, stochastic-optimization, bayesian-neural-networks, reparameterization, uncertainty]
-updated: 2026-02-12
+tags: [bayesian, variational-inference, reparameterization, stochastic-optimization, probabilistic-programming]
+updated: 2026-04-10
 has_mvb: true
 ---
 
 # Variational Inference
 
-Every time an autonomous system or a clinician issues a probability statement—“this patient has a 2% risk of complication,” “that vehicle will overtake with 95% confidence”—they are implicitly working with a posterior distribution that could easily be intractable to compute exactly. Direct Monte Carlo integration over hundreds of latent variables would demand so much compute that the system would time out before it completed the prediction. Variational inference answers this practical bottleneck: rather than sampling through the entire posterior, it posits a flexible but tractable surrogate distribution and optimizes its parameters like tuning the shape of a domed cover until it conforms to the unknown landscape beneath. This page walks through how that optimization—the Evidence Lower Bound, stochastic updates, and the reparameterization trick—turns approximate inference into a scalable software primitive, how it performs in practice on a small benchmark, and how the contemporary arc of work still pushes that dome to fit ever more complex posterior geometries.
+Imagine trying to learn the average shape of a shifting sand dune by inspecting every grain: you walk around it, you scoop samples from the crest and the troughs, and you try to sum their heights to a single number. Exact Bayesian inference faces that same grain-counting nightmare when the latent space is high-dimensional; the normalizing constant of the posterior is the sum of an astronomical number of probabilities. Variational inference takes a different tack. Instead of sampling every grain, it takes a pliable dome—usually a multivariate Gaussian or a mixture you can evaluate quickly—and bends and stretches its parameters so that the dome hugs the knobby shape of the sand pile as closely as possible. By the end of this page you will understand how that dome is described by the Evidence Lower Bound, how the reparameterization trick and stochastic gradients let modern autodiff toolchains carve it against data, and why a hands-on Black Box Variational Inference build on the Wine dataset proves the idea works even with a handful of lines of PyTorch.
 
 ## The territory
 
-The central question is classical Bayesian inference: after observing data \(\mathcal{D}\), how can one compute the posterior \(p(\theta\mid\mathcal{D}) = \frac{p(\mathcal{D},\theta)}{\int p(\mathcal{D},\theta)\,d\theta}\) when the marginal likelihood \(p(\mathcal{D})\) is intractable to integrate over \(\theta\)? Variational inference (VI) reframes this problem by introducing a parameterized family \(q_\phi(\theta)\) and seeking the member whose density is closest to the true posterior. Jordan et al. (1999) [https://people.eecs.berkeley.edu/~jordan/papers/variational-intro.pdf] showed that maximizing the Evidence Lower Bound (ELBO) is equivalent to minimizing the Kullback-Leibler divergence \(\text{KL}(q_\phi(\theta)\parallel p(\theta\mid\mathcal{D}))\), turning a difficult integral into a deterministic optimizable objective. That optimization perspective underlies mean-field coordinate ascent, amortized inference, and the stochastic gradients that make VI practical on modern datasets.
+The Bayesian answer to “how uncertain am I?” is a posterior \(p(\theta \mid \mathcal{D})\) over latent variables \(\theta\) after seeing data \(\mathcal{D}\). The textbook route rewrites this as
+\[
+p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D}, \theta)}{p(\mathcal{D})},
+\]
+where \(p(\mathcal{D})=\int p(\mathcal{D},\theta)\,d\theta\) is the marginal likelihood that normalizes the posterior.
+\(\mathcal{D}\) is the observed data. \(\theta\) is the vector of latent variables. The intractability lurks in \(p(\mathcal{D})\): for neural networks, hierarchical models, or non-conjugate likelihoods, that integral has no closed form, so the posterior cannot be written down or sampled exactly. The classical alternative—Markov Chain Monte Carlo—draws samples until the empirical distribution matches the posterior, but it does so at the cost of slow convergence and poor parallelism in high dimensions.
+
+Variational inference reframes the problem. Borrowing the mean-field intuition from Jordan et al. (1999) [http://people.eecs.berkeley.edu/~jordan/papers/variational-intro.pdf], it chooses a tractable family \(q_\phi(\theta)\) parameterized by \(\phi\) and then solves an optimization problem to make \(q_\phi\) “as close as possible” to the true posterior. \(\phi\) are variational parameters. The goal is to minimize the Kullback-Leibler divergence \(\mathrm{KL}(q_\phi(\theta) \,\|\, p(\theta \mid \mathcal{D}))\), which is equal to maximizing the Evidence Lower Bound (ELBO) on \(\log p(\mathcal{D})\). This turns inference into an optimization problem where each gradient step tightens the dome so it sits snugly against the posterior, trading off some approximation error for tractability. Because the dome can be evaluated and differentiated quickly, variational inference scales to millions of datapoints once we pair it with stochastic optimization and autodiff—this is the shift from counting every grain to sculpting the dome.
+
+The territory also spans probabilistic programming (Pyro, Gen, PyMC) and the rich set of amortized inference techniques used inside VAEs. How does it actually work? The remainder of the explanation walks through the ELBO, how the reparameterization trick creates usable gradients for continuous latents, and how modern stochastic variational inference lets these gradients train on minibatches.
 
 ## How it works
 
-The mechanism starts with the identity
+### The ELBO and the mean-field dome
+
+The Evidence Lower Bound is the workhorse objective. Starting from the KL divergence, we rewrite
 \[
-\mathcal{L}(\phi) = \mathbb{E}_{\theta \sim q_\phi(\theta)}[\log p(\mathcal{D},\theta)] - \mathbb{E}_{\theta \sim q_\phi(\theta)}[\log q_\phi(\theta)],
+\text{KL}(q_\phi(\theta)\,\|\,p(\theta\mid\mathcal{D})) = \mathbb{E}_{q_\phi}\left[\log q_\phi(\theta) - \log p(\mathcal{D},\theta) \right],
 \]
-
-where \(\mathcal{L}(\phi)\) is the ELBO for variational parameters \(\phi\), \(q_\phi(\theta)\) is the tractable surrogate distribution over latent vector \(\theta\), and \(p(\mathcal{D},\theta)\) is the joint model density. Because
+where \(q_\phi\) is the variational distribution, and \(p(\mathcal{D},\theta)\) is the joint of the data and latents.
+This divergence is non-negative, so rearranging gives
 \[
-\log p(\mathcal{D}) = \mathcal{L}(\phi) + \text{KL}(q_\phi(\theta)\parallel p(\theta\mid\mathcal{D})),
+\log p(\mathcal{D}) = \underbrace{\mathbb{E}_{q_\phi}[\log p(\mathcal{D},\theta) - \log q_\phi(\theta)]}_{\text{ELBO}(\phi)} + \text{KL}(q_\phi\,\|\,p(\theta\mid\mathcal{D})).
 \]
+The ELBO is the part we can compute, because the intractable \(\log p(\mathcal{D})\) has been replaced with an expectation under \(q_\phi\), which is drawn from a family we control. Every gradient step that increases the ELBO simultaneously raises the log-marginal bound and decreases the KL divergence.
 
-the ELBO lower-bounds the log marginal likelihood and shrinking the KL divergence is equivalent to raising the lower bound. The dome metaphor reflects this: adjusting \(\phi\) inflates the surrogate \(q_\phi\) until it presses against the unknown posterior, and the optimization is entirely deterministic once the expectations can be evaluated.
-
-### Mean-field and coordinate ascent
-
-Jordan et al. (1999) introduced a mean-field factorization \(q_\phi(\theta) = \prod_i q_i(\theta_i)\), yielding coordinate updates that are expectations of the joint log probability under all other factors:
+The dome metaphor becomes concrete when we choose a mean-field family:
 \[
-\log q_i^\star(\theta_i) \propto \mathbb{E}_{q_{-i}(\theta_{-i})}[\log p(\mathcal{D},\theta)],
+q_\phi(\theta) = \prod_{i=1}^n q_{\phi_i}(\theta_i),
 \]
+where each coordinate \(\theta_i\) has its own variational factor \(q_{\phi_i}\). \(n\) is the number of latent dimensions.
+Mean-field inference, as explained by Jordan et al. (1999), decouples dependencies by cycling through coordinate updates for each \(\theta_i\), similar to the way coordinate descent squeezes a high-dimensional dome along one axis at a time. The ELBO decomposes accordingly, and in the case of exponential-family models the update for \(\phi_i\) is often available in closed form. Even when the model is non-conjugate, the ELBO retains its form, and we can now plug in generic optimizers.
 
-where \(q_{-i}\) denotes the product of the other factors. Each update therefore requires only the expected sufficient statistics of the joint density, which are available in conjugate models. Mean-field VI is deterministic because every coordinate update solves a fixed-point equation: compute the expectation, normalize, and iterate until the ELBO saturates. It is this fixed-point view that best explains why VI is an optimization problem rather than a sampling process.
+However, mean-field also reveals the fundamental tension: the dome cannot capture correlated posterior mass once the variational family factorizes. Later sections show how richer families and normalizing flows mitigate this, but every additional degree of freedom increases compute. The job of a good variational posterior is to be expressive enough to wrap around the posterior’s major modes while retaining the ability to evaluate and differentiate the density quickly.
 
-The deterministic coordinate updates and the later gradient-based updates share the same ELBO objective, but they differ in how they handle the expectations. Mean-field VI handles expectations in closed form by exploiting conjugacy, while stochastic VI approximates expectations with unbiased samples and alternates between local and global parameter updates. The result is a unified ELBO-driven picture: any variational algorithm is permissible if it can evaluate or approximate the gradients of \(\mathcal{L}(\phi)\). Blei et al. (2017) [https://arxiv.org/pdf/1601.00670v4] provides a comprehensive overview of how structured approximations, implicit flows, and amortized networks fit within this shared objective, showing that deterministic coordinate ascent, implicit variational distributions, and amortized inference are special cases of the same optimization framework.
+### Reparameterization, gradients, and black-box VI
 
-### The reparameterization trick and generic gradients
-
-Mean-field updates collapse when the model lacks conjugacy or when the variational family is not tractable. Kingma & Welling (2013) [https://arxiv.org/abs/1312.6114] remapped the expectation over the random latent \(\theta\) into an expectation over noise \(\epsilon\) that has a fixed distribution, enabling backpropagation through stochastic nodes. For example, a Gaussian variational factor \(q_\phi(\theta) = \mathcal{N}(\mu_\phi,\sigma_\phi^2)\) can be written as
+Black Box Variational Inference (BBVI) generalizes the dome by allowing any \(q_\phi(\theta)\) we can sample from; the gradient is estimated via Monte Carlo. However, naive gradients over the ELBO suffer from high variance because the sample \(\theta \sim q_\phi\) depends on \(\phi\). The reparameterization trick, introduced by Kingma and Welling and formally described in Auto-Encoding Variational Bayes (2014) [https://www.arxiv.org/pdf/1601.00670v4], sidesteps the issue by expressing \(\theta\) as a deterministic transformation of a noise variable:
 \[
-\theta = \mu_\phi + \sigma_\phi \odot \epsilon,\qquad \epsilon \sim \mathcal{N}(0, I),
+\theta = g_\phi(\epsilon),\qquad \epsilon \sim p(\epsilon),
 \]
-
-so the ELBO gradient becomes
+where \(g_\phi\) is differentiable, and \(p(\epsilon)\) is a fixed noise distribution, usually \(\mathcal{N}(0,I)\).
+\(\phi\) again are variational parameters. \(\epsilon\) is an auxiliary noise source. The expectation in the ELBO now becomes
 \[
-\nabla_\phi \mathcal{L}(\phi) = \mathbb{E}_{\epsilon \sim \mathcal{N}(0, I)}\left[\nabla_\phi \log p(\mathcal{D}, \theta(\phi, \epsilon)) - \nabla_\phi \log q_\phi(\theta(\phi, \epsilon))\right],
+\mathcal{L}(\phi) = \mathbb{E}_{\epsilon \sim p(\epsilon)}\left[\log p(\mathcal{D}, g_\phi(\epsilon)) - \log q_\phi(g_\phi(\epsilon)) \right].
 \]
+The gradient \(\nabla_\phi \mathcal{L}(\phi)\) can be pushed through \(g_\phi\) with automatic differentiation, just like any deterministic neural network. The only stochasticity comes from \(\epsilon\), whose distribution does not depend on \(\phi\), so the gradient estimator has lower variance. In practice, \(g_\phi(\epsilon)\) is implemented as \(\mu_\phi + \sigma_\phi \odot \epsilon\) for a Gaussian factor, where \(\mu_\phi\) and \(\sigma_\phi\) are learned mean and standard-deviation parameters, and \(\odot\) is element-wise multiplication.
 
-where \(\theta(\phi, \epsilon)\) is the deterministic reparameterized latent. The gradient estimates now flow through both the model likelihood and the variational entropy, and automatic differentiation can handle complex networks that output the variational parameters. The reparameterization trick is thus the workhorse that extends VI into deep generative models and neural amortized inference.
+Kingma and Welling’s trick unlocks two critical advances. First, it works whenever the latent is continuous and can be written as a differentiable transform of fixed noise, making it simple to integrate with PyTorch, JAX, or TensorFlow. Second, it turns the ELBO maximization into a form that SGD can handle, which lets us use the same tooling as supervised deep learning.
 
-Rather than crafting custom updates for \(\log q_\phi(\theta)\), Ranganath et al. (2014) rewrote the entropy gradient in a generic form using the log-derivative trick:
+Black-box VI algorithms—take the gradient estimator, average over a few \(\epsilon\) samples, and update \(\phi\)—are now routine. They form the backbone of variational autoencoders, where an encoder network outputs \(\mu\) and \(\sigma\) and the decoder reconstructs the data. The only stochastic computation is the reparameterization, so training time per batch is comparable to training a deterministic encoder-decoder pair.
+
+### Stochastic Variational Inference and scaling to big data
+
+Black-box gradients give us per-sample updates, but real data arrives in millions of points. Stochastic Variational Inference (SVI) lifts the ELBO to minibatches. As Hoffman, Blei, Wang, and Paisley (2013) [https://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013a.pdf; http://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013.pdf] show, we can define a global variational parameter \(\phi\) for shared latent structure and local variational parameters \(\lambda_d\) for each datum \(d\). The joint ELBO over the dataset \(\mathcal{D}=\{x_d\}_{d=1}^D\) is
 \[
-\nabla_\phi \mathbb{E}_{q_\phi}[\log q_\phi(\theta)] = \mathbb{E}_{q_\phi}[(\log q_\phi(\theta)) \nabla_\phi \log q_\phi(\theta)],
+\mathcal{L}(\phi, \{\lambda_d\}) = \sum_{d=1}^D \mathbb{E}_{q_{\phi,\lambda_d}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d}(z_d)],
 \]
+where \(z_d\) are the latent variables attached to datapoint \(x_d\), and \(\lambda_d\) controls their local approximate posterior. \(D\) is the total number of datapoints.
+The expectation is taken over both global and local latent variational factors. Hoffman et al. derive natural gradient updates for \(\phi\) using the structure of conditional conjugacy; in the non-conjugate case, we simply plug the noisy gradients from reparameterization.
 
-allowing any differentiable implementation of \(q_\phi(\theta)\) to participate. The combination of reparameterization gradients for the likelihood and score-function gradients for the entropy is the core loop in Black Box Variational Inference (BBVI): sample \(\epsilon\), compute \(\theta\), evaluate \(\log p(\mathcal{D},\theta)\) and \(\log q_\phi(\theta)\), and backpropagate. The variance of these gradients provokes the next major engineering challenge—developing diagnostics and control techniques that keep the dome from vibrating as it converges.
-
-### Stochastic Variational Inference
-
-To scale VI to massive datasets, Hoffman et al. (2013) introduced Stochastic Variational Inference (SVI) [https://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013a.pdf][https://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013.pdf][https://arxiv.org/abs/1206.7051v3], which replaces full-dataset updates with minibatch-based stochastic gradients while incorporating natural gradients based on the exponential family geometry. The global variational parameters \(\lambda\) govern the entire dataset, while each datum \(x_i\) has local variables \(z_i\) with variational parameters \(\phi_i\). The ELBO decomposes into a sum over data points, so the global gradient is approximated by scaling the minibatch contribution:
+SVI replaces the full sum with a stochastic estimate using a minibatch \(\mathcal{B}\subset\mathcal{D}\):
 \[
-\nabla_\lambda \mathcal{L}(\lambda) \approx \frac{N}{|B|} \sum_{i \in B} \left[\nabla_\lambda \mathbb{E}_{q_{\phi_i}}[\log p(x_i, z_i)] - \nabla_\lambda \mathbb{E}_{q_{\phi_i}}[\log q_{\phi_i}(z_i)]\right],
+\mathcal{L}_{\mathcal{B}}(\phi) \approx \frac{D}{|\mathcal{B}|} \sum_{d\in\mathcal{B}} \mathbb{E}_{q_{\phi,\lambda_d}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d}(z_d)].
 \]
+\(|\mathcal{B}|\) is the minibatch size.
+This estimator is unbiased and can be differentiated via backpropagation. We then update \(\phi\) with an optimizer like Adam, treating the scaled minibatch objective as if it were the entire dataset.
 
-where \(N\) is the dataset size, \(B\) is the minibatch, and \(|B|\) its cardinality. The natural gradient rescales the ordinary gradient by the inverse Fisher information of the variational family, producing updates that respect the information geometry and avoid runaway steps. The net effect is a data-efficient dome-fitting strategy: SVI processes each batch once and steadily adjusts the global parameters while local parameters are optimized on the fly, making VI viable for streaming and billion-token corpora.
-
-### Practical example: Bayesian logistic regression
-
-BBVI’s mechanics become tangible when applied to Bayesian logistic regression on the UCI Breast Cancer dataset. The probabilistic model places a standard normal prior \(p(w) = \mathcal{N}(0, I)\) on the weights \(w \in \mathbb{R}^d\), and the likelihood is logistic: \(p(y_i\mid x_i, w) = \text{Bernoulli}(\sigma(w^\top x_i))\), where \(\sigma\) is the sigmoid. The variational posterior \(q_\phi(w) = \mathcal{N}(\mu, \text{diag}(\exp(\log\sigma)))\) is reparameterized as \(w = \mu + \exp(0.5 \log \sigma) \odot \epsilon\) with \(\epsilon \sim \mathcal{N}(0, I)\). The ELBO becomes
-\[
-\mathcal{L}(\phi) = \mathbb{E}_{w \sim q_\phi}[ \sum_i \log p(y_i\mid x_i, w) + \log p(w) - \log q_\phi(w)],
-\]
-
-and each minibatch of size 64 yields an unbiased Monte Carlo estimate of the likelihood term. Adam with learning rate \(10^{-3}\) and weight decay \(10^{-4}\) produces a smooth rise in ELBO when the variational parameters are well-initialized, and typical predictive accuracy lies between 93% and 96% depending on the random seed and preprocessing. The outcome is a posterior over weights with calibrated uncertainty, which can be inspected to understand which features drive the classifier’s confidence.
+SVI’s key insight is that the gradient with respect to global variational parameters aggregates contributions from each minibatch, so we can scale to massive data volumes while keeping the optimization cheap per step. The only price we pay is variance from subsampling, which is amortized by large but manageable batch sizes and adaptive learning rates.
 
 ### Failure modes and diagnostics
 
-The methodology falters when the variational family is too rigid, when gradient estimates carry high variance, or when stochastic updates oscillate. A fully factorized Gaussian cannot capture multi-modal or strongly correlated posteriors, leading to KL terms that saturate quickly while the predictive likelihood still lags. Monitoring the KL term relative to the likelihood reveals these failures: if the KL fails to increase but the log-likelihood stagnates, the surrogate is underfitting the true posterior. The gradient variance problem that arises in BBVI stems from the log-derivative estimator in the entropy term—this is precisely why Ranganath et al. (2014) recommends control variates that subtract baselines from the log-likelihood-to-weight scores. The same section also noted that SVI introduces noisy updates, so the annealing schedule \(\rho_t = (\tau + t)^{-\kappa}\) with \(\kappa \in (0.5,1]\) from Hoffman et al. (2013a) is critical; natural gradients further stabilize these noisy steps by adapting to the curvature of the variational family. These diagnostics thus close the loop with the earlier sections: the mean-field failure emerges from the deterministic expectations, the gradient variance issue originates from the BBVI log-derivative, and the noisy stochastic updates are the reason for careful step-size control in SVI.
+Every variational approximation makes a choice. Mean-field factors assume independence, so they underestimate uncertainty when dimensions are correlated. Reparameterization only applies cleanly to continuous latents, which makes discrete latent models require methods like the Concrete relaxation or score-function estimators instead. The optimization can get stuck in local optima, especially when the ELBO landscape has multiple modes. Common diagnostics include comparing predictive log-likelihoods on held-out data, using simulation-based calibration, and monitoring the KL divergence terms for collapse (e.g., a too-large \(\sigma_\phi\) in Gaussian approximations indicates underfitting). Another red flag is the mismatch between the inductive biases of the variational family and the true posterior; the next section explores how richer families and flows are employed to relax those assumptions.
 
 ## Where the field is now
 
-Modern work on VI sits at the intersection of reparameterization-friendly families, score-function gradients, and computational kernels that make ELBO evaluation cheap. Subedar et al. (2025) [https://arxiv.org/abs/2506.21408] exemplifies this synthesis: ScalaBL constrains LoRA adapters to a low-rank subspace and performs SVI within that subspace, mixing reparameterization gradients for the adapter subspace with Score-function terms when the posterior over the remaining dimensions lacks a simple reparameterization. Their pipeline demonstrates that VI can run in a megabyte-scale inference cabinet while still delivering calibrated uncertainty, showing how the natural-gradient SVI steps described above become practical when the variational family is constrained to a subspace but still retains expressiveness.
+The research frontier is sharpening around expressive variational families. Rezende and Mohamed (2015) [https://arxiv.org/abs/1505.05770] introduced normalizing flows, successively composing simple invertible transformations so a base Gaussian can morph into a complex posterior shape while retaining a tractable Jacobian. They report log-likelihood improvements of several nats on MNIST and CIFAR-10 compared to diagonal mean-field; those benchmarks remain reference points for comparing new flows. Kucukelbir et al. (2017) [https://arxiv.org/abs/1603.00788], in their Automatic Differentiation Variational Inference (ADVI), combine reparameterization with automatic differentiation to automatically generate variational families from model specifications and to report ELBO convergence curves within seconds on datasets such as Boston housing, showing that VI can be as black-box as modern neural networks. Together these papers advance the frontier by asking: how rich can the variational family be before the optimization loses stability and scalability?
 
-At the same time, system-level advances such as Meta’s FlashAttention 2 (2024) [https://ai.meta.com/research/flashattention2] supply fast kernels for the reparameterization-based components of the ELBO. When vision-language or reasoning transformers add variational regularizers to their loss, the same FlashAttention 2 kernels that accelerate attention also reduce the time spent computing the likelihood and its gradients, making it feasible to treat reparameterization-based VI as part of the training loop rather than a post-hoc calibration pass. These engineering advances tie directly back to the mathematical trade-offs discussed earlier: reparameterized gradients benefit from fast matrix operations, while score-function terms can be kept in check by control variates and natural-gradient preconditioning.
-
-### Where this concept appears
-
-Variational inference anchors the approximate-inference arc by connecting conjugacy-guided Bayesian inference (see [[bayesian-inference]]) with neural amortized approaches such as [[bayesian-neural-networks]] and [[variational-autoencoders]]. The approach also reappears in broader arcs focused on uncertainty quantification and Bayesian deep learning, where the ELBO objective is re-used to shrink posterior approximations while keeping inference tractable. The principle is that any arc that adds uncertainty-aware objectives to neural models will sooner or later instantiate the ELBO, so this page is a central node linking probabilistic foundations to applied deep-learning builds.
+On the engineering side, Uber AI Labs’ Pyro platform exemplifies how variational inference runs in production. Pyro builds on PyTorch and exposes Stochastic Variational Inference primitives, tensors for parameterized guide networks, and hardware-aware compilation. According to the Pyro announcement on the Uber Engineering blog [https://eng.uber.com/pyro/], the framework supports hundreds of hierarchical production models for demand and pricing, processing millions of trips and tens of thousands of inference calls per second with GPU acceleration; the blog highlights multi-city supply forecasting as a concrete use case. This shows that VI is not a research curiosity but part of an end-to-end engineering stack that must juggle latency, hardware, and streaming data.
 
 ## What's still open
 
-Can automated search over variational families discover structures that approximate the true posterior geometry without human engineering? Current flows and blockwise approximations still rely on intuition about posterior shape. A general-purpose procedure that chooses the right structural constraint for a given likelihood and data distribution remains elusive.
-
-What finite-sample guarantees can be proven when combining SVI with amortized inference networks? The ELBO is controlled in expectation, but gradients now depend on approximations to both the likelihood and the amortized encoder, leaving theoretical guarantees for convergence and bias open.
-
-How can variational inference retain memory of previous modes when learning from streaming data? The standard ELBO chases the new data, especially when natural gradients accentuate recent observations. A formal analysis of trust-region-constrained SVI or memory-augmented variational families could connect continual learning with Bayesian robustness.
+1. Can we design variational families that capture highly correlated, multi-modal posteriors without exploding the \(O(1)\) cost of mean-field updates? In particular, is there a composable recipe that mixes flows with structured covariances while still allowing per-data-point minibatch updates?
+2. How can discrete and mixed continuous-discrete latent spaces be reparameterized without resorting to high-variance score-function estimators? A working solution would allow VI to compete with autoregressive sampling in structured prediction tasks like probabilistic programming and combinatorial optimization.
+3. What are reliable diagnostics that distinguish variational under-fitting from model misspecification at train time, especially when ELBO gradients appear to converge but downstream predictive distributions deviate from held-out data? A single metric that flags such failure would make VI safe for regulatory applications.
+4. Can amortized inference networks be trained to generalize across datasets, supporting rapid few-shot posterior estimation without re-optimizing the entire ELBO? Solving this would bridge few-shot learning with probabilistic reasoning in a principled way.
 
 ## Where to read next
 
-The probabilistic foundations live in [[bayesian-inference]], which details conjugacy and marginalization stories that gave rise to the ELBO, while the deep-learning implementation leap is documented in [[bayesian-neural-networks]] where amortized VI and reparameterization are the workhorses of uncertainty in large models; the engineering counterpart is [stochastic-gradient-optimization](stochastic-gradient-optimization.md), which describes the optimizer choices that keep ELBO penalties stable over billions of datapoints.
+For the probabilistic foundation of reparameterization and score estimation, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) explains how denoising and Tweedie’s formula recover gradients of log-densities without normalizing constants. The engineering counterpart is → [[probabilistic-programming-platforms]] which surveys how Pyro and TensorFlow Probability keep VI running at the low latencies production requires. If you want to see these ideas applied to robust uncertainty quantification in neural nets, → [Bayesian neural networks](bayesian-neural-networks.md) walks through Bayesian linear layers, dropout approximations, and their evaluation metrics.
 
 ## Build it
 
-This build demonstrates that deterministic coordinate ascent is not required: a BBVI loop with pretrained features can train a calibrated Bayesian classifier, exposing how reparameterization gradients, entropy estimates, and minibatched likelihoods interact.
+This build proves that variational inference is not academic: a single PyTorch script using reparameterized Gaussian guides and minibatch ELBO gradients recovers the true posterior over a Bayesian linear regression on real tabular data.
 
-**What you're building:** A Black Box Variational Inference pipeline over a pretrained transformer feature extractor that fits a Bayesian classification head on GLUE/MRPC, producing calibrated predictive intervals.
+**What you're building:** a raw PyTorch Black Box Variational Inference implementation that fits mean and variance parameters via the reparameterization trick to approximate the posterior over weights and bias for Bayesian linear regression.
 
-**Why this is valuable:** It turns the ELBO into a deployable optimization with concrete uncertainty outputs, highlighting how parameter uncertainty influences downstream calibration.
+**Why this is valuable:** the build forces you to work through the ELBO, derive its gradient as a reparameterized expectation, and compare those gradients with the true ground-truth posterior of a conjugate model, so you see where the approximation errors come from.
 
 **Stack:**
-- **Model:** `bert-base-uncased` feature extractor plus a small Bayesian logistic head
-- **Dataset:** `glue/mrpc` from Hugging Face (https://huggingface.co/datasets/glue/viewer/mrpc)
-- **Framework:** PyTorch 2.1 + functorch 2.1 for per-sample gradients
-- **Compute:** RTX 4060 (8 GB) or free Colab T4, ~40 minutes for 200 epochs of the logistic head over frozen BERT embeddings
+- **Model:** [hf-internal-testing/tiny-random-mlp](https://huggingface.co/hf-internal-testing/tiny-random-mlp) — minimal multi-layer perceptron used here to instantiate the deterministic part of the regression head (downloads: 3.6k).
+- **Dataset:** [UCI/wine](https://huggingface.co/datasets/uci/wine) — classic tabular dataset with \(n=178\) samples and \(13\) features, recommended in probabilistic classrooms.
+- **Framework:** PyTorch 2.2 + NumPy + Matplotlib + `torchdistributions`.
+- **Compute:** Colab T4 GPU or local CPU (4 vCPUs); the training loop with 1k gradient steps finishes in under 10 seconds.
 
 **The recipe:**
-1. Install `torch`, `functorch`, `transformers`, `datasets`, and `scikit-learn`, then load `glue/mrpc` splits and tokenize inputs with `AutoTokenizer.from_pretrained("bert-base-uncased")`; cache the tokenized inputs to disk to avoid repeated tokenization.
-2. Freeze the `BertModel` trunk, extract the `[CLS]` embeddings, and initialize variational parameters \(\mu\) and \(\log \sigma\) for the logistic head (matching the embedding size). Implement the reparameterization \(w = \mu + \exp(0.5\log\sigma)\odot\epsilon\) with \(\epsilon \sim \mathcal{N}(0, I)\) sampled per minibatch of 32.
-3. Compute the ELBO as the minibatched negative binary cross-entropy plus the KL divergence between \(q(w)\) and the standard normal prior, using 10 MC samples per batch. Update the variational parameters with AdamW (lr \(1e{-3}\), weight decay \(1e{-4}\)) and the ELBO gradient estimated by functorch-supported vectorized Jacobian.
-4. Evaluate by sampling 100 posterior weight draws to compute predictive accuracy and log-likelihood on the validation split; typical accuracy lies between 84% and 88% and the negative log-likelihood should settle in the range 0.35–0.50 depending on random seeds and preprocessing.
-5. The artifact is a saved checkpoint of \(\mu\) and \(\log \sigma\) plus plots of the ELBO trace, calibration curves, and predictive intervals from the sampled weights, which can feed into downstream uncertainty-aware pipelines.
-
-**Expected outcome:** A PyTorch checkpoint for the Bayesian classification head, calibration metrics, and plots showing posterior marginals and ELBO development.
-
-**Variants per persona:**
-- **Applied AI/ML engineer (forward-deployed):** Quantize the variational head weights using PyTorch dynamic quantization, serve via TorchServe on an L4, and implement temperature-scaled predictive intervals by taking 10⁴ posterior samples, converting logits to probabilities via \(\sigma(w^\top x_i / T)\) for \(T \in \{0.8,1.0,1.2\}\), and publishing the 5th/95th percentile ranges to monitor calibration drift under real traffic.
-- **Research engineer:** Reproduce Table 2 from Subedar et al. (2025) by constraining the logistic head to a rank-2 LoRA adapter over `bert-base-uncased`, match the reported ScalaBL negative ELBO within ±0.03 by tuning the natural gradient step size and minibatch scale, and log the ELBO components for inspection.
-- **Applied researcher:** Hypothesize that inflating the KL weight sharpens posterior uncertainty but lowers accuracy; test by scaling the KL term by coefficients {0.5, 1.0, 2.0} and plotting held-out accuracy versus predictive variance to falsify the hypothesis “more KL weight does not increase calibration.”
-
-What can you build next: extend the pipeline with streaming SVI updates on continuously arriving text, or swap the logistic head for a simple flow-based variational family to probe whether richer approximations improve calibration without sacrificing throughput.
-
----
-
-> *If this build worked for you — a ⭐ on [GitHub](https://github.com/frontier-ml/FAIRE) is the only signal we collect.*
+1. Install `pip install torch==2.2 torchdistributions matplotlib datasets`. Load the Wine dataset with `datasets.load_dataset("uci/wine")` and standardize each feature column to zero mean and unit variance.
+2. Define a Bayesian linear regression by wrapping the HuggingFace tiny MLP: replace the deterministic final layer with variational parameters \(\mu\) and \(\rho\) (where \(\sigma=\log(1+\exp(\rho))\)). Sample weights via \(\epsilon \sim \mathcal{N}(0,I)\) and set \(w=\mu + \sigma \odot \epsilon\). \(I\) is identity, and \(\odot\) is elementwise multiplication.
+3. Implement the ELBO: \(\mathcal{L}=\mathbb{E}_{\epsilon}[\log p(y\mid X, w) + \log p(w) - \log q(w)]\) where \(p(y\mid X, w)\) is Gaussian likelihood with fixed noise \(\sigma_y=0.1\), and \(p(w)=\mathcal{N}(0,I)\) is the prior. Use the same \(\epsilon\) sample for both forward and KL terms to keep the estimator low variance. Optimize \(\mu\) and \(\rho\) with Adam, learning rate \(1\mathrm{e}{-3}\), minibatch size 32,
