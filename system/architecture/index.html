@@ -1151,10 +1151,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-the-long-running-cycle-what-actually-happens-for-10" class="md-nav__link">
+  <a href="#8-what-a-real-cycle-actually-cost-30-top-up-may-2026" class="md-nav__link">
     <span class="md-ellipsis">
       
-        8. The long-running cycle (what actually happens for $10)
+        8. What a real cycle actually cost ($30 top-up, May 2026)
       
     </span>
   </a>
@@ -1554,45 +1554,50 @@
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                              ▲
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                              │ writes / reads
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>┌─────────────────────────────────────────────────────────────────┐
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  Layer 4 — Editorial pipeline (LangGraph)                        │
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>│  Layer 4 — Editorial pipeline (LangGraph, per-page)              │
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>│     load_persona → read_stub → research → plan_and_scratch       │
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│        → write_{draft|arc_step|arc_index} → link → review_PANEL  │
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│        → write_file → commit → log_run                           │
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>└─────────────────────────────────────────────────────────────────┘
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                              ▲
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>                              │ uses
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>┌─────────────────────────────────────────────────────────────────┐
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>│  Layer 3 — Skills (agents/skills/*.md)                           │
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>│     faire-sense · wiki-prose · math-latex · mvb-recipe           │
-<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>│     source-policy · sota-coverage · navigation-ia · arc-context  │
-<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│     critic-human-centered · critic-beginner-onramp ·             │
-<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│     critic-wiki-voice · critic-info-architecture ·               │
-<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│     critic-build-nudge                                            │
-<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>└─────────────────────────────────────────────────────────────────┘
-<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>                              ▲
-<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>                              │ accesses
-<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>┌─────────────────────────────────────────────────────────────────┐
-<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>│  Layer 2 — Tools (agents/src/frontier_agents/tools.py)           │
-<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>│     Exa: papers · sota · production · find_similar               │
-<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>│     HF:  models · datasets                                        │
-<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│     FS:  read_stub · write_file · ensure_track_index             │
-<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│     Git: git_commit (auto when conf ≥ 0.7)                       │
-<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>└─────────────────────────────────────────────────────────────────┘
-<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>                              ▲
-<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>                              │ routed via
-<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>┌─────────────────────────────────────────────────────────────────┐
-<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>│  Layer 1 — Models (OpenRouter via LangChain ChatOpenAI)          │
-<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>│     writer · reviewer · research · mvb · fallback                │
-<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>│     Budget gate: full → reduced → paused                         │
-<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>└─────────────────────────────────────────────────────────────────┘
-<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>                              ▲
-<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>                              │ measured by
-<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>┌─────────────────────────────────────────────────────────────────┐
-<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>│  Layer 0 — Control loop                                          │
-<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>│     observer (sensor) → supervisor (controller) →                │
-<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>│     pipeline (actuator) → runs.jsonl (feedback)                  │
-<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│     Set points: quality 0.85 · coverage 0.80 · staleness 180d    │
-<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>└─────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>│        → build_writing_checklist → write_{draft|arc_step|         │
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>│           arc_index} → link → review (rubric + 8-critic panel)   │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>│        → revise → review&#39; → keep_best_draft (knockout) →         │
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>│           route_after_review → write_file (H1-fixed, arc-       │
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>│           breadcrumbed) → commit (if conf ≥ 0.7) → log_run        │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>└─────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>                              ▲
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                              │ uses
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>┌─────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>│  Layer 3 — Skills (agents/skills/*.md)                           │
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>│     faire-sense · wiki-prose · math-latex · mvb-recipe           │
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>│     source-policy · sota-coverage · navigation-ia · arc-context  │
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>│     critic-human-centered · critic-beginner-onramp ·             │
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>│     critic-wiki-voice · critic-info-architecture ·               │
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>│     critic-build-nudge                                            │
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>└─────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>                              ▲
+<a id="__codelineno-0-27" name="__codelineno-0-27" href="#__codelineno-0-27"></a>                              │ accesses
+<a id="__codelineno-0-28" name="__codelineno-0-28" href="#__codelineno-0-28"></a>┌─────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-29" name="__codelineno-0-29" href="#__codelineno-0-29"></a>│  Layer 2 — Tools (agents/src/frontier_agents/tools.py)           │
+<a id="__codelineno-0-30" name="__codelineno-0-30" href="#__codelineno-0-30"></a>│     Exa: papers · sota · production · find_similar               │
+<a id="__codelineno-0-31" name="__codelineno-0-31" href="#__codelineno-0-31"></a>│     HF:  models · datasets                                        │
+<a id="__codelineno-0-32" name="__codelineno-0-32" href="#__codelineno-0-32"></a>│     FS:  read_stub · write_file · ensure_track_index             │
+<a id="__codelineno-0-33" name="__codelineno-0-33" href="#__codelineno-0-33"></a>│     Git: git_commit (auto when conf ≥ 0.7)                       │
+<a id="__codelineno-0-34" name="__codelineno-0-34" href="#__codelineno-0-34"></a>└─────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-35" name="__codelineno-0-35" href="#__codelineno-0-35"></a>                              ▲
+<a id="__codelineno-0-36" name="__codelineno-0-36" href="#__codelineno-0-36"></a>                              │ routed via
+<a id="__codelineno-0-37" name="__codelineno-0-37" href="#__codelineno-0-37"></a>┌─────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-38" name="__codelineno-0-38" href="#__codelineno-0-38"></a>│  Layer 1 — Models (OpenRouter via LangChain ChatOpenAI)          │
+<a id="__codelineno-0-39" name="__codelineno-0-39" href="#__codelineno-0-39"></a>│     writer · reviewer · research · mvb · fallback                │
+<a id="__codelineno-0-40" name="__codelineno-0-40" href="#__codelineno-0-40"></a>│     Budget gate: full → reduced → paused                         │
+<a id="__codelineno-0-41" name="__codelineno-0-41" href="#__codelineno-0-41"></a>└─────────────────────────────────────────────────────────────────┘
+<a id="__codelineno-0-42" name="__codelineno-0-42" href="#__codelineno-0-42"></a>                              ▲
+<a id="__codelineno-0-43" name="__codelineno-0-43" href="#__codelineno-0-43"></a>                              │ measured by
+<a id="__codelineno-0-44" name="__codelineno-0-44" href="#__codelineno-0-44"></a>┌─────────────────────────────────────────────────────────────────┐
+<a id="__codelineno-0-45" name="__codelineno-0-45" href="#__codelineno-0-45"></a>│  Layer 0 — Closed control loop (per-cycle)                       │
+<a id="__codelineno-0-46" name="__codelineno-0-46" href="#__codelineno-0-46"></a>│     observer (sensor) → supervisor (controller) →                │
+<a id="__codelineno-0-47" name="__codelineno-0-47" href="#__codelineno-0-47"></a>│     sprint (actuator, N pages parallel) → runs.jsonl (feedback)  │
+<a id="__codelineno-0-48" name="__codelineno-0-48" href="#__codelineno-0-48"></a>│     → retrospective (reflector: scrum-style retro + safe         │
+<a id="__codelineno-0-49" name="__codelineno-0-49" href="#__codelineno-0-49"></a>│         auto-applies stub-seeds) → next cycle&#39;s supervisor       │
+<a id="__codelineno-0-50" name="__codelineno-0-50" href="#__codelineno-0-50"></a>│     Set points: quality 0.85 · coverage 0.80 · staleness 180d    │
+<a id="__codelineno-0-51" name="__codelineno-0-51" href="#__codelineno-0-51"></a>└─────────────────────────────────────────────────────────────────┘
 </code></pre></div>
 <hr />
 <h2 id="4-the-agent-roster">4. The agent roster<a class="headerlink" href="#4-the-agent-roster" title="Permanent link">&para;</a></h2>
@@ -1650,18 +1655,25 @@
 <td>same node</td>
 </tr>
 <tr>
+<td><strong>Checklist builder</strong></td>
+<td>Promotes scratch_pad facts to mandatory: must-cite papers (arxiv-id resolved), must-use HF model IDs (pre-verified by <code>verify_mvb_stack</code>), must-include equations, must-link concept slugs</td>
+<td>scratch_pad</td>
+<td><code>writing_checklist</code> dict</td>
+<td><code>nodes.py::build_writing_checklist_node</code></td>
+</tr>
+<tr>
 <td><strong>Writer</strong></td>
-<td>Produces a full schema-compliant page draft</td>
-<td>persona + plan + scratch_pad</td>
+<td>Produces a full schema-compliant page draft constrained by the checklist</td>
+<td>persona + plan + scratch_pad + checklist</td>
 <td><code>draft</code></td>
 <td><code>nodes.py::write_{draft,arc_step,arc_index}_node</code></td>
 </tr>
 <tr>
-<td><strong>Sanitizer</strong></td>
-<td>Strips fenced YAML, preambles; ensures file starts with <code>---</code></td>
+<td><strong>Sanitizer + H1 fixer</strong></td>
+<td>Strips fenced YAML and preambles; promotes the first heading after frontmatter to <code># Topic</code> if writer drifted to <code>## Topic</code></td>
 <td>draft</td>
 <td>sanitized final</td>
-<td><code>nodes.py::_sanitize_draft</code></td>
+<td><code>nodes.py::_sanitize_draft</code>, <code>_ensure_h1</code></td>
 </tr>
 <tr>
 <td><strong>Linker</strong></td>
@@ -1671,29 +1683,29 @@
 <td><code>nodes.py::link_node</code></td>
 </tr>
 <tr>
-<td><strong>Critic panel (planned)</strong></td>
-<td>5 specialized critics, run in parallel; each scores one dimension</td>
-<td>draft + scratch_pad</td>
-<td fixes="fixes" issues_="issues," score_="score,">per-critic</td>
-<td><code>nodes.py::review_node</code> (refactor target)</td>
-</tr>
-<tr>
-<td><strong>Aggregator (planned)</strong></td>
-<td>Combines critic outputs into single confidence + issue list</td>
-<td>critic outputs</td>
-<td><code>review_confidence</code>, <code>review_feedback</code></td>
-<td>same as review</td>
+<td><strong>Critic panel (8 critics, parallel)</strong></td>
+<td>Each <code>critic-*</code> skill spawns one parallel API call scoring its dimension (info-architecture · beginner-onramp · human-centered · wiki-voice · build-nudge · cohesion · coverage · prerequisites). Combined with structured rubric reviewer + deterministic checklist enforcement + future-arxiv-ID validator</td>
+<td>draft + scratch_pad + checklist</td>
+<td>per-critic {score, issues, fixes}, aggregated <code>review_confidence</code></td>
+<td><code>nodes.py::review_node</code>, <code>_run_critic_panel</code>, <code>_aggregate_review</code></td>
 </tr>
 <tr>
 <td><strong>Reviser</strong></td>
-<td>One revision pass on flagged drafts</td>
+<td>Up to 2 revision passes on flagged drafts</td>
 <td>draft + critic feedback</td>
 <td>revised draft</td>
 <td><code>nodes.py::revise_draft_node</code></td>
 </tr>
 <tr>
+<td><strong>Knockout selector</strong></td>
+<td>After revise + re-review, keeps the higher-confidence of {previous, revised}; restores prior draft if revision regressed by ≥0.02 (PerFine pattern, arxiv 2510.24469)</td>
+<td>review_confidence vs prev_review_confidence</td>
+<td><code>draft</code>, <code>review_confidence</code></td>
+<td><code>nodes.py::keep_best_draft_node</code></td>
+</tr>
+<tr>
 <td><strong>Committer</strong></td>
-<td>git add + commit if confidence ≥ <code>GIT_COMMIT_THRESHOLD</code></td>
+<td>git add + commit if confidence ≥ <code>GIT_COMMIT_THRESHOLD</code>; never-throw-away routing lands ≥0.6 drafts on disk</td>
 <td>output_path + confidence</td>
 <td>git side-effect</td>
 <td><code>nodes.py::commit_node</code></td>
@@ -1718,6 +1730,13 @@
 <td>docs/</td>
 <td><code>last_audit.json</code></td>
 <td><code>audit.py::audit_wiki</code></td>
+</tr>
+<tr>
+<td><strong>Retrospective (backlog agent)</strong></td>
+<td>After every cycle: aggregates deterministic signals (per-track health, recurring critic issues, unresolved wikilinks, heading drift, citation health), runs scrum-style retro through gpt-5-mini with structured output, auto-applies safe items (stub-seeds for high-reference unresolved slugs)</td>
+<td>runs.jsonl + supervisor.json + backlinks.json + sprint queue</td>
+<td><code>docs/system/backlog.md</code>, auto-seeded stub files</td>
+<td><code>retrospective.py::retrospective_job</code></td>
 </tr>
 </tbody>
 </table>
@@ -1843,8 +1862,18 @@
 </tr>
 <tr>
 <td><code>docs/system/changelog.md</code></td>
-<td>Quality delta per sprint</td>
-<td>scheduler</td>
+<td>Per-page generation log</td>
+<td>logger agent</td>
+</tr>
+<tr>
+<td><code>docs/system/backlog.md</code></td>
+<td>Sprint retrospectives (scrum-style: went-well, went-wrong, needs-depth, new-to-add, process-improvements)</td>
+<td><strong>retrospective agent</strong></td>
+</tr>
+<tr>
+<td><code>docs/system/learnings-log.md</code></td>
+<td>Human-curated cross-cycle learnings</td>
+<td>human</td>
 </tr>
 <tr>
 <td><code>docs/system/backlinks.json</code></td>
@@ -1935,8 +1964,12 @@
 </thead>
 <tbody>
 <tr>
-<td>Per-run quality</td>
-<td>review fails → revise → re-review (max 2 revisions)</td>
+<td>Per-run quality (within page)</td>
+<td>review fails → revise → re-review → <strong>knockout selector</strong> keeps higher-confidence draft (max 2 revisions)</td>
+</tr>
+<tr>
+<td>Per-run hallucination guards</td>
+<td>deterministic future-arxiv-ID validator + checklist enforcement inside <code>review_node</code> — pure regex/arithmetic, zero LLM cost</td>
 </tr>
 <tr>
 <td>Per-cycle quality</td>
@@ -1944,7 +1977,11 @@
 </tr>
 <tr>
 <td>Per-cycle coverage</td>
-<td>filesystem stub count → supervisor queues generate actions</td>
+<td>filesystem stub count + unresolved wikilinks → supervisor queues generate actions</td>
+</tr>
+<tr>
+<td><strong>Per-cycle retrospective</strong> (new)</td>
+<td>runs.jsonl + critic_panel + backlinks.json → <code>retrospective_job</code> → <code>backlog.md</code> + auto-seeded stubs → supervisor reads on next cycle</td>
 </tr>
 <tr>
 <td>Long-horizon voice</td>
@@ -1956,95 +1993,61 @@
 </tr>
 </tbody>
 </table>
-<p>The system has feedback for everything <em>except</em> the writer's own voice over time. That last loop is the next upgrade — see <code>critic-attribution + persona-update</code> under "what's missing" below.</p>
+<p>The retrospective loop is the centerpiece — it makes the system <em>learn from itself</em>. Each cycle's scrum retro names what went well, what regressed, what needs depth, and what to add. Safe items (stub-seed for unresolved wikilinks referenced 2+ times) auto-apply; risky items (queue-priority changes, arc proposals, author pages) are queued for human review. The next cycle's supervisor sees the new stubs and the retro context, and the wiki grows in the direction the agents themselves identified as weak.</p>
 <hr />
-<h2 id="8-the-long-running-cycle-what-actually-happens-for-10">8. The long-running cycle (what actually happens for $10)<a class="headerlink" href="#8-the-long-running-cycle-what-actually-happens-for-10" title="Permanent link">&para;</a></h2>
-<p>Concrete numbers under current model config (writer = gemini-3.1-flash-lite, reviewer = gpt-5-mini, research = gemini-2.0-flash-lite, panel of 5 critics in parallel):</p>
+<h2 id="8-what-a-real-cycle-actually-cost-30-top-up-may-2026">8. What a real cycle actually cost ($30 top-up, May 2026)<a class="headerlink" href="#8-what-a-real-cycle-actually-cost-30-top-up-may-2026" title="Permanent link">&para;</a></h2>
+<p>These are measured numbers from the production run that shipped 60 v2 pages across the 10 canonical tracks. Model stack: writer/MVB = <code>openai/gpt-5.1-codex-mini</code>, reviewer = <code>openai/gpt-5-mini</code>, critics = <code>google/gemini-3.1-flash-lite</code>, research = <code>google/gemini-3.5-flash</code>.</p>
 <table>
 <thead>
 <tr>
-<th>Step</th>
-<th>Cost</th>
-<th>Time</th>
-<th>Cumulative</th>
+<th>Metric</th>
+<th>Value</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Per page: research (3 Exa calls + 2 HF)</td>
-<td>$0.02</td>
-<td>10s</td>
-<td></td>
+<td>Pages shipped (approved)</td>
+<td>53 / 60 (88%)</td>
 </tr>
 <tr>
-<td>Per page: plan + scratch</td>
-<td>$0.02</td>
-<td>8s</td>
-<td></td>
+<td>First-try approval rate</td>
+<td>73%</td>
 </tr>
 <tr>
-<td>Per page: write draft</td>
-<td>$0.06</td>
-<td>25s</td>
-<td></td>
+<td>Average confidence</td>
+<td>0.76</td>
 </tr>
 <tr>
-<td>Per page: link injection</td>
-<td>$0.01</td>
-<td>5s</td>
-<td></td>
+<td>Tracks with ≥4 concept pages</td>
+<td>10 / 10</td>
 </tr>
 <tr>
-<td>Per page: review panel (5× parallel critics)</td>
-<td>$0.05</td>
-<td>12s (longest critic)</td>
-<td></td>
+<td>Total spent</td>
+<td><strong>$7.41</strong></td>
 </tr>
 <tr>
-<td>Per page: revise (if needed, avg 0.7×)</td>
-<td>$0.04</td>
-<td>15s</td>
-<td></td>
+<td>Per-page cost (incl. revisions)</td>
+<td><strong>$0.18</strong></td>
 </tr>
 <tr>
-<td>Per page: commit + log</td>
-<td>$0</td>
-<td>2s</td>
-<td></td>
+<td>Budget remaining (of $30 top-up)</td>
+<td>$22.77</td>
 </tr>
 <tr>
-<td><strong>One full page</strong></td>
-<td><strong>~$0.20</strong></td>
-<td><strong>~70s</strong></td>
-<td>$0.20</td>
+<td>Wall-clock for full sprint</td>
+<td>~3.5 hours @ 4 parallel workers</td>
 </tr>
 <tr>
-<td>~25 curriculum pages</td>
-<td>$5.00</td>
-<td>~30 min @ 4 parallel workers</td>
-<td>$5.00</td>
+<td>Retrospective cycle (gpt-5-mini, structured output)</td>
+<td>$0.04, 25s</td>
 </tr>
 <tr>
-<td>~10 arc steps + 2 arc indexes</td>
-<td>$2.40</td>
-<td>~12 min</td>
-<td>$7.40</td>
-</tr>
-<tr>
-<td>~12 improvement passes on flagged</td>
-<td>$1.80</td>
-<td>~10 min</td>
-<td>$9.20</td>
-</tr>
-<tr>
-<td>Audit + supervisor LLM call</td>
-<td>$0.20</td>
-<td>2 min</td>
-<td><strong>~$9.40</strong></td>
+<td>Auto-seeded stubs from first retro</td>
+<td>7</td>
 </tr>
 </tbody>
 </table>
-<p>That brings us to ~50 pages on a $10 cap, then <code>paused</code> mode. Maintenance after that is audit + supervisor only until the next budget anchor.</p>
+<p>Per-page breakdown holds at roughly: research $0.02 · plan+scratch $0.02 · checklist $0.005 · write $0.05 · link $0.005 · review (rubric + 8 critics in parallel) $0.05 · revise (~0.27× of pages) $0.03. The closed loop is significantly cheaper than the v1 budget table above because the checklist + knockout selector reduce revision count and the critic panel runs in parallel.</p>
 <hr />
 <h2 id="9-whats-still-missing-the-honest-list">9. What's still missing (the honest list)<a class="headerlink" href="#9-whats-still-missing-the-honest-list" title="Permanent link">&para;</a></h2>
 <table>
@@ -2059,39 +2062,33 @@
 <tbody>
 <tr>
 <td>1</td>
-<td><strong>Critic panel.</strong> Current <code>review_node</code> is one model, one call.</td>
+<td><strong>Critic-attribution → persona update.</strong> Failed-critic patterns surface in <code>backlog.md</code>, but the writer's persona YAML isn't yet auto-amended by the retrospective.</td>
 <td>Medium</td>
-<td>One model can't be expert in IA + voice + sources + nudge + reader-fit at once.</td>
+<td>Without this, the same critic flags can recur cycle after cycle even when the retro identified them.</td>
 </tr>
 <tr>
 <td>2</td>
-<td><strong>Critic-attribution feedback.</strong> Failed-critic patterns don't feed back into the writer's persona.</td>
-<td>Medium</td>
-<td>Without this, the system doesn't actually improve its voice over time.</td>
+<td><strong>Arc proposal phase.</strong> Supervisor should propose arc slates once curriculum coverage stabilises; retrospective already flags candidates but doesn't promote them.</td>
+<td>Small</td>
+<td>The user picks which arcs become real; matches the "2 active arcs at a time" canon.</td>
 </tr>
 <tr>
 <td>3</td>
-<td><strong>Arc proposal phase.</strong> After curriculum coverage &gt; 60%, supervisor should propose a slate of arcs to materialize.</td>
+<td><strong>Author pages.</strong> High-frequency cited researchers (Bengio, He, Vaswani, Pearl…) deserve author pages with their seminal works; retrospective flags this but it's marked moderate-risk and stays human-review.</td>
 <td>Small</td>
-<td>The user picks which arcs become real; matches the "2 active arcs at a time" constraint.</td>
+<td>Compounds citation density and gives every concept page a place to deep-link to.</td>
 </tr>
 <tr>
 <td>4</td>
-<td><strong>Backlinks bidirectional.</strong> Curriculum links forward to arcs that may not exist yet; arc steps need to add backlinks to curriculum on creation.</td>
-<td>Small</td>
-<td>The "Where this concept appears" section currently can be wrong.</td>
-</tr>
-<tr>
-<td>5</td>
 <td><strong>Visual sanity for math.</strong> No automated check that LaTeX renders.</td>
 <td>Small</td>
 <td>Some pages have unrendered <code>\(...\)</code> because of escaping.</td>
 </tr>
 <tr>
-<td>6</td>
-<td><strong>MVB executability check.</strong> No verification that the named model ID + dataset ID exist on HuggingFace at write time.</td>
-<td>Small</td>
-<td>An MVB pointing to a renamed/deleted model is a dead end.</td>
+<td>5</td>
+<td><strong>Hybrid local/cloud mode.</strong> Critics could run locally (Gemma 3 4B) while writer/reviewer stay cloud — cuts cost ~30%. Local-mode has working scaffold but Gemma 4 MLX is broken upstream.</td>
+<td>Medium</td>
+<td>Cheap parallel critic fanout without burning OpenRouter budget on every dimension.</td>
 </tr>
 </tbody>
 </table>
