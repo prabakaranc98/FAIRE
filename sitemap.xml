@@ -113,6 +113,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/adaptive-optimizers/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/backpropagation/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -122,6 +126,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/gradient-descent/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/layer-normalization/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -138,6 +146,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/residual-connections/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/residual-networks/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -178,6 +190,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/mcmc/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/probabilistic-programming/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -301,7 +317,19 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/communication-collectives/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/compiler-optimizations-for-ml/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/data-parallelism/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/differentiable-optimization/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -321,11 +349,19 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/kv-cache-management/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/kv-cache/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/llm-architecture-optimizations/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/llm-inference/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -357,7 +393,15 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/quantization-basics/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/quantization/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/reinforcement-learning-schedulers/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>

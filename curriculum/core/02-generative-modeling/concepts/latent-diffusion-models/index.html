@@ -1295,34 +1295,34 @@
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
 <p>The mechanism of latent diffusion unwinds in four acts: compress, diffuse, predict, and decode. Each act is engineered so that expensive computations happen in the small latent space and only the decoder touches the full-resolution pixels.</p>
 <h3 id="compress-encoding-semantic-structure">Compress: encoding semantic structure<a class="headerlink" href="#compress-encoding-semantic-structure" title="Permanent link">&para;</a></h3>
-<p>The first act is a perceptual compression <span class="arithmatex">\(\mathcal{E}\)</span>. Instead of shrinking images with a fixed downsampling, an LDM trains an autoencoder whose encoder <span class="arithmatex">\(\mathcal{E}\)</span> learns to preserve the features that matter to a downstream diffusion model, and whose decoder <span class="arithmatex">\(\mathcal{D}\)</span> reconstructs the same features from the latent. The latent encoding is written as
-[
+<p>The first act is a perceptual compression <span class="arithmatex">\(\mathcal{E}\)</span>. Instead of shrinking images with a fixed downsampling, an LDM trains an autoencoder whose encoder <span class="arithmatex">\(\mathcal{E}\)</span> learns to preserve the features that matter to a downstream diffusion model, and whose decoder <span class="arithmatex">\(\mathcal{D}\)</span> reconstructs the same features from the latent. The latent encoding is written as</p>
+<div class="arithmatex">\[
 z = \mathcal{E}(x)
-]</p>
+\]</div>
 <p>where <span class="arithmatex">\(x\)</span> is the high-resolution input image, <span class="arithmatex">\(\mathcal{E}\)</span> is the encoder network, and <span class="arithmatex">\(z\)</span> is the low-dimensional latent representation.</p>
-<p>The decoder reverses the process:
-[
+<p>The decoder reverses the process:</p>
+<div class="arithmatex">\[
 \hat{x} = \mathcal{D}(z)
-]</p>
+\]</div>
 <p>where <span class="arithmatex">\(\mathcal{D}\)</span> is the decoder network and <span class="arithmatex">\(\hat{x}\)</span> is the reconstructed image.</p>
 <p>This autoencoder is often trained separately with a combination of reconstruction and perceptual losses so that <span class="arithmatex">\(\mathcal{D}\)</span> can fill in the pixel-level detail after the diffusion model provides the semantic blueprint. Because most of the U-Net’s compute never sees a 1024×1024 tensor, the LDM’s training batch size can grow, and each update requires fewer accelerator nodes.</p>
 <h3 id="diffuse-applying-noise-in-latent-space">Diffuse: applying noise in latent space<a class="headerlink" href="#diffuse-applying-noise-in-latent-space" title="Permanent link">&para;</a></h3>
-<p>Once the latent <span class="arithmatex">\(z_0\)</span> is available, we run the standard diffusion forward process on it. The latent forward process mirrors a DDPM: at each timestep <span class="arithmatex">\(t\)</span>, we mix <span class="arithmatex">\(z_0\)</span> with Gaussian noise,
-[
+<p>Once the latent <span class="arithmatex">\(z_0\)</span> is available, we run the standard diffusion forward process on it. The latent forward process mirrors a DDPM: at each timestep <span class="arithmatex">\(t\)</span>, we mix <span class="arithmatex">\(z_0\)</span> with Gaussian noise,</p>
+<div class="arithmatex">\[
 z_t = \sqrt{\bar{\alpha}_t}\, z_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon
-]</p>
+\]</div>
 <p>where <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, I)\)</span> is standard normal noise, <span class="arithmatex">\(\bar{\alpha}_t = \prod_{s=1}^t (1 - \beta_s)\)</span> is the cumulative product of the noise schedule <span class="arithmatex">\(\beta_s\)</span>, and <span class="arithmatex">\(z_t\)</span> is the noisy latent seen by the U-Net at timestep <span class="arithmatex">\(t\)</span>. The schedule <span class="arithmatex">\(\{\beta_s\}\)</span> is chosen so that <span class="arithmatex">\(\bar{\alpha}_t\)</span> decays smoothly from 1 to 0; common choices include cosine or sigmoid schedules, though the score-matching literature shows that smoothing the score estimation noise yields more stable training (To smooth a cloud or to pin it down: Guarantees and Insights on Score Matching i (2023) [arxiv:2305.09605v3]).</p>
-<p>Training then optimizes the latent-space noise prediction network <span class="arithmatex">\(\epsilon_\theta\)</span> to match the sampled noise. The LDM loss is
-[
-\mathcal{L}<em _epsilon="\epsilon" t_="t," x_="x,">{\text{LDM}} = \mathbb{E}</em>\left[|\epsilon - \epsilon_\theta(z_t, t)|^2\right]
-]</p>
+<p>Training then optimizes the latent-space noise prediction network <span class="arithmatex">\(\epsilon_\theta\)</span> to match the sampled noise. The LDM loss is</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{LDM}} = \mathbb{E}_{x, t, \epsilon}\left[\|\epsilon - \epsilon_\theta(z_t, t)\|^2\right]
+\]</div>
 <p>where <span class="arithmatex">\(x\)</span> is a clean data sample, <span class="arithmatex">\(t \sim \text{Uniform}(\{1,\dots,T\})\)</span> is a timestep, <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, I)\)</span> is the noise added at timestep <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(z_0 = \mathcal{E}(x)\)</span> is the latent encoding, <span class="arithmatex">\(z_t\)</span> is the noisy latent after the forward process, and <span class="arithmatex">\(\epsilon_\theta\)</span> is the UNet we are learning. The loss penalizes the squared error between the true noise and the network’s prediction; in latent space, this has the practical effect of heading the U-Net toward the precise semantic adjustments needed to reconstruct <span class="arithmatex">\(z_0\)</span> rather than micro-texture.</p>
 <p>Because the encoder-decoder pair introduces some distortion, the U-Net’s predictions also compensate for encoding imperfections. The entire training pipeline is therefore a hybrid: the autoencoder learns to keep detail, the U-Net learns to denoise semantic structure, and the decoder fills in the rest when sampling. This triad is connected mathematically by the recent measure-theoretic unification of diffusion, flow matching, and score models, which proves that latent diffusion is not a hack but another instance of the same underlying object (From Score Matching to Diffusion: A Fine-Grained Error Analysis in the Gaussian (2025) [arxiv:2503.11615]). That unified perspective explains why the same noise-prediction loss, when applied to the latent measure induced by <span class="arithmatex">\(\mathcal{E}\)</span>, still approximates the score function of the original density.</p>
 <h3 id="predict-conditioning-and-guidance">Predict: conditioning and guidance<a class="headerlink" href="#predict-conditioning-and-guidance" title="Permanent link">&para;</a></h3>
-<p>Modern LDMs extend the vanilla noise predictor to handle conditioning signals such as text or editing masks. The UNet takes as input not only <span class="arithmatex">\(z_t\)</span> and <span class="arithmatex">\(t\)</span> but also cross-attended embeddings <span class="arithmatex">\(c\)</span>. During training, these embeddings can be text tokens, class labels, or image contexts. A common trick is classifier-free guidance: the network is trained on both conditioned and unconditioned pairs, and at sampling time the network’s outputs <span class="arithmatex">\(\epsilon_\theta(z_t, t, c)\)</span> and <span class="arithmatex">\(\epsilon_\theta(z_t, t, \varnothing)\)</span> are combined as
-[
+<p>Modern LDMs extend the vanilla noise predictor to handle conditioning signals such as text or editing masks. The UNet takes as input not only <span class="arithmatex">\(z_t\)</span> and <span class="arithmatex">\(t\)</span> but also cross-attended embeddings <span class="arithmatex">\(c\)</span>. During training, these embeddings can be text tokens, class labels, or image contexts. A common trick is classifier-free guidance: the network is trained on both conditioned and unconditioned pairs, and at sampling time the network’s outputs <span class="arithmatex">\(\epsilon_\theta(z_t, t, c)\)</span> and <span class="arithmatex">\(\epsilon_\theta(z_t, t, \varnothing)\)</span> are combined as</p>
+<div class="arithmatex">\[
 \epsilon_\text{guided} = \epsilon_\theta(z_t, t, \varnothing) + w\left(\epsilon_\theta(z_t, t, c) - \epsilon_\theta(z_t, t, \varnothing)\right)
-]</p>
+\]</div>
 <p>where <span class="arithmatex">\(w &gt; 1\)</span> is the guidance scale. This emphasizes the conditioning signal without needing an external classifier; the latent space’s compactness also means that each attention block processes far smaller tensors, so the extra compute for guidance is affordable even on consumer GPUs.</p>
 <p>These conditioning signals become particularly efficient when the encoder <span class="arithmatex">\(\mathcal{E}\)</span> is itself conditional. For example, in text-to-image pipelines the image encoder is replaced by a text encoder that produces latent vectors <span class="arithmatex">\(z_0\)</span> for each prompt; the diffusion process then modifies those text latents before decoding. That flexibility is one of the reasons LDMs bootstrap so well into multimodal tasks.</p>
 <h3 id="decode-sampling-back-to-pixels">Decode: sampling back to pixels<a class="headerlink" href="#decode-sampling-back-to-pixels" title="Permanent link">&para;</a></h3>

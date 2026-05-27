@@ -1282,58 +1282,58 @@
 <h1 id="variational-inference">Variational Inference<a class="headerlink" href="#variational-inference" title="Permanent link">&para;</a></h1>
 <p>Imagine trying to learn the average shape of a shifting sand dune by inspecting every grain: you walk around it, you scoop samples from the crest and the troughs, and you try to sum their heights to a single number. Exact Bayesian inference faces that same grain-counting nightmare when the latent space is high-dimensional; the normalizing constant of the posterior is the sum of an astronomical number of probabilities. Variational inference takes a different tack. Instead of sampling every grain, it takes a pliable dome—usually a multivariate Gaussian or a mixture you can evaluate quickly—and bends and stretches its parameters so that the dome hugs the knobby shape of the sand pile as closely as possible. By the end of this page you will understand how that dome is described by the Evidence Lower Bound, how the reparameterization trick and stochastic gradients let modern autodiff toolchains carve it against data, and why a hands-on Black Box Variational Inference build on the Wine dataset proves the idea works even with a handful of lines of PyTorch.</p>
 <h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>The Bayesian answer to “how uncertain am I?” is a posterior <span class="arithmatex">\(p(\theta \mid \mathcal{D})\)</span> over latent variables <span class="arithmatex">\(\theta\)</span> after seeing data <span class="arithmatex">\(\mathcal{D}\)</span>. The textbook route rewrites this as
-[
+<p>The Bayesian answer to “how uncertain am I?” is a posterior <span class="arithmatex">\(p(\theta \mid \mathcal{D})\)</span> over latent variables <span class="arithmatex">\(\theta\)</span> after seeing data <span class="arithmatex">\(\mathcal{D}\)</span>. The textbook route rewrites this as</p>
+<div class="arithmatex">\[
 p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D}, \theta)}{p(\mathcal{D})},
-]
-where <span class="arithmatex">\(p(\mathcal{D})=\int p(\mathcal{D},\theta)\,d\theta\)</span> is the marginal likelihood that normalizes the posterior.
+\]</div>
+<p>where <span class="arithmatex">\(p(\mathcal{D})=\int p(\mathcal{D},\theta)\,d\theta\)</span> is the marginal likelihood that normalizes the posterior.
 <span class="arithmatex">\(\mathcal{D}\)</span> is the observed data. <span class="arithmatex">\(\theta\)</span> is the vector of latent variables. The intractability lurks in <span class="arithmatex">\(p(\mathcal{D})\)</span>: for neural networks, hierarchical models, or non-conjugate likelihoods, that integral has no closed form, so the posterior cannot be written down or sampled exactly. The classical alternative—Markov Chain Monte Carlo—draws samples until the empirical distribution matches the posterior, but it does so at the cost of slow convergence and poor parallelism in high dimensions.</p>
 <p>Variational inference reframes the problem. Borrowing the mean-field intuition from Jordan et al. (1999) [http://people.eecs.berkeley.edu/~jordan/papers/variational-intro.pdf], it chooses a tractable family <span class="arithmatex">\(q_\phi(\theta)\)</span> parameterized by <span class="arithmatex">\(\phi\)</span> and then solves an optimization problem to make <span class="arithmatex">\(q_\phi\)</span> “as close as possible” to the true posterior. <span class="arithmatex">\(\phi\)</span> are variational parameters. The goal is to minimize the Kullback-Leibler divergence <span class="arithmatex">\(\mathrm{KL}(q_\phi(\theta) \,\|\, p(\theta \mid \mathcal{D}))\)</span>, which is equal to maximizing the Evidence Lower Bound (ELBO) on <span class="arithmatex">\(\log p(\mathcal{D})\)</span>. This turns inference into an optimization problem where each gradient step tightens the dome so it sits snugly against the posterior, trading off some approximation error for tractability. Because the dome can be evaluated and differentiated quickly, variational inference scales to millions of datapoints once we pair it with stochastic optimization and autodiff—this is the shift from counting every grain to sculpting the dome.</p>
 <p>The territory also spans probabilistic programming (Pyro, Gen, PyMC) and the rich set of amortized inference techniques used inside VAEs. How does it actually work? The remainder of the explanation walks through the ELBO, how the reparameterization trick creates usable gradients for continuous latents, and how modern stochastic variational inference lets these gradients train on minibatches.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
 <h3 id="the-elbo-and-the-mean-field-dome">The ELBO and the mean-field dome<a class="headerlink" href="#the-elbo-and-the-mean-field-dome" title="Permanent link">&para;</a></h3>
-<p>The Evidence Lower Bound is the workhorse objective. Starting from the KL divergence, we rewrite
-[
-\text{KL}(q_\phi(\theta)\,|\,p(\theta\mid\mathcal{D})) = \mathbb{E}<em>{q</em>\phi}\left[\log q_\phi(\theta) - \log p(\mathcal{D},\theta) \right],
-]
-where <span class="arithmatex">\(q_\phi\)</span> is the variational distribution, and <span class="arithmatex">\(p(\mathcal{D},\theta)\)</span> is the joint of the data and latents.
-This divergence is non-negative, so rearranging gives
-[
-\log p(\mathcal{D}) = \underbrace{\mathbb{E}<em>{q</em>\phi}[\log p(\mathcal{D},\theta) - \log q_\phi(\theta)]}<em>{\text{ELBO}(\phi)} + \text{KL}(q</em>\phi\,|\,p(\theta\mid\mathcal{D})).
-]
-The ELBO is the part we can compute, because the intractable <span class="arithmatex">\(\log p(\mathcal{D})\)</span> has been replaced with an expectation under <span class="arithmatex">\(q_\phi\)</span>, which is drawn from a family we control. Every gradient step that increases the ELBO simultaneously raises the log-marginal bound and decreases the KL divergence.</p>
-<p>The dome metaphor becomes concrete when we choose a mean-field family:
-[
+<p>The Evidence Lower Bound is the workhorse objective. Starting from the KL divergence, we rewrite</p>
+<div class="arithmatex">\[
+\text{KL}(q_\phi(\theta)\,\|\,p(\theta\mid\mathcal{D})) = \mathbb{E}_{q_\phi}\left[\log q_\phi(\theta) - \log p(\mathcal{D},\theta) \right],
+\]</div>
+<p>where <span class="arithmatex">\(q_\phi\)</span> is the variational distribution, and <span class="arithmatex">\(p(\mathcal{D},\theta)\)</span> is the joint of the data and latents.
+This divergence is non-negative, so rearranging gives</p>
+<div class="arithmatex">\[
+\log p(\mathcal{D}) = \underbrace{\mathbb{E}_{q_\phi}[\log p(\mathcal{D},\theta) - \log q_\phi(\theta)]}_{\text{ELBO}(\phi)} + \text{KL}(q_\phi\,\|\,p(\theta\mid\mathcal{D})).
+\]</div>
+<p>The ELBO is the part we can compute, because the intractable <span class="arithmatex">\(\log p(\mathcal{D})\)</span> has been replaced with an expectation under <span class="arithmatex">\(q_\phi\)</span>, which is drawn from a family we control. Every gradient step that increases the ELBO simultaneously raises the log-marginal bound and decreases the KL divergence.</p>
+<p>The dome metaphor becomes concrete when we choose a mean-field family:</p>
+<div class="arithmatex">\[
 q_\phi(\theta) = \prod_{i=1}^n q_{\phi_i}(\theta_i),
-]
-where each coordinate <span class="arithmatex">\(\theta_i\)</span> has its own variational factor <span class="arithmatex">\(q_{\phi_i}\)</span>. <span class="arithmatex">\(n\)</span> is the number of latent dimensions.
+\]</div>
+<p>where each coordinate <span class="arithmatex">\(\theta_i\)</span> has its own variational factor <span class="arithmatex">\(q_{\phi_i}\)</span>. <span class="arithmatex">\(n\)</span> is the number of latent dimensions.
 Mean-field inference, as explained by Jordan et al. (1999), decouples dependencies by cycling through coordinate updates for each <span class="arithmatex">\(\theta_i\)</span>, similar to the way coordinate descent squeezes a high-dimensional dome along one axis at a time. The ELBO decomposes accordingly, and in the case of exponential-family models the update for <span class="arithmatex">\(\phi_i\)</span> is often available in closed form. Even when the model is non-conjugate, the ELBO retains its form, and we can now plug in generic optimizers.</p>
 <p>However, mean-field also reveals the fundamental tension: the dome cannot capture correlated posterior mass once the variational family factorizes. Later sections show how richer families and normalizing flows mitigate this, but every additional degree of freedom increases compute. The job of a good variational posterior is to be expressive enough to wrap around the posterior’s major modes while retaining the ability to evaluate and differentiate the density quickly.</p>
 <h3 id="reparameterization-gradients-and-black-box-vi">Reparameterization, gradients, and black-box VI<a class="headerlink" href="#reparameterization-gradients-and-black-box-vi" title="Permanent link">&para;</a></h3>
-<p>Black Box Variational Inference (BBVI) generalizes the dome by allowing any <span class="arithmatex">\(q_\phi(\theta)\)</span> we can sample from; the gradient is estimated via Monte Carlo. However, naive gradients over the ELBO suffer from high variance because the sample <span class="arithmatex">\(\theta \sim q_\phi\)</span> depends on <span class="arithmatex">\(\phi\)</span>. The reparameterization trick, introduced by Kingma and Welling and formally described in Auto-Encoding Variational Bayes (2014) [https://www.arxiv.org/pdf/1601.00670v4], sidesteps the issue by expressing <span class="arithmatex">\(\theta\)</span> as a deterministic transformation of a noise variable:
-[
+<p>Black Box Variational Inference (BBVI) generalizes the dome by allowing any <span class="arithmatex">\(q_\phi(\theta)\)</span> we can sample from; the gradient is estimated via Monte Carlo. However, naive gradients over the ELBO suffer from high variance because the sample <span class="arithmatex">\(\theta \sim q_\phi\)</span> depends on <span class="arithmatex">\(\phi\)</span>. The reparameterization trick, introduced by Kingma and Welling and formally described in Auto-Encoding Variational Bayes (2014) [https://www.arxiv.org/pdf/1601.00670v4], sidesteps the issue by expressing <span class="arithmatex">\(\theta\)</span> as a deterministic transformation of a noise variable:</p>
+<div class="arithmatex">\[
 \theta = g_\phi(\epsilon),\qquad \epsilon \sim p(\epsilon),
-]
-where <span class="arithmatex">\(g_\phi\)</span> is differentiable, and <span class="arithmatex">\(p(\epsilon)\)</span> is a fixed noise distribution, usually <span class="arithmatex">\(\mathcal{N}(0,I)\)</span>.
-<span class="arithmatex">\(\phi\)</span> again are variational parameters. <span class="arithmatex">\(\epsilon\)</span> is an auxiliary noise source. The expectation in the ELBO now becomes
-[
-\mathcal{L}(\phi) = \mathbb{E}<em>{\epsilon \sim p(\epsilon)}\left[\log p(\mathcal{D}, g</em>\phi(\epsilon)) - \log q_\phi(g_\phi(\epsilon)) \right].
-]
-The gradient <span class="arithmatex">\(\nabla_\phi \mathcal{L}(\phi)\)</span> can be pushed through <span class="arithmatex">\(g_\phi\)</span> with automatic differentiation, just like any deterministic neural network. The only stochasticity comes from <span class="arithmatex">\(\epsilon\)</span>, whose distribution does not depend on <span class="arithmatex">\(\phi\)</span>, so the gradient estimator has lower variance. In practice, <span class="arithmatex">\(g_\phi(\epsilon)\)</span> is implemented as <span class="arithmatex">\(\mu_\phi + \sigma_\phi \odot \epsilon\)</span> for a Gaussian factor, where <span class="arithmatex">\(\mu_\phi\)</span> and <span class="arithmatex">\(\sigma_\phi\)</span> are learned mean and standard-deviation parameters, and <span class="arithmatex">\(\odot\)</span> is element-wise multiplication.</p>
+\]</div>
+<p>where <span class="arithmatex">\(g_\phi\)</span> is differentiable, and <span class="arithmatex">\(p(\epsilon)\)</span> is a fixed noise distribution, usually <span class="arithmatex">\(\mathcal{N}(0,I)\)</span>.
+<span class="arithmatex">\(\phi\)</span> again are variational parameters. <span class="arithmatex">\(\epsilon\)</span> is an auxiliary noise source. The expectation in the ELBO now becomes</p>
+<div class="arithmatex">\[
+\mathcal{L}(\phi) = \mathbb{E}_{\epsilon \sim p(\epsilon)}\left[\log p(\mathcal{D}, g_\phi(\epsilon)) - \log q_\phi(g_\phi(\epsilon)) \right].
+\]</div>
+<p>The gradient <span class="arithmatex">\(\nabla_\phi \mathcal{L}(\phi)\)</span> can be pushed through <span class="arithmatex">\(g_\phi\)</span> with automatic differentiation, just like any deterministic neural network. The only stochasticity comes from <span class="arithmatex">\(\epsilon\)</span>, whose distribution does not depend on <span class="arithmatex">\(\phi\)</span>, so the gradient estimator has lower variance. In practice, <span class="arithmatex">\(g_\phi(\epsilon)\)</span> is implemented as <span class="arithmatex">\(\mu_\phi + \sigma_\phi \odot \epsilon\)</span> for a Gaussian factor, where <span class="arithmatex">\(\mu_\phi\)</span> and <span class="arithmatex">\(\sigma_\phi\)</span> are learned mean and standard-deviation parameters, and <span class="arithmatex">\(\odot\)</span> is element-wise multiplication.</p>
 <p>Kingma and Welling’s trick unlocks two critical advances. First, it works whenever the latent is continuous and can be written as a differentiable transform of fixed noise, making it simple to integrate with PyTorch, JAX, or TensorFlow. Second, it turns the ELBO maximization into a form that SGD can handle, which lets us use the same tooling as supervised deep learning.</p>
 <p>Black-box VI algorithms—take the gradient estimator, average over a few <span class="arithmatex">\(\epsilon\)</span> samples, and update <span class="arithmatex">\(\phi\)</span>—are now routine. They form the backbone of variational autoencoders, where an encoder network outputs <span class="arithmatex">\(\mu\)</span> and <span class="arithmatex">\(\sigma\)</span> and the decoder reconstructs the data. The only stochastic computation is the reparameterization, so training time per batch is comparable to training a deterministic encoder-decoder pair.</p>
 <h3 id="stochastic-variational-inference-and-scaling-to-big-data">Stochastic Variational Inference and scaling to big data<a class="headerlink" href="#stochastic-variational-inference-and-scaling-to-big-data" title="Permanent link">&para;</a></h3>
-<p>Black-box gradients give us per-sample updates, but real data arrives in millions of points. Stochastic Variational Inference (SVI) lifts the ELBO to minibatches. As Hoffman, Blei, Wang, and Paisley (2013) [https://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013a.pdf; http://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013.pdf] show, we can define a global variational parameter <span class="arithmatex">\(\phi\)</span> for shared latent structure and local variational parameters <span class="arithmatex">\(\lambda_d\)</span> for each datum <span class="arithmatex">\(d\)</span>. The joint ELBO over the dataset <span class="arithmatex">\(\mathcal{D}=\{x_d\}_{d=1}^D\)</span> is
-[
-\mathcal{L}(\phi, {\lambda_d}) = \sum_{d=1}^D \mathbb{E}<em _phi_lambda_d="\phi,\lambda_d">{q</em>(z_d)],
-]
-where }}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d<span class="arithmatex">\(z_d\)</span> are the latent variables attached to datapoint <span class="arithmatex">\(x_d\)</span>, and <span class="arithmatex">\(\lambda_d\)</span> controls their local approximate posterior. <span class="arithmatex">\(D\)</span> is the total number of datapoints.
+<p>Black-box gradients give us per-sample updates, but real data arrives in millions of points. Stochastic Variational Inference (SVI) lifts the ELBO to minibatches. As Hoffman, Blei, Wang, and Paisley (2013) [https://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013a.pdf; http://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013.pdf] show, we can define a global variational parameter <span class="arithmatex">\(\phi\)</span> for shared latent structure and local variational parameters <span class="arithmatex">\(\lambda_d\)</span> for each datum <span class="arithmatex">\(d\)</span>. The joint ELBO over the dataset <span class="arithmatex">\(\mathcal{D}=\{x_d\}_{d=1}^D\)</span> is</p>
+<div class="arithmatex">\[
+\mathcal{L}(\phi, \{\lambda_d\}) = \sum_{d=1}^D \mathbb{E}_{q_{\phi,\lambda_d}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d}(z_d)],
+\]</div>
+<p>where <span class="arithmatex">\(z_d\)</span> are the latent variables attached to datapoint <span class="arithmatex">\(x_d\)</span>, and <span class="arithmatex">\(\lambda_d\)</span> controls their local approximate posterior. <span class="arithmatex">\(D\)</span> is the total number of datapoints.
 The expectation is taken over both global and local latent variational factors. Hoffman et al. derive natural gradient updates for <span class="arithmatex">\(\phi\)</span> using the structure of conditional conjugacy; in the non-conjugate case, we simply plug the noisy gradients from reparameterization.</p>
-<p>SVI replaces the full sum with a stochastic estimate using a minibatch <span class="arithmatex">\(\mathcal{B}\subset\mathcal{D}\)</span>:
-[
-\mathcal{L}<em d_in_mathcal_B="d\in\mathcal{B">{\mathcal{B}}(\phi) \approx \frac{D}{|\mathcal{B}|} \sum</em>}} \mathbb{E<em _phi_lambda_d="\phi,\lambda_d">{q</em>(z_d)].
-]
-}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d<span class="arithmatex">\(|\mathcal{B}|\)</span> is the minibatch size.
+<p>SVI replaces the full sum with a stochastic estimate using a minibatch <span class="arithmatex">\(\mathcal{B}\subset\mathcal{D}\)</span>:</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\mathcal{B}}(\phi) \approx \frac{D}{|\mathcal{B}|} \sum_{d\in\mathcal{B}} \mathbb{E}_{q_{\phi,\lambda_d}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d}(z_d)].
+\]</div>
+<p><span class="arithmatex">\(|\mathcal{B}|\)</span> is the minibatch size.
 This estimator is unbiased and can be differentiated via backpropagation. We then update <span class="arithmatex">\(\phi\)</span> with an optimizer like Adam, treating the scaled minibatch objective as if it were the entire dataset.</p>
 <p>SVI’s key insight is that the gradient with respect to global variational parameters aggregates contributions from each minibatch, so we can scale to massive data volumes while keeping the optimization cheap per step. The only price we pay is variance from subsampling, which is amortized by large but manageable batch sizes and adaptive learning rates.</p>
 <h3 id="failure-modes-and-diagnostics">Failure modes and diagnostics<a class="headerlink" href="#failure-modes-and-diagnostics" title="Permanent link">&para;</a></h3>

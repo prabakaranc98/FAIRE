@@ -1292,36 +1292,36 @@
 <p>Training large neural networks without precision tricks can require more bandwidth than a single accelerator provides, and doubling the batch size or depth to squeeze more FLops often leads to out-of-memory errors long before the model is “finished.” When Tensor Cores first introduced FP16 matrix multiplies, practitioners saw massive throughput gains, but they also saw gradients disappear. The problem is not the compute units; it is the 11-bit mantissa in FP16. Each multiplication is precise enough for activations that stay near unity, but gradients and updates often fall into the <span class="arithmatex">\(10^{-6}\)</span> to <span class="arithmatex">\(10^{-9}\)</span> range. The naive solution—keep everything in FP32—severely limits batch sizes and model depth. Mixed precision sits between those extremes: keep the data in reduced precision for the heavy inner loops but track the weights and accumulators in higher precision so updates stay meaningful. This is the discipline that Micikevicius et al. (2017) <a href="https://arxiv.org/abs/1710.03740">arxiv:1710.03740</a> introduced, and the same recipe lives in the astrophysics catalog entry “Mixed Precision Training – ADS” (2017) [https://ui.adsabs.harvard.edu/abs/2017arXiv171003740M/abstract], which catalogs the earliest HPC deployments that turned off underflow with a scaled loss.</p>
 <p>The territory also includes the observability and scheduling layers that make modern stacks work: once you have a mixed-precision engine, the compiler, scheduler, and telemetry must know where the master copy lives, where the cast happens, and when to reduce the loss to keep gradients visible. The result is a discipline that is as much about numerical psychology as it is about hardware: the engineer must constantly ask, “What precision does this accumulator tolerate?” and “How do we detect when a gradient vanished so we can react?” How mixed precision actually works depends on whether you focus on the hardware advantage (memory, bandwidth, Tensor Core peaks) or the numerical safety net (master weights, loss scaling, hybrid formats), and the mechanism is best understood by starting from the underflow itself.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>The central observation is simple: the backward pass generates gradients whose magnitude can be orders of magnitude smaller than the forward activations. Consider a single linear layer whose input is <span class="arithmatex">\(x\in\mathbb{R}^d\)</span>, weights <span class="arithmatex">\(W\in\mathbb{R}^{d\times k}\)</span>, and loss <span class="arithmatex">\(L\)</span>. The default gradient update is
-[
+<p>The central observation is simple: the backward pass generates gradients whose magnitude can be orders of magnitude smaller than the forward activations. Consider a single linear layer whose input is <span class="arithmatex">\(x\in\mathbb{R}^d\)</span>, weights <span class="arithmatex">\(W\in\mathbb{R}^{d\times k}\)</span>, and loss <span class="arithmatex">\(L\)</span>. The default gradient update is</p>
+<div class="arithmatex">\[
 W' = W - \eta \frac{\partial L}{\partial W},
-]
-where <span class="arithmatex">\(\eta\)</span> is the learning rate. Training in FP32 evaluates both <span class="arithmatex">\(W\)</span> and <span class="arithmatex">\(\partial L / \partial W\)</span> at 32-bit precision, so the subtraction retains the gradient contribution even when it is small. In mixed precision, <span class="arithmatex">\(W\)</span> and <span class="arithmatex">\(\partial L / \partial W\)</span> are stored or computed in FP16, whose mantissa can only express about 3 decimal digits. If a gradient falls below <span class="arithmatex">\(2^{-11}\)</span>, it is rounded to zero and the update disappears, so training stalls.</p>
+\]</div>
+<p>where <span class="arithmatex">\(\eta\)</span> is the learning rate. Training in FP32 evaluates both <span class="arithmatex">\(W\)</span> and <span class="arithmatex">\(\partial L / \partial W\)</span> at 32-bit precision, so the subtraction retains the gradient contribution even when it is small. In mixed precision, <span class="arithmatex">\(W\)</span> and <span class="arithmatex">\(\partial L / \partial W\)</span> are stored or computed in FP16, whose mantissa can only express about 3 decimal digits. If a gradient falls below <span class="arithmatex">\(2^{-11}\)</span>, it is rounded to zero and the update disappears, so training stalls.</p>
 <h3 id="the-precision-gap-and-the-scaled-loss">The precision gap and the scaled loss<a class="headerlink" href="#the-precision-gap-and-the-scaled-loss" title="Permanent link">&para;</a></h3>
-<p>The cure is to widen the floating-point funnel for gradients without losing the throughput gains of FP16 arithmetic. Micikevicius et al. (2017) did this by keeping a “master” copy of the weights in FP32 while still running matrix multiplies in FP16. Every forward pass casts the FP32 master to FP16 before entering the kernel, and every backward pass computes gradients in FP16 and then casts them back to FP32 before applying the update. That casting itself does not rescue underflow, so the authors also multiply the loss by a constant scale factor <span class="arithmatex">\(s\)</span> before backpropagation:
-[
+<p>The cure is to widen the floating-point funnel for gradients without losing the throughput gains of FP16 arithmetic. Micikevicius et al. (2017) did this by keeping a “master” copy of the weights in FP32 while still running matrix multiplies in FP16. Every forward pass casts the FP32 master to FP16 before entering the kernel, and every backward pass computes gradients in FP16 and then casts them back to FP32 before applying the update. That casting itself does not rescue underflow, so the authors also multiply the loss by a constant scale factor <span class="arithmatex">\(s\)</span> before backpropagation:</p>
+<div class="arithmatex">\[
 \tilde{L} = s \cdot L.
-]</p>
-<p>Here, <span class="arithmatex">\(\tilde{L}\)</span> is the scaled loss entering the backward pass and <span class="arithmatex">\(s &gt; 1\)</span> is chosen so that the gradients land in the representable range of FP16. After computing gradients, the scheme divides them by <span class="arithmatex">\(s\)</span> before applying them to the FP32 master:
-[
-G_{fp32} = \text{cast}<em fp16="fp16">{fp32}(g</em>) / s,
-]
-where <span class="arithmatex">\(g_{fp16} = \nabla_L\tilde{L}\)</span> is the raw gradient in FP16. The subtraction
-[
-W'<em fp32="fp32">{fp32} = W</em>
-]
-happens in full precision, so the underflow has no chance to corrupt the master copy. This re-scaling is a bookkeeping step: the optimizer always sees the correctly scaled gradient, while FP16 math gets the benefit of extra dynamic range.} - \eta G_{fp32</p>
+\]</div>
+<p>Here, <span class="arithmatex">\(\tilde{L}\)</span> is the scaled loss entering the backward pass and <span class="arithmatex">\(s &gt; 1\)</span> is chosen so that the gradients land in the representable range of FP16. After computing gradients, the scheme divides them by <span class="arithmatex">\(s\)</span> before applying them to the FP32 master:</p>
+<div class="arithmatex">\[
+G_{fp32} = \text{cast}_{fp32}(g_{fp16}) / s,
+\]</div>
+<p>where <span class="arithmatex">\(g_{fp16} = \nabla_L\tilde{L}\)</span> is the raw gradient in FP16. The subtraction</p>
+<div class="arithmatex">\[
+W'_{fp32} = W_{fp32} - \eta G_{fp32}
+\]</div>
+<p>happens in full precision, so the underflow has no chance to corrupt the master copy. This re-scaling is a bookkeeping step: the optimizer always sees the correctly scaled gradient, while FP16 math gets the benefit of extra dynamic range.</p>
 <h3 id="gradients-losses-and-overflow-detection">Gradients, losses, and overflow detection<a class="headerlink" href="#gradients-losses-and-overflow-detection" title="Permanent link">&para;</a></h3>
-<p>Scaling also introduces the risk of overflow: if <span class="arithmatex">\(s\)</span> is too large, the scaled gradients exceed the FP16 finite range and produce infinities or NaNs. The detection is built into the forward-backward loop: once the gradients are computed, the runtime searches the gradient tensors for any Inf or NaN. If any appear, the step is discarded and the scale <span class="arithmatex">\(s\)</span> is reduced, typically by a safety factor such as <span class="arithmatex">\(1/2\)</span>. If the gradient passes the check for several consecutive steps, the scale is increased (e.g., multiplied by 2) in order to capture more of the FP16 mantissa. Zhao et al. (2019) formalized this adaptive process as “Adaptive Loss Scaling,” proposing the control law:
-[
+<p>Scaling also introduces the risk of overflow: if <span class="arithmatex">\(s\)</span> is too large, the scaled gradients exceed the FP16 finite range and produce infinities or NaNs. The detection is built into the forward-backward loop: once the gradients are computed, the runtime searches the gradient tensors for any Inf or NaN. If any appear, the step is discarded and the scale <span class="arithmatex">\(s\)</span> is reduced, typically by a safety factor such as <span class="arithmatex">\(1/2\)</span>. If the gradient passes the check for several consecutive steps, the scale is increased (e.g., multiplied by 2) in order to capture more of the FP16 mantissa. Zhao et al. (2019) formalized this adaptive process as “Adaptive Loss Scaling,” proposing the control law:</p>
+<div class="arithmatex">\[
 s_{t+1} =
 \begin{cases}
-s_t / 2 &amp; \text{if overflow detected on step } t,\
-s_t \cdot \alpha &amp; \text{if success counter } \geq \beta,\
+s_t / 2 &amp; \text{if overflow detected on step } t,\\
+s_t \cdot \alpha &amp; \text{if success counter } \geq \beta,\\
 s_t &amp; \text{otherwise},
 \end{cases}
-]
-where <span class="arithmatex">\(s_t\)</span> is the current scale, <span class="arithmatex">\(\alpha &gt; 1\)</span> is the increase factor (often 2), and <span class="arithmatex">\(\beta\)</span> is the number of clean steps before scaling up. The success counter tracks how many recent steps produced finite gradients, and overflow detection is cheap because it only inspects the FP16 buffers that already exist for the gradients.</p>
+\]</div>
+<p>where <span class="arithmatex">\(s_t\)</span> is the current scale, <span class="arithmatex">\(\alpha &gt; 1\)</span> is the increase factor (often 2), and <span class="arithmatex">\(\beta\)</span> is the number of clean steps before scaling up. The success counter tracks how many recent steps produced finite gradients, and overflow detection is cheap because it only inspects the FP16 buffers that already exist for the gradients.</p>
 <p>This adaptive rule means engineers no longer have to search for a “magic” static scale. Instead, the runtime responds to the gradient distribution: if the gradients are tiny because of a small learning rate, the scale climbs to keep them visible; if a sudden failure mode yields large updates, the scale shrinks and the optimizer repeats the step.</p>
 <h3 id="accumulators-master-weights-and-optimizer-states">Accumulators, master weights, and optimizer states<a class="headerlink" href="#accumulators-master-weights-and-optimizer-states" title="Permanent link">&para;</a></h3>
 <p>The FP32 master copy needs to exist for every parameter and every optimizer accumulator. Optimizers such as Adam maintain first- and second-moment estimates, so the parameter tuple becomes <span class="arithmatex">\((W_{fp32}, m_{fp32}, v_{fp32})\)</span>, while the forward and backward passes still work with FP16 casts. The sequence is:
