@@ -260,6 +260,94 @@ The README's previous premium stack (Claude Opus + Gemini Pro) plugs in by editi
 
 ---
 
+## Local-mode (Apple Silicon / MLX) — what we actually found
+
+FAIRE supports a fully local stack: set `OPENAI_API_BASE=http://127.0.0.1:8081/v1` in
+`agents/.env`, point the role MODELs at any OpenAI-compatible local endpoint, and
+the cloud path stays untouched. Setup script at `scripts/local-setup.sh`. See
+`docs/system/local-mode.md`.
+
+**This is honest documentation of what worked, what didn't, and where the limits
+sit — based on a real session on an M4 24GB Mac in May 2026.**
+
+### Hardware tier → realistic model size
+
+| Unified RAM | Realistic writer model | Cause of cap |
+|---|---|---|
+| 16 GB | Gemma 3 4B QAT (Q4) | KV cache for FAIRE's 17K-token writer prompt + OS overhead |
+| 24 GB (M4 base) | Gemma 3 4B QAT (Q4) — **observed ceiling** | 12B OOMs mid-generation when FAIRE's prompt cache grows |
+| 48 GB (M4 Pro) | Gemma 3 12B QAT (Q4) | Can hold KV cache without paging |
+| 64+ GB (M4 Max) | Gemma 3 27B QAT (Q4) or Llama 3.3 70B (Q4) | Comfortable headroom |
+
+### Gemma 4 MLX status (as of mlx-lm 0.31.3, May 2026)
+
+**Don't use Gemma 4 quants on MLX yet.** All three we tested (`gemma-4-e2b-it-4bit`,
+`gemma-4-e4b-it-4bit`, `gemma-4-e4b-it-8bit`) load partially — missing
+`v_proj`/`k_proj`/`k_norm` weights for the upper transformer layers — and
+completions hang silently. The model registers at `/v1/models` but inference
+times out. mlx-lm 0.31.3 is the latest on PyPI; this is a framework gap, not a
+quant-specific bug. Use **`mlx-community/gemma-3-27b-it-qat-4bit`** (or the
+12B/4B QAT variants) until mlx-lm ships proper Gemma 4 support. Google's QAT
+weights are far more reliable on MLX than post-hoc community quants.
+
+### Trim knobs (required for local on ≤24GB)
+
+Without these, FAIRE's pipeline drives the local server past its memory budget.
+
+```bash
+# agents/.env additions for local
+CRITIC_PANEL_DISABLE=true      # skip 8-way critic fan-out (saves ~5GB KV cache duplication)
+SPRINT_WORKERS=1               # serial pages; parallel writer calls = Metal OOM
+SCHEMA_PROMPT_BYTES=4000       # was 12000; trim agents/SCHEMA.md slice in writer prompt
+SCRATCH_PAD_BYTES=8000         # was effectively unlimited
+```
+
+### Quality gaps observed on local Gemma 3 4B QAT (vs cloud `gpt-5.1-codex-mini`)
+
+The pipeline runs and produces structurally-correct v2 pages, but the content
+quality drops in specific ways the cloud writer doesn't suffer from:
+
+| Failure mode | Frequency on local 4B | Concrete example |
+|---|---|---|
+| **Hallucinated arxiv IDs** | Most pages | `arxiv.org/abs/2604.16324`, `arxiv.org/abs/2512.22473v4` — invented future-year IDs |
+| **Context bleed from scratch_pad** | Most pages | Bayesian-inference page's "Where the field is now" cited FLUX.1, DDPM, Latent Diffusion — all diffusion papers, none Bayesian |
+| **Missing equations on math-heavy topics** | Math topics specifically | Do-calculus page had **zero** LaTeX equations on a topic literally defined by 3 inference rules |
+| **H1 format drift** | All pages | Model emits `## Topic Name` instead of `# Topic Name` |
+| **Lenient self-review** | Always (same-model reviewer) | Reviewer scores its own writer's output at 0.90 confidence, doesn't catch the hallucinated citations or missing math |
+| **Word count under floor** | Most pages | 1,100–1,400 words vs 1,500 minimum vs cloud's 2,400+ |
+| **Build it bleed** | Several pages | Backpropagation page's Build it described training Stable Diffusion on CIFAR-10 |
+
+### Why this happens (the four real causes)
+
+1. **Parameter count.** A 4B model has dramatically less factual memory than a ~100B+ cloud model. It knows the *shape* of a topic but can't recall specific equations or papers.
+2. **Training cutoff.** Gemma 3 stops in March 2025. Asked for a "2025-2026 paper", it invents a future-year arxiv ID instead of admitting ignorance.
+3. **Context confusion.** FAIRE's 17K-token writer prompt holds scratch_pad results from Exa searches for the *current* topic. The 4B model can't reliably keep "this fact is about backprop, that fact came from the diffusion-models example" separate — it mashes them together.
+4. **Same-model reviewer.** Reviewer is also 4B, so it can't catch hallucinations its writer-self produced. Same-model self-review rarely surfaces its own mistakes.
+
+### Recommendation
+
+**Local mode is for prototyping the pipeline and structure validation. Cloud is
+for production wiki content.** The local stack proved:
+- The env-var swap works (one line in `.env`)
+- The langgraph pipeline runs end-to-end against a local server (~4 min/page on 4B)
+- The v2 structural template lands (all 6 sections + 5-persona Build it)
+- The trim knobs prevent OOM on 24GB
+
+But the local output **is not publishable as-is** — fake citations, off-topic references,
+missing math. If you're seeing a pattern where every other page links to DDPM regardless
+of topic, that's the 4B context-bleed signature.
+
+A practical middle path: **hybrid mode** — keep the writer on cloud
+(`WRITER_MODEL=openai/gpt-5.1-codex-mini`), route reviewer + critics + research to local.
+Cuts ~50% of cloud spend without giving up writer accuracy.
+
+For 24GB Macs that want to go fully local in production, the realistic path is
+adding a **deterministic post-write validator** (no LLM) that pings the arxiv API
+for every citation in the draft and strips/flags any that don't resolve. This
+defends against hallucination regardless of model size.
+
+---
+
 ## Source policy (enforced via `verify_source_trust`)
 
 | Section | Allowed |
