@@ -81,6 +81,7 @@ nav:
     - What FAIRE is (Sense): system/sense.md
     - System Architecture: system/architecture.md
     - Structure v2 (design): system/structure-v2.md
+    - Local LLM mode: system/local-mode.md
     - Generation Status: system/status.md
     - Observer Dashboard: system/observer.md
     - Agent Changelog: system/changelog.md

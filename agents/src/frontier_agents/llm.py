@@ -1,13 +1,25 @@
 """LLM factory for the Frontier Wiki agent system.
 
-All LLMs route through OpenRouter using LangChain's ChatOpenAI interface.
-This gives access to any model on OpenRouter without changing any node code.
+All LLM calls go through LangChain's ChatOpenAI, which speaks the standard
+OpenAI Chat Completions API. By default we talk to OpenRouter (cloud). To
+swap in a local model, just point `OPENAI_API_BASE` at any OpenAI-compatible
+endpoint (MLX, Ollama, vLLM, LMStudio, …) and set the role MODELs to whatever
+that server exposes.
 
-Model selection philosophy (verified on OpenRouter 2026-05-25):
-- WRITER (Editorial, MVB):   anthropic/claude-opus-4-7 — $5/M, 1M ctx — maximum prose intelligence
-- REVIEWER (Schema checks):  google/gemini-3.1-pro-preview — $2/M, 1M ctx — best structured reasoning
-- RESEARCH (fast search):    google/gemini-3.5-flash — $1.50/M, 1M ctx — high-quality, low latency
-- FALLBACK:                  anthropic/claude-sonnet-4.6 — $3/M, 1M ctx — still high quality
+Cloud (default):
+  # .env
+  OPENROUTER_API_KEY=sk-or-...
+  WRITER_MODEL=openai/gpt-5.1-codex-mini
+
+Local (MLX server on Apple Silicon):
+  # .env
+  OPENAI_API_BASE=http://127.0.0.1:8080/v1
+  OPENROUTER_API_KEY=local-not-needed     # ChatOpenAI requires *some* string
+  WRITER_MODEL=qwen2.5-coder-32b-instruct
+  REVIEWER_MODEL=qwen2.5-7b-instruct
+  # ...etc
+
+See docs/system/local-mode.md for the setup script and model recommendations.
 """
 
 from __future__ import annotations
@@ -19,51 +31,28 @@ from langchain_openai import ChatOpenAI
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
-# Default model IDs — override via .env
-# Role split (2026-05-26):
-#   WRITER + MVB use openai/gpt-5.1-codex-mini — coding-specialized for clean LaTeX,
-#     markdown tables, code recipes, real HF model IDs (cuts phantom-ID failures).
-#   RESEARCH uses google/gemini-3.1-flash (full, not lite) for richer context synthesis
-#     during plan_and_scratch — the writer reads the scratch_pad as its main source.
-#   CRITIC + FALLBACK use gemini-3.1-flash-lite — cheap non-reasoning for 8-way fanout.
-#   REVIEWER uses openai/gpt-5-mini — reasoning model for the single structured rubric call.
+# Cloud model defaults (verified on OpenRouter 2026-05-26). Override via .env.
 _DEFAULTS = {
     "WRITER_MODEL":   "openai/gpt-5.1-codex-mini",
     "MVB_MODEL":      "openai/gpt-5.1-codex-mini",
     "REVIEWER_MODEL": "openai/gpt-5-mini",
     "CRITIC_MODEL":   "google/gemini-3.1-flash-lite",
-    "RESEARCH_MODEL": "google/gemini-3.1-flash",
+    "RESEARCH_MODEL": "google/gemini-3.5-flash",
     "FALLBACK_MODEL": "google/gemini-3.1-flash-lite",
 }
 
 
-def _get_key() -> str:
-    key = os.getenv("OPENROUTER_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
-    if not key:
-        raise ValueError(
-            "Set OPENROUTER_API_KEY in .env (preferred) or ANTHROPIC_API_KEY as fallback"
-        )
-    return key
-
-
-def _get_base_url() -> str:
-    # If only ANTHROPIC_API_KEY is set (not OPENROUTER_API_KEY), use Anthropic direct via langchain-anthropic
-    if os.getenv("OPENROUTER_API_KEY"):
-        return OPENROUTER_BASE_URL
-    # Fallback: use Anthropic direct — caller must use ChatAnthropic separately
-    return OPENROUTER_BASE_URL
-
-
 @lru_cache(maxsize=8)
 def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
-    """Return a configured LangChain LLM for the given role.
+    """Return a ChatOpenAI configured for the given role.
+
+    Routes to whatever `OPENAI_API_BASE` points at; defaults to OpenRouter.
+    The same agent code therefore runs against cloud or a local server with
+    no code changes — only env vars.
 
     Args:
-        role: "writer" | "reviewer" | "mvb" | "fallback"
+        role: writer | reviewer | critic | mvb | research | fallback
         temperature: sampling temperature (lower = more deterministic)
-
-    Returns:
-        ChatOpenAI instance configured for OpenRouter
     """
     model_env_key = {
         "writer":   "WRITER_MODEL",
@@ -76,36 +65,42 @@ def get_llm(role: str = "writer", temperature: float = 0.3) -> ChatOpenAI:
 
     model = os.getenv(model_env_key, _DEFAULTS[model_env_key])
 
-    # OpenRouter requires these headers for routing and billing
-    extra_headers = {
-        "HTTP-Referer": "https://prabakaranc98.github.io/FAIRE",
-        "X-Title": "Frontier Wiki Agent",
-    }
+    # The single switch that swings cloud↔local: where do we POST?
+    base_url = os.getenv("OPENAI_API_BASE", OPENROUTER_BASE_URL)
 
-    # Full wiki pages need up to 12000 tokens of output — set explicitly per role
     max_tokens_by_role = {
-        "writer":   16000,  # full schema page: ~4000-8000 tokens; 16K gives headroom for longer pages
-        "mvb":      4096,   # MVB section only
-        "reviewer": 8192,   # one structured rubric call per page; reasoning model.
-        "critic":   8192,   # one call per critic skill, 8 in parallel. 8K to absorb full
-                            # page draft (~3-6K input) + structured JSON output without
-                            # LengthFinishReasonError, even on gemini-3.1-flash-lite.
-        "research": 4096,   # plan + summaries
+        "writer":   16000,
+        "mvb":      4096,
+        "reviewer": 8192,
+        "critic":   8192,
+        "research": 4096,
         "fallback": 16000,
     }
     max_tokens = max_tokens_by_role.get(role, 8192)
 
-    if os.getenv("OPENROUTER_API_KEY"):
+    # Cloud (OpenRouter) needs the routing headers; local servers ignore them.
+    extra_kwargs = {}
+    if base_url == OPENROUTER_BASE_URL:
+        extra_kwargs["model_kwargs"] = {"extra_headers": {
+            "HTTP-Referer": "https://prabakaranc98.github.io/FAIRE",
+            "X-Title": "Frontier Wiki Agent",
+        }}
+
+    # ChatOpenAI requires *some* api_key string. Cloud uses the real
+    # OPENROUTER_API_KEY; local servers accept any placeholder.
+    api_key = os.getenv("OPENROUTER_API_KEY") or "local-not-needed"
+
+    if os.getenv("OPENROUTER_API_KEY") or base_url != OPENROUTER_BASE_URL:
         return ChatOpenAI(
             model=model,
-            openai_api_key=os.environ["OPENROUTER_API_KEY"],
-            openai_api_base=OPENROUTER_BASE_URL,
+            openai_api_key=api_key,
+            openai_api_base=base_url,
             temperature=temperature,
             max_tokens=max_tokens,
-            model_kwargs={"extra_headers": extra_headers},
+            **extra_kwargs,
         )
 
-    # Fallback: direct Anthropic via langchain-anthropic (when no OpenRouter key)
+    # Last-resort: direct Anthropic (only when no OpenRouter key AND no local URL)
     from langchain_anthropic import ChatAnthropic
     return ChatAnthropic(  # type: ignore[return-value]
         model=model.replace("anthropic/", "") or "claude-opus-4.7",
