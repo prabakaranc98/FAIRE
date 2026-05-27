@@ -654,8 +654,20 @@ def _apply_arc_proposal(proposal: dict, params: dict, docs_path: Path) -> str:
     if not sprint_path.exists():
         return f"skipped (sprint queue {sprint_path} not found)"
 
-    with sprint_path.open("a", encoding="utf-8") as f:
-        f.write("\n".join(lines) + "\n")
+    # Insert arc lines BEFORE "## New Content" so arc work runs in the same
+    # cycle as critical fixes, before stub generation. Without this, on a
+    # budget-constrained cycle the 10-15 stubs at the top of the queue burn
+    # through the envelope and arcs never land. Falls back to append-at-end
+    # if no "## New Content" section exists yet.
+    existing = sprint_path.read_text(encoding="utf-8")
+    insertion = "\n".join(lines) + "\n"
+    marker = "\n## New Content"
+    if marker in existing:
+        idx = existing.index(marker)
+        new_text = existing[:idx] + insertion + existing[idx:]
+    else:
+        new_text = existing + insertion
+    sprint_path.write_text(new_text, encoding="utf-8")
 
     return f"applied → queued arc-index + {total} arc-step items for {arc_id} in {track_name}"
 
