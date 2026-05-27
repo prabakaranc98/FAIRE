@@ -15,16 +15,27 @@ updated: 2026-05-27
 
 > **What this subject is for:** Making models fast, cheap, and deployable — distributed training, parallelism, kv-cache, FlashAttention, quantization, inference optimization.
 
-**Track status:** 18 substantive concept pages · 6 stubs awaiting next cycle. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
+**Track status:** 33 substantive concept pages · 4 stubs awaiting next cycle. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
 ## Concepts
 
 - [Attention Mechanisms](concepts/attention-mechanisms/)
+- [Automatic Differentiation](concepts/automatic-differentiation/)
+- [Communication Collectives](concepts/communication-collectives/)
+- [Compiler Optimizations for ML](concepts/compiler-optimizations-for-ml/)
+- [Scaling Agent Coordination Through Systems Architecture](concepts/connected-topics-template-09-algorithms-systems-for-ai/)
+- [Constrained Learning](concepts/constrained-learning/)
+- [Convex Optimization](concepts/convex-optimization/)
+- [Curriculum Learning](concepts/curriculum-learning/)
+- [Curriculum resampling](concepts/curriculum-resampling/)
 - [Data Parallelism](concepts/data-parallelism/)
+- [Differentiable Optimization](concepts/differentiable-optimization/)
 - [Distributed Training Arc](concepts/distributed-training-arc/)
 - [Distributed Training](concepts/distributed-training/)
 - [Flash Attention](concepts/flash-attention/)
+- [Gradient bucketing](concepts/gradient-bucketing/)
 - [Inference optimization](concepts/inference-optimization/)
+- [KV Cache Management](concepts/kv-cache-management/)
 - [KV cache](concepts/kv-cache/)
 - [LLM Architecture Optimizations](concepts/llm-architecture-optimizations/)
 - [LLM Inference](concepts/llm-inference/)
@@ -32,13 +43,17 @@ updated: 2026-05-27
 - [Model Deployment](concepts/model-deployment/)
 - [Model Parallelism](concepts/model-parallelism/)
 - [Pipeline Parallelism](concepts/pipeline-parallelism/)
+- [Policy Gradient Theory](concepts/policy-gradient-theory/)
 - [Post-Training Quantization](concepts/post-training-quantization/)
 - [Precision scaling](concepts/precision-scaling/)
 - [Quantization-Aware Training](concepts/quantization-aware-training/)
+- [Quantization Basics](concepts/quantization-basics/)
 - [Quantization](concepts/quantization/)
+- [Reinforcement Learning Schedulers](concepts/reinforcement-learning-schedulers/)
+- [Tensor Cores](concepts/tensor-cores/)
 - [Tensor parallelism](concepts/tensor-parallelism/)
 
-*Auto-seeded stubs awaiting next cycle: `communication-collectives`, `compiler-optimizations-for-ml`, `differentiable-optimization`, `kv-cache-management`, `quantization-basics`, `reinforcement-learning-schedulers`*
+*Auto-seeded stubs awaiting next cycle: `collective-communication`, `long-context-models`, `reinforcement-learning`, `rlhf-infrastructure-overview`*
 
 ## Arcs through this subject
 

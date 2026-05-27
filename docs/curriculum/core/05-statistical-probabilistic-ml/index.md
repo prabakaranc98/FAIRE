@@ -15,7 +15,7 @@ updated: 2026-05-27
 
 > **What this subject is for:** Reasoning under uncertainty — Bayesian inference, variational methods, MCMC, Gaussian processes, EM, uncertainty quantification.
 
-**Track status:** 9 substantive concept pages · 1 stub awaiting next cycle. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
+**Track status:** 10 substantive concept pages. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
 ## Concepts
 
@@ -26,14 +26,13 @@ updated: 2026-05-27
 - [Expectation-Maximization](concepts/expectation-maximization/)
 - [Gaussian processes](concepts/gaussian-processes/)
 - [Markov Chain Monte Carlo](concepts/mcmc/)
+- [Probabilistic programming](concepts/probabilistic-programming/)
 - [Uncertainty Quantification](concepts/uncertainty-quantification/)
 - [Variational Inference](concepts/variational-inference/)
 
-*Auto-seeded stubs awaiting next cycle: `probabilistic-programming`*
-
 ## Arcs through this subject
 
-*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+- **[Bayesian Deep Learning](arcs/bayesian-deep-learning/)**
 
 ## Key thinkers
 

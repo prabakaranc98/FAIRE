@@ -29,7 +29,7 @@ updated: 2026-05-27
 
 ## Arcs through this subject
 
-*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+- **[Self-Supervised Vision Foundations](arcs/self-supervised-vision-foundations/)**
 
 ## Key thinkers
 

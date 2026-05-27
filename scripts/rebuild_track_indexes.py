@@ -63,24 +63,62 @@ def _is_stub(path: Path) -> bool:
 
 
 def _list_section(track_dir: Path, subfolder: str, label: str, empty_msg: str) -> str:
-    """Render a markdown section that links every non-stub file in <track>/<subfolder>/."""
+    """Render a markdown section that links every non-stub item in <track>/<subfolder>/.
+
+    Two layouts supported:
+      - Flat .md files (concepts, authors, builds): each file becomes one entry.
+      - Subdirectories with an index.md inside (arcs): each subdir is one arc;
+        the arc-index page is its index.md.
+    """
     folder = track_dir / subfolder
     if not folder.exists():
         return f"## {label}\n\n*{empty_msg}*\n"
+
+    # Flat-file entries
     pages = sorted(p for p in folder.glob("*.md") if p.name != "index.md")
-    real = [p for p in pages if not _is_stub(p)]
-    stubs = [p for p in pages if _is_stub(p)]
+    # Subdirectory entries (arcs/<arc-id>/index.md or any other arcs/<arc-id>/*.md)
+    subdirs = sorted(d for d in folder.iterdir() if d.is_dir())
+
+    real_pages = [p for p in pages if not _is_stub(p)]
+    stub_pages = [p for p in pages if _is_stub(p)]
+    real_subdirs = []
+    for d in subdirs:
+        idx = d / "index.md"
+        if idx.exists() and not _is_stub(idx):
+            real_subdirs.append((d, idx))
+
     lines = [f"## {label}", ""]
-    if not real and not stubs:
+    if not real_pages and not stub_pages and not real_subdirs:
         lines.append(f"*{empty_msg}*")
         lines.append("")
         return "\n".join(lines)
-    for p in real:
+
+    # Subdirectory items first (arcs are the headline for the section)
+    for d, idx in real_subdirs:
+        title = _title_from_md(idx)
+        # Try to pull a one-line destination for arc cards. Look only at
+        # explicit destination/capability fields, never blockquotes (those
+        # contain the auto-injected breadcrumb that points back at this
+        # very section).
+        dest = ""
+        try:
+            body = idx.read_text(encoding="utf-8", errors="ignore")
+            m = re.search(r"^\*\*Capability at end[^:]*:\*\*\s*(.+?)$", body, re.MULTILINE) or \
+                re.search(r"^\*\*Destination[^:]*:\*\*\s*(.+?)$", body, re.MULTILINE) or \
+                re.search(r"^\*\*dest[^:]*:\*\*\s*(.+?)$", body, re.MULTILINE | re.IGNORECASE)
+            if m:
+                dest = " — " + m.group(1).strip().strip("*").strip()[:160]
+        except Exception:
+            pass
+        lines.append(f"- **[{title}]({subfolder}/{d.name}/)**{dest}")
+
+    for p in real_pages:
         title = _title_from_md(p)
         lines.append(f"- [{title}]({subfolder}/{p.stem}/)")
-    if stubs:
+
+    if stub_pages:
         lines.append("")
-        lines.append(f"*Auto-seeded stubs awaiting next cycle: " + ", ".join(f"`{p.stem}`" for p in stubs) + "*")
+        lines.append(f"*Auto-seeded stubs awaiting next cycle: " + ", ".join(f"`{p.stem}`" for p in stub_pages) + "*")
     lines.append("")
     return "\n".join(lines)
 
