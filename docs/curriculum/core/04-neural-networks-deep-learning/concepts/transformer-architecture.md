@@ -1,86 +1,134 @@
 ---
-title: Transformer architecture
+title: Transformer Architecture
 slug: transformer-architecture
 layer: core
-subject: 04-neural-networks
+subject: 04-neural-networks-deep-learning
 page_type: concept
 state: drafted
-authors_anchored: [vaswani]
+authors_anchored: [vaswani, hoffmann, brown, leike, sutskever]
 feeds_de_pillar: []
-mvb_personas: [applied-ai-engineer, research-engineer, applied-researcher]
-prereqs: [linear-algebra, probability, optimization]
-tags: [attention, sequence-modeling, architecture]
-updated: 2024-11-20
+mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
+prereqs: [scaled-dot-product-attention, residual-networks, layer-normalization, optimization-basics]
+tags: [transformer, attention, normalization, stability, production, inference]
+updated: 2026-04-20
 has_mvb: true
 ---
 
-Imagine you are handed a live audio transcript that stretches for an hour and asked to detect when a speaker switches from interview mode to instruction mode, without reading the whole thing. You could walk through it sequentially, but that takes time, and modern hardware is built for operations that run in parallel. The transformer architecture is the design that makes this kind of “token-level routing without waiting for the previous step” possible. By turning the problem of modeling sequences into one where every position directly attends to every other position, transformers sidestep the limitations of recurrence and let GPUs swallow entire sentences at once. By the end of this page, you will understand why that radical routing choice works, where the trick still struggles, and how to get a working transformer fine-tuned for a real task with less than 16 GB of GPU RAM.
+# Transformer Architecture
+
+Imagine translating a novel while reading it through a straw: the only words you can see are the next three, and by the time you reach chapter two you’ve forgotten the plot twist in chapter one. That was the reality of sequential recurrence. Every timestep in an LSTM or GRU insists you wait for the previous hidden state to finish before passing information forward, so long stories are processed inch by inch and the gradients paid to distant dependencies decay along the way. Transformer architecture exists because someone asked, what if you could read the entire book at once? By removing recurrence entirely and letting every position see every other position through scaled dot-product attention, the Transformer shifts the bottleneck from sequential compute to memory bandwidth and makes training on huge corpora not just possible but predictive. This page will explain how that shift works, why the exact placement of normalization and residual paths decided the difference between a toy language model and a deployable 100-billion-parameter system, and how a careful implementation on TinyShakespeare gives you the debugging data you need if your next batch explodes at 3 a.m.
 
 ## The territory
 
-Before transformers, sequence models threaded their computations through time: RNNs and LSTMs passed a hidden state from one token to the next, while CNNs slid filters over windows in the sequence, both of which made inference a sequential operation that choked on long contexts. The Transformer shook the field by asking a different question: “Why not let every token look at every other token in parallel, and learn the importance weights directly?” Attention Is All You Need (Vaswani et al. 2017) [https://arxiv.org/pdf/1706.03762](https://arxiv.org/pdf/1706.03762) instantiates this idea by replacing recurrence entirely with self-attention layers and lightweight position encodings, demonstrating that parallel token-to-token routing is enough to learn translation models that beat earlier LSTM baselines. Mirrors of that original manuscript appear on the University of Pittsburgh site [https://www.research.pitt.edu/sites/default/files/Attention%20is%20All%20You%20Need.pdf](https://www.research.pitt.edu/sites/default/files/Attention%20is%20All%20You%20Need.pdf) and with accompanying lecture notes on the Georgia Tech archive [https://hasler.ece.gatech.edu/Courses/MachineLearning/FoundationalPapers/Google_Attention_NIPS-2017.pdf](https://hasler.ece.gatech.edu/Courses/MachineLearning/FoundationalPapers/Google_Attention_NIPS-2017.pdf). The result is a family of models where sequence modeling becomes a hardware-scalable matrix multiplication puzzle: each layer is just a few dense projections plus attention matrices calculated by softmax-normalizing pairwise token compatibilities. The consequence is that a transformer can see the entire sequence at once, which feeds directly into how it is implemented and tuned. How does it actually work under the hood?
+Transformers sit at the intersection of three competing design forces. First, language modeling wants to process hundreds of tokens simultaneously to capture long-range semantics, but traditional RNNs or LSTMs obligate a timestep-by-timestep loop that keeps GPUs mostly idle waiting for the previous hidden state. Second, high-capacity models require depth, and every extra layer compounds the risk of gradients vanishing or exploding unless they are guided by residual connections and normalization. Third, every attention logit scores pairs of tokens, so quadratic cost in sequence length arrives attached to instability if the scale is wrong. Vaswani et al. (2017) [https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762) led the answer to the first two tensions by eliminating recurrence entirely, stacking residual blocks, and using scaled self-attention to let every token attend to every other token in parallel. They provided not only the arithmetic of attention but also explicit code to compute the attention weights through matrix multiplication. Those same equations appear verbatim in the class mirrors hosted at the University of Pittsburgh [https://www.research.pitt.edu/sites/default/files/Attention%20is%20All%20You%20Need.pdf](https://www.research.pitt.edu/sites/default/files/Attention%20is%20All%20You%20Need.pdf) and Georgia Tech [https://hasler.ece.gatech.edu/Courses/MachineLearning/FoundationalPapers/Google_Attention_NIPS-2017.pdf](https://hasler.ece.gatech.edu/Courses/MachineLearning/FoundationalPapers/Google_Attention_NIPS-2017.pdf), underscoring that the narrative of the Transformer hinges on that same set of matrix multiplies and residual equations everywhere you look. Subsequent work, like the Image Transformer (Parmar et al. 2018) [https://ar5iv.labs.arxiv.org/html/1802.05751](https://ar5iv.labs.arxiv.org/html/1802.05751), showed how relative positional encodings and restricted attention windows preserve the same parallel computation while keeping memory pressure manageable for large images. BERT (Devlin et al. 2018) [https://arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805) then demonstrated that the same architecture becomes a general-purpose encoder when its masking scheme breaks the left-to-right assumption and instead lets every position attend to every other position while predicting masked tokens. The Transformer has therefore become the chassis; attention is the axle, and the rest of the paper follows the wiring logic that makes this chassis stable, scalable, and deployable on a single Colab T4.
 
 ## How it works
 
-At its heart, each transformer layer routes information through self-attention heads and residual blocks. Consider a single input sequence of token embeddings arranged in a matrix \(X \in \mathbb{R}^{T \times d}\), where \(T\) is the sequence length and \(d\) is the embedding dimension. Self-attention begins by projecting \(X\) into queries \(Q\), keys \(K\), and values \(V\) via learned weight matrices \(W_q, W_k, W_v \in \mathbb{R}^{d \times d_k}\) to get \(Q = X W_q\), \(K = X W_k\), \(V = X W_v\). Each row \(Q_i\) represents the query vector for token \(i\), and the attention weight from token \(i\) to token \(j\) is computed as the scaled dot product \( \frac{Q_i K_j^T}{\sqrt{d_k}} \). Softmax across \(j\) yields a distribution of relevance.
+There are three mechanical layers to examine: the attention core that removes recurrence, the feedforward/residual stack that gives depth without gradients collapsing, and the engineering glue—positional encodings, normalization, and stabilization heuristics—that keeps massive models healthy.
 
-Attention weights are therefore a matrix \(A = \text{softmax}(Q K^T / \sqrt{d_k})\) with shape \(T \times T\), and the attended representation is \(Y = A V\). The scaling by \(\sqrt{d_k}\) prevents overly sharp gradients when \(d_k\) is large; the matrix dimensions keep the whole operation parallelizable because each query pays attention to every key simultaneously. Multi-head attention replicates this process \(h\) times with different projection matrices \(W_q^{(h)}, W_k^{(h)}, W_v^{(h)}\), concatenates the resulting \(Y\) matrices, and projects back to dimension \(d\) with an output weight matrix \(W_o\). This multi-headed structure allows the layer to capture diverse compatibility patterns: one head might track syntactic dependencies while another tracks semantic themes, and they all share the same attention formula.
+### Attention as computation, not recurrence
 
-Normalization and residual connections keep the stack stable: after each attention block, the architecture applies LayerNorm to \(X + \text{Attention}(X)\), and after the feed-forward network it again adds a residual connection before normalization. The feed-forward sublayer is two linear layers with a non-linearity (usually GELU) and expands the dimension from \(d\) to \(d_{\text{ff}}\) on the inner layer, giving the layer expressive power without breaking the matrix-multiplication pipeline. Each transformer block therefore consists of: (1) multi-head attention (parallelized dot products); (2) residual connection + LayerNorm; (3) position-wise feed-forward network (dense expansions); and (4) another residual connection + LayerNorm.
+The Transformer replaces the recurrent loop with two matrix multiplies per head. For a sequence \(X \in \mathbb{R}^{L \times d}\), where \(L\) is the sequence length and \(d\) is the model dimension, the model projects \(X\) into queries \(Q = XW_Q\), keys \(K = XW_K\), and values \(V = XW_V\), each with weight matrices \(W_Q, W_K, W_V \in \mathbb{R}^{d \times d_k}\). Each query interacts with every key through a scaled dot product:
 
-Position matters even though attention is symmetric, which is why Vaswani et al. added sinusoidal positional encodings \(\text{PE}_{(pos,2i)} = \sin(pos/10000^{2i/d})\), \(\text{PE}_{(pos,2i+1)} = \cos(pos/10000^{2i/d})\) where \(pos\) indexes the timestep and \(i\) indexes the embedding dimension. These deterministic signals inject order information without introducing recurrence. Later variants replace them with learned positional embeddings or relative bias terms, but the original formulation highlights how order can be embedded without altering the parallel attention computation itself.
-
-Training the transformer on next-token prediction or translation data uses teacher forcing: for a decoder-only variant, each training example contains a prefix \(x_{1:t-1}\) and a target token \(x_t\), and the model minimizes the cross-entropy \(-\log p_\theta(x_t \mid x_{1:t-1})\). Decoder-only models mask future positions in the attention matrix so that the softmax sees only \(j \leq i\). In encoder-decoder architectures, the encoder processes the source sequence with stacked self-attention, and the decoder attends to both its own previous tokens and the encoder outputs via cross-attention layers.
-
-Transformers are memory-intensive because the attention matrix scales with \(T^2\). Image Transformer (Parmar et al. 2018) [https://ar5iv.labs.arxiv.org/html/1802.05751](https://ar5iv.labs.arxiv.org/html/1802.05751) demonstrated this concretely on images by treating pixels as tokens and factorizing attention to reduce quadratic blowup, foreshadowing numerous efficient attention schemes. Understanding how quadratic cost emerges from the pairwise softmax is essential for reasoning about those approximations: the attention matrix \(A\) has \(T^2\) entries, and while modern GPUs can handle dozens of thousands of tokens in contexts with sparse kernels or chunked attention (e.g., FlashAttention), the vanilla matrix multiplication still becomes the computational bottleneck for very long contexts.
-
-For the mathematics student: the transformer objective is the log-likelihood across positions,
 \[
-\mathcal{L}(\theta) = -\sum_{t=1}^{T} \log p_\theta(x_t \mid x_{<t}),
+A = \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}}\right) V,
 \]
-where \(x_t\) is the target token at position \(t\), \(x_{<t}\) are the preceding tokens, and \(p_\theta\) is parameterized by stacking attention blocks and linear decoders with softmax output. Because each log-probability decomposes into the attention scores and the decoder projection, gradients flow through the normalized attention weights back to every position simultaneously, which is why training can parallelize across tokens rather than sequence steps.
 
-Failure modes highlight the importance of token routing and alignment: attention can degenerate to focusing on only a few positions, leaving other tokens underused, and when sequence length exceeds training length, positional encodings may not generalize. These issues can be mitigated with relative position biases, scaling of key-query projections, or calibration techniques like layer-wise learning rate decay. The transformer’s routing decision—replacing hidden state recurrence with attention matrices—means its success depends on managing the O(\(T^2\)) matrices and ensuring each token receives useful gradients from everywhere else rather than relying purely on its local history.
+where \(A \in \mathbb{R}^{L \times d_k}\) is the attention output, \(QK^\top\) produces unnormalized similarity scores for every token pair, and the denominator \(\sqrt{d_k}\) prevents those scores from drifting into saturation as dimension grows. This softmax sends each token’s attention distribution across the entire sequence (and all tokens are processed in one matrix multiply), so the architecture is embarrassingly parallel across the tokens axis. Multi-head attention replicates this computation \(h\) times with different weight matrices and concatenates the outputs to restore the model dimension; a final projection \(WO\) collapses the heads back to \(d\).
+
+Because attention is pure matrix algebra, the Transformer’s runtime per layer is \(O(L^2 d)\) but is fully parallelizable across \(L\) tokens. That parallelism is why modern accelerators can keep hundreds of thousands of cores busy: they do not wait for the previous timestep. Instead, they stream the entire token matrix through a GEMM (general matrix multiply), so the bottleneck shifts from sequential latency to memory bandwidth and the quality of the sparse matrix multiplies. Those same matrices appear in the official Image Transformer derivation, where attention windows are restricted to local patches to keep the same GEMM-based compute while still letting each patch condition on every other patch in the window through the same \(QK^\top\) structure [https://ar5iv.labs.arxiv.org/html/1802.05751](https://ar5iv.labs.arxiv.org/html/1802.05751).
+
+### Depth through residuals and feedforward modules
+
+A single attention head cannot change the hidden dimension, so the Transformer alternates attention with a position-wise feedforward network (FFN) to mix the information captured by attention into the channels. After computing the attention output \(A\), the block adds a residual connection and normalization:
+
+\[
+\hat{A} = \mathrm{LayerNorm}(X + \mathrm{Mult​iHead}(X)),
+\]
+
+where \(\mathrm{LayerNorm}\) standardizes the features across the \(d\) dimension for each position, and the residual \(X + \mathrm{MultiHead}(X)\) conserves gradients. The subsequent feedforward layer is two linear layers with a nonlinearity:
+
+\[
+\mathrm{FFN}(x) = W_2[\max(0, W_1 x + b_1)] + b_2,
+\]
+
+where \(W_1 \in \mathbb{R}^{d \times d_{ff}}\) expands the dimension to \(d_{ff}\), \(W_2 \in \mathbb{R}^{d_{ff} \times d}\) projects back, and the ReLU activation injects nonlinearity. Again, residuals surround this block:
+
+\[
+\mathrm{Output} = \mathrm{LayerNorm}(\hat{A} + \mathrm{FFN}(\hat{A})).
+\]
+
+The residual connections serve two purposes simultaneously: they transport gradients back to earlier layers during training, and they allow the model to learn identity functions when additional depth is not beneficial.
+
+### Positional information and normalization placement
+
+Attention, being permutation invariant, must be told about token order. Vaswani et al. (2017) introduced sinusoidal positional encodings:
+
+\[
+\mathrm{PE}_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d}}\right), \quad \mathrm{PE}_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d}}\right),
+\]
+
+where \(pos\) indexes the sequence position and \(i\) indexes the dimension. Adding \(\mathrm{PE}\) to the input embeddings binds the sequence index to each model dimension, letting attention differentiate “first word” from “twenty-first word.” The Image Transformer extended this by computing relative distances between positions and encoding them into the attention logits so that attention windows could be localized without losing the global pairwise structure [https://ar5iv.labs.arxiv.org/html/1802.05751](https://ar5iv.labs.arxiv.org/html/1802.05751).
+
+Normalization placement, however, determines the dynamics through depth. The original Transformer stacked Post-LN layers, i.e., \(\mathrm{LayerNorm}\) applied after the residual addition. Later work showed this could lead to vanishing gradients in very deep models. Pre-LN instead normalizes before the attention and FFN blocks, letting each block receive inputs with stable variance before the residual addition. Peri-LN is the 2024 refinement that places normalization both immediately before and after the block (peri meaning “around”), learning separate affine parameters for each position to keep gradients stable even for 100B+ parameter dense transformers. Peri-LN (Zhang et al. 2024) [https://arxiv.org/abs/2403.02349](https://arxiv.org/abs/2403.02349) demonstrates that this double normalization smooths the gradient path, eliminating the sudden spikes that previously required ad-hoc tricks like clipping or rewinding steps. When gradients are stable, the Transformer can be stacked deeper and trained faster, so the architecture’s practical maturity hinges on these normalization choices as much as on attention.
+
+### The decoder-only specialization
+
+Decoder-only Transformers reuse the same building blocks but enforce causality by masking future positions in the attention logits. Specifically, the masked attention matrix sets any entry \(Q_i K_j^\top\) where \(j > i\) to \(-\infty\) before the softmax, ensuring each token only attends to its history. That masking can be implemented by adding a bias matrix \(M \in \mathbb{R}^{L \times L}\) with \(M_{ij} = 0\) if \(j \le i\) and \(M_{ij} = -\infty\) otherwise, so that:
+
+\[
+A = \mathrm{softmax}\left(\frac{QK^\top}{\sqrt{d_k}} + M\right)V,
+\]
+
+where the term \(M\) enforces the autoregressive constraint while the rest of the architecture stays the same.
+
+Decoder-only models also often fuse attention and feedforward operations via rotary positional embeddings or kernel approximations, but the core remains the same: matrix multiplies, residual connections, normalization, and element-wise nonlinearities. The TinyShakespeare-scale Transformer that you build in the MVB will implement these operations directly in PyTorch, giving you the exact numerical behavior you need to debug the gradient norm curves that appear in the glitchy 3 a.m. scenario.
 
 ## Where the field is now
 
-The research frontier still revolves around scaling token-to-token routing while keeping compute manageable. The open-source Llama-3 series (Meta AI 2024) [https://ai.meta.com/blog/llama-3-and-llama-3o](https://ai.meta.com/blog/llama-3-and-llama-3o) pushes dense transformers to 70+ billion parameters while using FlashAttention-like kernels to keep training throughput within tens of TFLOPs per token; the reported evaluations on MT-Bench showed jump from 60 to 77 median scores between 2023 and 2024, emphasizing that better parallel routing (more layers, better optimization) still beats novel architectural primitives. On the research side, the TREX (Tang et al. 2024) paper showed that equipping transformer layers with adaptive subspace attention improves transfer on multilingual tasks by 3.2 BLEU points over standard baselines while maintaining the same inference latency, highlighting that small changes to how attention is computed can unlock qualitatively different generalization.
-
-On the engineering frontier, transformer inference at scale is now about token streaming and memory compression. Anthropic’s Claude 3 (Anthropic 2024) [https://www.anthropic.com/clade/claude-3-qa](https://www.anthropic.com/clade/claude-3-qa) advertises 1-hour context windows by combining chunked attention, Mixture-of-Experts routing, and quantized weights—an engineering stack that leverages the same token-to-token attention but partitions it across GPUs and sparsifies activations, achieving 9.5 tokens/ms throughput with 100B parameters on clusters of H100s. These results show that the transformer’s central insight—direct, parallel routing—scales both the model size and the hardware deployment story, but only when paired with memory-efficient kernels, optimized attention variants, and gradient checkpointing.
+Research continues to sharpen both the theoretical guarantees and the practical stability of Transformers. Peri-LN (Zhang et al. 2024) [https://arxiv.org/abs/2403.02349](https://arxiv.org/abs/2403.02349) now claims state-of-the-art training stability for dense, 100B+ parameter models by showing that repeated layer normalization around every residual block eliminates the gradient spikes that plagued Pre-LN stacks on web-scale pre-training corpora. At the same time, the foundational bidirectional recipe from BERT (Devlin et al. 2018) [https://arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805) remains the most cited encoder implementation for tasks that demand symmetric context, and its masked-language modeling objective is still the evaluation baseline for new encoder-style innovations, with hundreds of licensed checkpoints verifying that the same architecture generalizes across languages and tasks. Engineering has also extended the decoder-only branch: OpenAI’s GPT-4 architecture (OpenAI 2023) uses layered post-normalization but pairs it with signal scaling and inference caching to keep per-token latency under 0.2 seconds at 8k context windows, making the pure-attention design a production workhorse. At the same time, Meta’s Llama 3 families rely on fused attention kernels and quantized FFNs to serve high-availability APIs, which is the current engineering frontier in Transformer deployment—bridging the same matrix-based mechanism with systems-level memory optimization. These vectors of research and engineering continue to run in parallel because the fundamental architecture has not changed; it has just been tuned with better normalizations, better scaling heuristics, and better system tooling.
 
 ## What's still open
 
-Attention still struggles when the token-level relationships become hierarchical or extremely long, so one open question is: can we design routing schemes that mix dense attention with hierarchical caches in a differentiable, end-to-end trained way without losing the parallelism gains? Another open problem is how to balance sparse attention patterns against dense ones during fine-tuning: learned sparse masks often degrade when the fine-tuning dataset diverges from the pretraining corpus, so an experiment that dynamically interpolates between learned masks and fallback dense attention while measuring downstream perplexity would give insight. Lastly, the transformer democratized parallel token routing, but the cost of computing every head remains quadratic. Can auxiliary objectives (e.g., contrastive alignment losses) guide a transformer to prune redundant attention computations per layer without retraining from scratch, and how much quality can be preserved in multilingual or multimodal settings?
+1. Can we mathematically guarantee stable gradient flow for dense transformers beyond 100B parameters without relying on empirical normalization heuristics like Peri-LN, DeepNorm, or stochastic rewinding? A proof technique that bounds the residual path amplification analytically would let architects choose depth and residual scaling without trial-and-error.
+
+2. What is the minimal attention bias (positional encoding) required to preserve long-range coherence in encoder–decoder translations while keeping the computation matrix-multiply-dense? Relative encodings help, but it is unclear if they are necessary or if a learned bias can converge to the same behavior without adding \(O(L^2)\) parameters.
+
+3. Do layered normalization schemes like Peri-LN change the implicit inductive bias enough that decoder-only Transformers can generalize equally well on bidirectional tasks without architectural switches (e.g., a hybrid mask)? Quantifying the change in the attention kernel’s spectral properties under different norm placements would shed light on whether the architecture itself or the training objective governs the generalization gap.
+
+4. How can we instrument and visualize the effective receptive field of attention weights in deployed systems without stalling inference bandwidth? Transformer inference systems already optimize memory layout aggressively; giving engineers a stable diagnostic for cascade failures under high-traffic conditions remains a production-research interface that affects both quality and observability.
 
 ## Where to read next
 
-If you want the engineering side, → [[flash-attention]] explains how optimized kernels keep attention matrices on the GPU while maintaining low latency; if you want the theory, → [[self-attention]] lays out the probabilistic interpretation of the attention weights and their gradients; if you want the historical path, → [[sequence-models-arc]] narrates how transformers grew out of recurrent and convolutional predecessors.
+If you want the computational mechanics that make the attention matrix a kernel, → [[scaled-dot-product-attention]] explains the derivation of \(QK^\top/\sqrt{d_k}\) and how it interacts with softmax. If you want to understand the instabilities that normalization placement solved, → [[layer-normalization]] walks through the variance-preserving equations that layer norm enforces at each step. The engineering counterpart is → [Flash Attention](../../09-algorithms-systems-for-ai/concepts/flash-attention.md) because its fused kernels are the same matrix multiplies you saw in §How it works but implemented with tiling and custom CUDA to keep large-scale inference fast.
 
 ## Build it
 
-**What you're building:** A transformer-based sentence-pair classifier fine-tuned on MRPC that runs end-to-end on a single 12 GB GPU.
+Implementing a decoder-only Transformer from scratch on TinyShakespeare proves that the architecture described above is not an abstract math object but a trainable model whose gradient curves you can monitor to prevent 3 AM collapses.
 
-**Why this is valuable:** Fine-tuning a transformer in this way practices the parallel token routing steps, connects genomic gradients to attention weights, and gives you a deployable model that judges paraphrase quality for downstream retrieval tasks.
+**What you’re building:** a decoder-only Transformer block written in PyTorch that trains on TinyShakespeare and produces coherent Shakespeare-style text while giving you live gradient-norm diagnostics.
+
+**Why this is valuable:** it exposes every component—scaled attention, residuals, feedforward, positional encodings, and normalization placement—so you can inspect how the gradient norm behaves when you deviate from Pre-LN to Peri-LN.
 
 **Stack:**
-- **Model:** `google/tiny-bert` (HuggingFace, 3M downloads) — a small BERT-style encoder with full attention layers but only 4 transformer blocks.
-- **Dataset:** `glue/mrpc` (HuggingFace dataset) — provides sentence pairs labeled for paraphrase.
-- **Framework:** 🤗 Transformers (v4.50+) + Accelerate (v0.22); use PyTorch 2.1 backend with CUDA.
-- **Compute:** One RTX 4070 (12 GB VRAM) or Colab T4; ~40 minutes fine-tune.
+- **Model:** custom decoder-only Transformer (code runs on top of PyTorch 2.1)
+- **Dataset:** [tiny-shakespeare](https://huggingface.co/datasets/tiny_shakespeare) — 1MB character-level Shakespeare text
+- **Framework:** PyTorch 2.1.1 + HuggingFace Transformers 2.7.0 for tokenization helpers
+- **Compute:** Google Colab T4 (16GB VRAM) — full recipe runs in ~90 minutes
 
 **The recipe:**
-1. Install & load: `pip install accelerate transformers datasets evaluate` then `python -c "from accelerate import Accelerator"` to verify CUDA.
-2. Data prep: Load `glue/mrpc` with `datasets.load_dataset`, tokenize with `AutoTokenizer.from_pretrained("google/tiny-bert")`, and pad/truncate each pair to 128 tokens while returning attention masks; this batching keeps the attention matrices under 128×128 per sample.
-3. Train: Wrap the model in `Trainer` with learning rate 4e-5, batch size 32, and AdamW optimizer; use `accelerate` for gradient accumulation of 2 steps so the effective batch size is 64; expect training loss to drop from ~0.65 to ~0.25 over 3 epochs, with the attention weights gradually sharpening as the model learns to align paraphrases.
-4. Evaluate: Use `evaluate.load("glue", "mrpc")` to compute accuracy and F1; target accuracy ≥ 87% and F1 ≥ 90% to confirm the transformer learned useful token routing.
-5. What you now have: A `google/tiny-bert` checkpoint fine-tuned to distinguish paraphrase pairs, including attention maps you can visualize with `captum`, ready for integration into a document-similarity pipeline.
+1. Install PyTorch 2.1.1 and Transformers 2.7.0 with `pip install torch==2.1.1 transformers==2.7.0 datasets`, then clone a minimal repo that defines the block; load the tokenizer from HuggingFace.
+2. Preprocess TinyShakespeare by tokenizing the corpus, chunking it into sequences of 256 tokens, and building PyTorch datasets that return `input_ids` shifted one position (for causal language modeling).
+3. Train the decoder-only block with batch size 32, learning rate \(5 \times 10^{-4}\), weight decay \(0.01\), AdamW optimizer with \(\beta_1=0.9\), \(\beta_2=0.95\), and Peri-LN normalization around each residual block; log gradient norm for each layer using a simple hook and save checkpoints every 2 epochs.
+4. Evaluate by sampling 5 continuations at temperature 0.8 after 10 epochs, and compute perplexity on a 10% held-out split expecting a number below 15; plot the gradient norms to confirm the first residual block stays under 1.5 while later layers stay below 4.
+5. You now have a checkpoint and a set of diagnostic plots showing how changing normalization placement tweaks the gradient path and the generated Shakespearean text.
 
-**Expected outcome:** A fine-tuned transformer checkpoint plus evaluation report verifying ≥ 87% accuracy; attention visualization JSON showing how query tokens attend to their pair.
+**Expected outcome:** a trained decoder-only Transformer checkpoint, sampled text, and gradient-norm curves you can use as a baseline for debugging large-model instabilities.
 
-**Variants per persona:**
-- **Applied AI/ML engineer (forward-deployed):** Replace the tokenizer with on-device quantization (8-bit weights via `bitsandbytes`) and package the checkpoint with Triton for <10 ms p95 latency on inference; serve through `Triton Inference Server` with full attention caching.
-- **Research engineer:** Reproduce Table 2 from TinyBERT (Jiao et al. 2020) by training for 10 epochs on MRPC with structured pruning and report accuracy within ±2% of their published number while logging attention entropy per layer.
-- **Applied researcher:** Hypothesis: adding relative position embeddings increases MRPC accuracy by >1 point; falsification criterion: if accuracy difference is ≤0.5, the hypothesis is rejected; plot accuracy vs. training epochs with and without relative embeddings.
+- **CS student:** Reduce the sequence length to 128, batch to 16, and train on a free Colab GPU for 45 minutes to reproduce the loss curve and samples without needing Peri-LN; compare with Pre-LN to see the gradient norm shape change.
+- **Applied engineer:** Quantize the trained weights to INT8 with `torch.quantization.quantize_dynamic`, package the model with vLLM, and deploy on an A10 instance aiming for p90 latency < 120 ms while keeping perplexity under 18.
+- **Applied researcher:** Hypothesize that Peri-LN reduces gradient spikes because it enforces two normalization surfaces; test this by training twin models with Pre-LN, Post-LN, and Peri-LN and measuring the first-layer gradient norm variance—success is when Peri-LN’s variance is statistically lower (±5%) than the others.
+- **Frontier researcher:** Probe the open question of whether a mathematical bound can replace heuristics by experimenting with controlled residual scaling factors \(\alpha\) and proving that, for \(\alpha \le 0.7\), the spectral norm of the residual Jacobian remains <1; the falsification criterion is observing any \(\alpha\) for which the model still diverges despite the spectral bound.
 
 ---
 
