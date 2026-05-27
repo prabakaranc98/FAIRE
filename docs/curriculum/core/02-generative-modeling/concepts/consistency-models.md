@@ -29,29 +29,39 @@ Consistency models provide a fresh territory. Work such as Rezende et al. (2016)
 ### The diffusion context and the teacher
 
 Reuse the DDPM forward noising chain. For a clean datapoint \(\mathbf{x}_0\) and timestep \(t \in \{1,\dots,T\}\), the marginal over noisy samples is
+
 \[
 q(\mathbf{x}_t \mid \mathbf{x}_0) = \mathcal{N}\!\left(\mathbf{x}_t;\, \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,\; (1 - \bar{\alpha}_t) I\right)
 \]
+
 where \(\bar{\alpha}_t = \prod_{s=1}^{t}(1-\beta_s)\) and each \(\beta_s\) is the forward variance at step \(s\). The forward chain can be seen as continuous-time SDE \(d\mathbf{x}_t = -\tfrac{1}{2}\beta(t)\mathbf{x}_t\,dt + \sqrt{\beta(t)}\,dW_t\), where \(dW_t\) is Brownian noise; the exact schedule \(\beta(t)\) determines how fast information is washed away.
 
 DDPM trains a denoiser \(\epsilon_\theta\) by regressing the added Gaussian noise sample \(\boldsymbol{\eta} \sim \mathcal{N}(0, I)\) through
+
 \[
 \mathcal{L}_{\text{DDPM}}(\theta) = \mathbb{E}_{\mathbf{x}_0, t, \boldsymbol{\eta}} \left[\left\|\boldsymbol{\eta} - \epsilon_\theta(\mathbf{x}_t, t)\right\|^2\right]
 \]
+
 where \(\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\eta}\). This loss teaches the reverse Markov chain, but inference requires reconstructing \(\mathbf{x}_0\) through \(T\) sequential updates, each invoking the network.
 
 Consistency models keep this forward teacher but aim to distill a student \(f_\theta(\mathbf{x}_t, t)\) that is self-consistent: when \(t\) equals the near-noise-free boundary \(t_0 \approx 0\), \(f_\theta\) should return the input itself,
+
 \[
 f_\theta(\mathbf{x}_{t_0}, t_0) = \mathbf{x}_{t_0}
 \]
+
 This boundary anchors the function to the data manifold. Further, Song & Dhariwal showed that the difference \(f_\theta(\mathbf{x}_t, t) - \mathbf{x}_t\) should align with the score of the noised distribution,
+
 \[
 \frac{f_\theta(\mathbf{x}_t, t) - \mathbf{x}_t}{\gamma_t} \approx -\nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)
 \]
+
 where \(\gamma_t\) is a schedule-dependent scalar, \(\mathbf{x}_t\) is drawn from the forward process, and \(\log p_t\) is the log-density of \(\mathbf{x}_t\). This relation comes from differentiating the self-consistency constraint along the diffusion trajectory and mirrors the score-matching identities used in diffusion and flow models. The continuous-time version of this constraint leads to a partial differential equation:
+
 \[
 \frac{\partial}{\partial t} f_\theta(\mathbf{x}_t, t) + \nabla_{\mathbf{x}_t} f_\theta(\mathbf{x}_t, t)^\top \frac{d\mathbf{x}_t}{dt} = 0
 \]
+
 where \(\frac{d\mathbf{x}_t}{dt}\) is known from the forward SDE. This PDE enforces that \(f_\theta\) transports noisy samples back to the manifold while respecting the temporal structure of the diffusion chain.
 
 Consistency models then ask: how do we train \(f_\theta\) to obey those constraints without executing all \(T\) steps? Song & Dhariwal answer this through two complementary paradigms.
@@ -61,9 +71,11 @@ Consistency models then ask: how do we train \(f_\theta\) to obey those constrai
 Consistency Distillation keeps a pretrained diffusion model \(\epsilon_\theta^{\text{teacher}}\) and lets it simulate intermediate denoising steps to create regression targets. Given a sampled timestep \(t\) and its noisy sample \(\mathbf{x}_t\), the teacher produces a slightly less noisy point \(\hat{\mathbf{x}}_{t-\delta}\) by taking \(\delta\) reverse steps (with \(\delta=1\) being the usual choice). The student \(f_\theta\) is then trained to map \(\mathbf{x}_t\) directly to \(\hat{\mathbf{x}}_{t-\delta}\). Because \(\hat{\mathbf{x}}_{t-\delta}\) already lies closer to \(\mathbf{x}_0\), the student learns to leap ahead in one evaluation while the teacher still enforces paths that respect the diffusion schedule.
 
 This training yields the mean-squared error loss
+
 \[
 \mathcal{L}_{\text{CD}}(\theta) = \mathbb{E}_{\mathbf{x}_t, \hat{\mathbf{x}}_{t-\delta}} \left[\left\|\hat{\mathbf{x}}_{t-\delta} - f_\theta(\mathbf{x}_t, t)\right\|^2\right]
 \]
+
 with \(\hat{\mathbf{x}}_{t-\delta}\) sampled from the teacher’s rollout. The key tension is that \(f_\theta\) must approximate a target that the teacher generated via \( \delta \) steps, so a small \(\delta\) keeps the target close to the true diffusion path and makes distillation stable. In Song & Dhariwal’s experiments, \(\delta=1\) already suffices for photo-realistic samples. The distillation pipeline thus shifts the sampling cost into training: once \(f_\theta\) is trained, inference requires a single evaluation, yet the training loss still reflects the geometry of the diffusion trajectory thanks to the teacher.
 
 To keep the teacher outputs coherent across timesteps, practitioners reuse a single teacher rollout per batch, sample \(t\) uniformly, and cache the corresponding \( (\mathbf{x}_t, \hat{\mathbf{x}}_{t-\delta})\) pairs for the student. This caching converts the teacher’s iterative computation into large-grown regression data that the student sees repeatedly, which is why CD models often inherit the teacher’s compute cost during training but pay it back with a one-shot sampler at inference.
@@ -71,15 +83,19 @@ To keep the teacher outputs coherent across timesteps, practitioners reuse a sin
 ### Consistency Training (CT) and the bootstrap view
 
 Consistency Training removes the teacher entirely and instead relies on the student’s self-consistency across timesteps. Song & Dhariwal framed the constraint as a loss between the outputs at neighboring timesteps, while Geng et al. (2024) [arxiv:2410.18958](https://arxiv.org/abs/2410.18958) reinterpreted it as temporal-difference (TD) learning in a Markov Decision Process (MDP). In this view, each noisy sample \(\mathbf{x}_t\) is a state, the student’s output is a value estimate, and the TD target is the student’s output at the next timestep. The resulting loss is
+
 \[
 \mathcal{L}_{\text{CT}}(\theta) = \mathbb{E}_{\mathbf{x}_t} \left[\left\|f_\theta(\mathbf{x}_t, t) - f_\theta\left(\mathbf{x}_{t+\delta}, t+\delta\right)\right\|^2\right]
 \]
+
 where \(\mathbf{x}_{t+\delta}\) is obtained by sampling another chunk of Gaussian noise. This bootstrapping update compels the student to agree with its own future predictions, mirroring how Q-learning updates value functions toward future estimates.
 
 Geng et al. augment this loss with score identities to control the variance from bootstrapping. They approximate the score \(\nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)\) via auxiliary networks and inject the correction
+
 \[
 f_\theta(\mathbf{x}_t, t) \approx \mathbf{x}_t + \gamma_t \nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)
 \]
+
 with \(\gamma_t\) derived from the diffusion schedule. This correction keeps the TD target grounded to the geometry of the data distribution even when \(\delta\) is large, preventing the bootstrap from drifting toward degenerate minima. In practice CT is noisier than CD because it lacks a teacher, but the MDP view explains why the noise can be tamed with careful scheduling and variance reduction.
 
 CT therefore unifies consistency learning with reinforcement learning: the student continually reestimates its target, the score identity acts like a critic that regularizes the update, and the boundary constraint at \(t_0\) serves as the terminal reward that anchors the trajectory. Combined with CD, these paradigms trace a spectrum from teacher-guided regression to bootstrapped self-consistency.

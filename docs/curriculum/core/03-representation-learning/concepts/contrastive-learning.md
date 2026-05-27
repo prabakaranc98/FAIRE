@@ -27,15 +27,19 @@ This perspective matters because the embedding space is the product. Downstream 
 ## How it works
 
 Contrastive learning starts with a pairwise geometry. Chopra et al. (2005) [https://cs.nyu.edu/~sumit/research/assets/cvpr05.pdf] introduced a loss that takes two embedded vectors \(z\) and \(z^+\) from a positive pair and a negative pair \(z\) and \(z^-\), then minimizes
+
 \[
 \mathcal{L}_{\text{margin}} = \max(0, \|z - z^+\|_2^2 - \|z - z^-\|_2^2 + m),
 \]
+
 where \(m\) is a fixed margin between positives and negatives, \(z\) is the anchor embedding, and \(z^+\) and \(z^-\) are the positive and negative embeddings respectively. The intuition is geometric: positives must sit within a radius \(m\) of the anchor, whereas negatives are penalized when they cross that boundary. This is the clean seed that says “embedding distance equals similarity,” but the loss needs a trainable sampling strategy to provide positives and negatives without labels.
 
 InfoNCE realizes that strategy statistically. It frames the problem as mutual information estimation between an anchor view and a positive view under context \(c\). Oord et al. (2018) [arxiv:1807.03748](https://arxiv.org/pdf/1807.03748) derive the contrastive objective
+
 \[
 \mathcal{L}_{\text{InfoNCE}} = -\mathbb{E}_{(x, x^+, \{x_k^-\})} \log \frac{\exp(\text{sim}(z, z^+)/\tau)}{\exp(\text{sim}(z, z^+)/\tau) + \sum_k \exp(\text{sim}(z, z_k^-)/\tau)},
 \]
+
 where \(z = f_\theta(x)\) is the encoder output for the anchor view \(x\), \(z^+ = f_\theta(x^+)\) is the encoder output for the positive view \(x^+\), \(z_k^- = f_\theta(x_k^-)\) are the embeddings of \(K\) negatives from the same batch, \(\text{sim}(u, v) = u^\top v / \|u\|\|v\|\) is cosine similarity, and \(\tau\) is the temperature scaling the distribution. InfoNCE encourages the positive cosine similarity to dominate the entire softmax over positives plus negatives, which can be interpreted as estimating a log-bilinear score proportional to the pointwise mutual information between views.
 
 The example from Oord et al. is CPC: the positive pair is a future timestep in a sequence, while negatives are sampled from other timesteps or other sequences. Batch-wise negatives are the simplest instantiation for images. If the encoder \(f_\theta\) is just a ResNet, then sampling a different image in the same batch acts as a negative; the loss then teaches the model to recognize invariance across augmentations and discriminativeness across different instances.
@@ -43,15 +47,19 @@ The example from Oord et al. is CPC: the positive pair is a future timestep in a
 Augmentations define what co-occurrence means. SimCLR (Chen et al. 2020) [arxiv:1902.09229](https://arxiv.org/pdf/1902.09229) operationalizes this by taking each image \(x\) and producing two augmented crops \(x, x^+\) via random resized crop, color jitter, Gaussian blur, and horizontal flip. The encoder \(f_\theta\) processes both crops, and a projection head \(g_\phi\) maps encoder outputs to the contrastive space \(z = g_\phi(f_\theta(x))\). The projection head is a non-linear MLP; the simplified finding is that InfoNCE should be applied in the projection space while the linear evaluation is done on the encoder output \(f_\theta(x)\). The resulting training loop for epoch \(t\) uses a large batch size (e.g., \(N=4096\)) to increase the number of negatives, and incorporates a cosine learning rate schedule with a weight decay tuned to keep the embedding norms stable. Without the projection head, the encoder is directly penalized by the InfoNCE signal, which is noisier.
 
 SimCLR’s reliance on large batches led to Momentum Contrast (MoCo) (He et al. 2019) [arxiv:1911.05722](https://ar5iv.labs.arxiv.org/html/1911.05722), which augments the negative set by maintaining a queue of past embeddings. MoCo keeps two encoders: a query encoder \(f_q\) with parameters \(\theta_q\) and a key encoder \(f_k\) with parameters \(\theta_k\). The query encoder processes the current anchor \(x\), while the key encoder processes the positive \(x^+\). Instead of updating \(\theta_k\) via gradients, it updates via momentum:
+
 \[
 \theta_k \leftarrow m \theta_k + (1 - m) \theta_q,
 \]
+
 where \(m \in [0,1)\) is the momentum coefficient. This update keeps the key encoder’s representation relatively stable, allowing the queue to accumulate down-stream embeddings without being destroyed by stale gradients. The negative queue is filled with past \(z_k^- = f_k(x_k^-)\), which are no longer constrained by the current batch size because they persist across iterations. InfoNCE now compares the current positive with the queued negatives, achieving similar or better performance than large-batch SimCLR with batch size \(N=256\).
 
 MoCo also introduced the stop-gradient on the key encoder, which prevents gradients from flowing through the queue. BYOL (Grill et al. 2020) [arxiv:2105.15134](https://arxiv.org/pdf/2105.15134) takes a different tack: it eliminates negatives altogether by matching two views via a prediction network and a momentum encoder. One view is processed by the online network \(f_\theta\) and predictor \(q_\theta\), the other by a target network \(f_{\theta'}\). The loss is
+
 \[
 \mathcal{L}_{\text{BYOL}} = \|q_\theta(f_\theta(x)) - \text{stopgrad}(f_{\theta'}(x^+))\|_2^2,
 \]
+
 where \(\text{stopgrad}(\cdot)\) indicates that gradients do not flow through the target branch, and \(\theta'\) is updated via momentum similar to MoCo. BYOL shows that with sufficient architectural asymmetry and stop-gradient, InfoNCE-style alignment can work without explicit negatives, but the same insights about augmentations and projection heads carry over.
 
 Contrastive training is not only about losses; it is about the augmentation pipeline that defines positives. Random resized crop plus color jitter ensures invariance to translation and color but not to large-scale semantics—for example, if a dataset includes both cats and dogs, the color jitter will still leave the cat-dog distinction intact. Gaussian blur adds invariance to texture, while solarization or grayscale encourages shape features. The probabilistic interpretation is that each augmentation samples from a conditional distribution \(x^+ \sim \mathcal{A}(x)\), and InfoNCE maximizes mutual information between \(x\) and \(x^+\) by implicitly estimating \(p(x^+ \mid x)\) through discriminative modeling.

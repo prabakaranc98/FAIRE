@@ -27,47 +27,61 @@ Early GAN research focused on improving divergence estimation, but the narrative
 ### Adversarial distillation through the minimax lens
 
 At the core of GAN training is a two-player minimax game in which the discriminator approximates a divergence between the generator distribution \(p_g\) and the true data distribution \(p_{\text{data}}\) while the generator tries to minimize that divergence. The canonical objective is
+
 \[
 \min_\theta \max_\phi \mathbb{E}_{x \sim p_{\text{data}}}[\log D_\phi(x)] + \mathbb{E}_{z \sim p_z}[\log(1 - D_\phi(G_\theta(z)))]
 \]
+
 where \(x\) is a real data sample, \(z\) is a noise vector sampled from the latent prior \(p_z\), \(G_\theta\) is the generator with parameters \(\theta\), and \(D_\phi\) is the discriminator with parameters \(\phi\). The first term rewards the critic for assigning high scores to genuine data; the second penalizes it for accepting generator fakes. The generator receives gradients through \(D_\phi\), so it learns to move its samples toward the support of \(p_{\text{data}}\) in a single evaluation, which enforces the “single-stroke” quality that keeps latency low.
 
 When a GAN distills a diffusion or flow teacher, the discriminator’s positive examples become teacher outputs \(x_T\) instead of raw data samples. The distilled adversarial loss becomes
+
 \[
 \mathcal{L}_{\text{adv}} = \mathbb{E}_{x_T \sim p_{\text{teacher}}}[\log D_\phi(x_T)] + \mathbb{E}_{z \sim p_z}[\log(1 - D_\phi(G_\theta(z)))]
 \]
+
 where \(p_{\text{teacher}}\) denotes the high-fidelity distribution produced by the teacher after many denoising steps. UCGM shows that both diffusion and GAN objectives emerge as special cases of a continuous-time critic \(D_t(x_t)\) trained over \(t \in [0, T]\), and that placing the adversarial pressure at \(t = T\) recovers sub-2.0 FID quality with far fewer inference steps than the original diffusion sampler [LINs-lab et al. 2025](https://arxiv.org/abs/2505.07447). The GAN now plays the accelerator: it learns a mapping from conditioning or noise to final teacher samples without replaying the entire chain.
 
 ### Patch-based critics and localized gradients
 
 Modeling high-frequency textures in one shot requires gradients that focus on small neighborhoods. PatchGAN discriminators (Isola et al. 2017) score overlapping \(N\times N\) patches independently, producing a map \(D_\phi(x)\in\mathbb{R}^{H\times W}\) instead of a single scalar. The adversarial loss sums the log probabilities across patches for real samples and does the same for fake samples:
+
 \[
 \mathcal{L}_{\text{patch}} = -\sum_{i,j} \log D_\phi(x)_{i,j}
 \]
+
 where \(D_\phi(x)_{i,j}\) denotes the critic’s output for the \((i,j)\)th patch. The localized gradients constrain the generator to respect texture, edges, and spatial layout without relying on a long denoising sequence. These patch-wise signals are essential when the generator has to mimic diffusion outputs that contain fine detail: each patch enforces realness locally, which softens the adversarial pressure on any single pixel.
 
 ### Conditional reconstruction and the total objective
 
 In translation problems, the generator takes a conditioning image \(x_c\) and synthesizes \(G_\theta(x_c, z)\). The conditional minimax objective becomes
+
 \[
 \mathbb{E}_{x, x_c}[\log D_\phi(x_c, x)] + \mathbb{E}_{x_c, z}[\log(1 - D_\phi(x_c, G_\theta(x_c, z)))]
 \]
+
 where \(x_c\) is the condition (e.g., a sketch) and \(x\) is its photographic counterpart. A reconstruction term such as
+
 \[
 \lambda \mathbb{E}_{x, x_c, z}[\|x - G_\theta(x_c, z)\|_1]
 \]
+
 anchors the generator to the structure implied by \(x_c\), and feature matching penalties (matching intermediate discriminator activations) further align intermediate representations with the teacher’s refinement path. The combined generator objective becomes
+
 \[
 \mathcal{L}_{\text{total}} = \mathcal{L}_{\text{adv}} + \lambda \mathbb{E}_{x, x_c, z}[\|x - G_\theta(x_c, z)\|_1]
 \]
+
 where \(\lambda\) trades off pixel fidelity (L1) with perceptual realism enforced by the discriminator. In the distilled setting, the reconstruction term keeps the generator close to what the diffusion teacher would have produced after many steps, while the adversarial term delivers teacher-quality texture in one pass.
 
 ### Stability through spectral normalization and TTUR
 
 Training remains a saddle-point problem, so conditioning the discriminator matters. Spectral normalization (Miyato et al. 2018) enforces \(1\)-Lipschitz continuity by dividing each weight matrix \(W\) by its largest singular value \(\sigma(W)\):
+
 \[
 \bar{W} = \frac{W}{\sigma(W)}
 \]
+
 where \(\sigma(W)\) is computed via power iteration. This normalization keeps the discriminator’s gradients bounded, preventing the critic from reacting excessively to small changes in its input, and it ensures that the generator sees smoother signals even when it tries to invent high-frequency artifacts.
 
 Two-time-scale update rule (TTUR) further smooths the adversarial trajectory by setting the discriminator learning rate higher than the generator’s—often four times as large [Heusel et al. 2017](https://arxiv.org/abs/1706.08500). If the critic learns too slowly, the generator chases a shifting target; if it learns too fast, gradients vanish and the generator collapses. TTUR balances those forces by letting the discriminator approach its local optimum faster without completely dominating the game, which is crucial when the discriminator is tasked with matching a teacher’s distribution.
@@ -75,9 +89,11 @@ Two-time-scale update rule (TTUR) further smooths the adversarial trajectory by 
 ### Connecting to continuous teachers
 
 UCGM (LINs-lab et al. 2025) expresses the adversarial-distillation loss as an integral over a continuous time parameter:
+
 \[
 \mathcal{L}_{\text{UCGM}} = \mathbb{E}_{t \sim \mathcal{U}(0, T)}\left[w(t)\mathbb{E}_{x_t \sim p_t}[\log D_t(x_t)]\right] + \mathbb{E}_{z \sim p_z}[\log(1 - D_T(G_\theta(z)))]
 \]
+
 where \(w(t)\) is a weighting function, \(p_t\) is the teacher’s distribution at time \(t\), and \(D_t\) is the discriminator scoring samples along that trajectory. The first term keeps the discriminator aware of intermediate diffusion states, which improves mode coverage, while the second term is the terminal adversarial loss that the generator learns to satisfy in one inference pass. Coupling this continuous-time critic with PatchGAN and spectral-normalized layers keeps the single-step enforcement on solid theoretical footing: the generator internalizes what diffusion modeled across time despite only evaluating \(D_T\).
 
 ## Where the field is now

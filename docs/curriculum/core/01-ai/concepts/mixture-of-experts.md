@@ -25,32 +25,42 @@ Modern language, vision, and multi-modal models keep increasing parameters becau
 ## How it works
 
 The Mixture-of-Experts block splits into two cooperating pieces: the gate that computes attention-like weights, and the experts—usually small MLPs—who do the heavy lifting. Start with an input token embedding \(x \in \mathbb{R}^d\). A gating network applies a linear projection \(W_g x + b_g\) to produce logits \(l \in \mathbb{R}^E\), where \(E\) is the number of experts. A naive softmax \(p = \text{softmax}(l)\) gives a probability vector over experts, but the trick that makes modern MoEs practical is to activate only the top \(k\) experts per token (typically \(k=2\)). This keeps the per-token compute proportional to \(k\) instead of \(E\). The clean gating formulation is
+
 \[
 g(x) = \text{TopK}\bigl(\text{softmax}(l + n)\bigr)
 \]
+
 where \(n \sim \mathcal{N}(0, \sigma^2 I)\) is noise added per token before top-\(k\) selection to nudge the gate away from deterministically favoring a single expert.
 In this equation, \(x\) is the token embedding entering the block, \(W_g \in \mathbb{R}^{E \times d}\) and \(b_g \in \mathbb{R}^E\) are gating parameters, \(\text{TopK}(\cdot)\) zeroes out all but the \(k\) highest entries, and \(\sigma\) is a tunable scale that ensures exploration.
 
 The gated dispatch and combine steps mimic attention. After computing \(g(x)\), the dispatcher scatters \(x\) to each expert \(e\) that received a non-zero gate score, forming \(k\) independent mini-batches. Each expert \(F_e\) (an MLP with its own parameters) processes only the tokens routed to it:
+
 \[
 y_e = F_e(x)
 \]
+
 and the block’s output is the weighted sum of these expert outputs:
+
 \[
 y = \sum_{e \in \text{TopK}} g_e(x) \cdot y_e
 \]
+
 where \(g_e(x)\) is the gate score for expert \(e\). Because only \(k\) experts are active per token, the FLOPs per token are \(k \cdot \text{MLP-FLOPs}\), regardless of \(E\). For example, with \(E=256\) and \(k=2\), each token uses \(2 \times\) the FLOPs of a single expert rather than \(256 \times\). The inactive experts keep their weights but pay no compute price.
 
 Noisy top-k gating is the route that keeps gradients flowing through the discrete expert selection. Without noise, the gate would hard-select one expert and the gradient would vanish for the rest. During backprop, the gate’s gradient is computed via the softmax before the top-k mask, and the noise term \(n\) is sampled once per token at forward pass, so the gate still learns which experts to prefer on average.
 
 Routing collapse—where every token chooses the same expert—looks small in the loss but fatal for capacity. Shazeer et al. (2017) “Outrageously large neural networks” [https://arxiv.org/abs/1701.06538] introduced auxiliary balancing losses for this reason. The importance of expert \(e\) is the aggregate gate mass:
+
 \[
 \text{Importance}_e = \sum_{x \in \mathcal{B}} g_e(x)
 \]
+
 and the load is the expected number of tokens dispatched to \(e\). The load-balancing loss pairs these two terms:
+
 \[
 \mathcal{L}_{\text{balance}} = \lambda \cdot E \cdot \sum_{e=1}^E \text{Importance}_e \cdot \text{Load}_e
 \]
+
 where \(\lambda\) scales the auxiliary objective relative to the downstream loss, \(E\) is the expert count, and the product encourages both importance and load to be uniform across experts. This loss keeps the gating network from collapsing and ensures idle experts still receive traffic. In practice, Shazeer et al. found \(\lambda = 0.01\) works well, and the expert-local losses are combined with the main classification or language-modeling loss.
 
 Training also requires efficient dispatch kernels. The dispatcher reshapes the per-token gate scores into a sparse matrix that maps the mini-batch axes to expert-local mini-batches. During the backward pass, gradients propagate through the same sparse gather/scatter path, preserving the Top-2 structure. When MoE sits inside a Transformer layer, the MoE block replaces the standard feed-forward network (FFN) while keeping the multi-head attention and residual structure intact; the rest of the model treats the MoE output like any other feed-forward output.

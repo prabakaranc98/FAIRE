@@ -31,6 +31,7 @@ We start by writing the prior and posterior formulas so that every variable is e
 \[
 f \sim \mathcal{N}(m(X), K_{XX}),
 \]
+
 where \(m(X)\) is the mean vector with each entry \(m(x_i)\) typically set to zero for convenience, and \(K_{XX}\) is the \(n \times n\) covariance matrix whose entries \(k(x_i, x_j)\) come from a positive-definite kernel (e.g., RBF, Matérn, spectral mixture). This is Equation (1). Here \(k(\cdot, \cdot)\) encodes how fast the function can vary, so the kernel distances act as regularizers. If the function is smooth, nearby inputs share high covariance, effectively shrinking the posterior variance in dense regions.
 
 When we observe noisy targets \(y = f + \epsilon\) with \(\epsilon \sim \mathcal{N}(0, \sigma^2 I)\), the predictive distribution at a new input \(x_*\) has the mean and variance
@@ -39,6 +40,7 @@ When we observe noisy targets \(y = f + \epsilon\) with \(\epsilon \sim \mathcal
 \mu(x_*) = k_{x_*X}(K_{XX} + \sigma^2 I)^{-1} y, \qquad
 \sigma^2(x_*) = k(x_*, x_*) - k_{x_*X}(K_{XX} + \sigma^2 I)^{-1}k_{Xx_*},
 \]
+
 where \(k_{x_*X}\) is the \(1\times n\) vector of covariances between \(x_*\) and each training input, and \(k_{Xx_*} = k_{x_*X}^\top\). This is Equation (2). The posterior mean \(\mu(x_*)\) is the best guess in the reproducing kernel Hilbert space defined by \(k\), while the variance \(\sigma^2(x_*)\) shrinks near inputs covered by \(X\) and grows in sparse regions, giving a calibrated uncertainty envelope.
 
 Fitting kernel hyperparameters \(\theta\), including kernel length scales and noise variance \(\sigma^2\), uses the marginal likelihood:
@@ -46,6 +48,7 @@ Fitting kernel hyperparameters \(\theta\), including kernel length scales and no
 \[
 \log p(y \mid X, \theta) = -\frac{1}{2} y^\top (K_{XX} + \sigma^2 I)^{-1} y - \frac{1}{2} \log \det (K_{XX} + \sigma^2 I) - \frac{n}{2} \log 2\pi,
 \]
+
 with \(\theta\) collecting the hyperparameters. This is Equation (3). The first term measures data fit, the second penalizes model complexity (related to the volume of the predictive distribution), and the constant arises from the Gaussian normalizer. Optimizing this evidence yields automatic relevance determination: dimensions that do not explain variance see their length scales grow, effectively nullifying those inputs.
 
 ### Sparse variational inference
@@ -55,11 +58,13 @@ Cubic scaling prevents naïve usage beyond a few thousand points, so we introduc
 \[
 q(f,u) = p(f \mid u, X, Z) q(u),
 \]
+
 where \(q(u) = \mathcal{N}(m_u, S_u)\) is independent and trainable. Marginalizing \(u\) leads to a variational approximation of the predictive distribution. The sparse evidence lower bound (ELBO) is
 
 \[
 \mathcal{L} = \mathbb{E}_{q(f)}[\log p(y \mid f)] - \text{KL}(q(u) \,\|\, p(u)),
 \]
+
 which is Equation (4). The expectation term measures how well the variational posterior explains the data given the likelihood, and the KL term discourages the variational distribution from straying too far from the prior \(p(u)\). Because \(q(f)\) is built by conditioning on \(u\), it remains Gaussian, and the expectation has a closed form for Gaussian, categorical, or other conjugate likelihoods. This form is the one GPyTorch exposes via `VariationalELBO`.
 
 The expectation in practice is approximated over mini-batches. With \(b\) observations per batch, the ELBO becomes
@@ -67,6 +72,7 @@ The expectation in practice is approximated over mini-batches. With \(b\) observ
 \[
 \mathcal{L}_{\text{batch}} \approx \frac{n}{b} \sum_{i=1}^b \mathbb{E}_{q(f_i)}[\log p(y_i \mid f_i)] - \text{KL}(q(u) \| p(u)),
 \]
+
 Equation (5), where \(f_i\) is the latent value for the \(i\)-th data point in the batch. The \(n/b\) factor reweights the batch contribution to approximate the full dataset. Gradient-based optimizers differentiate through both the expectation and the KL term, updating kernel hyperparameters, \(m_u\), \(S_u\), and inducing locations \(Z\). This makes the computation scale as \(O(n m^2)\) per epoch rather than \(O(n^3)\).
 
 Despite its success, the standard ELBO can still suffer from mode collapse when the posterior is complex. The recent work “Extending Mean-Field Variational Inference via Entropic Regularization: Theory and Practice” (Zhang, Lee, and Titsias 2024) [arxiv:2404.09113](https://arxiv.org/abs/2404.09113) adds an entropy term \(\lambda \mathcal{H}(q(u))\) to the KL, shaping the geometry of the variational family and preventing \(S_u\) from degenerating. Here \(\mathcal{H}(q(u))\) is the differential entropy of the Gaussian \(q(u)\), and \(\lambda\) controls the temperature of the barrier. When \(\lambda\) is high early in training, the entropy encourages exploration across inducing locations; as \(\lambda\) anneals down, the ELBO can settle into sharper posteriors without catastrophic collapse. The result is more stable optimization with high-capacity kernels and multi-modal likelihoods.

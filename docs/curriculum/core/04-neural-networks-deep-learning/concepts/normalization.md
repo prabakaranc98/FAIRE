@@ -31,9 +31,11 @@ Normalization works by inserting operations that re-center, re-scale, or re-para
 ### Batch normalization: rescaling via batch statistics
 
 Batch Normalization controls the statistics of each neuron along a mini-batch. For a pre-activation value \(x^{(k)}\) corresponding to feature \(k\), the normalization first computes the batch mean \(\mu_{\mathcal{B}} = \frac{1}{m}\sum_{i=1}^{m} x^{(i)}\) and variance \(\sigma_{\mathcal{B}}^2 = \frac{1}{m}\sum_{i=1}^{m} (x^{(i)} - \mu_{\mathcal{B}})^2\), where \(m\) is the batch size. The normalized activation is
+
 \[
 \hat{x}^{(k)} = \frac{x^{(k)} - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}},
 \]
+
 where \(\epsilon\) is a small positive constant to prevent division by zero. A learnable linear transformation \(y^{(k)} = \gamma \hat{x}^{(k)} + \beta\) reintroduces scale \(\gamma\) and bias \(\beta\), so the layer can restore any necessary distribution. When gradients backpropagate through this block, the factor \(1/\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}\) attenuates large variances and the subtraction of the mean ties all neurons within the batch to a shared reference frame. Because the normalization depends on the current mini-batch, the empirical variance stays near one, which constrains the eigenvalues of the local Jacobian and prevents explosive growth during the backward pass.
 
 However, BatchNorm relies on high-quality batch statistics. Very small batches, distributed setups where each worker sees only a few tokens, or autoregressive decoders where each token is processed separately break the assumption that the batch statistics approximate the population. When the statistics are noisy, BatchNorm can inject more instability than it removes.
@@ -41,43 +43,55 @@ However, BatchNorm relies on high-quality batch statistics. Very small batches, 
 ### Layer normalization: per-instance stabilization
 
 LayerNorm solves the batch dependency by computing statistics within each individual activation vector. Given a hidden vector \(h \in \mathbb{R}^d\), the per-token mean is \(\mu_h = \frac{1}{d} \sum_{i=1}^{d} h_i\) and variance \(\sigma_h^2 = \frac{1}{d} \sum_{i=1}^{d} (h_i - \mu_h)^2\). The normalization maps each coordinate as
+
 \[
 \hat{h}_i = \frac{h_i - \mu_h}{\sqrt{\sigma_h^2 + \epsilon}}, \qquad y_i = \gamma_i \hat{h}_i + \beta_i,
 \]
+
 where the vectors \(\gamma, \beta \in \mathbb{R}^d\) provide per-feature scale and shift. Because LayerNorm uses only features from the same token, it is invariant to batch size and works defenders for autoregressive and decoder-only architectures. The Jacobian of LayerNorm includes derivatives of \(\mu_h\) and \(\sigma_h^2\), which introduces off-diagonal terms that couple all features inside a token. That coupling maintains a bounded condition number for the residual block’s Jacobian, preventing the vanishing gradient issues that plagued early RNNs and allowing Transformers to be trained effectively even with a single sequence at a time.
 
 ### Weight normalization: decoupling scale from direction
 
 Where LayerNorm controls forward activations, Weight Normalization offers a different knob by re-parameterizing each weight vector \(w \in \mathbb{R}^d\) as
+
 \[
 w = \frac{g}{\|v\|} v,
 \]
+
 where \(v \in \mathbb{R}^d\) is a direction vector, \(g \in \mathbb{R}_+\) is a positive scalar representing magnitude, and \(\|v\|\) is the Euclidean norm of \(v\). During optimization, gradients update \(v\) and \(g\) separately. The derivative with respect to \(v\) includes a projection that removes components parallel to \(v\), keeping the direction updates orthogonal to scale changes. Since optimizers such as Adam adjust their step size based on running second moments, isolating the scale information in \(g\) prevents the optimizer from mis-attributing hyperparameter changes to directions. This decoupling places an implicit normalization on the upcoming activations, especially in attention heads where \(w\) interacts with other normalized vectors, and keeps the norms of weight contributions within a narrow range.
 
 ### Placement matters: Pre-LN, Post-LN, and Peri-LN
 
 Normalization placement relative to skip connections modulates how gradients traverse residual stacks. In Pre-LN Transformers each residual block begins with LayerNorm:
+
 \[
 x_{l+1} = x_l + \text{Sublayer}(\text{LayerNorm}(x_l)),
 \]
+
 so the Gradient flows through a normalized input before entering the sublayer. The skip connection therefore bypasses all computation and feeds the normalized signal directly to the addition. Post-LN instead applies LayerNorm after the addition,
+
 \[
 x_{l+1} = \text{LayerNorm}(x_l + \text{Sublayer}(x_l)),
 \]
+
 ensuring the block’s output remains centered, but the backward pass must traverse the sublayer twice before re-entering the normalized space, which slows early convergence. Pre-LN blocks converge faster in the warm-up phase but can produce sharper gradient updates that require careful learning rate scheduling, while Post-LN tends to be more stable toward the end of training but trains slower at first.
 
 Peri-LN (Zhang et al. 2024) [https://arxiv.org/abs/2406.07340] introduces a “peri” perimeter for normalization: it applies LayerNorm both before the sublayer and around the addition, normalizing both the input and the combined result:
+
 \[
 x_{l+1} = \text{LayerNorm}(\text{LayerNorm}(x_l) + \text{Sublayer}(\text{LayerNorm}(x_l))).
 \]
+
 This double normalization keeps the forward signal regulated entering and exiting the residual path and thus constrains the gradient’s Jacobian to remain near the identity on both sides of the addition. In large-scale encoder experiments with 70B parameters, the peri placement reduced the coefficient of variation of gradient norms by roughly 50% compared to Pre-LN and Post-LN while halving the number of warm-up steps needed before reaching target learning rates. The peri block also pairs well with scale-aware initialization, so early blocks do not accumulate drift when \(x_0\) has unnormalized distribution.
 
 ### Jacobians and gradient stability: the mathematical foundation
 
 Normalization’s effectiveness is visible through the Jacobian of a residual block. If the block is \(x_{l+1} = x_l + F(x_l)\), then
+
 \[
 \frac{\partial L}{\partial x_l} = \frac{\partial L}{\partial x_{l+1}} \left( I + \frac{\partial F(x_l)}{\partial x_l} \right).
 \]
+
 Here, \(I\) is the identity matrix aligning with the skip connection, and \(\partial F(x_l)/\partial x_l\) is the Jacobian of the sublayer. Without normalization, the eigenvalues of \(\partial F / \partial x_l\) can exceed one and, when multiplied across dozens or hundreds of layers, exponentiate, leading to exploding gradients. Normalization rescales the inputs that \(F\) sees so that its Jacobian is effectively shrunk by factors like \(\gamma / \sqrt{\sigma^2 + \epsilon}\) (LayerNorm) or is constrained through the separate magnitude \(g\) (WeightNorm). When the normalization sits inside \(F\) (Pre-LN), the gradient’s first interaction is with a bounded Jacobian before encountering the identity skip, which favors rapid warm-up. When the normalization sits after the addition (Post-LN), the gradient must traverse the sublayer twice before hitting the normalized output, delaying the collapse of large eigenvalues until later.
 
 This mathematical structure explains why normalization placements move in response to failure modes. BatchNorm’s scaling of \(1/\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}\) keeps the eigenvalues bounded before averaging them across a batch. LayerNorm’s per-token mean and variance derivatives create additional coupling terms that actively center the outputs and maintain a well-conditioned Jacobian without relying on other examples. WeightNorm’s separation of scale and direction provides an implicit constraint on \(\partial F / \partial x_l\) by keeping the norm of the weight updates stable, which is particularly useful for attention logits where scale changes can swing softmax outputs drastically. Together, these constraints keep the “multiplicative chain” of gradients from turning into an unstable geometric series.

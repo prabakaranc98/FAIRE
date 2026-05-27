@@ -37,9 +37,11 @@ This is still only correlation, so researchers refined the search. Activation pa
 ### Sparse autoencoders as compact interfaces
 
 Once a candidate activation has been found, it is still inscrutable: a vector in ℝ^d with no semantics. Sparse autoencoders (SAEs) are the reconstruction tool that turns these vectors into interpretable coordinates. Given a dataset of activations \(A \in \mathbb{R}^{n \times d}\) collected from clean forward passes, we fit an encoder \(f_\phi: \mathbb{R}^d \to \mathbb{R}^k\) and decoder \(g_\psi: \mathbb{R}^k \to \mathbb{R}^d\) with a sparsity penalty. The SAE objective is
+
 \[
 \mathcal{L}(\phi, \psi) = \frac{1}{n}\sum_{i=1}^n \|g_\psi(f_\phi(a_i)) - a_i\|^2 + \lambda \cdot \text{KL}(f_\phi(a_i) \,\|\, \text{Laplace}(0, b)),
 \]
+
 where \(a_i\) is the activation vector, \(f_\phi(a_i)\) is its sparse code, and the KL term encourages most coordinates to be near zero, letting only a few features fire per activation. Here the decoder reconstructs the original activations, so successful reconstruction means the sparse codes retain the original causal structure. If one SAE coordinate activates whenever the model performs “SQL parsing” on a prompt—and adding that coordinate to a different activation flips the model’s behavior—then that coordinate inherits the semantics of “SQL parsing.” Kuznetsov et al. (2025) showed that a coordinate we call the “reflection feature” had this property: it fired before reasoning steps, and amplifying it in post-activation patching lengthened and improved the reasoning trace by 13% on MATH.
 
 SAE training thus compresses the manifold of activations into interpretable axes. Because the SAE is exponentially smaller than the original residual stream, we can inspect weights and gradients in human scale. The decoder reveals which original neurons the coordinate attends to, and the encoder tells us when the feature is triggered.
@@ -51,9 +53,11 @@ Identifying candidate features requires rigorous evaluation. Mueller et al. (202
 ### GrAInS and gradient-based attribution
 
 Distance from the training set is the final barrier. Static features are useful, but real applications demand inference-time control: how do we nudge the model on the fly without retraining? GrAInS (Gradient-based Attribution for Interpretability in Sparse codes) [arxiv:2502.04217](https://arxiv.org/abs/2502.04217) moves beyond static steering by computing Integrate Gradients on the SAE coordinates themselves. Given an input \(x\) and an SAE coordinate \(c_j\), GrAInS computes
+
 \[
 \text{IG}(x; c_j) = (x - x') \times \int_{\alpha=0}^1 \frac{\partial c_j(f_\phi(x' + \alpha(x - x')))}{\partial x} \, d\alpha,
 \]
+
 where \(x'\) is a baseline prompt, \(f_\phi\) is the encoder, and \(c_j\) is the \(j\)-th coordinate. This integral captures how sensitive the coordinate is to each token. Because the encoder is differentiable, GrAInS flows gradients through the SAE into the embedding layer, creating token-level saliency that respects the feature’s causal footprint. GrAInS then uses these gradients to selectively override the target tokens through gradient descent: we add a small perturbation \(\Delta x\) to the embedding so that the coordinate increases or decreases in a desired direction. The perturbation is scaled to keep the resulting logit shift within the model’s activation range.
 
 With this pipeline, we achieve two things simultaneously: (1) we produce an attribution map that explains which tokens triggered the causal feature, and (2) we obtain an inference-time steering signal by adjusting the tokens in the direction the feature wants. GrAInS also generalizes to vision-language models by treating the baseline as an image embedding and backpropagating through the image encoder. Without fine-tuning the backbone, we can send the feature counterfactual values. The success of GrAInS shows mechanistic interpretability is not a post-hoc lab report; it is a live knob we can turn while the model is running.

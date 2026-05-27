@@ -27,29 +27,39 @@ Generative modeling has always balanced two conflicting needs: define a probabil
 ### The forward (corruption) chain
 
 The forward process \(q(x_t \mid x_{t-1})\) is a fixed Gaussian Markov chain that blurs the data sample \(x_0\) with incremental noise, turning structure into entropy. Mathematically,
+
 \[
 q(x_t \mid x_{t-1}) = \mathcal{N}\!\left(x_t; \sqrt{1 - \beta_t} x_{t-1}, \beta_t I\right),
 \]
+
 where \(x_{t-1}\) is the image at timestep \(t-1\), \(\beta_t \in (0,1)\) is the variance schedule for step \(t\), and \(I\) is the identity covariance. Each \(\beta_t\) controls how much of the signal is replaced by noise at that step, and by choosing a small \(\beta_t\) we ensure the chain never jumps too far. Repeated composition yields a closed-form marginal for any \(t\):
+
 \[
 q(x_t \mid x_0) = \mathcal{N}\!\left(x_t; \sqrt{\bar{\alpha}_t} x_0, (1 - \bar{\alpha}_t)I\right),
 \]
+
 where \(\alpha_t = 1 - \beta_t\) and \(\bar{\alpha}_t = \prod_{s=1}^t \alpha_s\). The remarkable property is that \(x_t\) is a linear interpolation between the original image and Gaussian noise, so sampling \(x_t\) requires just one draw: \(x_t = \sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon\) with \(\epsilon \sim \mathcal{N}(0, I)\). Sohl-Dickstein et al. (2015) [arxiv:1503.03585](https://arxiv.org/abs/1503.03585) introduced this nonequilibrium thermodynamic view, showing that the forward chain is computationally cheap and that it provides a tractable distribution from which to build the inverse.
 
 ### The reverse process and noise prediction
 
 Given the forward chain, we now need a reverse chain \(p_\theta(x_{t-1} \mid x_t)\) that recovers images step by step. Because the forward chain is Gaussian, its reverse can also be modeled as Gaussian:
+
 \[
 p_\theta(x_{t-1} \mid x_t) = \mathcal{N}\!\left(x_{t-1}; \mu_\theta(x_t, t), \Sigma_\theta(x_t, t)\right),
 \]
+
 where \(\mu_\theta\) and \(\Sigma_\theta\) are learned functions. Ho et al. (2020) [arxiv:2006.11239](https://arxiv.org/abs/2006.11239) observed that directly predicting \(\mu_\theta\) is unnecessary if the network instead predicts the noise \(\epsilon\) that was added at each step; the mean can then be computed analytically. The parameterization becomes
+
 \[
 \mu_\theta(x_t, t) = \frac{1}{\sqrt{\alpha_t}} \left(x_t - \frac{1 - \alpha_t}{\sqrt{1 - \bar{\alpha}_t}} \epsilon_\theta(x_t, t)\right),
 \]
+
 where \(\epsilon_\theta\) is the network output and \(\alpha_t\), \(\bar{\alpha}_t\) are defined as above. This is the key insight that transforms the reverse distribution estimation into a regression problem. The training loss is
+
 \[
 L(\theta) = \mathbb{E}_{x_0, t, \epsilon} \left[\left\|\epsilon - \epsilon_\theta\left(\sqrt{\bar{\alpha}_t} x_0 + \sqrt{1 - \bar{\alpha}_t} \epsilon, t\right)\right\|^2\right],
 \]
+
 where \(x_0 \sim p_{\text{data}}\), \(t\) is drawn uniformly from \(\{1,\dots,T\}\), and \(\epsilon \sim \mathcal{N}(0, I)\). The left-hand side of the loss penalizes differences between the true noise and the model prediction; the right-hand side ensures each timestep gets equal attention. By predicting noise, the network avoids learning the scale of \(x_0\) and focuses on the direction back toward structure—this is why it is described as a denoiser.
 
 Because the variance \(\Sigma_\theta\) can be fixed (e.g., set to \(\beta_t I\)) or even learned slowly, the training objective remains simple and the gradient flow is stable. The loss can also be reweighted to prioritize earlier or later steps, giving a handle on fidelity vs. diversity. Importantly, sampling from the trained reverse chain starts from \(x_T \sim \mathcal{N}(0, I)\) and iteratively applies \(p_\theta(x_{t-1} \mid x_t)\) for \(t = T, \dots, 1\) to reach \(x_0\). Because each step is just a single forward pass through \(\epsilon_\theta\), the process is embarrassingly parallelizable and can be run with as few as a dozen timesteps in practice, albeit with a quality trade-off.
@@ -61,9 +71,11 @@ The architecture of \(\epsilon_\theta\) mirrors U-Nets that work well on segment
 ### Latent diffusion and scaling to high resolution
 
 Pixel-space diffusion at \(512^2\) or higher is costly because each convolutional pass must handle large tensors. Rombach et al. (2022) [arxiv:2112.10752](https://arxiv.org/abs/2112.10752) introduced Latent Diffusion Models (LDMs) to shift most of the computation into a compact latent space. An autoencoder \(E\) maps \(x_0\) into latents \(z_0 = E(x_0)\) with a modest downsampling factor (typically \(4\times\) or \(8\times\)), and the decoder \(D\) reconstructs the image from latents. The diffusion process now operates on \(z_t\) rather than \(x_t\), with noise added in the latent space:
+
 \[
 q(z_t \mid z_{t-1}) = \mathcal{N}\!\left(z_t; \sqrt{1 - \beta_t} z_{t-1}, \beta_t I \right).
 \]
+
 Because the latents have lower dimensionality, the UNet denoiser has fewer layers and fewer channels, reducing memory bandwidth and enabling training on a single V100 or A5000 with \(\sim 16\) GB VRAM. The decoder then projects the denoised \(z_0\) back to the pixel domain: \(x_0 = D(z_0)\). This latent shift is what allowed diffusion models to scale from \(32 \times 32\) research toys to industrial-grade \(1024 \times 1024\) systems while still preserving the fundamental denoising training objective.
 
 ### Failure modes and practical notes

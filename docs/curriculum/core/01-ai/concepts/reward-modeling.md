@@ -25,17 +25,23 @@ Reinforcement learning traditionally assumes a hand-crafted reward function \(r(
 ## How it works
 
 The first core insight is that pairwise judgments give us a ranking signal without requiring an absolute scale. Given two responses \(x^+\) (preferred) and \(x^-\) (rejected), the Bradley-Terry model defines the probability that \(x^+\) wins as
+
 \[
 P_\phi[x^+ \succ x^-] = \frac{\exp(r_\phi(x^+))}{\exp(r_\phi(x^+)) + \exp(r_\phi(x^-))}
 \]
+
 where \(r_\phi\) is our differentiable reward model. This formula is a sigmoid over the reward gap; subtracting \(r_\phi(x^-)\) from \(r_\phi(x^+)\) yields a logit whose magnitude reflects how strongly the model prefers one response. The training signal is the negative log probability of the human’s choice,
+
 \[
 \mathcal{L}_\text{BT}(\phi) = -\log P_\phi[x^+ \succ x^-]
 \]
+
 which expands to
+
 \[
 \mathcal{L}_\text{BT}(\phi) = \log\left(1 + \exp\left(r_\phi(x^-) - r_\phi(x^+)\right)\right)
 \]
+
 where the margin \(r_\phi(x^+) - r_\phi(x^-)\) controls the curvature of the loss. Because every preference pair yields exactly one scalar loss, the training can leverage large-scale supervised optimizers rather than RL rollouts. This is why the human bottleneck shifts: once the reward model is fit, the policy no longer needs to query a human for every rollout, it simply maximizes the learned scalar.
 
 ### Architecting the reward model
@@ -49,29 +55,37 @@ Human annotators compare pairs of model outputs for the same instruction. The pi
 ### Regularization and margin losses
 
 Reward models can overfit to subtle artifacts, like preferring longer responses because humans often choose the more informative-looking one. To combat this, practitioners introduce regularization terms. A simple example is an \(\ell_2\) penalty on the readout weights,
+
 \[
 \mathcal{L}(\phi) = \mathcal{L}_\text{BT}(\phi) + \lambda \|w\|^2
 \]
+
 where \(\lambda\) trades off preference fit for smoothness. A more structured approach is margin rescaling: we replace the logistic loss with a margin-based hinge,
+
 \[
 \mathcal{L}_\text{margin}(\phi) = \max\big(0, m + r_\phi(x^-) - r_\phi(x^+)\big)
 \]
+
 where \(m > 0\) enforces that the chosen sample is at least \(m\) points better. This margin exaggerates the penalty for near-ties and can be annealed as the model calibrates.
 
 ### Residual reward modeling
 
 Residual reward modeling addresses the instability that pure preference learning sometimes introduces by decomposing the reward into a prior heuristic plus a learned residual. Residual Reward Models (2022) [arxiv:2205.15367](https://arxiv.org/pdf/2205.15367) express the reward as
+
 \[
 r_\phi(x) = r_\text{prior}(x) + f_\phi(x)
 \]
+
 where \(r_\text{prior}\) is a fixed heuristic (e.g., the log-probability under the policy or a length penalty) and \(f_\phi\) is a smaller neural network trained to explain the difference between the heuristic and human preferences. The prior anchors the scale and biases the model toward known-safe behavior, while the residual \(f_\phi\) focuses on the nuanced part of the human signal. This decomposition reduces variance in both reward training and subsequent RL fine-tuning because the prior term handles the bulk of the reward, leaving \(f_\phi\) to solve a less-wiggly regression. The training objective remains the Bradley-Terry loss applied to \(r_\phi\).
 
 ### Generative reasoning reward models
 
 Standard reward models output a scalar without revealing why. RM-R1 (2025) as summarized in Zhong et al.’s survey (2025) [arxiv:2504.12328](https://arxiv.org/html/2504.12328) proposes ReasRMs, which generate a short chain-of-thought-style justification alongside the scalar score. The joint model maximizes
+
 \[
 \mathcal{L}_\text{ReasRM}(\phi) = \mathcal{L}_\text{BT}(\phi) + \alpha \mathcal{L}_\text{gen}(\phi)
 \]
+
 where \(\mathcal{L}_\text{gen}\) is the cross-entropy for the generated rationale and \(\alpha\) weights the explainability penalty. The rationale serves two purposes: it exposes the alignment model’s reasoning for auditing, and it provides an auxiliary signal to regularize the scalar score, making the reward less prone to shortcut reasoning that exploits length or token frequency.
 
 ### Online adaptation and policy interplay

@@ -31,15 +31,19 @@ Most CRL recipes start with two assumptions: there exists an SCM linking latent 
 ### Counterfactual generalization via representation alignment
 
 The generative story in Shalit et al. (2017) [arxiv:1605.03661](https://arxiv.org/abs/1605.03661) is a useful concrete anchor. They assume that each sample consists of features \(x\), a binary treatment \(t\), and two potential outcomes \(y^0, y^1\), with the observed outcome \(y = y^t\). The goal is to estimate the individualized treatment effect (ITE) \(y^1 - y^0\). Their insight was to learn a representation \(f_\phi(x)\) before fitting treatment-specific heads \(g_\theta^0\) and \(g_\theta^1\); the representation is trained to minimize prediction error plus an Integral Probability Metric (IPM) between the treatment and control representations. Formally, their empirical objective is
+
 \[
 \mathcal{L}(\phi, \theta) = \sum_{t \in \{0,1\}} \mathbb{E}_{(x,y) \sim \mathcal{D}^t} \left[ \left(y - g_\theta^t(f_\phi(x))\right)^2 \right] + \lambda \cdot \text{IPM}(f_\phi(\mathcal{D}^0), f_\phi(\mathcal{D}^1))
 \]
+
 where \(\mathcal{D}^t\) is the empirical distribution for treatment \(t\) and the IPM is typically instantiated as the Maximum Mean Discrepancy (MMD). The squared loss term enforces factual prediction accuracy, and the IPM term forces \(f_\phi\) to map both groups into a shared representation, thus discouraging the encoder from encoding treatment-specific nuisance. The causal guarantee is that if representation alignment perfectly matches the two distributions, then the counterfactual prediction head can generalize from observed to unobserved treatments because both outcomes now sit in the same latent space.
 
 In CRL work more broadly, the treatment/control split generalizes to multi-environment data. We now consider multiple distributions \(\{\mathcal{D}^{(e)}\}_{e=1}^E\) where each environment \(e\) is induced by intervening on some subset of latent variables. The training objective augments the downstream task loss with an IPM penalty across environment pairs. The MMD kernel \(k\) gives a convenient differentiable form:
+
 \[
 \text{MMD}^2(\mathcal{D}^{(i)}, \mathcal{D}^{(j)}) = \mathbb{E}_{z,z' \sim \mathcal{D}^{(i)}}[k(z,z')] + \mathbb{E}_{z,z' \sim \mathcal{D}^{(j)}}[k(z,z')] - 2\mathbb{E}_{z \sim \mathcal{D}^{(i)}, z' \sim \mathcal{D}^{(j)}}[k(z,z')]
 \]
+
 where \(z = f_\phi(x)\). This penalty minimizes the Hilbert-space distance between environment-specific latent means, making the downstream head blind to which environment a sample came from. At the same time, the encoder is required to keep enough predictive information for \(y\), so it must learn invariances that are causally relevant to the label.
 
 Shalit et al. argue that this alignment bounds the counterfactual error. The practical effect is that spurious factors that vary across environments (like machine noise) cannot survive the MMD penalty: they are, by construction, environment-specific signals, so the encoder will be penalized for encoding them. The remaining latents are those that are stable across environments and therefore are candidate causal mechanisms.

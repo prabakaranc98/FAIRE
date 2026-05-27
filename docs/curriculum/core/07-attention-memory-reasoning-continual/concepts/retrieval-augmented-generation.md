@@ -39,15 +39,19 @@ CodeRAG (2024), which specializes in codebases, applies the same pattern but rep
 ### Dual-level retrieval: local chunks plus graph context
 
 Once the vector store contains both chunks and relation-aware embeddings, a query is processed in two passes. In the local pass, a bi-encoder computes the similarity between the query \(q\) and each chunk embedding \(c_i\); the top \(k_{\text{local}}\) chunks serve as immediate context. The similarity score can be written as
+
 \[
 s_{\text{local}}(q, c_i) = \text{cosine}(f_{\text{query}}(q), f_{\text{chunk}}(c_i)),
 \]
+
 where \(f_{\text{query}}\) and \(f_{\text{chunk}}\) are neural encoders trained on question–answer pairs to align semantics. \(k_{\text{local}}\) is often 3–5 for latency reasons, and these chunks anchor the generator in the latest facts.
 
 The global pass then expands the reasoning horizon by traversing the graph. If every node \(v\) has an embedding \(g_v\) (derived from aggregated chunk text or relation-specific sub-networks), the traversal score for an edge sequence \(e_1, e_2, \ldots, e_n\) can be modeled as
+
 \[
 s_{\text{global}}(q, e_{1:n}) = \sum_{j=1}^n \alpha_j \cdot \text{cosine}(f_{\text{query}}(q), g_{v_j}),
 \]
+
 where \(\alpha_j\) is a learned attention weight that lets the model prioritize certain hops. The global retrieval returns a trace of nodes and edges (a path) that the generator can follow. LightRAG keeps the global budget tight by only considering entities that appear in the local chunks or within a radius \(r\) in the graph; \(r\) is typically 2–3 hops, which mirrors human multi-hop reasoning depth without exploding computation.
 
 Merging the local and global contexts requires care. The generator receives the local chunks first, then the global path described with natural language templates such as “Edge: Acme Holdings – acquired – Gemini Labs.” Language models treat these as soft instructions, so the global context must be unambiguous. If the graph traversal includes contradictory statements (e.g., two edges claiming different acquisition years), the generator defaults to the chunk with higher local score unless a relation-level confidence overrides it. That is why LightRAG maintains a score \(\beta\) per relation and only surfaces relations above a threshold, ensuring the global path does not hallucinate.

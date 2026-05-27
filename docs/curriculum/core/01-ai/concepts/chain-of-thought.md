@@ -29,23 +29,29 @@ Chain-of-thought rewrites next-token prediction as a structured process where th
 ### Mathematical foundations
 
 The joint probability of generating the chain and answer under model parameters \(\theta\) is
+
 \[
 P_\theta(C, a \mid q) = \prod_{t=1}^{m+k} P_\theta(t_t \mid q, t_{<t}),
 \]
+
 where \(t_t\) is the \(t\)th token in the concatenated reasoning-plus-answer stream, \(t_{<t}\) denotes the prefix before token \(t_t\), and the multiplication runs sequentially through the entire chain and answer.
 
 The supervised loss for CoT training simply sums the cross-entropy over every token:
+
 \[
 \mathcal{L}_{\text{chain}}(\theta) = - \sum_{t=1}^{m+k} \log P_\theta(t_t \mid q, t_{<t}),
 \]
+
 where each \(t_t\) is annotated as either a reasoning token \(c_i\) or an answer token \(a_j\). Including the chain in the objective encourages the decoder to guesstimate the path as well as the destination, which pushes the model to internalize transitions instead of treating them as artifacts of instruction.
 
 Because CoT increases the number of tokens emitted at inference time, the total reasoning budget becomes a parameter. Define the budget as \(B = |C| \cdot \text{token\_cost}\), where \(|C| = m\) counts the reasoning tokens and \(\text{token\_cost}\) summarizes latency + compute per token. The challenge is to choose \(C\) so that the marginal benefit in accuracy outpaces the marginal cost captured by \(B\). That framing transforms the planning problem into an optimization over sequences rather than scalars.
 
 When compression is introduced, an auxiliary blueprint \(z = f_\psi(C)\) summarizes the reasoning path in lower dimensions. The contrastive compression loss becomes
+
 \[
 \mathcal{L}_{\text{comp}}(\psi) = - \log \frac{\exp(\text{sim}(f_\psi(C), f_\psi(C^+))/\tau)}{\sum_{C^-} \exp(\text{sim}(f_\psi(C), f_\psi(C^-))/\tau)},
 \]
+
 where \(f_\psi(C)\) is the compressor output for the true chain \(C\), \(C^+\) is a chain from a semantically similar question, \(C^-\) are distractors, \(\text{sim}\) is cosine similarity, and \(\tau\) is a temperature scalar. Compressing the “semantic trajectory” keeps \(B\) small while preserving key deductions, which is why Meincke (2007) [arxiv:0708.4311](https://arxiv.org/pdf/0708.4311) described diminishing returns from adding redundant tokens.
 
 These equations set the stage for the subsequent mechanisms: how operators are monitored, how compressed summaries control planning, and how controllers decide when to stop reasoning.
@@ -53,9 +59,11 @@ These equations set the stage for the subsequent mechanisms: how operators are m
 ### Meta-cognition and operator supervision
 
 Reasoning is brittle if the decoder never wrenches itself out of a misleading track. Li et al. (2022) proposed twenty-eight reasoning operators such as “expand definition,” “reframe goal,” or “verify units,” and they observed many hallucinations stemmed from missing transitions between these operators. In CoT, the operator choice is roughly encoded in the token vocabulary, but nothing enforces a clean separation between, say, “estimate” and “verify.” A meta-cognitive monitor supervises the sequence \(C\) with operator labels \(o_i\): each reasoning token \(c_i\) gets a binary indicator or class label, and the training loss augments the token loss with
+
 \[
 \mathcal{L}_{\text{meta}}(\theta) = \lambda \sum_{i=1}^{m} \mathbb{I}[\text{operator}(c_i)] \log P_\theta(o_i \mid q, C_{<i}),
 \]
+
 where \(\lambda\) trades off the attention to operator transitions versus raw token accuracy. The indicator \(\mathbb{I}\) flags when an operator label exists, and the monitor head learns to classify shifts such as “build hypotheses” or “check answer.” This meta-cognitive signal keeps the controller from skipping verification steps and lets planners infer when a subgoal is complete.
 
 ### Compression and planning
@@ -67,13 +75,17 @@ Compression is applied by maintaining the summary \(z = f_\psi(C)\) alongside th
 ### Sampling, calibration, and controllers
 
 At inference time, difficulty estimates \(d(q)\) shape how long the chain should be. Controllers add binary decisions \(b_t \in \{0,1\}\) that signal whether to continue reasoning (\(b_t=1\)) or stop (\(b_t=0\)). The cost is
+
 \[
 C_{\text{tokens}} = \sum_{t=1}^{T} b_t \cdot \text{cost\_per\_token},
 \]
+
 where \(T\) is the maximum allowed tokens. Controllers learn to optimize
+
 \[
 \mathcal{L}_{\text{cal}} = \mathcal{L}_{\text{answer}} + \eta \sum_{t=1}^{T} b_t,
 \]
+
 with \(\mathcal{L}_{\text{answer}}\) measuring the answer accuracy and \(\eta\) encoding the per-token penalty. The gating decision uses the hidden state \(h_t\) after each token: \(b_t = \sigma(w^\top [h_t; d(q)])\), where \(w\) is learned and \(\sigma\) is the sigmoid. This allows the controller to gate reasoning based on difficulty and uncertainty, so easy questions stop after a short chain and harder ones keep thinking.
 
 ### Consistency and synthesis

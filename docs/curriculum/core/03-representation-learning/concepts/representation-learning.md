@@ -27,12 +27,14 @@ Every supervised head we train is really asking the same geometric question: whi
 Contrastive representation learning trades label supervision for structure in the data itself. This structure is typically induced through data augmentation—two transformed versions of the same underlying signal become a positive pair, while every other sample in the batch (or a memory bank) forms a negative pair. The learning algorithm then pulls positives together and pushes negatives apart in the embedding space.
 
 The most widely used optimization for this is the InfoNCE loss introduced by Oord et al. (2018) [arxiv:1807.03748](https://arxiv.org/pdf/1807.03748) in Contrastive Predictive Coding. The loss looks like:
+
 \[
 \mathcal{L}_{\text{InfoNCE}} = -\mathbb{E}_{(x, x^+), \{x^-\}} \left[
 \log \frac{\exp\left(\text{sim}(f_\theta(x), f_\theta(x^+)) / \tau \right)}
 {\exp\left(\text{sim}(f_\theta(x), f_\theta(x^+)) / \tau \right) + \sum_{x^-} \exp\left(\text{sim}(f_\theta(x), f_\theta(x^-)) / \tau \right)}
 \right]
 \]
+
 where \( (x, x^+) \) is a positive pair derived from the same raw example, \( \{x^-\} \) are negatives sampled from the rest of the batch or memory bank, \( \text{sim}(u, v) \) is a cosine similarity between embeddings, and \( \tau \) is the temperature that controls how sharply similarities are weighted. This objective approximates maximizing mutual information between representations of \(x\) and \(x^+\) without estimating the intractable joint distribution—InfoNCE becomes a log-softmax over similarities, providing a surrogate that is simple to compute with mini-batches and backpropagation.
 
 Augmentation choices define what invariances the representation encodes. The positive pair is created by composing augmentations \(\mathcal{T}_1\) and \(\mathcal{T}_2\) such that \(x^+ = \mathcal{T}_2(x)\) and \(x = \mathcal{T}_1(x)\). That means the learned space is invariant to the composition \(\mathcal{T}_2 \circ \mathcal{T}_1^{-1}\). Gidaris et al. (2019) [arxiv:1901.09005](https://ar5iv.labs.arxiv.org/html/1901.09005) revisited self-supervised visual representation learning and showed empirically that the palette of augmentations—cropping, color jitter, Gaussian blur—matters just as much as the network architecture, because augmentations define which variations stay close in the learned manifold. They also introduced multi-crop training, where a pair includes a high-resolution crop and several low-resolution crops, forcing the encoder to aggregate both coarse and fine-grained cues. Experimentally, multi-crop improved linear-probe accuracy on ImageNet across multiple encoders, demonstrating that augmentation design is not simply a tuning knob but the core of the representation hypothesis.

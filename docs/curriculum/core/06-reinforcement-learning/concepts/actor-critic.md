@@ -25,6 +25,7 @@ Reinforcement learning sits on a spectrum whose endpoints are familiar: value-ba
 ## How it works
 
 Actor-critic begins with the policy gradient theorem, which states that the gradient of the expected return \(J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}[R(\tau)]\) with respect to policy parameters \(\theta\) can be written as
+
 \[
 \nabla_\theta J(\theta) = \mathbb{E}_{s \sim d^{\pi_\theta}, a \sim \pi_\theta}\left[\nabla_\theta \log \pi_\theta(a \mid s)\, A^{\pi_\theta}(s,a)\right].
 \]
@@ -32,9 +33,11 @@ Actor-critic begins with the policy gradient theorem, which states that the grad
 where \(d^{\pi_\theta}(s)\) is the discounted state visitation distribution under policy \(\pi_\theta\), \(\pi_\theta(a \mid s)\) is the policy’s conditional probability of action \(a\) in state \(s\), and \(A^{\pi_\theta}(s,a)\) is the advantage—the difference between the quality of taking \(a\) now and the baseline expectation. The advantage \(A^{\pi_\theta}(s,a)\) can be estimated by the critic, which provides the necessary variance reduction compared to using raw returns. The simplest choice is \(A^{\pi_\theta}(s,a) = Q^{\pi_\theta}(s,a) - V^{\pi_\theta}(s)\), so the critic has to approximate either the action-value \(Q\) or the state-value \(V\). In practice, representing \(Q\) or \(V\) with a neural network \(V_\phi(s)\) (with parameters \(\phi\)) permits bootstrapping and allows the actor to use shorter, lower-variance targets than full episode returns.
 
 Training the critic uses TD learning. With one-step TD, we minimize the squared TD error
+
 \[
 \mathcal{L}_{\text{critic}}(\phi) = \mathbb{E}_{s,a,s'}\left[\left(r + \gamma V_\phi(s') - V_\phi(s)\right)^2\right].
 \]
+
 where \(r\) is the immediate reward observed after transition \(s \rightarrow s'\), \(\gamma \in [0,1)\) is the discount factor, and \(V_\phi\) is the current value estimate. This loss updates the critic towards matching its one-step bootstrap target \(r + \gamma V_\phi(s')\), which is cheaper to compute and has far lower variance than waiting for the full return. The actor, meanwhile, receives the advantage estimate computed from this critic and performs gradient ascent on the policy parameters using the gradient formula above.
 
 ### Compatible function approximation and two time-scales
@@ -52,6 +55,7 @@ Temporal difference (TD) returns form the backbone of actor-critic updates. In m
 Batching and parallelism further stabilize actor-critic training. Mnih et al.’s Asynchronous Advantage Actor-Critic (A3C) (Mnih et al. 2016, [arXiv:1602.01783](https://ar5iv.labs.arxiv.org/html/1602.01783)) replaced experience replay with a set of parallel actors each interacting with separate environment instances. Each worker computes gradients independently and periodically updates shared policy and value networks; this decorrelates the data and keeps the policy fresh without storing massive replay buffers. The asynchronous scheme exploits multi-core CPUs, increasing throughput and stability, especially when training on brittle environments where replay causes stale targets. Every worker computes its own advantage estimates \(A_t\) and updates the shared parameters via gradients; the collective effect is similar to large-batch gradient descent while the critic keeps acting as the stable baseline.
 
 Later refinements in 2017 (Schulman et al. 2017, [https://arxiv.org/pdf/1711.04755](https://arxiv.org/pdf/1711.04755)) introduced the clipped surrogate objective that PPO uses. In PPO the critic updates on the same minibatch as the actor, but the actor’s updates are constrained by the ratio
+
 \[
 r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)},
 \]

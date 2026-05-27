@@ -25,6 +25,7 @@ Policy gradient lies at the heart of reinforcement learning because it directly 
 ## How it works
 
 The starting point remains the fundamental policy gradient theorem: the update proceeds in the direction that increases the log probability of actions that led to higher-than-expected returns. Formally, one writes the optimization objective as
+
 \[
 \nabla_\theta J(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[ \sum_{t=1}^T \nabla_\theta \log \pi_\theta(a_t \mid s_t) A_t^\pi \right]
 \]
@@ -34,6 +35,7 @@ where \(\pi_\theta\) is the policy parameterized by \(\theta\), \(\tau\) denotes
 ### Token-level relative advantage
 
 Token-level relative advantage replaces the trajectory-wide return with a reward that reflects the immediate impact of a token relative to a baseline derived from other tokens in the same context. We define \(\delta_t = r_t - \bar{r}_t\) where \(r_t\) is the reward associated with the token generated at step \(t\) (for example, the change in preference score attributed to inserting or omitting that token) and \(\bar{r}_t\) is a local baseline constructed from tokens that share a similar prefix or token identity. The update becomes
+
 \[
 \nabla_\theta J_{\text{rel}}(\theta) = \mathbb{E}_{\tau \sim \pi_\theta}\left[ \sum_{t=1}^T \nabla_\theta \log \pi_\theta(a_t \mid s_t) \delta_t \right]
 \]
@@ -45,6 +47,7 @@ This formulation is the foundation of Group Relative Policy Optimization (GRPO).
 ### KL regularization and entropy rewards
 
 Stability also demands explicit controls on how far the policy drifts from its initialization, especially when the reward signal is sparse. KL regularization plays that role. We augment the objective with both forward and reverse KL terms, leading to the KL-regularized RPG formulation in Yu et al. (2025) [arxiv:2505.17508](https://arxiv.org/abs/2505.17508). The augmented objective is
+
 \[
 \mathcal{L}_{\text{KL}}(\theta) = -\mathbb{E}_{\tau \sim \pi_\theta}\left[ \sum_{t=1}^T \log \pi_\theta(a_t \mid s_t) \delta_t \right] + \lambda_{\text{F}} \text{KL}\left(\pi_\theta \,\|\, \pi_{\text{ref}}\right) + \lambda_{\text{R}} \text{KL}\left(\pi_{\text{ref}} \,\|\, \pi_\theta\right)
 \]
@@ -52,6 +55,7 @@ Stability also demands explicit controls on how far the policy drifts from its i
 where \(\pi_{\text{ref}}\) is a frozen reference model (often the pretrained LM), \(\lambda_{\text{F}}\) and \(\lambda_{\text{R}}\) are coefficients for the forward and reverse KL, and \(\delta_t\) is the token-level relative advantage. The forward KL term prevents the updated policy from straying too far, while the reverse KL encourages the policy to keep its mass concentrated on high-likelihood sequences, thus preserving coherence. The symmetry ensures that even without a critic, the policy neither collapses to deterministic degeneracy nor drifts into low-quality, high-reward regions. 
 
 To provide a smoother reward for individual tokens, GTPO/GRPO-S (arXiv:2508.04349) reinterprets policy entropy as a dynamic reward signal: higher entropy indicates that the model is still exploring, so the reward encourages tokens that maintain an optimal level of uncertainty, preventing overconfidence in the face of noisy preferences. The token-level reward becomes
+
 \[
 r_t = \alpha \cdot \text{pref}_t + \beta \cdot \mathcal{H}\left(\pi_\theta(\cdot \mid s_t)\right)
 \]
@@ -63,6 +67,7 @@ where \(\alpha\) scales the preference-based reward \(\text{pref}_t\) and \(\bet
 One lingering concern is convergence without a critic. Gao et al. (2025) introduced the \(A^\star\)-PO architecture where offline value estimation is entirely separated from online policy updates, showing that the policy gradient can converge by minimizing the KL divergence between the current policy and the distribution implied by the offline value function. The offline estimator only needs to provide a high-quality ordering of trajectories, not exact values, so it can be trained using rewards gathered from human preferences or synthetic evaluators. The online policy, using the token-level relative advantages described above, simply performs regularized gradient steps to match the offline ranking. This two-phase separation drastically reduces the compute needed for high-variance critic training because the offline estimator can be trained less frequently and on smaller data budgets.
 
 Mathematically, the convergence argument around \(A^\star\)-PO leverages the policy update 
+
 \[
 \theta_{k+1} = \arg\min_\theta \text{KL}\left(\pi_\theta \,\|\, \pi_{\text{offline}}^{(k)} \right)
 \]

@@ -32,16 +32,20 @@ Alignment safety works as a runtime loop that watches every plan fragment, score
 
 ### Instrumentation as probabilistic state tracking
 The heart of the planner-inspired instrumentation is a transition model that links abstract states to tool calls. Let \(s_t\) be the symbolic state after the \(t\)th tool call, where \(t = 0\) is the user instruction. Each tool call \(a_t\) transitions the state via a function \(T(s_{t-1}, a_t)\) that records both the nominal effects and side-channel metadata (e.g., which files changed, how many tokens were read). A simple probabilistic state predictor defines
+
 \[
 P(s_t \mid s_{t-1}, a_t) = \delta[s_t = T(s_{t-1}, a_t)]
 \]
+
 where \(\delta[\cdot]\) is the indicator that the predicted state matches the actual observation. The transition model is augmented with heuristics grown from STRIPS-like preconditions: when a guard registers that \(a_t\) would flip a protected attribute, the state predictor flags a deviation and the instrumentation marks the step as “sensitive.” This instrumentation feeds the intent scoring module.
 
 ### Intent scoring via dual critics
 The scoring stage answers: given the exposed trajectory \(h_t = \{a_1, \dots, a_t\}\) and the incoming instruction \(u\), how likely is there a hidden adversarial intent? We define a risk score
+
 \[
 \mathrm{Risk}(h_t, u) = \lambda_{\text{ling}} \cdot \mathrm{Score}_{\text{LLM}}(h_t, u) + \lambda_{\text{rule}} \cdot \mathrm{Score}_{\text{rule}}(T(h_t))
 \]
+
 where \(\mathrm{Score}_{\text{LLM}}\) is a judge model’s soft probability that a trajectory is manipulative, \(\mathrm{Score}_{\text{rule}}\) captures deterministic violations of policies derived from Amodei et al.’s taxonomy (reward tampering, side effects, etc.), \(\lambda_{\text{ling}}\) and \(\lambda_{\text{rule}}\) are task-dependent weights, and \(T(h_t)\) summarizes the symbolic state reached. The judge is typically a fine-tuned LLM that observes both the current instruction and the summary of past actions; it is trained to produce higher scores when the trajectory includes indirect prompt injection or collateral data leakage.
 
 In practice we compute \(\mathrm{Score}_{\text{LLM}}\) by passing the serialized history (tool names, arguments, outputs) and the instruction to a smaller “judge” model and interpreting the logit for “malicious intent.” \(\mathrm{Score}_{\text{rule}}\) is a sum of indicator features for side effect categories: e.g., \(\mathbb{I}[\text{modifies-protected-archive}]\), \(\mathbb{I}[\text{bypasses-audit-logs}]\), and so on. When \(\mathrm{Risk} > \tau\) for some threshold \(\tau\), the intervention module activates.

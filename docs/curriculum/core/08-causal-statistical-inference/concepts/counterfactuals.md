@@ -31,9 +31,11 @@ The mechansim behind counterfactuals is best understood as a synthesis of a stru
 ### Structural equations and the Abduction-Action-Prediction loop
 
 Take a structural causal model \(M = (U, V, F)\), where \(V = \{V_1, \dots, V_n\}\) are the endogenous variables we observe, \(U = \{U_1, \dots, U_n\}\) are exogenous noise terms, and \(F = \{f_1, \dots, f_n\}\) are deterministic functions. The generative process is
+
 \[
 V_i := f_i(Pa_i, U_i)
 \]
+
 where \(Pa_i \subset V \setminus \{V_i\}\) denotes the parent set of \(V_i\) in the causal DAG, \(U_i\) is the exogenous noise for node \(i\), and each \(f_i\) is parameterized by structural parameters (which might come from domain knowledge or a learned neural net). The noises \(U_i\) are jointly independent under the SCM prior. With a fully specified model \(M\), the factual outcome for a unit is computed by sampling \(U \sim P(U)\) and computing \(V\) through the recursive structural equations; abduction, the first step of the counterfactual query, reverses that: given the observed factual data \(v^*\), we infer the posterior \(P(U \mid V {=} v^*)\). That posterior tightens the possible latent configurations to those consistent with the observation.
 
 Abduction is usually intractable analytically, so modern practice replaces the exact posterior with amortized inference networks—a mapping \(g_\phi(v^*)\) that outputs a summary of the noise (e.g., mean and scale for each \(U_i\)). When the noises are Gaussian and the structural functions are differentiable, we can treat \(g_\phi\) as part of a variational encoder, and the loss includes a KL term back to the prior \(P(U)\). Once abduction gives us \(\hat{U}\), we proceed to action: say we want to counterfactually set a treatment node \(T\) to \(t'\). We replace the structural equation \(f_T\) with the constant \(T := t'\) and keep the abduced \(\hat{U}\) for every other node, generating a new outcome \(Y_{t'}\). Prediction computes the distribution of \(Y_{t'}\) while holding the other functions fixed, so the counterfactual depends on both the structural mechanisms and the inferred tail of the noise.
@@ -43,6 +45,7 @@ This entire calculus is validated in “Structural Counterfactuals: A Brief Intr
 ### Building the structural model with deep components
 
 If each \(f_i\) is a small tabular function, this framework stays transparent, but real-world counterfactuals involve high-dimensional covariates, complex heterogeneities, and unobserved confounders. Deep Structural Causal Models (Pawlowski et al. 2020) [https://arxiv.org/abs/2006.06826] bring neural nets into \(f_i\) and use normalizing flows to match the expressive posterior and prior over the noise terms. The key trick is to rewrite each structural equation as a latent-to-observed mapping \(V_i = f_i(Pa_i, U_i; \theta_i)\) where \(\theta_i\) parameterizes a neural network and \(U_i \sim \mathcal{N}(0, I)\). The flows now model \(P(U \mid V)\), enabling flexible abduction. For example, the structural model for a trial with treatment \(T\), covariates \(X\), and outcome \(Y\) becomes:
+
 \[
 \begin{aligned}
 X &:= f_X(U_X), \\
@@ -50,6 +53,7 @@ T &:= f_T(X, U_T; \theta_T), \\
 Y &:= f_Y(T, X, U_Y; \theta_Y).
 \end{aligned}
 \]
+
 Here \(f_X\) might simply copy its noise if \(X\) is assumed exogenous; \(f_T\) is the policy network producing treatment probabilities; \(f_Y\) is the outcome network. Each noise \(U_i\) can be modeled by a flow \(h_{\psi_i}\) producing a density \(p_{\psi_i}(U_i)\) and trained by maximizing variational lower bounds. The entire model is optimized end-to-end: the abduction encoder takes an observation \((x, t, y)\), maps it to a latent \(u = g_\phi(x, t, y)\), and a reconstruction loss ensures \(f_Y(t, x, u_Y)\) matches \(y\).
 
 The representation learning insight of Johansson et al. (2016) [https://arxiv.org/abs/1605.03661] augments this pipeline. Selection bias—differences in the covariate distribution between treated and control groups—damages abduction because the encoder sees different \(x\) distributions during training and inference. The solution is to learn a representation \(r = h_\eta(x)\) that is predictive of the outcome but indistinguishable between treatment groups via a domain-adversarial objective. The learned representation \(r\) then feeds into the structural equations: \(T := f_T(r, U_T)\), \(Y := f_Y(r, T, U_Y)\). This adversarial regularizer ensures the treatment assignment is “balanced” in representation space, allowing abduction to generalize to unseen combinations.

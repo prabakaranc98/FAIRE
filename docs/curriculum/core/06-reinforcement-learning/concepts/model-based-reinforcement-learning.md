@@ -27,17 +27,21 @@ MBRL techniques vary along two axes: how the world model is represented (probabi
 ## How it works
 
 At the mathematical heart of MBRL is the same objective as any reinforcement learning algorithm: find a policy \(\pi_\psi\) maximizing expected return
+
 \[
 \mathcal{J}(\psi) = \mathbb{E}_{\tau\sim p_\pi}\left[\sum_{t=0}^{T-1} \gamma^t r(s_t, a_t)\right],
 \]
+
 where \(\tau = (s_0,a_0,s_1,\dots)\) is a trajectory, \(p_\pi\) is the distribution induced by the policy, and \(\gamma\in(0,1]\) is the discount factor. The difference is that in MBRL, \(p_\pi\) is approximated by a neural network \(f_\theta(s_t,a_t)\) that predicts the next state, together with \(r_\phi(s_t,a_t)\) if the reward is learned. Every variable in that expression remains annotated: \(s_t\) is the current state, \(a_t\) the action the policy takes, \(r\) is the scalar reward, and \(\psi\) parametrizes the policy we ultimately care about.
 
 ### Learning the world model
 
 Because \(f_\theta\) is a learned function, we must keep it honest with data from a replay buffer \(\mathcal{D}\). The usual loss for a deterministic model is
+
 \[
 \mathcal{L}_{\text{dyn}}(\theta) = \mathbb{E}_{(s,a,s')\sim\mathcal{D}} \left\|f_\theta(s,a) - s'\right\|^2,
 \]
+
 where \(s'\) is the state observed after executing \(a\) from \(s\). Every symbol is annotated: \(\mathcal{D}\) holds tuples \((s,a,s')\) collected under past policies, \(f_\theta\) is the neural network parameters, and the norm is usually Euclidean. In practice, practitioners add penalties for predicting uncertainty or use probabilistic models so that \(f_\theta(s,a)\) outputs both a mean \(\mu_\theta(s,a)\) and a covariance \(\Sigma_\theta(s,a)\), with the training loss becoming the negative log likelihood of \(s'\) under the predicted Gaussian. When the observations contain pixels, the network is often a latent dynamics model, as in the robotics-focused preprint at arXiv:1709.03153, where the authors embedded observations into a latent space before learning dynamics. That paper showed that compressing the state eases planning while still capturing the degrees of freedom the policy needs; the latent space is trained jointly so the planner never sees noise that is irrelevant to control.
 
 The dataset \(\mathcal{D}\) also feeds a reward model \(\mathcal{L}_{\text{rew}}(\phi)\) when the reward is unknown or noisy. Many tasks have access to \(r(s,a)\) from sensors, but shaping a reward model becomes essential in domains where humans provide sparse credit. Modern implementations simultaneously track both \(f_\theta\) and \(\mathcal{C}_k\), an ensemble of dynamics models indexed by \(k\), to capture epistemic uncertainty: each model’s disagreement becomes a proxy for where the world model is unreliable.
@@ -45,17 +49,23 @@ The dataset \(\mathcal{D}\) also feeds a reward model \(\mathcal{L}_{\text{rew}}
 ### Imagined rollouts and policy learning
 
 With \(\mathcal{D}\), \(f_\theta\), and \(r_\phi\) trained, we can generate synthetic transitions without touching the real environment. Beginning from initial states sampled from \(\mathcal{D}\), we roll the learned model forward for \(H\) steps:
+
 \[
 s_{t+1} = f_\theta(s_t, \pi_\psi(s_t)), \quad a_t = \pi_\psi(s_t), \quad r_t = r_\phi(s_t, a_t).
 \]
+
 The policy \(\pi_\psi\) is then trained on the imagined trajectory \((s_0,a_0,r_0,\dots,s_H)\) as if it were real data. When this imagined data serves a value-based method like Q-learning, the targets are
+
 \[
 Q_{\text{target}}(s_t,a_t) = r_t + \gamma \max_{a'} Q(s_{t+1}, a'),
 \]
+
 and the Q-network is updated via the usual squared Bellman error. When using policy gradients, imagined trajectories compute \(\nabla_\psi \mathcal{J}(\psi)\) via the score function estimator or via differentiating through the model. The latter requires the model to be differentiable with respect to its inputs, which is the core idea behind many modern "dream" planners. That gradients through the model follow
+
 \[
 \nabla_\psi \mathcal{J}(\psi) \approx \sum_{t=0}^{T-1} \frac{\partial r(s_t,a_t)}{\partial s_t} \frac{\partial s_t}{\partial a_t} \frac{\partial \pi_\psi(s_t)}{\partial \psi},
 \]
+
 where \(\partial s_t / \partial a_t\) is computable from \(f_\theta\)’s Jacobian if the model is differentiable. The 2025 Decoupled Backpropagation paper demonstrated how to compute these gradients even when the simulator is black-box by learning an auxiliary differentiable model alongside the primary planner, decoupling trajectory generation (\(s_{t+1} = f_\theta(s_t,a_t)\)) from gradient computation (\(\partial f_\theta / \partial a_t\)) and thereby keeping the imagined rollouts cheap and informative.
 
 ### Controlling compounding model error
@@ -71,21 +81,27 @@ The alternative to short rollouts is deterministic planning via model predictive
 Many environments produce high-dimensional raw observations, so it is common to learn a latent state \(z_t\) together with the dynamics. The preprint at arXiv:2008.05556v2 detailed how recurrent state-space models (RSSMs) can be trained to simultaneously encode observations into \(z_t\), predict the next latent state \(\hat{z}_{t+1}\), and decode rewards or observations. Unlike feeding raw pixels to the planner, the RSSM consists of a representation encoder \(g_\xi(x_t)\), a recurrent transition \(h_\theta(z_t,a_t)\), and a decoder for reward and reconstruction. Training mixes reconstruction loss, KL regularization, and reward prediction loss so that \(z_t\) becomes expressive enough for planning but compact enough for stable gradients.
 
 When a policy uses these latents, the imagined transitions operate on \(z_t\) rather than \(x_t\):
+
 \[
 z_{t+1} = h_\theta(z_t, \pi_\psi(z_t)), \qquad \hat{r}_t = r_\phi(z_t, \pi_\psi(z_t)),
 \]
+
 and all policy updates are computed in latent space. This keeps the planner’s rollout cost low (no pixel synthesis) and the gradient chain manageable. The RSSM architecture in that preprint also introduced a balance between stochastic units (to capture multimodal futures) and deterministic units (to keep latent planning consistent), which has become a template for succeeding work.
 
 ### Gradients, decoupled backpropagation, and trust
 
 Although short-horizon rollout policies can be trained via Q-learning, differentiable models allow one to compute gradients of the imagined return with respect to policy parameters more directly. The gradient of the trajectory’s cumulative reward can be approximated as
+
 \[
 \nabla_\psi \mathcal{J}(\psi) \approx \sum_{t=0}^{H-1} \frac{\partial \mathcal{R}(s_t, a_t)}{\partial a_t} \frac{\partial \pi_\psi(s_t)}{\partial \psi},
 \]
+
 where the partial derivative \(\partial \mathcal{R}/\partial a\) is computed by backpropagating through the learned transition model. The current frontier paper on Decoupled Backpropagation introduced a second neural network that imitates the simulator’s gradients and is trained concurrently. Specifically, the trajectory loss uses
+
 \[
 \frac{\partial s_{t+1}}{\partial \psi} = \frac{\partial f_\theta(s_t, a_t)}{\partial a_t} \frac{\partial \pi_\psi(s_t)}{\partial \psi},
 \]
+
 and the decoupling means that \(\partial f_\theta/\partial a_t\) can be learned via a surrogate \(g_{\tilde{\theta}}(s_t,a_t)\) so that the expensive simulator need not be differentiated explicitly. That makes imagined gradients fast enough to use inside a policy gradient or actor-critic update without requiring the policy to be differentiable through the real physics engine. The consequence is that the same world model can support planning via MPC, Q-learning through synthetic experiences, and gradient-based policy updates scored by the learned surrogate.
 
 To keep the policy from exploiting model inaccuracies, practitioners integrate posterior uncertainty into the decision-making loop, either via conservative Q-targets computed from lower quantiles of the ensemble or by terminating imagined rollouts when disagreement exceeds a threshold. These engineering choices are what keep the dream from spinning into fantasy: the policy can still train on imagined data, but the imagined trajectories respect the limits of the learned dynamics.

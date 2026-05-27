@@ -31,35 +31,45 @@ This pressure is not hypothetical. “A Decade of Deep Learning: A Survey on The
 ## How it works
 
 Quantization becomes a guided optimization problem when we accept that the discrete grid is a variable we can adjust, not a fixed necessity. The basic affine mapping rewrites each float weight \(w\) as
+
 \[
 \hat{w} = s \cdot (\text{round}(w / s) + z),
 \]
+
 where \(s > 0\) is the scale that determines the step size between quantized levels, \(z\) is the zero point aligning the integer grid to zero, and “round” picks the nearest integer that lies in the codebook \(\mathcal{C} = \{-K, \dots, K\}\) determined by the chosen bit width (e.g., \(K=7\) for 4 bits). By storing the integer \(q = \text{round}(w / s) + z\) and reconstructing \(\hat{w}\) during inference, we cut the storage from 32 bits to the target width, but the residue \(\delta = w - \hat{w}\) becomes the quantization error. In naïve PTQ we minimize \(\|\delta\|_2^2\) per tensor independently, ignoring downstream loss, which can break large reasoning models because one layer’s error amplifies through the next layer’s logits. The remedy is to instead treat \(s\) and \(z\) as optimization variables whose gradients are informed by the ultimate task loss.
 
 Guided gradient-based quantization adds that supervision. Consider a loss \(\mathcal{L}(\hat{W})\) computed on quantized tensors \(\hat{W}\); we augment it with a fidelity penalty to the floats \(W\),
+
 \[
 \min_{s,z} \mathcal{L}(\hat{W}) + \lambda \|\hat{W} - W\|_2^2,
 \]
+
 where \(\lambda\) trades off staying close to the float weights \(W\) and adapting the quantization grid to minimize task loss. The gradient \(\nabla_{\hat{W}} \mathcal{L}\) is estimated on a small calibration set and injected back into the update for \(s\) and \(z\) via straight-through estimators, so higher-magnitude gradients push the codebook entries farther apart to preserve reasoning dimensions. This idea is the heart of the guided squeeze: the discrete grid remains, but now each level is moved to align with what the loss actually needs, not just what minimizes reconstruction error.
 
 “AutoAWQ” extends the same insight by turning bit-width selection itself into a constrained budget allocation. Each layer \(l\) collects statistics \(\mu_l\) and \(\sigma_l\) from calibration activations; assuming uniform noise within a layer’s dynamic range, the expected quantization error for bit width \(b\) is approximated as
+
 \[
 \mathbb{E}[\|\delta_l(b)\|_2^2]\approx \sigma_l^2 \cdot 2^{-2b},
 \]
+
 where \(\sigma_l\) characterizes the spread of activations and \(b\) is the candidate bit width for that layer. With a total budget \(\epsilon\) derived from an acceptable loss penalty, AutoAWQ chooses \(\{b_l\}\) such that \(\sum_l \mathbb{E}[\|\delta_l(b_l)\|_2^2] < \epsilon\), meaning layers with high gradient sensitivity (attention outputs, MoE routers) receive more bits while residual or gating channels stay smaller. The optimization thus becomes a knapsack problem where the “value” of each layer is the inverse of its guided loss sensitivity, creating a per-layer bit plan that matches reasoning importance.
 
 We also reshape the representation itself. Additive multi-codebook quantization decomposes each vector \(w \in \mathbb{R}^d\) into \(m\) codewords \(c_i \in \mathcal{C}_i\) such that
+
 \[
 w \approx \sum_{i=1}^m c_i,
 \]
+
 where each codebook \(\mathcal{C}_i\) contains \(|\mathcal{C}_i|\) entries (e.g., \(2^4\) per codebook) and the total bit cost is \(m \cdot \log_2|\mathcal{C}_i|\). The optimizer searches the combination of codewords that minimizes \(\|w - \sum_i c_i\|_2^2\), and when these codebooks are learned jointly with the loss penalty above, the resulting decomposition can represent sharp activation spikes with minimal residual. This additive structure lets reasoning-critical modes use more representation capacity without exploding storage requirements.
 
 Activation-aware clamping guards the process. Extreme outliers ruin quantization if they push the range too wide, so each activation channel is clamped to \([-\alpha, \alpha]\), where \(\alpha\) is estimated from the 99.999th percentile on the calibration data. The clamp keeps the activations within the discrete grid, and the guided gradient term keeps \(\alpha\) from shrinking so much that it distorts the loss. Combining clamping with gradient-informed codebook updates yields a noise-control mechanism reminiscent of modular arithmetic safeguards in lattice cryptosystems: the clamp prevents overflow, the gradient penalty keeps the meaningful signal aligned with the modulus.
 
 Finally, inference kernels must respect the quantized format without decompressing the entire tensor. At INT4, most libraries (bitsandbytes, custom CUDA/fused kernels) store a tensor \(Q\) of integers and compute
+
 \[
 \text{dequant}(q) = (q - z) \cdot s,
 \]
+
 with \(q\) the stored integer, \(z\) the zero point, and \(s\) the scale per tensor. The dequantization is fused with the GEMM so that the GPU uses FP16 accumulators while the per-element scale and zero point are read once. This fusion explains why engineers describe quantization as a strategic compression mechanism: the matrix shape stays the same, but each weight becomes a pointer into a codebook whose geometry is warped by gradient guidance, adaptive bit allocation, and clamp-derived noise control.
 
 The guided squeeze also links to recent modeling insights. Zhang et al. (2025) [arxiv:2504.02010v1](https://arxiv.org/abs/2504.02010v1) show that reasoning activations \(h_{\text{reason}}\) and parametric memorization \(h_{\text{param}}\) occupy distinct axes, so compression can crush \(h_{\text{param}}\) without damaging reasoning, as the gradient penalty steers \(h_{\text{reason}}\) toward alignment with the loss. This synergy between constrained optimization and reasoning geometry is what makes quantization more than an engineering hack—it is a way to sculpt a predictive agent under a tight memory budget.

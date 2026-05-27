@@ -25,10 +25,13 @@ The statistical territory EM inhabits is the gap between models that offer clean
 ## How it works
 
 The starting point is the incomplete-data log-likelihood. Let \(X = \{x^{(1)}, \dots, x^{(N)}\}\) be the observed samples and \(Z = \{z^{(1)}, \dots, z^{(N)}\}\) the corresponding latent variables (e.g., cluster indicators), and let \(\theta\) parametrise the joint distribution \(p(x, z \mid \theta)\). The marginal likelihood is
+
 \[
 \log p(X \mid \theta) = \sum_{n=1}^{N} \log \sum_{z^{(n)}} p(x^{(n)}, z^{(n)} \mid \theta)
 \]
+
 where \(N\) is the dataset size, \(x^{(n)}\) is the \(n\)-th observed sample, and the inner sum marginalises over the latent variable. That inner sum makes the log-likelihood non-linear and hard to differentiate. The key idea of EM is to introduce an auxiliary distribution \(q^{(n)}(z)\) over the latent variable for each data point and rewrite the log-likelihood as a sum of a lower bound plus a KL divergence:
+
 \[
 \log p(X \mid \theta) = \sum_{n=1}^{N} \left[\mathcal{L}(q^{(n)}, \theta) + \mathrm{KL}\left(q^{(n)}(z) \, \| \, p(z \mid x^{(n)}, \theta)\right)\right]
 \]
@@ -38,17 +41,21 @@ where \(\mathcal{L}(q^{(n)}, \theta) = \sum_{z^{(n)}} q^{(n)}(z^{(n)}) \log \fra
 ### The E-step: tightening the bound
 
 In the E-step, the current parameter estimate \(\theta^{(t)}\) is used to compute posterior responsibilities
+
 \[
 q^{(n)}(z) \leftarrow p(z \mid x^{(n)}, \theta^{(t)})
 \]
+
 where \(p(z \mid x^{(n)}, \theta)\) denotes the posterior probability of latent configuration \(z\) given the data point \(x^{(n)}\) and current parameters. Computing this posterior is tractable in many models: in Gaussian mixture models it reduces to Bayes’ rule—each component’s likelihood times its mixing proportion normalized over components—and in hidden Markov models it is the forward–backward probability. The E-step therefore closes the KL gap by setting the auxiliary distribution equal to the true posterior, which makes \(\mathcal{L}(q^{(n)}, \theta)\) equal to the log-likelihood when the parameters do not change. Because each data point’s contribution is independent, the responsibilities can be computed in parallel across the dataset without changing the algorithmic structure.
 
 ### The M-step: maximizing the bound
 
 After the E-step, the auxiliary distributions are fixed, so \(\mathcal{L}(q, \theta)\) becomes a surrogate objective that is linear in \(\log p(x, z \mid \theta)\). The M-step maximises this surrogate with respect to \(\theta\), namely
+
 \[
 \theta^{(t+1)} \leftarrow \arg\max_{\theta} \sum_{n=1}^{N} \sum_{z^{(n)}} q^{(n)}(z^{(n)}) \log p(x^{(n)}, z^{(n)} \mid \theta)
 \]
+
 where \(q^{(n)}(z^{(n)})\) are the responsibilities computed in the E-step. This sum is the expected complete-data log-likelihood under the current posterior; in many models the expectation creates sufficient statistics that have closed-form updates. In a GMM with diagonal covariances, for example, the new mixture weight is the average responsibility, the mean is the responsibility-weighted average of the data assigned to that component, and the covariance is the responsibilities-weighted empirical covariance. Because this expected log-likelihood is a lower bound on the true log-likelihood, and because the M-step maximises it exactly (or increases it in the case of constrained or numerical optimisation), Dempster, Laird, and Rubin (1977) proved that \(\log p(X \mid \theta^{(t+1)}) \geq \log p(X \mid \theta^{(t)})\), guaranteeing monotonic ascent with each iteration. That ascent cannot jump to the global optimum in the presence of multiple modes, but the algorithm cannot decrease the likelihood, which makes EM attractive for problems where a local maximum is sufficient.
 
 ### Variational and coordinate-ascent view

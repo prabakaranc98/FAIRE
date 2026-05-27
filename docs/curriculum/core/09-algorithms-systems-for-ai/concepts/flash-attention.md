@@ -29,21 +29,27 @@ FlashAttention sits at the intersection of two families of techniques. On one si
 ### Where the I/O costs hide
 
 Transformers compute attention through three steps: similarity, softmax, and weighted sum. Concretely, for head \(h\) we compute
+
 \[
 A = \text{softmax}\left(\frac{Q K^\top}{\sqrt{d}}\right)
 \]
+
 where \(Q\) and \(K\) contain \(N\) query/key vectors of dimension \(d\), and the softmax is applied row-wise so each of the \(N\) query positions sees a full distribution over \(N\) keys. The resulting matrix \(A \in \mathbb{R}^{N \times N}\) is then multiplied by \(V \in \mathbb{R}^{N \times d}\) to get the attention output. The naive implementation materializes \(A\) explicitly, which requires reading the full \(QK^\top\) matrix, writing it to HBM, applying softmax, and then reading it again to multiply with \(V\). Each of these reads and writes is expensive because HBM latency dominates compute when \(N\) grows large, so the GPU sits idle waiting for memory bandwidth. The same arithmetic performs in less than half the time when the attention matrix stays within the on-chip shared memory or registers of a single streaming multiprocessor (SM). FlashAttention targets that gap: how can we do synchronous softmax and accumulation while keeping only a fraction of the \(N^2\) matrix in fast memory?
 
 ### Tiles and online softmax
 
 The key idea is to tile the \(QK^\top\) computation so that each GPU thread block works on a small patch of size \(T \times T\), with \(T \ll N\), and never writes the full \(A\) to HBM. Instead, the block computes partial dot products on-the-fly, performs an online softmax over the rows it is responsible for, and accumulates contributions into the output. The equivalence of this procedure to the naive attention comes from two algebraic rearrangements. First, the dot products over a row can be computed incrementally:
+
 \[
 A_{i, :} = \text{softmax}\left(\frac{Q_i K^\top}{\sqrt{d}}\right),\quad O_{i} = A_{i, :} V,
 \]
+
 where \(Q_i\) denotes the \(i\)-th query row and \(O_i\) the resulting output row. Instead of materializing \(Q_i K^\top\), FlashAttention iterates over the key blocks, computes the dot contributions \(Q_i K_j^\top\), updates the running max \(m_i\) and sum \(l_i\), rescales each block contribution to maintain numerical stability, and directly accumulates the scaled values into the output. The block-wise updates look like this:
+
 \[
 m_i \leftarrow \max(m_i, \max(Q_i K_j^\top)),\quad l_i \leftarrow l_i \cdot e^{m_i - m'_i} + \sum e^{Q_i K_j^\top - m'_i},\quad O_i \leftarrow O_i + V_j^\top \cdot e^{Q_i K_j^\top - m'_i},
 \]
+
 where \(m'_i\) is the updated maximum after including block \(j\), and \(V_j\) are the matching value vectors. Because the softmax normalization only depends on the exponentiated, shifted similarities, FlashAttention can keep \(m_i\) and \(l_i\) in registers and flush contributions to \(O_i\) without ever writing the full \(A\). The arithmetic is identical to the naive softmax: it just executes the same sums in a different order that minimizes the working set resident in HBM.
 
 ### Tiling, shared memory, and Triton primitives

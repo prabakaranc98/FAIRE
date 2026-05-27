@@ -31,9 +31,11 @@ The mechanism has three interlocking pieces: (1) how tensors are mapped to the q
 ### Representing tensors for integer inference
 
 The inference graph represents a real-valued tensor \(x\) by rounding to the nearest integer, clamping inside the bounds, and scaling back. The canonical formula is
+
 \[
 \hat{x} = s \cdot \mathrm{clip}\!\left(\left\lfloor \frac{x}{s} + z \right\rceil,\; q_{\min},\; q_{\max} \right),
 \]
+
 where \(x\) is the floating-point tensor before quantization, \(s > 0\) is the trainable step size (scale), \(z\) is the zero-point offset, \(q_{\min}\) and \(q_{\max}\) define the integer range (for signed 4-bit, \(q_{\min}=-8\), \(q_{\max}=7\)), and \(\lfloor \cdot \rceil\) denotes round-to-nearest-integer. The clip function keeps the rounded value within the representable integers, and the multiplication by \(s\) converts the integer back into a floating-point surrogate for the rest of the graph. Inference implementations store only the integers and reconstruct the floating point value \(s \cdot q\) before continuing the computation. If the model never saw that rounding during training, the accuracy falls off a cliff as soon as quantization is enabled.
 
 To keep the training graph honest, QAT inserts a fake-quantization module after each tensor that will be quantized at inference: each weight tensor, each activation entering a convolution, and each output of a fused conv+bn kernel. The fake-quantizer uses the same \(s, z, q_{\min}, q_{\max}\) parameters as the inference kernel, so the forward activations become numerically identical to the quantized integers that run later. That simulation is what allows the optimizer to adapt not just the floating-point weights but the quantization grid itself.
@@ -41,29 +43,39 @@ To keep the training graph honest, QAT inserts a fake-quantization module after 
 ### Fake quantization and trainable step sizes
 
 Fake quantization is typically implemented with learnable scales. The formula is
+
 \[
 \hat{x} = \mathrm{clamp}\big( \mathrm{round}(x / s + z),\; q_{\min},\; q_{\max} \big) \cdot s,
 \]
+
 where \(s\) (and, in some cases, \(z\)) is a parameter that the optimizer updates. The optimizer therefore controls not only the raw weights but also the quantization grid: it can shrink \(s\) to get finer resolution around high-density regions, stretch it to avoid saturation, or even shift \(z\) when asymmetric ranges make sense. This trainable grid is how the network learns to adapt to low precision instead of being broken by it.
 
 The key challenge is that \(\hat{x}\) depends on non-differentiable operations (round and clamp), so we cannot compute exact gradients. QAT solves this by adopting the straight-through estimator (STE) introduced by Courbariaux et al. (2016) [arxiv:1609.07061](https://arxiv.org/pdf/1609.07061) and further analyzed in the JMLR survey by Bengio, Léonard, and Courville (2017) [JMLR 18(2017):16-456](https://jmlr.csail.mit.edu/papers/volume18/16-456/16-456.pdf). STE simply pretends that round and clip are identity functions during the backward pass so gradients can flow through. That gives
+
 \[
 \frac{\partial \hat{x}}{\partial x} \approx 1,
 \]
+
 and for the step size we start with the exact derivative before applying STE:
+
 \[
 \frac{\partial \hat{x}}{\partial s}
 = \mathrm{clip}\big(\mathrm{round}(x/s + z), q_{\min}, q_{\max}\big)
 + s \cdot \mathrm{clip}^\prime\big(\mathrm{round}(x/s + z), q_{\min}, q_{\max}\big) \cdot \mathrm{round}^\prime(x/s + z) \cdot \left(-\frac{x}{s^2}\right),
 \]
+
 where \(\mathrm{clip}^\prime(y; q_{\min}, q_{\max})\) is the derivative of the clip function: it is \(1\) when \(q_{\min} < y < q_{\max}\) and \(0\) otherwise, indicating that the quantization integer is inside the dynamic range and therefore the gradient does not vanish. Likewise, \(\mathrm{round}^\prime\) is the formal derivative of the rounding operation, which is zero almost everywhere but is replaced in STE with \(1\) so that the gradient can pass. Therefore, under STE the expression becomes
+
 \[
 \frac{\partial \hat{x}}{\partial s} \approx \mathrm{clip}\big(\mathrm{round}(x/s + z), q_{\min}, q_{\max}\big) - \frac{x}{s}.
 \]
+
 The clipped, rounded term is the integer that would be stored in inference; dividing by \(s\) gives \(\hat{x}/s\). If the quantized tensor stays close to the floating-point tensor (the goal of QAT), then \(\hat{x} \approx x\) and the difference reduces to
+
 \[
 \frac{\partial \hat{x}}{\partial s} \approx \frac{\hat{x} - x}{s} \approx -\frac{x}{s}.
 \]
+
 This last approximation implicitly assumes the quantized activation is centered on the real value and that saturation is rare; the \(-x/s\) term behaves like a soft penalty that keeps step sizes from growing unchecked. When the tensor saturates at \(q_{\min}\) or \(q_{\max}\), \(\mathrm{clip}^\prime\) drops to zero and the gradient no longer pushes \(s\) inward, which is exactly the guardrail you need to prevent exploding scales. The STE therefore provides a principled, adjustable gradient for \(s\) even though the forward pass is discontinuous.
 
 Jacob et al. (2017) [arxiv:1712.05877](https://arxiv.org/pdf/1712.05877) pushed this idea into integer-only inference by showing that the trainable scales can be absorbed into affine quantization kernels, letting the entire network run with pure integer arithmetic once QAT converges. Their INT8 pipeline on MobileNet and Inception architectures used per-channel scales for convolutions, which gives each output channel its own \(s\) to match the per-channel activation distribution. Because the scale gradient behaves like \(-x/s\), the optimizer can shrink the scale where the activation is small and widen it where the activation spread is larger, which is why per-channel quantization often recovers more than 90% of the floating-point accuracy when compared to per-tensor quantization on ImageNet. That empirical observation sets the stage for tighter integration between compute budgets and the quantization process.
@@ -83,9 +95,11 @@ Krizhevsky’s insight about operator fusion implies another constraint: all fus
 ### Scaling laws and compute budgeting
 
 The newest frontier in QAT is not rounding itself but deciding how much compute to spend in each phase. The Compute-Optimal QAT study (2024) [arxiv:2401.09322](https://arxiv.org/abs/2401.09322) fits scaling laws for the error reduction achieved by the QAT phase. For a total compute budget \(C_{\text{total}} = C_{\text{pretrain}} + C_{\text{QAT}}\), there exists an optimal split that keeps the quantized error low without wasting epochs on the QAT stage. The error follows an empirical power law:
+
 \[
 \text{Error}(C_{\text{QAT}}) \approx \alpha C_{\text{QAT}}^{-\beta},
 \]
+
 where \(\alpha\) and \(\beta\) are architecture-dependent constants, so returning to the computing budget, you backpropagate that the benefit of QAT saturates quickly once the pretraining stage already produced a smooth loss surface. Their experiments on ResNet-50 and ViT-B/16 further report that gradient instability crops up in sub-2-bit regimes because the STE mismatch becomes non-negligible unless you clamp the gradients or use smaller learning rates. In other words, the scaling law is only credible if the QAT phase avoids wandering into regions where the surrogate gradient diverges wildly from the true discrete gradient.
 
 The conclusion is a synthesis: the STE gradient (with its approximate \(-x/s\) behavior) keeps the step sizes aligned, but the compute-optimal analysis tells you how long to let those gradients run before deploying the quantized model. Together, the fake-quantization loop, the STE surrogate, trainable scales, per-channel flexibility, and compute-optimal budgeting make QAT a reliable way to keep the model fluent when the hardware forces a reduced vocabulary.

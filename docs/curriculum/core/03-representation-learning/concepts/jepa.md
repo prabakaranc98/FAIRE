@@ -26,9 +26,11 @@ Representation learning has long been split between reconstructing raw inputs an
 ## How it works
 
 Predictive architectures start by splitting the scene into context and target. Let \(x_c\) be a collection of context patches and \(x_t\) be a masked target patch (or frame). A context encoder \(f_\phi\) maps \(x_c\) to a context embedding \(c = f_\phi(x_c)\), while a target encoder \(g_\psi\) maps \(x_t\) to the target embedding \(e = g_\psi(x_t)\). The predictor \(h_\theta\) takes \(c\) and outputs \(\hat{e} = h_\theta(c)\). A JEPA optimizes the regression loss
+
 \[
 L(\theta, \phi, \psi) = \mathbb{E}_{x_c, x_t} \big[ \|\hat{e} - e\|^2 \big]
 \]
+
 where \(x_c\) is drawn from the partial observation, \(x_t\) is the masked future patch, \(e\) is the target embedding from the frozen encoder, and \(\hat{e} = h_\theta(f_\phi(x_c))\) is the prediction. This loss forces the predictor to match the downstream semantics encoded in \(e\), and it does so without ever decoding \(x_t\). The predictor \(h_\theta\) can therefore be lightweight, since it learns only what the latent space needs, not how to reconstruct pixels.
 
 JEPAs separate learning into three modules for stability: the context encoder \(f_\phi\), the predictor \(h_\theta\), and the target encoder \(g_{\psi^-}\) whose weights are an exponential moving average (EMA) of \(g_\psi\). The EMA acts as a moving target that drifts more slowly than the online encoder, preventing trivial collapse. During training the target encoder is stop-gradiented: gradients flow through \(g_{\psi^-}\)'s parameters only when the EMA updates, not from \(L\). This design mirrors the architectural choices in I-JEPA (Assran et al. 2024) [https://arxiv.org/abs/2404.07952], where the predictor sees only context embeddings and never touches the target encoder’s parameters. The stop-gradient ensures the predictor addresses only the meaningful differences between context and target, rather than chasing collapsing modes where every embedding is constant.
@@ -36,9 +38,11 @@ JEPAs separate learning into three modules for stability: the context encoder \(
 ### Avoiding collapse without reconstruction
 
 However, EMA and stop-gradient are heuristics. LeJEPA (Balestriero & LeCun 2025) [https://arxiv.org/abs/2501.01234] removes them by regularizing the embedding geometry. Instead of relying on slow-moving averages, LeJEPA samples isotropic Gaussian noise and projects it through a sketched linear map, enforcing that small perturbations in context embeddings actually shift the target prediction in the embedding space. This Sketched Isotropic Gaussian Regularization (SIGReg) can be summarized as a secondary objective
+
 \[
 R(\phi, \psi) = \mathbb{E}_{x_c, \epsilon} \big[ \|g_\psi(x_c + \epsilon) - g_\psi(x_c)\|^2 \big]
 \]
+
 where \(\epsilon\) is Gaussian noise. Here \(g_\psi\) is the embedding function, and the loss penalizes embeddings that collapse by encouraging sensitivity to isotropic perturbations. If the predictor \(h_\theta\) can still minimize \(L\) while the regularizer keeps \(g_\psi\) well-conditioned, the architecture no longer needs a frozen EMA encoder. The consequence is a representation that generalizes better across modalities because it no longer remembers the details of the last few updates; it only memorizes the stable directions in the embedding geometry.
 
 ### Scaling to sequences and language

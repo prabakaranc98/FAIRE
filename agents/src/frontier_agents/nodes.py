@@ -1425,7 +1425,28 @@ def _sanitize_draft(text: str) -> str:
             idx = stripped.find("---\n")
             if idx != -1:
                 stripped = stripped[idx:]
-    return stripped
+
+    # Display-math block normalisation: pymdownx.arithmatex (generic mode) only
+    # picks up `\[ ... \]` blocks when surrounded by blank lines. Writers
+    # routinely emit `text ending in colon:\n\[\nequation\n\]\ntext` which
+    # arithmatex leaves as raw text on the page. Force blank lines around
+    # every `\[` and `\]` that appears on its own line. Idempotent.
+    out_lines: list[str] = []
+    src_lines = stripped.split("\n")
+    for i, line in enumerate(src_lines):
+        st = line.strip()
+        if st == "\\[":
+            if out_lines and out_lines[-1].strip() != "":
+                out_lines.append("")
+            out_lines.append(line)
+            continue
+        if st == "\\]":
+            out_lines.append(line)
+            if i + 1 < len(src_lines) and src_lines[i + 1].strip() != "":
+                out_lines.append("")
+            continue
+        out_lines.append(line)
+    return "\n".join(out_lines)
 
 
 def _ensure_h1(text: str, topic: str) -> str:

@@ -33,9 +33,11 @@ The first key assumption is overlap: for every covariate vector \(x\) in the sup
 ### The weighted estimator
 
 Inverse probability weighting operationalizes the missing-data principle: it replicates the distribution of the counterfactual by reweighting the observed outcomes according to the inverse of the assignment probability. The IPW estimator for the average treatment effect (ATE) is
+
 \[
 \widehat{\text{ATE}}_{\text{IPW}} = \frac{1}{n} \sum_{i=1}^n \left( \frac{T_i Y_i}{e(X_i)} - \frac{(1-T_i) Y_i}{1 - e(X_i)} \right),
 \]
+
 where \(n\) is the sample size, \(T_i\) is the treatment indicator for \(i\), \(Y_i\) is the observed outcome, \(X_i\) is the observed covariates, and \(e(X_i)\) is the estimated propensity score. Each treated observation is upweighted by \(1/e(X_i)\) because it represents \(1/e(X_i)\) individuals in a pseudo-population where everyone takes the treatment, and each control observation is weighted by \(1/(1-e(X_i))\) to represent the counterfactual world where the treatment was assigned. This reweighting scheme creates an artificial sample where treatment assignment is unconfounded, so the difference in weighted sample means consistently estimates the missing counterfactual difference.
 
 This mechanism shows how the missing outcomes are imputed: each treated individual carries a multiplicity of “counterfactual twins” equal to \(1/e(X_i)\) drawn from the untreated pool, and vice versa. The variance of the estimator is governed by the weight distribution—hence overlap matters. When the data are longitudinal and time-varying confounding is present, the mechanism generalizes by building sequential propensity scores and chained weights, and the per-step reweighting still follows the form above, albeit using product weights across time.
@@ -43,9 +45,11 @@ This mechanism shows how the missing outcomes are imputed: each treated individu
 ### Propensity model training
 
 Estimating \(e(X)\) is itself a supervised learning problem. A common practical choice is to instantiate a logistic regression or, when \(X\) contains high-dimensional measurements, a neural network. In the build below we use a custom PyTorch multi-layer perceptron \(f_\phi(X)\) that outputs logits, and we train it with the binary cross-entropy loss
+
 \[
 \mathcal{L}(\phi) = -\frac{1}{n} \sum_{i=1}^n \big[T_i \log \sigma(f_\phi(X_i)) + (1-T_i)\log(1-\sigma(f_\phi(X_i)))\big],
 \]
+
 where \(\sigma(\cdot)\) is the logistic sigmoid, \(X_i\) is the covariate vector, \(T_i\) is the treatment label, and \(\phi\) are the network weights. The training optimization focuses on predicting the assignment mechanism, not the outcome; once the propensity scores are stable, we plug them into the IPW formula. Score-based regularization or early stopping are practical touches to avoid overfitting the assignment mechanism, which would exaggerate the weights and destabilize the estimator.
 
 ### Two-stage least squares and compliance

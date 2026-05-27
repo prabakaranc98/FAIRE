@@ -27,6 +27,7 @@ The history of RLHF is a story of increasing agency. Annotated History of Modern
 The RLHF loop has three actors: the policy, the reward model, and the preference aggregator. The policy \(\pi_\theta(a \mid s)\) is the language model with parameters \(\theta\), the reward model \(R_\phi(s,a)\) is a network with parameters \(\phi\) that maps state-action trajectories to scalar scores, and the preference aggregator introduces a baseline \(b(s)\) so the policy has a reference point for each conversational context \(s\). The policy rollout generates a completion \(a\) (or multi-turn sequence), the reward model scores it, and the optimizer updates \(\theta\) to increase the expected reward relative to the baseline.
 
 The core RL objective becomes
+
 \[
 L(\theta) = -\mathbb{E}_{s \sim \mathcal{D}, a \sim \pi_\theta(\cdot \mid s)}\left[(R_\phi(s,a) - b(s)) \log \pi_\theta(a \mid s)\right]
 \]

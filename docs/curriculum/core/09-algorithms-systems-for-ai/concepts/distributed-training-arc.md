@@ -36,33 +36,43 @@ Where this concept appears in the arc: the “Dynamic Mesh Scheduling” step in
 ### Static 3D grid baseline
 
 Before we innovate, we define the static baseline so the gains land in contrast. The familiar cube has dimensions \(p_{\text{data}} \times p_{\text{tensor}} \times p_{\text{pipeline}}\), where each node handles \(B / p_{\text{data}}\) of the global batch \(B\), owns \(N / p_{\text{tensor}}\) parameters of the total \(N\), and processes \(\lceil L / p_{\text{pipeline}} \rceil\) micro-batches when the sequence length is \(L\). Ignoring pipeline bubbles, the step time is
+
 \[
 T_{\text{step}} = T_{\text{comp}}(B, L) + T_{\text{comm}}(N, p_{\text{data}}, p_{\text{tensor}}),
 \]
+
 where \(T_{\text{comp}}\) grows with the local token count and \(T_{\text{comm}}\) tracks the communication volume of tensors synchronized across the data and tensor slices. The all-reduce volume is
+
 \[
 V_{\text{comm}} = \frac{2N}{p_{\text{tensor}}} + \frac{2N}{p_{\text{data}}},
 \]
+
 accounting for gradients and optimizer states. When \(L\) spikes, \(T_{\text{comp}}\) dominates and more tensor parallelism helps; when \(L\) shrinks, the collectives grow, and idle time creeps in because the grid cannot reassign devices mid-job. The fixed cube becomes brittle when workloads no longer match the assumption baked into \(p_{\text{data}}\), \(p_{\text{tensor}}\), and \(p_{\text{pipeline}}\).
 
 ### Trade-offs between collectives and memory
 
 This tension is why a grid needs softer axes. Let each device have \(M\) bytes of memory and consider an FSDP configuration that shards parameters, gradients, and optimizer states into \(p_{\text{fsdp}}\) slices. Then the per-device footprint is approximately
+
 \[
 M \approx \frac{3N}{p_{\text{fsdp}}},
 \]
+
 because weights, gradients, and optimizers each live on one shard. When the mesh wants to handle longer sequences, it can shrink \(p_{\text{fsdp}}\), giving each shard more memory and reducing per-step communication volume
+
 \[
 V_{\text{comm}}^{\text{FSDP}} = \frac{2N}{p_{\text{fsdp}}}.
 \]
+
 Because the FSDP shards are carved from the existing tensor and data splits, we tie \(p_{\text{fsdp}}\) to the earlier 3D grid: to first order \(p_{\text{fsdp}} \leq p_{\text{data}} \times p_{\text{tensor}}\) since each tensor shard spans at most one data shard per tensor shard. This inequality keeps the memory governor aligned with the mesh dimensions defined above. The collective latency stays roughly \(\alpha \log k + \beta s\), where \(\alpha\) is the startup cost, \(\beta\) the inverse bandwidth, \(k\) the number of devices participating, and \(s\) the message size set by the current shard shape. As the grid reshapes, so does \(s\)—it is not a constant.
 
 ### From static to hybrid meshes
 
 ByteScale (Li et al. 2025) walks past that brittleness with Hybrid Data Parallelism (HDP) [https://arxiv.org/abs/2502.21231]. HDP overlays a data-parallel mesh on top of the tensor-parallel engine and provides cached collectives in DTensor that can be swapped in during runtime. The scheduler monitors the ratio
+
 \[
 r = \frac{L_{\text{long}}}{L_{\text{short}}},
 \]
+
 where \(L_{\text{long}}\) is the compute time spent on long-context batches and \(L_{\text{short}}\) the time spent on short ones, both within the same epoch. When \(r\) exceeds a threshold, ByteScale widens \(p_{\text{tensor}}\) and shrinks \(p_{\text{data}}\) so that long sequences split parameters while short sequences keep the data split wide enough to sustain throughput. Crucially, the mesh swap does not trigger a full recompile: ByteScale pre-compiles a handful of \((p_{\text{data}}, p_{\text{tensor}}, p_{\text{pipeline}})\) tuples and updates DTensor metadata atomically so that the new topology reuses the cached collectives.
 
 The reinforcement-learning controller in ByteScale trains on metadata-rich episodes drawn from DeepResearch-9K (Kumar et al. 2026) [https://arxiv.org/html/2603.01152] with bandwidth, latency, and phase information for long-curriculum reasoning. Treating bandwidth as a limited reward (e.g., expanding the tensor-parallel collective uses a large fraction of the budget), the policy often prefers to stretch the data-parallel axis instead, which smooths transitions when a long document surfaces mid-epoch. Because HDP records the cost of each swap, it learns to reconfigure the topology in tens of milliseconds without pausing the job.
@@ -70,9 +80,11 @@ The reinforcement-learning controller in ByteScale trains on metadata-rich episo
 ### Compiler-aware overlapping orchestrated by DTensor
 
 Once a hybrid mesh is selected, the compiler must keep communication and computation intertwined. In a naive backward pass, gradient collectives block the computation, forcing idle devices. `torch.compile` analyzes each module so that a gradient reduction launches immediately after the gradient is produced, overlapping with backward activations from earlier layers. The overlapped time becomes
+
 \[
 T_{\text{overlap}} = \min(T_{\text{comm}}, T_{\text{comp}}),
 \]
+
 where \(T_{\text{comm}}\) is the duration of the reduction and \(T_{\text{comp}}\) the backward computation that can run in parallel. The compiler rewrites the IR so that collectives with higher latency \(L_k\) start earlier, making the overall effect \(\max(L_k, C_k)\) as small as possible across layers.
 
 DTensor attaches sharding metadata to each tensor, including whether it is sharded along batch, hidden, or pipeline dimensions. When the compiler emits a gradient reduction node, it consults this metadata to choose the matching collective (all-reduce, reduce-scatter, or all-gather) and calculates a latency estimate. Because DTensor’s metadata is mutable, swapping from one hybrid mesh to another simply involves updating these annotations; the cached collectives then take over without re-emitting the entire graph. The compiler and mesh converge in a single control loop: HDP chooses the topology, DTensor encodes it, and the compiler overlaps the communication accordingly.
@@ -86,9 +98,11 @@ DTensor exposes compiled IR nodes, including `all_reduce`, with timestamps that 
 ### Fully Sharded Data Parallel's role
 
 FSDP stitches the compiler, mesh, and RL controller together. Each parameter tensor \(W\) fragments into shards \(W_i\) such that
+
 \[
 W = \bigcup_{i=1}^{p_{\text{fsdp}}} W_i,
 \]
+
 where \(p_{\text{fsdp}}\) now inherits the bounds from the original grid: the tensor and data dimensions determine the number of independent shards, so \(p_{\text{fsdp}}\) is calibrated to be no larger than \(p_{\text{tensor}} \times p_{\text{data}}\) and aligns with the pipeline depth. The forward pass only materializes the local shards, and the backward pass participates in the collectives for its slice. Shrinking \(p_{\text{fsdp}}\) temporarily when long sequences need more memory increases the per-shard volume but is offset by the compiler overlapping the newly enlarged collectives. In this sense, FSDP behaves like the memory governor for the dynamic mesh: it decides when to trade memory for communication.
 
 This entire progression—dynamic HDP topologies, compiler-aware overlap, telemetry-rich RL scheduling, and FSDP as the guardrail—creates the coherent story the arc needs. The motivation to keep thousands of GPUs productive morphs into a technical path: HDP resizes the mesh, DTensor encodes the sharding metadata, the compiler hides the communication, telemetry justifies the swap, and FSDP absorbs the memory burst without stalling the job.

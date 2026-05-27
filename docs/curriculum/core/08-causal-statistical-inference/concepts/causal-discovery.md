@@ -29,23 +29,29 @@ How does it actually work? The next section walks through the mechanism: the SCM
 ## How it works
 
 The starting point is the structural causal model: a set of \(d\) endogenous variables \(X = (X_1, \dots, X_d)\) and a directed acyclic graph \(\mathcal{G}\) whose adjacency matrix \(A \in \{0,1\}^{d \times d}\) encodes edges \(A_{ij} = 1\) when \(X_i \to X_j\). Each vertex obeys a structural equation
+
 \[
 X_i = f_i\big(X_{pa(i)}, U_i\big),
 \]
+
 where \(X_{pa(i)}\) collects the parents of \(X_i\), \(f_i\) is a deterministic function, and \(U_i\) is the noise variable assumed independent across nodes. The graph’s acyclicity means there exists an ordering such that each node only depends on predecessors, and the distribution of \(X\) factorizes as \(p(x) = \prod_{i=1}^d p\big(x_i \mid x_{pa(i)}\big)\).
 
 Graph reconstruction thus becomes a structural search. Classic constraint-based methods like the PC algorithm start by assuming a complete undirected graph and iteratively remove edges when a conditional independence test identifies separation: for nodes \(i\) and \(j\), PC tests whether \(X_i \perp X_j \mid S\) for some conditioning set \(S\). The test uses statistical criteria such as partial correlations or HSIC. An absence of dependence implies no edge remains between \(i\) and \(j\), and orienting the remaining edges relies on rules that preserve acyclicity and avoid introducing new v-structures improperly. The consequence is that PC outputs the equivalence class of causal graphs consistent with the observed independencies: the CPDAG. The algorithm is efficient when the conditioning sets remain small, but in high dimensions the combinatorial explosion of conditioning sets becomes the bottleneck, which leads to the second family of methods.
 
 Score-based search sidesteps explicit independence testing by assigning a continuous score \(S(A)\) to each adjacency matrix \(A\), typically based on the log-likelihood under a parametric model plus a sparsity penalty. Brutal enumeration is infeasible, so differentiable approaches such as NOTEARS introduce a smooth acyclicity constraint \(h(A) = \mathrm{Tr}(e^{A \circ A}) - d = 0\), where \(e^{\cdot}\) is the matrix exponential and \(\circ\) denotes the Hadamard product; every parameter update approximates \(A\) as real-valued and applies gradient descent. The objective becomes
+
 \[
 \mathcal{L}(A, \theta) = \ell(A, \theta) + \lambda\, \|A\|_1 + \mu\, h(A),
 \]
+
 where \(\ell\) is the negative log-likelihood of the data given parameters \(\theta\), \(\|A\|_1\) enforces sparsity, and \(h(A)\) penalizes cycles. Backpropagation through \(h(A)\) enforces acyclicity in expectation, which makes the optimization tractable, though it still finds a single best graph under the assumed parametric family.
 
 Meta-learned discovery, as described by Löwe et al. (2022) [https://arxiv.org/abs/2204.04875], dramatically changes the search paradigm. Instead of solving an optimization for every new dataset, one trains a neural network \(g_\phi\) that takes dataset statistics (e.g., a sample covariance or more expressive summary) and outputs candidate adjacency matrices. The training dataset consists of many simulated SCMs \((\mathcal{G}^{(k)}, \mathcal{D}^{(k)})\), and the loss penalizes deviations from the true graph, for example via the structural Hamming distance (SHD) between the predicted adjacency matrix \(A^{(k)}_\phi\) and the ground-truth matrix \(A^{(k)}\). The training objective is
+
 \[
 \mathcal{L}(\phi) = \sum_k \mathrm{SHD}\big(A^{(k)}_\phi, A^{(k)}\big) + \gamma\, h\big(A^{(k)}_\phi\big),
 \]
+
 where \(h(\cdot)\) enforces acyclicity. Because the network sees many graphs, it learns to amortize the search: inference on a new dataset is a single forward pass through \(g_\phi\), which is orders of magnitude faster than iterating over conditional independence tests or gradient-based graph search. Löwe et al. demonstrate that such amortized graph inference generalizes across structural motifs and can incorporate interventional examples by feeding intervention masks into the summary.
 
 Time series causal discovery introduces temporal structure and non-stationarity. Zhu et al. (2025) [https://arxiv.org/abs/2207.05259] exploits transformer attention matrices to read out Granger causal graphs in non-stationary environments. The key idea is to treat each attention head’s weights as soft adjacency estimates between time-lagged embeddings: for tokens \(t\) and \(s\), the attention score \(a_{ts}\) quantifies how much information flows from \(X_s\) to \(X_t\). When the time series distribution shifts, a static Granger test fails, but an attention-based representation can track changes because it recomputes the adjacency per batch. Zhu et al. regularize the attention weights with a sparsity penalty and enforce temporal coherence by encouraging stability of attention patterns across sliding windows. The resulting graph extracts dynamic parent sets \(pa_t(i)\) that vary with time, and it identifies which tokens (past steps) truly Granger-cause future values even under changing regimes.

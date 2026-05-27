@@ -33,9 +33,11 @@ Where this concept appears: this page is the central node in the optimization ar
 ### From the Brachystochrone to discrete control
 
 The Brachystochrone illustrates the same geometric trade-offs we face when choosing optimizer steps. The time functional
+
 \[
 T[y] = \int_{x_0}^{x_1} \sqrt{\frac{1 + (y'(x))^2}{2g y(x)}}\,\mathrm{d}x,
 \]
+
 where \(y(x)\) is the height along the horizontal axis, \(y'(x)\) is its derivative, and \(g\) is gravitational acceleration, integrates the instantaneous time cost of a trajectory between \(x_0\) and \(x_1\). The numerator penalizes curvature—the steeper the slope, the more the numerator inflates—while the denominator rewards being low: a larger \(y(x)\) (i.e., greater drop) speeds the journey. The minimizer therefore does not follow a straight line; a short, steep initial drop reduces the denominator faster than the numerator grows, the same way an optimizer accepts a locally larger gradient if it aligns with a favorable geometry. The accumulated functional \(T[y]\) mirrors the cumulative cost in discrete optimization when we sum gradient-induced penalties over iterations.
 
 Converting this intuition into algorithmic updates requires control theory’s vocabulary. The control engineer tracks a state \(x(t)\) and a control \(u(t)\) such that \(\dot{x}(t) = f(x(t), u(t))\) and the performance index \(J = \int_0^T L(x(t), u(t))\,\mathrm{d}t\) is minimized. In deep learning the state \(x(t)\) becomes the parameter vector \(\theta\) evolving through parameter space, and the control \(u(t)\) is the optimizer’s preconditioning matrix or update vector. In Varaiya’s formulation, the Hamiltonian links the co-state (Lagrange multiplier) \(\lambda(t)\) to the dynamics, so the control law is implicitly a multiplier that ensures feasibility. Discrete optimizers like Adam, AdaFactor, and AdaMuon therefore inherit this idea: their preconditioners act as learned Lagrange multipliers, adjusting each coordinate’s step to satisfy both the loss descent direction and the manifold defined by the architecture’s constraints.
@@ -43,13 +45,17 @@ Converting this intuition into algorithmic updates requires control theory’s v
 ### Constraints, KKT, and infeasibility certificates
 
 Kuhn and Tucker’s Karush-Kuhn-Tucker conditions convert constrained programs into a Lagrangian whose stationary points respect the original feasibility.
+
 \[
 \min_\theta f(\theta)\quad\text{subject to } g_i(\theta) \leq 0,\quad h_j(\theta) = 0
 \]
+
 and
+
 \[
 L(\theta, \lambda, \nu) = f(\theta) + \sum_i \lambda_i g_i(\theta) + \sum_j \nu_j h_j(\theta),
 \]
+
 where \(f\) is the empirical loss, \(g_i\) and \(h_j\) are inequality and equality constraint functions respectively, \(\theta \in \mathbb{R}^n\) are the parameters, \(\lambda_i \geq 0\) are inequality multipliers, and \(\nu_j\) are equality multipliers. Stationarity \(\nabla_\theta L = 0\), primal feasibility \(g(\theta)\leq 0, h(\theta)=0\), dual feasibility \(\lambda \geq 0\), and complementary slackness \(\lambda_i g_i(\theta)=0\) ensure that every update respects the constraints. These conditions translate into per-parameter adaptivity when the constraints reflect normalization, spectral bounds, or trust regions: \(\lambda_i\) shrink updates that would violate bounds, while other coordinates remain free.
 
 Farkas’ lemma (Farkas 2009) [https://rutcor.rutgers.edu/~prekopa/FARKAS.pdf] supplies the infeasibility certificate: a vector \(y\) lies in the positive cone spanned by constraint normals if and only if a separating linear functional exists. In optimizer terms, if a gradient \(g\) points outside of the feasible cone, one can write \(g = A^\top \lambda\) with \(\lambda \geq 0\), allowing the multiplier vector \(\lambda\) to be interpreted as a scaling factor that tempers those offending components. The MINOS solver’s decomposition (Stanford SOL 1978) [http://stanford.edu/group/SOL/papers/minos-math-prog-1978.pdf] built linearizations that preserved this cone structure and solved reduced multipliers before updating primal variables, revealing the same structure now encoded implicitly inside clipping, projection, and penalty rules. Modern optimizers therefore integrate the KKT multipliers as learned statistics: moving along the gradient becomes a projection onto the feasible cone described by all constraints, and duality ensures that this projection is the shortest path, just like the Brachystochrone path is the shortest time.
@@ -59,15 +65,19 @@ This is the connection between continuous control and discrete optimization: the
 ### Parameterization adaptivity and Newton-Schulz orthogonalization
 
 The remaining link is making sure the optimizer tracks the parameterization scale from the architecture. A change of variables \(\theta \mapsto c\theta\) scales gradients by \(c\), so a fixed learning rate overshoots unless the optimizer re-scales per coordinate. Layer-wise adaptivity solves that via first and second moments: \(m_t\) tracks the decayed mean of gradients, \(v_t\) tracks the decayed mean of squared gradients, and a base learning rate \(\alpha_t\) orchestrates the step size.
+
 \[
 \theta_{t+1} = \theta_t - \alpha_t \frac{m_t}{\sqrt{v_t} + \epsilon},
 \]
+
 where \(\epsilon\) stabilizes division. This coordinate-wise projection works when curvature is diagonal but fails when Hessian eigenvectors rotate between layers, as in multi-head attention or long MLP stacks.
 
 AdaMuon (Lim et al. 2025) [https://arxiv.org/abs/2507.11005] adds an orthogonal correction inspired by the Newton-Schulz iteration. Starting with an unnormalized update matrix \(U\) that fuses momentum \(m_t\) and covariance information, the iteration
+
 \[
 Q_{k+1} = \frac{1}{2} Q_k (3I - Q_k^\top Q_k),
 \]
+
 with \(Q_0 = U\), converges to an orthogonal matrix \(Q_k \in O(n)\); here \(I\) is the identity and each step contracts toward the Stiefel manifold. \(Q_k\) thus approximates a geodesic on the parameter manifold. AdaMuon mixes the adaptive vector \(\frac{m_t}{\sqrt{v_t} + \epsilon}\) with the orthogonal projection \(Q_k\) so that updates preserve both local scaling (via adaptivity) and global directional stability (via orthogonality). This dual effect keeps billion-parameter models from blowing up: adaptive scaling handles magnitude disparities, while the orthogonal projection prevents twisty, constraint-violating directions from accumulating energy.
 
 Varaiya’s control perspective justifies why this combination works: the Newton-Schulz step enforces conservation of invariants much like Pontryagin constrains the control law to a Hamiltonian level set. When the parameterization changes—say by normalizing kernels—the orthogonal factor realigns with the new geometry, while the adaptivity rescales to the coordinate sensitivity measured by \(v_t\). This is the geometric insight that the Build section distills into code: instead of trusting AdamW’s fixed preconditioner we compute the Muon correction (Newton-Schulz orthogonal factor), stay within the feasible cone from KKT, and monitor the resulting loss trajectory on a synthetic dataset.

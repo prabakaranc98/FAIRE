@@ -29,21 +29,27 @@ To do this without intractable integrals we rely on approximations. The classic 
 ### From deterministic weights to predictive distributions
 
 Every neural network defines a conditional distribution \(p(y \mid x, w)\) for input \(x\) and output \(y\) once we fix weights \(w\). A BNN wraps that conditional with a prior and a posterior to describe the full data-generating process:
+
 \[
 p(y \mid x, D) = \int p(y \mid x, w)\,p(w \mid D)\,dw.
 \]
+
 Here \(p(y \mid x, D)\) is the predictive distribution we actually need, \(p(y \mid x, w)\) is the likelihood parameterized by weight instantiations \(w\), and \(p(w \mid D)\) is the posterior given dataset \(D\). Computing this integral exactly is impossible for deep nets, so we replace the posterior with an approximation \(q_\theta(w)\). Each prediction becomes
+
 \[
 p(y \mid x, D) \approx \mathbb{E}_{w \sim q_\theta(w)}[p(y \mid x, w)],
 \]
+
 which means the model propagates its own weight uncertainty into every downstream decision—uncertainty in \(q_\theta\) manifests as spread in the predictive probability vector.
 
 ### Learning the surrogate via Bayes by Backprop
 
 Blundell et al. (2015) [arXiv:1505.05424] introduced Bayes by Backprop to turn this idea into tractable optimization. The algorithm posits a fully factorized Gaussian \(q_\theta(w)=\mathcal{N}(w \mid \mu, \sigma^2)\) for every weight and maximizes the evidence lower bound (ELBO)
+
 \[
 \mathcal{L}(\theta) = \mathbb{E}_{w\sim q_\theta(w)}[\log p(D \mid w)] - \mathrm{KL}(q_\theta(w) \,\|\, p(w)),
 \]
+
 where \(\log p(D\mid w)\) is the log-likelihood for data \(D\) under weights \(w\), and \(\mathrm{KL}(\cdot\|\cdot)\) penalizes deviation from the prior \(p(w)\). The first term encourages likelihood fit, and the second enforces the prior; when the prior is a zero-mean Gaussian with variance \(\sigma_p^2\), the KL term penalizes large means and variances in \(\mu\) and \(\sigma\) respectively.
 
 Maximizing \(\mathcal{L}(\theta)\) with standard stochastic gradient descent is possible because Bayes by Backprop uses the reparameterization trick: draw \(\epsilon \sim \mathcal{N}(0, I)\) and set \(w = \mu + \sigma \odot \epsilon\), so gradients propagate through \(\mu\) and \(\sigma\). Each mini-batch update simulates a fresh weight sample while the same \(\mu\) and \(\sigma\) accumulate gradient information. The algorithm maintains a posterior belief across the entire weight space instead of converging to a Dirac delta. When the dataset contains ambiguous examples, the learned variance terms \(\sigma\) enlarge, signaling epistemic uncertainty back to the predictive distribution.
@@ -55,17 +61,21 @@ Temporal data adds another layer of complexity, because the same weight matrix i
 ### Bayesian dark knowledge and the student-teacher handshake
 
 Another place BNNs shine is in distillation. Whereas standard distillation teaches a student to mimic a teacher’s point estimate, Bayesian Dark Knowledge (Hinton et al. 2015) [arXiv:1506.04416] trains the student on the teacher’s posterior predictive distribution instead of its logits. The teacher itself can be a BNN, so the student learns both the mean and the spread of the teacher’s beliefs. This has two consequences: first, the student inherits better-calibrated uncertainty than it would by regressing on hard labels, and second, the student can be deterministic (and cheaper to deploy) while still capturing essential probabilistic information. In the distillation phase the objective is again an expectation over \(q_\theta(w)\), but the target becomes the teacher’s predictive distribution, which may be computed as
+
 \[
 q_{\text{teacher}}(y \mid x) = \frac{1}{S} \sum_{s=1}^S p(y \mid x, w^{(s)}),\qquad w^{(s)}\sim q_{\text{teacher}}(w),
 \]
+
 where the \(w^{(s)}\) are samples from the teacher. The student minimizes the cross-entropy between its own predictive distribution and \(q_{\text{teacher}}\), so it learns to reproduce the shape of uncertainty, not just the most frequent class.
 
 ### Dropout as a scalable approximation
 
 For larger models, directly storing \(\mu\) and \(\sigma\) for each weight becomes memory intensive, which is why researchers embraced dropout as a practical Bayesian approximation. Gal and Ghahramani (2016) [arXiv:1506.02142] showed that applying dropout at every layer during both training and inference is equivalent to sampling from a mixture of models, which approximates a Gaussian process prior on the output. Each dropout mask corresponds to a weight sample \(w\), and ensembles of forward passes through the dropout layer estimate posterior predictive statistics. This insight makes it possible to estimate epistemic uncertainty with standard architectures and small overhead: call the network \(T\) times with different dropout masks during inference, collect the logits \(f_t(x)\), and compute the predictive variance
+
 \[
 \text{Var}(f(x)) \approx \frac{1}{T} \sum_t f_t(x)^2 - \left(\frac{1}{T}\sum_t f_t(x)\right)^2.
 \]
+
 The same reasoning is used, for example, in [the 2017 arXiv preprint (Untitled, arXiv:1710.04759v1)](http://arxiv.org/pdf/1710.04759v1), which provides a collection of dropout-based baselines and open-source code to benchmark calibration on vision tasks. The dropout approximation trades some posterior fidelity for scalability, but it is often a better choice than point estimates when you need to quantify whether a prediction is trustworthy.
 
 ### Practical failure modes

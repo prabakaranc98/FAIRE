@@ -27,17 +27,21 @@ Historically the story began with centralized parameter servers. DistBelief intr
 ## How it works
 
 Every step’s wall-clock time for a data-parallel model with \(p\) workers is
+
 \[
 T_{\text{step}} = T_{\text{comp}} + T_{\text{comm}}.
 \]
+
 Here \(T_{\text{comp}}\) is the time each device spends computing gradients for its local mini-batch and performing the optimizer update, and \(T_{\text{comm}}\) is the time spent exchanging those gradients or updated parameters over the network fabric. When \(p\) increases, \(T_{\text{comp}}\) stays roughly constant (the batch per worker shrinks), but \(T_{\text{comm}}\) tends to grow unless the network protocol keeps the per-worker bandwidth cost and latency cost in check. The distributed-training challenge reduces to keeping \(T_{\text{comm}} \ll T_{\text{comp}}\) even as \(p\) grows.
 
 ### Parameter servers and asynchronous SGD
 
 DistBelief’s parameter server kept a centralized copy of every weight. Each worker read the latest parameters, computed gradients on its shard of data, then pushed the gradients back. Because the server serialized access, the communication cost seen by any worker was
+
 \[
 T_{\text{comm}}^{\text{ps}} \approx \alpha + \beta n,
 \]
+
 where \(\alpha\) is the latency to initiate a message, \(\beta\) is the inverse bandwidth, and \(n\) is the number of bytes in the worker’s gradient block. This cost does not shrink with \(p\), so scaling to hundreds of workers amplifies the ratio of network bytes to useful work unless the system splits the parameter matrix across multiple servers (sharding) and aggregates updates hierarchically. Asynchronous SGD allowed workers to move ahead without waiting; Tsitsiklis et al. (1986) [https://www.mit.edu/~jnt/Papers/J014-86-asyn-grad.pdf] showed convergence still held under bounded staleness if the learning rate decayed gracefully.
 
 The trade-off came through loose consistency. Every optimizer step had to tolerate gradients that might be several iterations stale, which meant extra noise persisted even if the compute nodes were fast. In practice, parameter servers pushed the communication latency into the optimizer loop, making hyperparameter tuning more fragile. This tension is precisely why modern workloads started returning to synchronous protocols that guarantee every worker sees the same gradients before stepping. The remaining question became how to shape those synchronous collectives so \(T_{\text{comm}}\) stays lean.
@@ -45,9 +49,11 @@ The trade-off came through loose consistency. Every optimizer step had to tolera
 ### Ring AllReduce, bucketization, and alpha–beta dynamics
 
 Synchronous collective algorithms require every worker to participate in aggregation. A centralized gather-and-broadcast costs \(\mathcal{O}(p)\) messages at the master node, flooding one machine with bandwidth requirements. Horovod’s Ring AllReduce (Sergeev & Del Balso 2018) organizes the workers into a logical ring and circulates the gradients, avoiding the master bottleneck. The time per aggregation becomes
+
 \[
 T_{\text{allreduce}} = \alpha (p - 1) + \beta \frac{n}{p},
 \]
+
 because each worker performs \(p - 1\) peer-to-peer transfers (the first term) and sends/receives \(n/p\) bytes through the ring (the second term). The total volume is \(2n\) because every byte traverses the ring twice. When the network topology is uniform, the scheme reaches bandwidth optimality.
 
 Krizhevsky’s “one weird trick” anticipated this by showing that fusing gradients into large buckets sized to match the NIC’s maximum transmission unit (MTU) saturates the interconnect instead of sending thousands of micro-messages. The bucket size parameter directly enters the cost model: if each bucket contains \(b\) bytes, then the latency term becomes \(\alpha (p - 1)\) per bucket, so using fewer, larger buckets reduces the apparent latency cost by lowering the number of collective calls. PyTorch’s DistributedDataParallel (DDP) now assigns gradients to buckets around the bucket_size_mb setting, overlaps bucket communication with backward computation, and triggers NCCL’s fused kernels. This overlapping means the aggregate latency \(\alpha\)-term is amortized over the bucket, while the bandwidth cost \(\beta (n/p)\) is metered by NCCL’s pipelined reduce-scatter and all-gather.
@@ -57,9 +63,11 @@ Taking a step back, the cost model reveals why synchronous collectives replaced 
 ### Sharding, ZeRO, and Fully Sharded Data Parallel (FSDP)
 
 As models grew beyond 10 billion parameters, even the memory needed for optimizer states dominated device memory. ZeRO (Rajbhandari et al. 2020) [https://arxiv.org/abs/1910.02054] splits the optimizer state, gradients, and parameters across devices so that each GPU stores only \(1/p\) of the total tensor. Zero Stage 3, the fully sharded optimizer, interleaves reduce-scatter and all-gather operations whose communication cost is
+
 \[
 T_{\text{zero3}} \approx \alpha (p - 1) + \beta\left(2 \frac{n}{p}\right),
 \]
+
 because every tensor participates in a reduce-scatter (sending \(n/p\) bytes per worker) and an all-gather (another \(n/p\) bytes). Compared to unsharded collectives where each worker handles \(n\) bytes, ZeRO’s sharding shrinks the bandwidth term \(\beta\) by \(p\) and keeps the latency term bounded by the number of stages in the bucketed collective.
 
 FSDP (Dettmers et al. 2021) [https://arxiv.org/abs/2104.04473] builds on this idea inside PyTorch: it shards each module’s parameters, gradients, and optimizer momenta, and it overlaps communication with computation. The key insight is that sharding reduces the ``\(n/p\)'' part in the cost model without altering \(\alpha\). FSDP now matches the latency and bandwidth usage expected in ZeRO Stage 3 and provably outperforms non-sharded DDP when \(n\) grows large. Collectively, ZeRO and FSDP demonstrate that one can tackle the bandwidth term at scale by slicing tensors instead of adding more network wires.

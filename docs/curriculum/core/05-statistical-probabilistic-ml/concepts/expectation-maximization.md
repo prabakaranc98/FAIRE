@@ -25,45 +25,59 @@ Latent-variable models recur whenever data carries hidden structure: mixture com
 ## How it works
 
 The core mathematical insight is to pretend the data were fully observable, derive the complete-data log likelihood, and then rewrite the marginal likelihood so that expectations over the missing data appear transparently. Let the observed data be \(\mathcal{X} = \{x^{(n)}\}_{n=1}^N\), the latent assignments be \(Z = \{z^{(n)}\}_{n=1}^N\), and the parameters be \(\theta\). The marginal log likelihood is
+
 \[
 \log p(\mathcal{X} \mid \theta) = \log \sum_Z p(\mathcal{X}, Z \mid \theta),
 \]
+
 where \(\mathcal{X}\) is the observed dataset, \(Z\) is the missing label configuration, and \(\theta\) parameterizes the joint model.
 
 Direct maximization is hard because the sum over \(Z\) ties all latent assignments together. EM avoids summing by introducing a variational distribution \(q(Z)\) and now writing
+
 \[
 \log p(\mathcal{X} \mid \theta) = \mathbb{E}_{q}[\log p(\mathcal{X}, Z \mid \theta)] - \mathbb{E}_{q}[\log q(Z)] + \mathrm{KL}(q(Z) \,\|\, p(Z \mid \mathcal{X}, \theta)).
 \]
+
 In this decomposition, the first term is the complete-data log likelihood averaged under \(q\), the second is the entropy of \(q\), and the third is the Kullback-Leibler divergence between \(q\) and the true posterior \(p(Z \mid \mathcal{X}, \theta)\). This identity shows that maximizing the marginal likelihood is equivalent to maximizing the evidence lower bound (ELBO)
+
 \[
 \mathcal{L}(q, \theta) = \mathbb{E}_{q}[\log p(\mathcal{X}, Z \mid \theta)] + \mathcal{H}(q),
 \]
+
 where \(\mathcal{H}(q)\) is the entropy of \(q\). (Neal and Hinton (1998) [http://www.cs.toronto.edu/~hinton/absps/emk.pdf] reinterpreted EM precisely as coordinate ascent on this free-energy, justifying the convergence guarantees even when you update \(q\) or \(\theta\) incrementally or sparsely.) Value of EM comes from the fact that one can alternate between optimizing \(q\) with \(\theta\) fixed and optimizing \(\theta\) with \(q\) fixed, and each step increases \(\mathcal{L}(q, \theta)\), thereby ascending the marginal likelihood while never computing the posterior normalization constant.
 
 ### The E-step: expectation of the complete-data log likelihood
 
 During the E-step we let \(q(Z) = p(Z \mid \mathcal{X}, \theta^{(t)})\) be the exact posterior under the current parameters \(\theta^{(t)}\). The \(Q\)-function is defined as
+
 \[
 Q(\theta \mid \theta^{(t)}) = \mathbb{E}_{Z \sim p(Z \mid \mathcal{X}, \theta^{(t)})}[\log p(\mathcal{X}, Z \mid \theta)],
 \]
+
 where \(Q(\cdot \mid \theta^{(t)})\) is the expected complete-data log likelihood and the expectation is taken over the true posterior with parameters \(\theta^{(t)}\). In this step, we “fill in” the missing assignments with their posterior probabilities under the current guess. Because the posterior depends on \(\theta^{(t)}\) only, this expectation is tractable whenever \(\log p(\mathcal{X}, Z \mid \theta)\) has a conjugate form with respect to the latent variables.
 
 For a GMM with \(K\) Gaussian components, let \(x^{(n)} \in \mathbb{R}^D\), the component mean \(\boldsymbol{\mu}_k \in \mathbb{R}^D\), covariance \(\mathbf{\Sigma}_k \in \mathbb{R}^{D \times D}\), and mixing proportions \(\pi_k\). The complete-data likelihood is
+
 \[
 p(x^{(n)}, z^{(n)} \mid \theta) = \prod_{k=1}^K [\pi_k \mathcal{N}(x^{(n)}; \boldsymbol{\mu}_k, \mathbf{\Sigma}_k)]^{\mathbb{I}[z^{(n)} = k]},
 \]
+
 where \(\mathbb{I}[\cdot]\) is the indicator function, and \(\theta = \{\pi_k, \boldsymbol{\mu}_k, \mathbf{\Sigma}_k\}_{k=1}^K\). The posterior responsibility of component \(k\) for data point \(x^{(n)}\) is
+
 \[
 r_k^{(n)} = p(z^{(n)} = k \mid x^{(n)}, \theta^{(t)}) = \frac{\pi_k^{(t)} \mathcal{N}(x^{(n)}; \boldsymbol{\mu}_k^{(t)}, \mathbf{\Sigma}_k^{(t)})}{\sum_{j=1}^K \pi_j^{(t)} \mathcal{N}(x^{(n)}; \boldsymbol{\mu}_j^{(t)}, \mathbf{\Sigma}_j^{(t)})}.
 \]
+
 This is the only step where the latent variables appear explicitly: EM computes soft assignments (responsibilities) rather than hard labels.
 
 ### The M-step: maximizing parameters with soft labels
 
 With responsibilities \(r_k^{(n)}\) fixed, the M-step maximizes \(Q(\theta \mid \theta^{(t)})\) with respect to \(\theta\). Because \(Q\) factorizes over components and the complete-data log likelihood is quadratic in the Gaussian parameters, the updates have closed-forms:
+
 \[
 \pi_k^{(t+1)} = \frac{1}{N} \sum_{n=1}^N r_k^{(n)}, \qquad \boldsymbol{\mu}_k^{(t+1)} = \frac{\sum_{n=1}^N r_k^{(n)} x^{(n)}}{\sum_{n=1}^N r_k^{(n)}}, \qquad \mathbf{\Sigma}_k^{(t+1)} = \frac{\sum_{n=1}^N r_k^{(n)}(x^{(n)} - \boldsymbol{\mu}_k^{(t+1)})(x^{(n)} - \boldsymbol{\mu}_k^{(t+1)})^\top}{\sum_{n=1}^N r_k^{(n)}}.
 \]
+
 Each sum is weighted by the responsibilities, turning the E-step posterior into soft sufficient statistics. This looks identical to the maximum likelihood estimates for fully labeled data, except that each data point is fractionally assigned across components instead of deterministically assigned.
 
 EM therefore becomes the repeated execution of these two steps: compute soft labels from the current parameters, then recompute parameters from the soft labels. The monotonic increase in \(\mathcal{L}(q, \theta)\) is immediate: holding \(\theta^{(t)}\) fixed, the E-step chooses \(q\) to minimize the KL divergence term, and holding \(q\) fixed, the M-step maximizes the expected complete-data likelihood. This coordinate-ascent view explains why even non-convex families like GMMs or HMMs have the familiar plateau-then-convergence behavior: each iteration can only improve the surrogate objective or leave it unchanged, so the algorithm settles in a stationary point, which was the main convergence claim of Dempster et al. (1977) [https://web.mit.edu/6.435/www/Dempster77.pdf and https://www.ece.iastate.edu/~namrata/EE527_Spring08/Dempster77.pdf].

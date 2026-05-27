@@ -25,6 +25,7 @@ The field’s core question has remained almost unchanged since “An Essay towa
 ## How it works
 
 Bayesian inference rewrites estimation as the iterative update of a distribution. The canonical formula is
+
 \[
 p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D} \mid \theta) p(\theta)}{\int p(\mathcal{D} \mid \theta') p(\theta') d\theta'}.
 \]
@@ -36,6 +37,7 @@ Carrying that denominator forward is what makes exact inference expensive, so th
 ### Variational inference and stochastic gradients
 
 In variational inference, we posit a family \(\mathcal{Q}\) of distributions and minimize the Kullback-Leibler divergence from \(q(\theta)\) to the true posterior. Practically we maximize the evidence lower bound (ELBO)
+
 \[
 \mathcal{L}(q) = \mathbb{E}_{q(\theta)}\left[\log p(\mathcal{D}, \theta) - \log q(\theta)\right]
 \]
@@ -49,9 +51,11 @@ The step from SVI to production-grade training involves more than minibatches: i
 ### Kernel Bayes’ rule for nonparametric posteriors
 
 When likelihoods are not easily specified but we can sample from generative simulators or streams, we can still apply Bayes via embeddings. Kernel Bayes’ Rule (Fukumizu et al. 2013) [https://jmlr.csail.mit.edu/papers/volume14/fukumizu13a/fukumizu13a.pdf] lifts priors and likelihoods into reproducing kernel Hilbert spaces and performs the multiplication there. The core idea is that the conditional embedding \(C_{Y|X}\) satisfies
+
 \[
 \mu_{Y \mid x} = C_{Y X} C_{XX}^{-1} \phi(x)
 \]
+
 where \(C_{Y X}\) and \(C_{XX}\) are cross-covariance operators in the RKHS, \(\phi(x)\) is the feature map of \(x\), and \(\mu_{Y \mid x}\) is the embedded conditional distribution. Estimating these operators from samples and multiplying them is computationally cheaper than performing likelihood evaluations, yet it captures nonparametric structure because the feature map can be any universal kernel. Kernelized Bayes is therefore a way of updating beliefs when the modeler does not trust parametric likelihoods, which keeps the “foggy” prediction alive even when only complex simulators or high-dimensional summaries are available. This is especially relevant for systems like the brain, which avoid explicit likelihood functions: Doya (2007) [arxiv:0402205](https://bayes.wustl.edu/etj/articles/how.does.the.brain.orig.pdf) describes neural circuitry as performing approximate Bayesian updates through recurrent loops and gain modulation, akin to kernelized inference in biological feature spaces.
 
 ### Composing priors, likelihoods, and heteroscedastic noise

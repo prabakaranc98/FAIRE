@@ -29,33 +29,43 @@ The Bayesian optimization loop alternates between fitting a surrogate to past ob
 ### Acquisition functions for multi-objective, constrained problems
 
 When we have \(m\) objectives \(f_1, \dots, f_m\), the goal becomes to discover the Pareto front \(P\) rather than a single optimum. The Expected Hypervolume Improvement (EHVI) acquisition function estimates, for each candidate \(x\), how much the hypervolume dominated by the Pareto front will grow if we observe \(f(x)\). Let \(\mathbf{r} \in \mathbb{R}^m\) be a reference point that is worse than the current Pareto approximations. The EHVI for \(x\) can be written as
+
 \[
 \mathrm{EHVI}(x) = \mathbb{E}_{\mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}_n(x), \Sigma_n(x))}\big[ \max\{0, \mathrm{HV}(\mathcal{P} \cup \{\mathbf{f}\}) - \mathrm{HV}(\mathcal{P})\}\big],
 \]
+
 where \(\boldsymbol{\mu}_n(x)\) and \(\Sigma_n(x)\) are the GP predictive mean vector and covariance matrix across objectives at \(x\), \(\mathcal{P}\) is the current Pareto set, and \(\mathrm{HV}(\cdot)\) computes the hypervolume dominated by a set. The expectation above averages over the multivariate normal capturing the surrogate’s uncertainty, ensuring we keep exploring regions that could expand the Pareto front. EHVI thereby outperforms naïve scalarization in low-data regimes by explicitly reasoning about the nondominated set, which is why the molecule-centric benchmark in *Bayesian Optimization for Molecules Should Be Pareto-Aware* (Raman et al. 2025) [arxiv:2507.13704](https://arxiv.org/abs/2507.13704) shows consistent gains when EHVI is used instead of linear objectives.
 
 Constraints enter the acquisition in a similar probabilistic way. When a constraint \(c(x)\) must remain below zero, we maintain a GP posterior over \(c\) and integrate it into the acquisition as a feasibility probability. For example, a constrained EI may take the form
+
 \[
 a(x) = \mathrm{EI}(x) \cdot \mathbb{P}(c(x) \leq 0 \mid \mathcal{D}_n),
 \]
+
 where \(\mathcal{D}_n\) denotes the data gathered so far. When the constraints are noisy or safety-critical, we prefer to downweight \(x\) where the posterior probability of feasibility is low, following the recipe from *Constrained Bayesian Optimization with Noisy Experiments* (Facebook AI Research 2024) [https://ai.meta.com/research/constrained-bayesian-optimization-with-noisy-experiments](https://ai.meta.com/research/constrained-bayesian-optimization-with-noisy-experiments). Their framework also emphasizes asynchronous batch evaluations and robust estimates of the feasibility probability under heavy-tailed noise, which matters in real labs where measurement error often deviates from a Gaussian.
 
 Risk-sensitive objectives such as Conditional Value at Risk (CVaR) further complicate acquisition because they depend on tails of the distribution. Instead of optimizing the mean, we can define the posterior predictive CVaR at level \(\alpha\) as
+
 \[
 \mathrm{CVaR}_\alpha(x) = \mathbb{E}[f(x) \mid f(x) \geq q_\alpha(x)],
 \]
+
 where \(q_\alpha(x)\) is the \(\alpha\)-quantile of the surrogate’s predictive distribution. The acquisition function then targets points that reduce the CVaR, ensuring the worst-case outcomes are manageable. *Bayesian Optimization for CVaR-based portfolio optimization* (Page et al. 2025) [arxiv:2503.17737](https://arxiv.org/abs/2503.17737) builds this idea into a constrained acquisition that analogously integrates risk measures into multi-objective selection, making it possible to keep both expected reward and tail loss under control.
 
 ### Entropic regularization and variational inference for surrogate modeling
 
 Fitting the surrogate, especially when we move beyond Gaussian processes to, say, sparse, distributed, or deep surrogates, requires solving an inference problem. Variational inference provides a tractable approximation by minimizing the Kullback–Leibler divergence between the true posterior \(p(\theta \mid \mathcal{D}_n)\) and a parameterized mean-field distribution \(q_\phi(\theta)\). The objective is the Evidence Lower Bound (ELBO):
+
 \[
 \mathcal{L}(\phi) = \mathbb{E}_{q_\phi(\theta)}[\log p(\mathcal{D}_n \mid \theta)] - \mathrm{KL}(q_\phi(\theta) \| p(\theta)),
 \]
+
 where \(\theta\) is the surrogate’s parameter vector. *Extending Mean-Field Variational Inference via Entropic Regularization: Theory* (Li et al. 2024) [arxiv:2404.09113](https://arxiv.org/pdf/2404.09113) observes that adding an entropy term to the ELBO faster disperses the surrogate’s belief when data are scarce and that this entropy serves the same purpose as exploration in the acquisition function. The regularized ELBO becomes
+
 \[
 \mathcal{L}_{\text{ent}}(\phi) = \mathcal{L}(\phi) + \lambda \mathbb{H}[q_\phi],
 \]
+
 where \(\mathbb{H}[q_\phi]\) is the Shannon entropy and \(\lambda > 0\) balances exploration in parameter space. In practice, the entropy regularization prevents the surrogate from collapsing to overconfident predictions that would suppress exploration, which is especially important when constrained or Pareto-aware acquisition functions rely on accurate uncertainty estimates.
 
 Building on this, the 2026 preprints [arxiv:2602.05873](https://arxiv.org/pdf/2602.05873) and [arxiv:2603.08925v1](https://arxiv.org/pdf/2603.08925v1) examine how entropically regularized variational families and auxiliary flows behave when we continuously update the surrogate with new data. They emphasize that maintaining a temperature schedule on the entropy term ties directly to acquisition temperature: a hotter surrogate encourages broader exploration and a colder one more exploitation. The hierarchical nature of Bayesian optimization—where the acquisition’s expectation is itself an integral over the surrogate’s posterior—invites multi-level variational methods. The sample continuation ideas in [arxiv:2604.15469](https://arxiv.org/abs/2604.15469) show that propagating samples through intermediate surrogate updates can reduce variance when we evaluate acquisition gradients for high-dimensional inputs. These works collectively push the surrogate from a static GP toward a dynamic belief model that adapts both mean and uncertainty as new constraints and risk preferences arrive, making acquisition optimization more robust.
@@ -63,9 +73,11 @@ Building on this, the 2026 preprints [arxiv:2602.05873](https://arxiv.org/pdf/26
 ### Acquisition optimization, batch selection, and practical implementation
 
 Finding the maximizer of \(a(x)\) is an inner optimization problem that itself requires care. Often \(a(x)\) is non-convex, multimodal, and expensive to evaluate because it contains expectations over the surrogate. Gradient-based optimizers with automatic differentiation (the default in BoTorch and GPyTorch) are the practical standard. Let \(x\) be parameterized through a vector \(z\) and \(x = \phi(z)\) where \(\phi\) handles any constraints via differentiable transforms (sigmoid for bounds, softmax for probabilities). We compute gradients \(\nabla_z a(\phi(z))\) via the reparameterization trick when \(a(x)\) involves expectations of Gaussian random variables:
+
 \[
 \mathbb{E}_{\mathbf{f} \sim \mathcal{N}(\boldsymbol{\mu}, \Sigma)}[g(\mathbf{f})] = \mathbb{E}_{\epsilon \sim \mathcal{N}(0, I)}[g(\boldsymbol{\mu} + L \epsilon)],
 \]
+
 where \(L\) is the Cholesky factor of \(\Sigma\). The reparameterization ensures gradients flow through both the mean \(\boldsymbol{\mu}\) and covariance \(\Sigma\), which is critical when acquisition functions like EHVI or CVaR involve the covariance across multiple objectives.
 
 Batch selection (parallel evaluation of several candidates) is handled via fantasy models: we temporarily "hallucinate" observations at the selected points and update the surrogate to account for those futures, ensuring the later points in the batch do not collapse onto previously chosen ones. BoTorch supports this through joint acquisition functions, and GPyTorch’s lazy tensors keep the updated covariance efficient even for hundreds of hallucinatory points. The overall workflow is thus: fit the surrogate via variational inference (possibly with entropic regularization), sample hyper-latent variables to approximate the acquisition expectation, optimize \(a(x)\) via gradients, query the true oracle (lab) at the selected points, and update the surrogate with the new noisy measurements.

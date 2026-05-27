@@ -29,17 +29,23 @@ The critical insight, found in Ioffe & Szegedy (2015) [arxiv:1502.03167](https:/
 ### From mini-batch statistics to normalized activations
 
 Every forward pass computes the mean and variance of a layer’s pre-activation vectors across the current mini-batch. Let \(x_i\) be the activation vector of the \(i\)-th sample in the current mini-batch of size \(m\). The mini-batch mean 
+
 \[
 \mu_{\mathcal{B}} = \frac{1}{m} \sum_{i=1}^{m} x_i
 \]
+
 where \(\mu_{\mathcal{B}}\) is the mini-batch mean vector, \(m\) is the mini-batch size (number of samples in the current batch), and \(\sum\) denotes summation across those samples. The batch variance is
+
 \[
 \sigma_{\mathcal{B}}^2 = \frac{1}{m} \sum_{i=1}^{m} (x_i - \mu_{\mathcal{B}})^2
 \]
+
 where \(\sigma_{\mathcal{B}}^2\) is the mini-batch variance vector. Normalization rescales each activation to unit variance by computing
+
 \[
 \hat{x}_i = \frac{x_i - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}
 \]
+
 where \(\hat{x}_i\) is the normalized activation vector, and \(\epsilon\) is a small constant that prevents division by zero. This operation centers the statistics so that each dimension has zero mean and unit variance within the mini-batch, which is differentiable because both \(\mu_{\mathcal{B}}\) and \(\sigma_{\mathcal{B}}^2\) are computed via sums and squares—operations whose derivatives are straightforward and manageable.
 
 Training computes gradients through the normalization by applying the chain rule twice: first for the subtraction of the mean and then for the division by the standard deviation. The result is that the gradient with respect to \(x_i\) depends not only on that sample but on every sample in the batch, which is why the “batch” qualifier is critical. This coupling introduces a subtle trade-off: the normalized activation loses some sample-level expressivity because its distribution is partially determined by neighbors, yet the loss surface becomes smoother and much less sensitive to the scale of the weights.
@@ -47,9 +53,11 @@ Training computes gradients through the normalization by applying the chain rule
 ### Learned scaling, shifting, and gradient smoothing
 
 Normalization itself would force every layer to output zero-mean, unit-variance activations permanently, which would limit what the layer can represent. Batch normalization therefore includes learnable scale and shift parameters, \(\gamma\) and \(\beta\), so the network can reintroduce magnitude and bias:
+
 \[
 y_i = \gamma \hat{x}_i + \beta.
 \]
+
 Here \(\gamma\) is a gating parameter that rescales each feature dimension, and \(\beta\) is a bias that shifts the mean back when convenient. These parameters are shared across the mini-batch and learnable via standard gradient descent. The presence of \(\gamma\) and \(\beta\) ensures that normalization is not a rigid constraint but a regularized prior that can be weakened when the optimization demands it.
 
 The normalized activations propagate gradients whose variance no longer explodes or vanishes as easily because the normalization operation removes the dependency of the gradient scale on the magnitude of the weights. In practice, this allows training to use learning rates an order of magnitude higher than without normalization, which is especially important in deep residual architectures where the gradient must traverse many layers. Ioffe & Szegedy (2015) [arxiv:1502.03167](https://arxiv.org/abs/1502.03167) observed that the smoothing effect lowers the Lipschitz constant of the network’s input-output mapping, making the optimization landscape behave more like a quadratic bowl near minima; this is what lets practitioners crank learning rates without divergence while still converging quickly.
@@ -57,15 +65,19 @@ The normalized activations propagate gradients whose variance no longer explodes
 ### Running statistics, momentum, and inference
 
 During training, the mini-batch statistics are available. During inference, there is no mini-batch, so the layer substitutes a running mean and variance that track a decayed average of the batch statistics:
+
 \[
 \text{running\_mean} \leftarrow \text{momentum} \cdot \text{running\_mean} + (1 - \text{momentum}) \cdot \mu_{\mathcal{B}}
 \]
+
 and similarly for running variance. The momentum hyperparameter controls how much weight the running statistic gives to the latest mini-batch versus the accumulated history; common defaults around 0.9 work well when batch statistics are stable.
 
 Switching between training and evaluation modes is critical because training uses mini-batch statistics, while evaluation uses the running averages:
+
 \[
 \text{if training: } \hat{x}_i = \frac{x_i - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}, \qquad \text{if eval: } \hat{x}_i = \frac{x_i - \text{running\_mean}}{\sqrt{\text{running\_var} + \epsilon}}.
 \]
+
 The boolean flag that toggles this behavior is why every PyTorch `BatchNorm2d` layer exposes a `training` argument, and why forgetting to call `model.eval()` during inference yields wildly wrong outputs. The running statistics themselves are not parameters but buffers—they participate in forward passes and are updated during training but are not part of the gradient computation, so they are typically excluded from optimizer state.
 
 ### Batch-dependence failure modes and fixes
@@ -73,9 +85,11 @@ The boolean flag that toggles this behavior is why every PyTorch `BatchNorm2d` l
 The dependence on mini-batch statistics becomes problematic as soon as mini-batches shrink, become non-i.i.d., or disappear entirely, because the normalization starts to reflect noise instead of signal. Layer normalization (Ba et al. 2016) [arxiv:1607.06450v1](https://arxiv.org/abs/1607.06450v1) was introduced precisely to bypass the batch axis: it computes the mean and variance per sample across the channel axis instead of across the batch axis, which keeps the normalization stable in recurrent or Transformer models where batch sizes can be one or the sequence length varies. This allows training sequential data without the batch-induced coupling that breaks temporal coherence.
 
 Batch renormalization (Ioffe 2017) [arxiv:1702.03275](https://arxiv.org/abs/1702.03275) patches the small-batch failure mode in a different way. It introduces correction terms \(r\) and \(d\) that limit how much a batch can deviate from the running statistics:
+
 \[
 \hat{x}_i = \frac{x_i - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}} \cdot r + d,
 \]
+
 where \(r = \frac{\sqrt{\text{running\_var} + \epsilon}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}\) and \(d = \frac{\text{running\_mean} - \mu_{\mathcal{B}}}{\sqrt{\sigma_{\mathcal{B}}^2 + \epsilon}}\). The terms \(r\) and \(d\) gradually ramp from neutral values of 1 and 0 to their clipped bounds, so initially the network leans on the stable running statistics while the batch statistics remain noisy. As training progresses, \(r\) and \(d\) are allowed to move toward their natural values, making the normalization robust to rapid changes in data distribution such as domain adaptation or very small per-device batch sizes.
 
 ### Failure modes manifest in gradients and in training curves

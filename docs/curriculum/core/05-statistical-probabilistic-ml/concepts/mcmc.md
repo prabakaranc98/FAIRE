@@ -29,9 +29,11 @@ The chain of ideas that make modern MCMC powerful starts with reinterpreting the
 ### Geometry-aware proposals
 
 Hamiltonian Monte Carlo treats the posterior target \(p(\theta) \propto \exp(-U(\theta))\) as a potential energy landscape, where \(U(\theta)\) is the negative log-density and \(\theta \in \mathbb{R}^d\) are the model parameters. Adding an auxiliary momentum \(r \sim \mathcal{N}(0, M)\), where \(M\) is a mass matrix, defines the joint distribution \(p(\theta, r) \propto \exp(-U(\theta) - \frac{1}{2} r^\top M^{-1} r)\). The Hamiltonian dynamics follow the ODE
+
 \[
 \frac{d\theta}{dt} = M^{-1} r, \qquad \frac{dr}{dt} = -\nabla_\theta U(\theta),
 \]
+
 where \(\nabla_\theta U(\theta)\) is the gradient of the potential and \(t\) is the fake time used to simulate the trajectory. The leapfrog integrator approximates these equations with steps of size \(\epsilon\) and \(L\) steps per proposal. The key property is reversibility and volume preservation: if the integrator is exact, the proposals lie on equipotential surfaces and only the proposal’s end-point needs a Metropolis correction. This means each gradient evaluation moves you far instead of inching around.
 
 Geodesic slice sampling (2025) [arxiv:2506.18630] generalizes this idea by constructing the sampler directly on the manifold defined by the level set \(U(\theta) = \text{const}\). Instead of simulating Hamiltonian trajectories in \(\mathbb{R}^d\), it solves a differential equation for the geodesic connecting two points on the constant-energy slice. The gradient \(\nabla_\theta U(\theta)\) then determines the direction of the geodesic through the Christoffel symbols of the induced metric, so the sampler adapts to local curvature even when the manifold bends sharply or becomes non-Euclidean. The sampler toggles between geodesic steps and slice updates, ensuring that each proposal respects the detailed balance even though it touches only a local patch of the manifold. This matters when the posterior has “banana-shaped” configurations, since the geodesic approximations keep you aligned with the curved valley instead of cutting across and paying a huge metropolis penalty.
@@ -39,9 +41,11 @@ Geodesic slice sampling (2025) [arxiv:2506.18630] generalizes this idea by const
 ### Gradient-budgeted evaluation
 
 Having a powerful sampler is only the first half of the story; we also need to know when the samples are trustworthy. Gelman and Cohn–Gordon (2024) introduced a standardized error metric that simultaneously tracks the sample mean error and the covariance error relative to a reference distribution, all normalized by the gradient budget consumed. Let \(\hat{\mu}\) and \(\hat{\Sigma}\) be the empirical mean and covariance from the chain after \(k\) gradient steps, and let \(\mu^\star,\Sigma^\star\) denote the reference values (obtainable by a high-precision long run). The standardized error is
+
 \[
 \text{SE}(k) = \frac{\|\hat{\mu} - \mu^\star\|_2}{\sqrt{\text{tr}(\Sigma^\star)}} + \frac{\|\hat{\Sigma} - \Sigma^\star\|_F}{\|\Sigma^\star\|_F},
 \]
+
 where \(\|\cdot\|_F\) is the Frobenius norm. Because both numerator terms are normalized by intrinsic scales, the metric is meaningful across different parameterizations, and the only “currency” that matters is how many gradients the sampler evaluated. This is why the field cares about the gradient-evaluation budget rather than raw iteration count.
 
 Gaussian processes illustrate why such normalized bounds are critical. The paper "Practical and Rigorous Uncertainty Bounds for Gaussian Process Regression" (2021) [arxiv:2105.02796] showed that the posterior variance depends on the reciprocal of the design matrix’s smallest eigenvalue, so any sampler that ignores this scaling will overestimate uncertainty in curved directions. The authors derive confidence bounds that tie directly to the RKHS norm of the posterior mean, which mirrors the standardized error idea: a gradient-aware sampler can drive shape errors down faster because it adjusts the proposal covariance to match the GP kernel’s anisotropy. Similarly, sparse variational Gaussian processes achieve pointwise uncertainty guarantees only when the inducing points align with the curvature of the log-likelihood (Pointwise uncertainty quantification for sparse variational Gaussian processes, 2023) [arxiv:2310.00097]. When an MCMC sampler approximates the posterior with a local Gaussian, the GP analysis tells us exactly where the sampler will struggle—at the sharp ridge where the variance can blow up and the gradient magnitude spikes.

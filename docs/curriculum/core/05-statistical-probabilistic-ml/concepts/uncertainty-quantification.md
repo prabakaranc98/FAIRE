@@ -27,9 +27,11 @@ In this applied setting, UQ plays a second, operational role: it is the “safe 
 ## How it works
 
 The foundation is the Gaussian process posterior, which tells us how to update beliefs about a latent function \(f\) after seeing data. Given \(N\) training pairs \((x_i, y_i)\), the prior \(f \sim \mathcal{GP}(0, k(\cdot, \cdot))\) with kernel \(k\) mixes with the likelihood \(y_i = f(x_i) + \epsilon_i\) where \(\epsilon_i \sim \mathcal{N}(0, \sigma_n^2)\). The classic predictive distribution for a new input \(x_*\) is 
+
 \[
 p(f_* \mid x_*, X, \mathbf{y}) = \mathcal{N}(m_*, \sigma_*^2),
 \]
+
 where \(m_* = k_*^\top (K + \sigma_n^2 I)^{-1} \mathbf{y}\) and \(\sigma_*^2 = k(x_*, x_*) - k_*^\top (K + \sigma_n^2 I)^{-1} k_*\).
 
 Here \(k_* = [k(x_*, x_i)]_{i=1}^N\) is the covariance vector between the test point and the training inputs, \(K\) is the \(N \times N\) covariance matrix, and \(I\) is the identity matrix. This expression is the “what I know” part: the predictive mean \(m_*\) is a weighted sum of observed targets, and the variance \(\sigma_*^2\) encodes how far \(x_*\) lies from the data manifold. The problem is the inversion of \(K + \sigma_n^2 I\), which costs \(O(N^3)\); large datasets require something faster, hence sparse approximations.
@@ -37,6 +39,7 @@ Here \(k_* = [k(x_*, x_i)]_{i=1}^N\) is the covariance vector between the test p
 ### Sparse variational GPs and heteroscedastic noise
 
 Sparse Variational Gaussian Processes (SVGPs) introduce \(M \ll N\) inducing points \(Z = \{z_j\}_{j=1}^M\) with corresponding inducing function values \(\mathbf{u}\). The variational distribution \(q(\mathbf{u}) = \mathcal{N}(\mathbf{m}, \mathbf{S})\) replaces the full posterior, and the ELBO to optimize becomes
+
 \[
 \mathcal{L}(q) = \sum_{i=1}^N \mathbb{E}_{q(f_i)}[\log p(y_i \mid f_i)] - \mathrm{KL}[q(\mathbf{u}) \,\|\, p(\mathbf{u})].
 \]

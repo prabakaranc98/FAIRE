@@ -35,9 +35,11 @@ To model the cost, consider the per-token latency \(L\) decomposed as \(L = L_\t
 FlashInfer (Ye et al. 2025) [arxiv:2501.01005](https://arxiv.org/abs/2501.01005) demonstrates that not all KV storage is created equal: some layers benefit from block-sparse layouts (for local attention) while others use dense tensors. The FlashInfer attention engine is JIT-compiled so that the same kernel can accept multiple memory formats, meaning the scheduler can move KV memory between dense and compressed representations without dropping into separate CUDA graphs. This heterogeneity means the optimizer must track the format, inferred reuse probability, and occupancy per cache block. It is insufficient to treat the KV cache as a uniform buffer; instead, we maintain metadata \(M\) where \(M_i = (f_i, r_i, s_i)\) summarizing format \(f_i\), reuse likelihood \(r_i\), and size \(s_i\) of block \(i\). This metadata shapes decisions about whether to evict block \(i\) or keep it resident.
 
 When block \(i\) is marked for eviction, we compute an eviction score:
+
 \[
 \text{score}_i = \alpha \cdot (1 - r_i) + \beta \cdot \frac{s_i}{S}
 \]
+
 where \(r_i\) is the normalized reuse probability estimated from past attention weights, \(s_i\) is the block size, \(S\) is the total cache size, and \(\alpha, \beta\) calibrate the relative importance of reuse vs. size. The system chooses the block with maximal \(\text{score}_i\) subject to SLO constraints, which is far more expressive than simple FIFO eviction.
 
 ### Workload-specific structures
@@ -47,25 +49,31 @@ PrefillOnly (Zhang et al. 2025) [arxiv:2503.01345](https://arxiv.org/abs/2503.01
 ### Heavy Hitter Oracle (H2O) cache eviction
 
 The core idea of our Build-it policy (H2O) is that only a few “heavy hitter” KV blocks—those that will contribute significantly to future attention—need to stay in the fast cache, while the rest can be compressed or spilled. To implement H2O, we predict the future attention weight for each block \(i\) using a small classifier \(g_\phi: \mathbb{R}^{d} \rightarrow [0, 1]\) trained on past attention patterns:
+
 \[
 g_\phi(h_i) = \sigma(W_\phi h_i + b_\phi)
 \]
+
 where \(h_i\) is the vector representation of block \(i\) (e.g., a projection of the key vectors), and \(\sigma\) is the sigmoid. The output approximates the probability the block will be among the top-\(k\) attended blocks in the next token. We call this probability the “stickiness.” The system selects blocks with high stickiness to remain resident, while low-stickiness blocks are candidates for eviction/compression. Crucially, we compute \(h_i\) incrementally using streaming attention weights to keep inference cost low. This oracle does not require retraining the base model; instead, it trains \(g_\phi\) online on logged attention scores (a few hundred tokens suffice).
 
 ### Scheduling and batching
 
 Apt-Serve (Lee et al. 2025) [arxiv:2504.03210](https://arxiv.org/abs/2504.03210) shows that the rigid first-come-first-served scheduling of classic queues is incompatible with dynamic cache availability. Instead, Apt-Serve proposes adaptive scheduling that considers each request’s cache demand. The scheduler maintains a priority queue where each request is scored by:
+
 \[
 \text{priority}_j = \gamma \cdot \text{remaining\_tokens}_j + \delta \cdot \text{cache\_hit\_ratio}_j
 \]
+
 Here \(\text{remaining\_tokens}_j\) is the number of tokens still to generate for request \(j\), and \(\text{cache\_hit\_ratio}_j\) is the fraction of its KV blocks already resident in the GPU. The server processes higher-priority requests first, which helps keep the cache warm for logical continuations (e.g., multi-step reasoning). The scheduler also exposes backpressure to the admission controller; if the cache pressure exceeds a threshold, new requests are delayed until low-priority KV blocks can be evicted safely without disrupting in-flight reasoning.
 
 ### Latency and coherence interplay
 
 Every eviction policy must answer: does removing a KV block break the model’s internal backtracking? Suppose tokens \(t_1\) and \(t_5\) have a strong cross-attention link, so tokens generated around \(t_5\) depend on the cached KV entries of \(t_1\). Evicting \(t_1\)’s block would require recomputing it from scratch, introducing latency spikes and possibly incoherent text. To guard against this, we enforce “dependency constraints” drawn from attention graphs recorded during the first pass through a block. We keep a soft dependency matrix \(D \in [0, 1]^{T \times T}\) where \(D_{i,j}\) captures how much token \(i\) attends to token \(j\). When evaluating a block for eviction, we ensure:
+
 \[
 \sum_{j: \text{block } j \text{ evicted}} D_{i,j} < \epsilon
 \]
+
 for all \(i\) still active in generation, with \(\epsilon\) a small tolerance. This constraint prevents high-attention edges from being severed, maintaining logical coherence even when blocks are compressed or spilled.
 
 ### Bringing it together

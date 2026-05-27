@@ -27,42 +27,52 @@ Do-calculus lies precisely between the structural causal models (SCMs) that desc
 The key to do-calculus is that the “do” operator is not a probability measure but a change to the structural equations. Removing “do” therefore requires showing that the post-intervention distribution agrees with an observational sub-expression. There are exactly three rules that were distilled from the graphical language in the early work on SCMs; they appear in Pearl’s early exposition of causal diagrams (Pearl 1995) and are carefully unpacked in the “Introduction to Judea Pearl’s Do-Calculus” notes (Pearl 2013) [arxiv:1305.5506]. Shpitser and Pearl’s technical report “Identification of Joint Interventional Distributions” (ftp://ftp.cs.ucla.edu/pub/stat_ser/r402.pdf) proved that these rules are complete, so if an effect is identifiable, the rules will reach it; their later revisit (Shpitser & Pearl 2012) [arxiv:1210.4852v1] provides alternative characterizations that emphasize algorithmic implementation. The rules are best understood as manipulations of the truncated factorization that defines interventions.
 
 When you intervene by setting \(X = x\), you create a mutilated graph \(G_{do(X)}\) where the edges into \(X\) are removed but all other edges remain. The truncated factorization of the interventional distribution is then
+
 \[
 P(V \setminus \{X\} \mid do(X = x)) = \prod_{Y \in V \setminus \{X\}} P(Y \mid \text{Pa}_G(Y))
 \]
+
 where \(\text{Pa}_G(Y)\) denotes the parents of \(Y\) in the original graph \(G\), and the product omits the factor for \(X\) because \(X\) is fixed by the intervention.
 This expression shows that interventions amount to evaluating the observational conditional distributions but in a graph where the parents of \(X\) no longer influence it. Do-calculus then provides rules to swap that mutilated graph with the original observational graph whenever certain conditional independences hold.
 
 ### Rule 1: removing a do when the intervention can be ignored
 
 Rule 1 allows you to drop the “do” when the variable you are intervening on is independent of the effect, given a conditioning set that d-separates them in the mutilated graph. Formally, if \(Y\) is d-separated from \(X\) by \(Z\) in \(G_{do(X)}\), then
+
 \[
 P(Y \mid do(X), Z) = P(Y \mid Z).
 \]
+
 Here \(Z\) does not contain descendants of \(X\) (because the mutilated graph removes the arrows into \(X\)). The intuition is that once the intervention disconnects \(X\) from \(Y\), the intervention no longer matters, and we can replace \(P(Y \mid do(X), Z)\) with the observational conditional \(P(Y \mid Z)\). This step is legal because the graphical d-separation encodes invariances that hold both before and after the intervention.
 
 ### Rule 2: exchanging do’s and observations
 
 Rule 2 swaps an intervention on \(X\) with an observation on another variable \(Z\) when a d-separation in the graph with the intervention on \(X\) but without \(Z\)’s incoming edges holds. Specifically, if \(Y\) is d-separated from \(X\) by \(Z\) in \(G_{do(X, Z)}\) and \(Z\) is not a descendant of \(X\) in the original graph, then
+
 \[
 P(Y \mid do(X), do(Z), W) = P(Y \mid do(X), Z, W)
 \]
+
 for any additional set \(W\). Rule 2 is what lets us substitute real, observable values for future interventions—if intervening on \(Z\) does not change the effect conditionally, then we can simply observe \(Z\) instead.
 
 ### Rule 3: inserting or deleting observations with interventions
 
 Rule 3 permits you to insert or remove observations from a “do” expression when a d-separation holds in the graph where both the intervention and the observation have been applied. If \(Y\) is d-separated from \(Z\) by \(X, W\) in \(G_{do(X)}\), then
+
 \[
 P(Y \mid do(X), Z, W) = P(Y \mid do(X), W).
 \]
+
 This means that once we have conditioned on \(W\) and applied the intervention on \(X\), observing \(Z\) does not provide extra information about \(Y\), so it can be dropped. The three rules collectively allow removal of a “do” by turning it into conditional probabilities that involve only observational data and previously justified substitutions.
 
 ### The front-door derivation as an illustration
 
 The canonical front-door example shows the rewriting process in action. Suppose \(X\) causes \(Z\), \(Z\) causes \(Y\), and there is an unobserved confounder \(U\) between \(X\) and \(Y\). The confounder blocks direct identification of \(P(Y \mid do(X))\) because \(U\) introduces a spurious correlation. However, if (1) \(Z\) is fully mediated by \(X\), (2) \(Z\) blocks all paths between \(X\) and \(Y\) except through \(Z\), and (3) \(X\) and \(Z\) are not confounded, then the front-door formula gives
+
 \[
 P(Y \mid do(X)) = \sum_{z} P(z \mid X) \sum_{x'} P(Y \mid z, x') P(x').
 \]
+
 In this expression, \(P(z \mid X)\) and \(P(x')\) are observational probabilities, and \(P(Y \mid z, x')\) is the standard conditional distribution. The derivation is a sequential application of the three rules: use Rule 2 to replace \(do(X)\) with an observation on \(Z\), then Rule 1 to remove the do from the inner term, and finally Rule 3 to marginalize out \(X'\). The technical report (ftp://ftp.cs.ucla.edu/pub/stat_ser/r402.pdf) spells out the graphical conditions under which the sum over \(z\) is valid, ensuring that no unblocked back-door path re-enters the expression. This is the algebraic heart of do-calculus.
 
 ### Connecting the calculus to completeness and algorithms

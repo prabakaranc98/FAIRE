@@ -29,17 +29,23 @@ No arc steps generated yet for this concept. The mechanism is best understood by
 ## How it works
 
 The key mechanism behind Masked Autoencoders is the selective withholding of information from the encoder and the use of reconstruction in the decoder to pressure the encoder into forming robust representations. Consider an image \(x_0 \in \mathbb{R}^{H \times W \times C}\) split into \(N\) non-overlapping patches, where each patch becomes a token for a transformer. A binary mask \(\mathbf{m} \in \{0,1\}^N\) selects a subset of visible tokens; the visible set \(\mathcal{V} = \{i : m_i=1\}\) is usually \(25\%\) or less of the full set, while the masked set \(\mathcal{M} = \{i : m_i=0\}\) becomes the reconstruction target. The encoder \(f_\theta\) only receives the visible tokens:
+
 \[
 h = f_\theta(x_0 \odot \mathbf{m}),
 \]
+
 where \(x_0 \odot \mathbf{m}\) denotes the visible patches scaled back to the original token dimension, and \(h\) are the encoder’s output embeddings for the visible set. The decoder \(g_\phi\) is intentionally lightweight (e.g., 4 transformer blocks) and is conditioned on both the encoder outputs and learned mask tokens for the missing patches. It reconstructs all \(N\) patches:
+
 \[
 \hat{x} = g_\phi(h, \mathbf{m}).
 \]
+
 The training objective minimizes the reconstruction loss over the masked patches only:
+
 \[
 L(\theta, \phi) = \frac{1}{|\mathcal{M}|} \sum_{i \in \mathcal{M}} \ell\big(x_i, \hat{x}_i\big),
 \]
+
 where \(x_i\) is the ground-truth content of patch \(i\), \(\hat{x}_i\) is the decoder’s prediction, and \(\ell\) is usually the mean squared error on normalized pixel values. Because the decoder does not see the visible patches except through the encoder, the encoder cannot simply memorize the masked content; it has to capture relations among visible patches that allow the decoder to "infill" the masked ones. The normalization constant \(1/|\mathcal{M}|\) keeps the gradient scale stable even as the mask ratio changes.
 
 ### Mask scheduling and sampling

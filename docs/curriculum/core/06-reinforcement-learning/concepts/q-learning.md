@@ -27,19 +27,25 @@ This is where replay buffers and update normalization come in. Modern variants o
 ## How it works
 
 Q-learning wants to solve for the optimal action-value function \(Q^*(s,a)\) that satisfies Bellman optimality:
+
 \[
 Q^*(s,a) = \mathbb{E}_{s'}\left[ r(s,a) + \gamma \max_{a'} Q^*(s', a') \right]
 \]
+
 where \(s\) and \(a\) are the current state and action, \(r(s,a)\) is the reward observed after taking \(a\) in \(s\), \(\gamma \in [0,1)\) is the discount factor, and the expectation is over the next state distribution induced by the environment dynamics. This recursion is a fixed point of a contraction mapping in the tabular case. Q-learning performs stochastic approximation toward this fixed point by observing elementary transitions \((s,a,r,s')\) collected under some behavior policy \(\mu\) and performing updates of the form
+
 \[
 Q(s,a) \leftarrow Q(s,a) + \alpha \left( r + \gamma \max_{a'} Q(s', a') - Q(s,a) \right)
 \]
+
 where \(\alpha\) is the step size. The beauty is that the update targets the greedy policy (the \(\max_{a'}\) term) even if \(a\) was chosen by a completely different policy \(\mu\); hence the algorithm is off-policy.
 
 Once \(Q\) is parameterized by a neural network \(Q_\theta\), the update becomes gradient descent on the temporal-difference (TD) error:
+
 \[
 L(\theta) = \mathbb{E}_{(s,a,r,s')} \left[ \left( Q_\theta(s,a) - \left( r + \gamma \max_{a'} Q_{\theta^-}(s', a') \right) \right)^2 \right]
 \]
+
 where \(Q_{\theta^-}\) denotes the target network frozen at parameters \(\theta^-\) that lag behind \(\theta\) to stabilize bootstrapping. The expectation is taken over transitions sampled from the replay buffer. Annotating, \(Q_\theta(s,a)\) is the current estimate of the action-value for \((s,a)\), \(r\) is the observed scalar reward, \(s'\) is the next state, and the inner max selects the greedy action under the target network. This objective is prone to overestimation bias because the max operator sits inside the squared error, which led to Double DQN using two estimators to avoid bias—this is the first example of how structural modifications cancel estimation pathologies in off-policy learning.
 
 When the experience buffer is uniform, every past transition has equal chance of being replayed, regardless of how relevant or how temporally recent it is. That means early, noisy transitions dominate because they are never removed, and the network keeps fitting the errors of a poorly trained critic. Prioritized replay introduced an importance sampling strategy that favors transitions with large absolute TD error, under the assumption that large error means there is something new to learn. In practice, however, the TD error itself is a noisy signal early in training, and a DQN can end up overfitting to those early, unstable examples. The ReaPER+ annealed replay strategy—generalized from [Anonymous et al. (2026)](https://arxiv.org/abs/2604.21863)—addresses exactly this fragility by starting with TD-error prioritization and smoothly transitioning to reliability-aware sampling as the network matures. Reliability here is quantified by the variance of the TD error across bootstrap samples; samples whose TD variance shrinks are more trustworthy, so ReaPER+ increases their sampling probability later in training without completely discarding the harder ones. This annealing prevents the buffer from overfitting to early noise and keeps a broader representation of the state-action space.
@@ -47,9 +53,11 @@ When the experience buffer is uniform, every past transition has equal chance of
 Another angle on stability is to make the critic less brittle by conditioning updates on a short-horizon model of the dynamics. QT-TDM (2025) introduces a Transformer Dynamics Model that predicts the next few latent states conditioned on a short action sequence, and pairs it with an autoregressive Q-Transformer that rolls out those latents to estimate action-values without having to plan long horizons explicitly. By offloading the forward model to a Transformer and keeping the Q-function autoregressive but shallow, QT-TDM avoids exploding TD errors while still using long-range information. The learned dynamics model also serves as a critic regularizer: the Q-Transformer is trained to match the return predicted by the dynamics model for the trajectory segments, which acts as a learned target network that adapts to non-stationary policies.
 
 Yet another modernization is update scaling using surprise in the latent representation. DISRC (2026) observes that when rewards are sparse, off-policy updates can explode because the critic sees very few informative signals and tries to propagate them through noisy bootstraps. Their solution is to compute a latent surprise score \(S\) based on a separate encoder's prediction error—if a transition is surprising in the latent space, the Q-update is down-weighted to avoid trusting uncorrelated noise. Mathematically, the update becomes
+
 \[
 L(\theta) = \mathbb{E}_{(s,a,r,s')} \left[ \left(1 - \tanh(S)\right) \left( Q_\theta(s,a) - \left( r + \gamma \max_{a'} Q_{\theta^-}(s', a') \right) \right)^2 \right]
 \]
+
 where \(S\) is the surprise signal normalized to \([0,1]\) and the \(\tanh\) ensures a smooth gradient. The term \((1 - \tanh(S))\) scales down the loss for transitions whose latent surprise is high, effectively slowing the pressure from untrustworthy data while still letting reliable samples drive learning.
 
 A practical implementation of these ideas needs careful engineering of the replay buffer: it must store the TD error, surprise score, and reliability flag for each transition; support updating priorities efficiently; and allow annealed sampling schedules. In addition, gradient clipping and adaptive optimizers help integrate the scaled loss without overshooting. Without these controls, the biased gradient built from the max operator, the bootstrapping noise, and rare signals would push the critic parameters far from the manifold that actually represents the optimal Q-function. ReaPER+, QT-TDM, and DISRC all act on different axes of this instability—buffer sampling, model-based regularization, and update scaling—so combining them is what lets a deep Q-learning system train on real-world tasks such as LunarLander-v3 or sparse-reward robotics benchmarks.
@@ -90,9 +98,11 @@ This build is your first end-to-end implementation of Q-learning that keeps the 
 1. Install the stack with `pip install torch==2.1.0 torchrl gymnasium tensorboard`, clone a repository with a buffer implementation (e.g. `git clone https://github.com/q-learning-engine/dqn-reaper && cd dqn-reaper`), and download the HuggingFace embedding model via `from huggingface_hub import snapshot_download`.
 2. Collect data by running LunarLander-v3 with an epsilon-greedy policy, storing transitions with TD error, reliability estimate (moving average of TD standard deviation), and surprise score (variance-normalized reward prediction) in the buffer.
 3. Train the DQN head by sampling mini-batches where the sampling probability \(P(i)\) for transition \(i\) is computed as
+
 \[
 P(i) \propto (|\delta_i| + \epsilon)^\alpha \cdot (1 - \rho_i)^\beta
 \]
+
 where \(\delta_i\) is the TD error, \(\rho_i\) is the normalized reliability, \(\alpha\) anneals down from 0.7 to 0.1, \(\beta\) anneals up from 0 to 0.5, and \(\epsilon=10^{-6}\); update the embedding encoder with a smaller learning rate than the head.
 4. Evaluate every 10,000 steps by running deterministic episodes for 5 seeds, logging average episodic reward and the distribution of sampled reliabilities; you should expect stable rewards around 200 once the reliability-aware phase kicks in and the TD-error tail from early noise has diminished.
 5. What you now have is a checkpointed DQN whose replay buffer can be frozen and replayed to reproduce the ReaPER+ schedule, along with TensorBoard dashboards showing how the reliability metric rises as the network matures.

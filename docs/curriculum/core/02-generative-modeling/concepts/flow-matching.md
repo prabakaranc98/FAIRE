@@ -29,13 +29,17 @@ Flow matching’s mechanism is best seen as a three-act play: (1) define a famil
 ### Interpolating noise to data
 
 Pick a clean sample \(x_0 \sim p_{\text{data}}(x)\) and a reference noise sample \(x_1 \sim p_{\text{noise}}(x)\), typically a standard Gaussian. For scalar \(t \in [0,1]\), define the straight-line interpolation
+
 \[
 x_t = (1 - t)\,x_0 + t\,x_1,
 \]
+
 where \(x_t\) lives in the data space; \(x_0\) anchors the trajectory end, \(x_1\) anchors the start, and \(t\) parametrizes progress along the line. This path is nothing more than convex combination; the derivative with respect to \(t\) is constant:
+
 \[
 \frac{dx_t}{dt} = x_1 - x_0.
 \]
+
 Here \(x_1 - x_0\) is the ground-truth velocity that pushes you from noise to the data point. Flow matching’s central idea is to have a neural network \(s_\theta(x, t)\) approximate this velocity for every location \(x_t\) and timestep \(t\), so that we can integrate \(s_\theta\) backwards from noise to recover \(x_0\). Because the velocity does not involve the network, training boils down to regression, not density estimation.
 
 In practice, the path need not be straight—Lipman et al. introduced “conditional” paths that adapt to data and noise choices, and later works have explored optimal-transport-informed curves. Regardless, flow matching always ensures that the target velocity is known in closed form, which is what differentiates it from diffusion’s probabilistic backward dynamics.
@@ -43,9 +47,11 @@ In practice, the path need not be straight—Lipman et al. introduced “conditi
 ### Training the vector field
 
 Given the path, the loss is the squared error between predicted and true velocity:
+
 \[
 \mathcal{L}(\theta) = \mathbb{E}_{x_0 \sim p_{\text{data}},\, x_1 \sim p_{\text{noise}},\, t \sim \mathcal{U}(0,1)} \left\|s_\theta(x_t, t) - \frac{x_1 - x_0}{1}\right\|^2.
 \]
+
 Here \(\theta\) are the network parameters, \(s_\theta(x_t, t)\) is the predicted velocity at location \(x_t\) and time \(t\), and the denominator “1” reflects that \(x_t\) spans the unit interval; if you use a different parametrization, the true derivative \(\frac{dx_t}{dt}\) must be computed accordingly. Since \(x_1 - x_0\) is known once \(x_0\) and \(x_1\) are sampled, this expectation is a standard supervised regression objective, which means you can plug in any architecture—U-Net, ResNet, Transformer—and optimize with SGD or Adam without scheduling variance terms.
 
 When the network sees \(x_t\), it implicitly knows both endpoints because \(x_t\) is a convex combination. Lipman et al. enhance this by conditioning \(s_\theta\) on a feature that encodes the noise source \(x_1\) (called Conditional Flow Matching, or CFM). In CFM you sample \(x_0, x_1\), compute their line, and feed the model both \(x_t\) and a representation of \(x_1\) so that it can adapt the velocity field per-pair. This conditionalization is analogous to the “noise-level embedding” in diffusion models, but here it makes the deterministic mapping data-dependent.
@@ -55,9 +61,11 @@ An important consequence is that there is no Langevin correction: the optimizati
 ### Sampling is integration
 
 Once trained, you sample by solving the ODE
+
 \[
 \frac{dx}{dt} = -s_\theta(x, t)
 \]
+
 backwards from \(t=1\) to \(t=0\), where \(x(1) = x_1 \sim p_{\text{noise}}\) is the noise input and \(x(0)\) is the generated sample. The initial condition is random noise; the vector field \(s_\theta\) tells the solver how to move each point toward the data manifold. Because the field is deterministic, you can use any ODE solver (Runge-Kutta, fixed-step Euler) and trade off a few function evaluations for accuracy. The key difference from diffusion is that there is no stochastic drift term; the solver only consults \(s_\theta\). That shifts complexity from the sampling loop (fewer steps but a more expensive velocity evaluation) to the regression problem (simple but global). In practice, a modest ODE solver with 10–20 steps already beats 1000-step diffusion sampling in wall-clock time on high-dimensional images, once you count both forward and backward passes.
 
 One refinement is to use “probability flow ODEs” (Song et al. 2020) to view diffusion as an ODE, which highlights that flow matching is not a completely new beast but a different way to instantiate a continuous-time generative flow. The advantage is that flow matching does not need to compute score estimates at all; the gradient of the log density is replaced by the model’s own vector outputs. You can still interpret the result through the continuity equation, but the modeling target is now velocity, not score.

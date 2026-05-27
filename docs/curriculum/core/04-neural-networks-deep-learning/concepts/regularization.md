@@ -27,9 +27,11 @@ Large language models are pretrained on massive corpora, and their emergent capa
 ### Anchoring the trajectory with KL penalties
 
 A policy gradient update without anchors only maximizes expected advantage, which encourages \(\pi_\theta\) to dart toward greedy actions on the new reward. The KL-regularized objective introduces a penalty term that measures how far the new policy diverges from the reference. The key idea is to rewrite the loss as
+
 \[
 L(\theta) = \mathbb{E}_{s \sim \mathcal{D}, a \sim \pi_\theta(\cdot \mid s)}\left[-\hat{A}(s,a) + \beta D_{\mathrm{KL}}(\pi_\theta(\cdot \mid s) \,\|\, \pi_{\mathrm{ref}}(\cdot \mid s))\right]
 \]
+
 where \(s\) is a prompt-state sampled from the fine-tuning dataset \(\mathcal{D}\), \(a\) is the sampled action (token sequence) from the current policy \(\pi_\theta\), \(\hat{A}(s,a)\) is the advantage estimate, \(\beta > 0\) is the KL coefficient, and \(D_{\mathrm{KL}}\) is the forward KL divergence. This term pushes \(\pi_\theta\) toward \(\pi_{\mathrm{ref}}\) when \(\beta\) is large, preventing the policy from assigning high probability mass to actions the reference would never take.
 
 The distinction between forward and reverse KL matters: On the Design of KL-Regularized Policy Gradient Algorithms (Author et al. 2025) [https://arxiv.org/abs/2505.17508] shows that using \(D_{\mathrm{KL}}(\pi_{\mathrm{ref}} \,\|\, \pi_\theta)\) (reverse KL) biases the update toward covering reference support, which is useful when the reference already captures the desired behavior, whereas forward KL prioritizes staying close to high-probability reference actions but allows broader exploration. In practice, implementations mix both: the RLHF step that penalizes both \(\pi_\theta\) w.r.t. \(\pi_{\mathrm{ref}}\) and vice versa yields more stable reasoning while still experimenting with novel generations. The paper also formalizes how the KL coefficient \(\beta\) acts like a temperature on the policy interpolation, and how adjusting \(\beta\) over the gradient step can balance exploration with constraint compliance. The upcoming MVB section will let you sweep \(\beta\) yourself and plot the resulting drift.
@@ -43,13 +45,17 @@ Combining parameter freezing with KL penalties compounds their effect. The KL te
 ### Activation sketching with BASIS
 
 KL penalties and freezing operate in parameter space; activation sketching operates in representation space to regularize internal activations. BASIS: Balanced Activation Sketching with Invariant Scalars (Author et al. 2026) [https://arxiv.org/abs/2604.16324] introduces a sketching matrix \(S\) that projects activation tensors onto a smaller space, computes moments that remain invariant to scaling, and feeds these moments into a lightweight regularizer. The activation sketch is defined as
+
 \[
 u = S \cdot \phi(\mathbf{h})
 \]
+
 where \(\mathbf{h}\) is the activation tensor at a certain layer and \(\phi\) is a nonlinearity. The invariant scalar \(v\) is computed as \(v = \| u \|_2\) normalized by the sketch survival probability. The penalty term then enforces \(v\) to remain close to its reference value \(v_{\mathrm{ref}}\) via
+
 \[
 L_{\mathrm{act}} = \gamma (v - v_{\mathrm{ref}})^2,
 \]
+
 where \(\gamma\) is a small coefficient. Because the sketch \(S\) is sparse and reused across batches, the cost of this regularization is comparable to a single matrix multiplication, making it feasible in production. The invariant scalars capture the bulk geometry of activations, so the regularizer indirectly constrains the model’s intermediate states while avoiding the OOMs of storing full activations for all layers.
 
 These activation constraints dovetail with KL penalties: while KL keeps the distribution over outputs similar, the sketch ensures that the hidden states follow a similar trajectory. In combinations, these methods lock down both ends of the transformation, making sure the forward pass stays on the pretrained manifold even while gradients at the end produce new reasoning refinements.

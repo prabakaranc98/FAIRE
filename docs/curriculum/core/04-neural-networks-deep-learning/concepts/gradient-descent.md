@@ -25,45 +25,59 @@ Gradient descent sits at the heart of every training loop yet it is anything but
 ## How it works
 
 The simplest possible iteration is
+
 \[
 \theta_{t+1} = \theta_t - \eta \nabla_\theta L(\theta_t),
 \]
+
 where \(\theta_t\) is the current parameter vector, \(\nabla_\theta L(\theta_t)\) is the gradient of the loss \(L\) evaluated at that point, and \(\eta > 0\) is the global learning rate that scales the step. This update assumes the landscape is isotropic: we walk the same amount in all directions. The moment the Hessian \(H(\theta) = \nabla^2_\theta L(\theta)\) has eigenvalues of widely different magnitudes, the trajectory swings across sharp walls because the gradient is dominated by the large eigenvalue components while the directions with small eigenvalues barely move.
 
 The core idea is to warp the metric. If we introduce a preconditioning matrix \(P_t\) that approximates the inverse curvature, the update becomes
+
 \[
 \theta_{t+1} = \theta_t - \eta P_t \nabla_\theta L(\theta_t),
 \]
+
 where \(P_t\) is positive definite and ideally compensates for the Hessian’s anisotropy. When \(P_t = I\) we recover plain gradient descent; when \(P_t = H(\theta_t)^{-1}\) we have Newton’s method. In deep learning the Hessian is too big to invert exactly, so we settle for structured approximations.
 
 One starting point is adaptive diagonal scaling. AdaGrad (Duchi et al. 2011) [arxiv:1106.5730](https://arxiv.org/abs/1106.5730) builds \(P_t\) as a diagonal matrix whose entries are inverse square roots of accumulated squared gradients. The per-coordinate accumulator \(G_{t} = G_{t-1} + \nabla_\theta L(\theta_t) \odot \nabla_\theta L(\theta_t)\) captures the frequency of large gradients, and AdaGrad sets
+
 \[
 \theta_{t+1} = \theta_t - \eta \frac{1}{\sqrt{G_t} + \epsilon} \odot \nabla_\theta L(\theta_t),
 \]
+
 where the division is element-wise. Because coordinates with large past gradients receive smaller steps, the algorithm automatically stretches flat directions and squeezes sharp ones without hand-tuning \(\eta\). This is why AdaGrad excels on sparse, high-dimensional tasks: it effectively makes the canyon floor more level by compressing steps where the walls are steep.
 
 AdaGrad’s constant decay can be too aggressive, so Adam (Kingma & Ba 2014) [arxiv:1412.6980](https://arxiv.org/abs/1412.6980) adds momentum and variance estimation. Adam keeps exponential moving averages of the gradient \(m_t\) and its square \(v_t\):
+
 \[
 m_t = \beta_1 m_{t-1} + (1 - \beta_1) \nabla_\theta L(\theta_t),\qquad
 v_t = \beta_2 v_{t-1} + (1 - \beta_2) (\nabla_\theta L(\theta_t))^2,
 \]
+
 followed by bias-corrected \(\hat m_t = m_t / (1 - \beta_1^t)\) and \(\hat v_t = v_t / (1 - \beta_2^t)\). The update then reads
+
 \[
 \theta_{t+1} = \theta_t - \eta \frac{\hat m_t}{\sqrt{\hat v_t} + \epsilon}.
 \]
+
 Momentum \(m_t\) smooths out the jagged canyon edges, while \(\hat v_t\) rescales each coordinate by its estimated variance, so the effective step stretches along flat stretches and shrinks against the walls. Adam thus warps the local metric dynamically using both first- and second-moment information. The automatic stabilization of the step size is essential for transformer workloads, where tiny variations can blow up training.
 
 Momentum itself can be seen as preconditioning in the time axis. The classical heavy-ball method introduces an auxiliary velocity \(v_t\) and updates
+
 \[
 v_{t+1} = \mu v_t - \eta \nabla_\theta L(\theta_t),\qquad
 \theta_{t+1} = \theta_t + v_{t+1},
 \]
+
 so the “step” becomes a smoothed combination of past gradients. In the continuous-time limit, this is equivalent to introducing an inertial term \(\mu\) that stores curvature of the path. When the loss surface oscillates, momentum allows the iterate to coast past a steep wall instead of reversing direction every time the gradient flips sign.
 
 To go beyond diagonal scalings, conjugate gradient methods aim to align updates with the principal axes of the Hessian. The Hestenes-Stiefel rule for conjugate directions maintains a direction \(d_t\) orthogonal with respect to the Hessian:
+
 \[
 d_{t+1} = -\nabla_\theta L(\theta_{t+1}) + \beta_t d_t,
 \]
+
 where \(\beta_t = \frac{\nabla_\theta L(\theta_{t+1})^\top (\nabla_\theta L(\theta_{t+1}) - \nabla_\theta L(\theta_t))}{d_t^\top (\nabla_\theta L(\theta_{t+1}) - \nabla_\theta L(\theta_t))}\) follows Hestenes and Stiefel’s derivation [https://www.stat.uchicago.edu/~lekheng/courses/302/classics/hestenes-stiefel.pdf](https://www.stat.uchicago.edu/~lekheng/courses/302/classics/hestenes-stiefel.pdf). That ratio adjusts how much of the previous direction survives, keeping successive steps conjugate and thus avoiding redundant exploration along already-optimized dimensions. Conjugate gradient methods are particularly attractive when Hessian-vector products are cheap but matrix inversion is not.
 
 When even conjugate directions are insufficient, the Gauss-Newton approximation tries to capture the curvature of the data term. Martens & Grosse (2015) [arxiv:1503.05671](https://arxiv.org/abs/1503.05671) introduce K-FAC, which approximates the Fisher information (a Gauss-Newton matrix for log-likelihood losses) with a Kronecker-factored structure. Layer-wise, the curvature matrix decomposes into factors corresponding to activations and gradients, and their inverses can be computed efficiently. Using this preconditioner accelerates training by multiple factors because it effectively rescales the metric in every layer using the local curvature. This is why K-FAC-style updates often need 3–5× fewer iterations than Adam on vision tasks—the matrix approximation approximates the Hessian yet is light enough to compute once per few steps.

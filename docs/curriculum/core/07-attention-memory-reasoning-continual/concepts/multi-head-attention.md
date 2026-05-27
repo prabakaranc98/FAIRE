@@ -25,19 +25,25 @@ Multi-head attention sits at the heart of transformers and the larger family of 
 ## How it works
 
 Multi-head attention begins by asking: how should a sequence \(X \in \mathbb{R}^{n \times d_{\text{model}}}\) be re-represented so that downstream modules can read different relationships in parallel? The answer is to learn three projection matrices, one for queries, one for keys, and one for values. Each head \(h \in \{1, \dots, H\}\) owns its own trio:
+
 \[
 Q_h = X W_h^Q, \quad K_h = X W_h^K, \quad V_h = X W_h^V,
 \]
+
 where \(X\) stacks the \(n\) input tokens and each projection matrix \(W_h^{Q}, W_h^{K}, W_h^{V} \in \mathbb{R}^{d_{\text{model}} \times d_h}\) maps into a lower-dimensional subspace of size \(d_h = d_{\text{model}}/H\). The matrices \(Q_h, K_h, V_h \in \mathbb{R}^{n \times d_h}\) now live in the specialized latent space for head \(h\). The core computation is the scaled dot-product attention for each head:
+
 \[
 \text{Attention}(Q_h, K_h, V_h) = \text{softmax}\left(\frac{Q_h K_h^\top}{\sqrt{d_h}}\right)V_h,
 \]
+
 where \(Q_h K_h^\top \in \mathbb{R}^{n \times n}\) measures pairwise affinity, \(\sqrt{d_h}\) is the scaling factor that counters the growing variance of dot products, and the softmax normalizes each query’s affinity to a probability distribution over keys. The resulting head output is a weighted sum of the \(V_h\) rows, which the model can interpret as the specific relation that head attends to.
 
 After computing all heads, MHA concatenates them along the model dimension:
+
 \[
 \text{MultiHead}(X) = \text{Concat}_h\left(\text{Attention}(Q_h, K_h, V_h)\right) W^O,
 \]
+
 where \(W^O \in \mathbb{R}^{d_{\text{model}} \times d_{\text{model}}}\) reprojects the \(H d_h\) concatenated outputs back into the shared model space. This concatenation is not merely for throughput; it stitches the insights of each specialist into a coherent representation that residual layers and feed-forward blocks can use. Each head’s projection is effectively a routing gate: if a relation needs to be preserved—say entity coreference—the optimizer learns to route queries with that relation into the projection matrices of a single head, so the focus and feed-forward parameters downstream can process a clean signal.
 
 The teacher of this routing mechanism is the attention mask itself. When a token’s query lands on a head that has learned to flag negation, the softmax will push probability mass toward the key tokens that carry negation cues, thereby gating which value vectors are aggregated. As the training set grows, the projections \(W_h^Q, W_h^K, W_h^V\) become disentangled, so that the heads operate in almost orthogonal subspaces of the model. This orthogonality stabilizes the optimizer because gradients from different heads do not interfere destructively; each head’s parameters receive gradients proportional only to the subset of relationships it specializes in.

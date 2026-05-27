@@ -27,15 +27,19 @@ The narrative strand running through this page connects four families of techniq
 ## How it works
 
 Because double descent lives at the intersection of capacity, noise, and solver choice, it is easiest to explain by zooming in on a linear random-feature model and then layering in the gradients of deeper networks. At training time we draw \(N\) labeled examples \((x_i, y_i)\) where each \(x_i \in \mathbb{R}^{d}\) is an image flattened to \(d=784\) for MNIST and \(y_i \in \{-1, +1\}\) is its label. The RFM generates \(m\) random basis functions \(z_j(x) = \phi(\omega_j^\top x)\) with fixed random vectors \(\omega_j\). The prediction is
+
 \[
 f_{w}(x) = \sum_{j=1}^{m} w_j z_j(x),
 \]
+
 where \(w \in \mathbb{R}^{m}\) are learned weights. The model is linear in the features \(z_j\), so training reduces to solving \(Z w = y\) where \(Z \in \mathbb{R}^{N \times m}\) is the feature matrix. As \(m\) grows, the rank of \(Z\) eventually reaches \(N\), and we hit the interpolation threshold—any extrapolation of capacity beyond this produces infinitely many solutions that overfit the training noise.
 
 To understand the test loss \(L(f)\) on a new distribution, introduce the decomposition
+
 \[
 L(f) = \mathrm{Bias}^2(f) + \mathrm{Var}_{\text{noise}}(f) + \mathrm{Var}_{\text{init}}(f) + \sigma_{\epsilon}^2,
 \]
+
 where \(\mathrm{Bias}^2(f)\) is the loss from the model class never containing the data-generating function, \(\mathrm{Var}_{\text{noise}}(f)\) is variance induced by label noise, \(\mathrm{Var}_{\text{init}}(f)\) is variance due to randomly initialized fixed features \(\omega_j\), and \(\sigma_{\epsilon}^2\) is the irreducible label noise variance. This splits the usual variance term into two sources, enabling analysis of how interpolation amplifies noise variance while leaving initialization variance low when \(m\) is small. The double descent spike emerges when \(\mathrm{Var}_{\text{noise}}\) overwhelms the drop in bias exactly at the interpolation boundary.
 
 When solving \(Z w = y\), different solvers navigate the space of solutions differently. The hybrid LSLU/LSQR solver introduced in Kan, Nagy, and Ruthotto (2024) [arxiv:2604.07233](https://www.arxiv.org/pdf/2604.07233) is designed to mimic Tikhonov regularization while avoiding expensive SVDs. It alternates between two actions: a low-iteration LSQR run that restricts the solution to a Krylov subspace and an LSLU step that projects residuals onto the span of the most recent Lanczos vectors. Formally, the \(k\)-th Krylov subspace is \(\mathcal{K}_k(Z^\top Z, Z^\top y)\); the hybrid solver projects \(w\) into \(\mathcal{K}_k\) and then solves the reduced least squares problem with an implicit ridge penalty. The penalty arises because the reduced system has well-conditioned singular values, which suppress modes where the data covariance is nearly singular. As \(k\) increases past the interpolation threshold, the solver continues to incorporate more eigenvectors, smoothly transitioning from under- to over-parameterized regimes and thus avoiding the sharp spike that a naïve pseudoinverse would produce.

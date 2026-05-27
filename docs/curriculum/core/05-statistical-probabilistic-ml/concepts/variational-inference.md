@@ -21,9 +21,11 @@ Imagine trying to learn the average shape of a shifting sand dune by inspecting 
 ## The territory
 
 The Bayesian answer to “how uncertain am I?” is a posterior \(p(\theta \mid \mathcal{D})\) over latent variables \(\theta\) after seeing data \(\mathcal{D}\). The textbook route rewrites this as
+
 \[
 p(\theta \mid \mathcal{D}) = \frac{p(\mathcal{D}, \theta)}{p(\mathcal{D})},
 \]
+
 where \(p(\mathcal{D})=\int p(\mathcal{D},\theta)\,d\theta\) is the marginal likelihood that normalizes the posterior.
 \(\mathcal{D}\) is the observed data. \(\theta\) is the vector of latent variables. The intractability lurks in \(p(\mathcal{D})\): for neural networks, hierarchical models, or non-conjugate likelihoods, that integral has no closed form, so the posterior cannot be written down or sampled exactly. The classical alternative—Markov Chain Monte Carlo—draws samples until the empirical distribution matches the posterior, but it does so at the cost of slow convergence and poor parallelism in high dimensions.
 
@@ -36,20 +38,26 @@ The territory also spans probabilistic programming (Pyro, Gen, PyMC) and the ric
 ### The ELBO and the mean-field dome
 
 The Evidence Lower Bound is the workhorse objective. Starting from the KL divergence, we rewrite
+
 \[
 \text{KL}(q_\phi(\theta)\,\|\,p(\theta\mid\mathcal{D})) = \mathbb{E}_{q_\phi}\left[\log q_\phi(\theta) - \log p(\mathcal{D},\theta) \right],
 \]
+
 where \(q_\phi\) is the variational distribution, and \(p(\mathcal{D},\theta)\) is the joint of the data and latents.
 This divergence is non-negative, so rearranging gives
+
 \[
 \log p(\mathcal{D}) = \underbrace{\mathbb{E}_{q_\phi}[\log p(\mathcal{D},\theta) - \log q_\phi(\theta)]}_{\text{ELBO}(\phi)} + \text{KL}(q_\phi\,\|\,p(\theta\mid\mathcal{D})).
 \]
+
 The ELBO is the part we can compute, because the intractable \(\log p(\mathcal{D})\) has been replaced with an expectation under \(q_\phi\), which is drawn from a family we control. Every gradient step that increases the ELBO simultaneously raises the log-marginal bound and decreases the KL divergence.
 
 The dome metaphor becomes concrete when we choose a mean-field family:
+
 \[
 q_\phi(\theta) = \prod_{i=1}^n q_{\phi_i}(\theta_i),
 \]
+
 where each coordinate \(\theta_i\) has its own variational factor \(q_{\phi_i}\). \(n\) is the number of latent dimensions.
 Mean-field inference, as explained by Jordan et al. (1999), decouples dependencies by cycling through coordinate updates for each \(\theta_i\), similar to the way coordinate descent squeezes a high-dimensional dome along one axis at a time. The ELBO decomposes accordingly, and in the case of exponential-family models the update for \(\phi_i\) is often available in closed form. Even when the model is non-conjugate, the ELBO retains its form, and we can now plug in generic optimizers.
 
@@ -58,14 +66,18 @@ However, mean-field also reveals the fundamental tension: the dome cannot captur
 ### Reparameterization, gradients, and black-box VI
 
 Black Box Variational Inference (BBVI) generalizes the dome by allowing any \(q_\phi(\theta)\) we can sample from; the gradient is estimated via Monte Carlo. However, naive gradients over the ELBO suffer from high variance because the sample \(\theta \sim q_\phi\) depends on \(\phi\). The reparameterization trick, introduced by Kingma and Welling and formally described in Auto-Encoding Variational Bayes (2014) [https://www.arxiv.org/pdf/1601.00670v4], sidesteps the issue by expressing \(\theta\) as a deterministic transformation of a noise variable:
+
 \[
 \theta = g_\phi(\epsilon),\qquad \epsilon \sim p(\epsilon),
 \]
+
 where \(g_\phi\) is differentiable, and \(p(\epsilon)\) is a fixed noise distribution, usually \(\mathcal{N}(0,I)\).
 \(\phi\) again are variational parameters. \(\epsilon\) is an auxiliary noise source. The expectation in the ELBO now becomes
+
 \[
 \mathcal{L}(\phi) = \mathbb{E}_{\epsilon \sim p(\epsilon)}\left[\log p(\mathcal{D}, g_\phi(\epsilon)) - \log q_\phi(g_\phi(\epsilon)) \right].
 \]
+
 The gradient \(\nabla_\phi \mathcal{L}(\phi)\) can be pushed through \(g_\phi\) with automatic differentiation, just like any deterministic neural network. The only stochasticity comes from \(\epsilon\), whose distribution does not depend on \(\phi\), so the gradient estimator has lower variance. In practice, \(g_\phi(\epsilon)\) is implemented as \(\mu_\phi + \sigma_\phi \odot \epsilon\) for a Gaussian factor, where \(\mu_\phi\) and \(\sigma_\phi\) are learned mean and standard-deviation parameters, and \(\odot\) is element-wise multiplication.
 
 Kingma and Welling’s trick unlocks two critical advances. First, it works whenever the latent is continuous and can be written as a differentiable transform of fixed noise, making it simple to integrate with PyTorch, JAX, or TensorFlow. Second, it turns the ELBO maximization into a form that SGD can handle, which lets us use the same tooling as supervised deep learning.
@@ -75,16 +87,20 @@ Black-box VI algorithms—take the gradient estimator, average over a few \(\eps
 ### Stochastic Variational Inference and scaling to big data
 
 Black-box gradients give us per-sample updates, but real data arrives in millions of points. Stochastic Variational Inference (SVI) lifts the ELBO to minibatches. As Hoffman, Blei, Wang, and Paisley (2013) [https://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013a.pdf; http://www.cs.columbia.edu/~blei/papers/HoffmanBleiWangPaisley2013.pdf] show, we can define a global variational parameter \(\phi\) for shared latent structure and local variational parameters \(\lambda_d\) for each datum \(d\). The joint ELBO over the dataset \(\mathcal{D}=\{x_d\}_{d=1}^D\) is
+
 \[
 \mathcal{L}(\phi, \{\lambda_d\}) = \sum_{d=1}^D \mathbb{E}_{q_{\phi,\lambda_d}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d}(z_d)],
 \]
+
 where \(z_d\) are the latent variables attached to datapoint \(x_d\), and \(\lambda_d\) controls their local approximate posterior. \(D\) is the total number of datapoints.
 The expectation is taken over both global and local latent variational factors. Hoffman et al. derive natural gradient updates for \(\phi\) using the structure of conditional conjugacy; in the non-conjugate case, we simply plug the noisy gradients from reparameterization.
 
 SVI replaces the full sum with a stochastic estimate using a minibatch \(\mathcal{B}\subset\mathcal{D}\):
+
 \[
 \mathcal{L}_{\mathcal{B}}(\phi) \approx \frac{D}{|\mathcal{B}|} \sum_{d\in\mathcal{B}} \mathbb{E}_{q_{\phi,\lambda_d}}[\log p(x_d, z_d) - \log q_{\phi,\lambda_d}(z_d)].
 \]
+
 \(|\mathcal{B}|\) is the minibatch size.
 This estimator is unbiased and can be differentiated via backpropagation. We then update \(\phi\) with an optimizer like Adam, treating the scaled minibatch objective as if it were the entire dataset.
 

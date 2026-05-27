@@ -29,9 +29,11 @@ Contemporary deployment rests on three layers: (1) delegating tenant-specific be
 ### Layer 1: Multi-tenant deltas and shared bases
 
 When an LLM is fine-tuned per tenant, the final weights \( \theta_i \) differ from the base \( \theta_{\text{base}} \) by a small perturbation \( \Delta_i \). DeltaZip (Yao et al. 2025) constructs deployments where \( \theta_i = \theta_{\text{base}} + \Delta_i \) and the \( \ell_2 \) norm \( \|\Delta_i\|_2 \) is deliberately kept an order of magnitude smaller than \( \|\theta_{\text{base}}\|_2 \). This separation enables a serving engine to keep \( \theta_{\text{base}} \) resident in fast shared memory and to stream the sparse, quantized \( \Delta_i \) per tenant on demand. Because \( \Delta_i \) occupies a fraction of the memory footprint, the working set during inference is
+
 \[
 W = \text{size}(\theta_{\text{base}}) + \text{size}(\Delta_i),
 \]
+
 where \( \text{size}(\cdot) \) counts the compressed byte size of the shared base and the tenant delta. At runtime \( W \) is dramatically smaller than \( \text{size}(\theta_i) \) without compression, which makes it feasible to host tens of tenants on one accelerator.
 
 In addition to memory savings, the delta view simplifies caching and migration. Service engineers treat \( \theta_{\text{base}} \) as a resident kernel and the \( \Delta_i \) as per-tenant patches: when a request from tenant \( i \) arrives, the server pulls \( \Delta_i \), decompresses it, and adds it to the base (either in fused kernels or on-the-fly). The cache only stores the last few \( \Delta_i \), so the eviction policy depends on request frequency rather than the full-parameter load time. The consequence is that tenants with similar deltas share most of the working set, which is why aggressive quantization, structured sparsity, and LoRA-style updates are all common in delta computation.
@@ -39,15 +41,19 @@ In addition to memory savings, the delta view simplifies caching and migration. 
 ### Layer 2: Scheduling precision and reasoning tokens
 
 Deltas reduce the memory constant, but latency and energy are dictated by how reasoning tokens flow through the accelerator. The total latency of processing a reasoning query with \( T_r \) tokens can be written as
+
 \[
 \text{Latency}(Q, R) = \sum_{t=1}^{T_r} L_t(Q_t, R_t),
 \]
+
 where \( Q_t \) is the quantization level (e.g., 8-bit, 4-bit, ternary) used when decoding token \( t \), \( R_t \) captures the reasoning state (cache fills, attention context, and the difficulty label for that token), and \( L_t \) is the time to execute the kernel on the accelerator given those settings. The arithmetic term of \( L_t \) shrinks with lower \( Q_t \), but tokens that are part of a critical rationale may demand higher precision to avoid cascading accuracy drops. The When Reasoning Meets Compression benchmark (Lu et al. 2025) [https://arxiv.org/abs/2504.02] explores this trade-off by measuring how 1.58-bit quantization affects energy per token \( E_t \) and reasoning fidelity: pruning attention heads reduces \( E_t \), but if the scheduler continues with that low precision into the final tokens, the chain needs more steps \( T_r \) to reach the same answer. The benchmark finds an optimal quantization schedule that fits latency while keeping accuracy losses under 2% on DeepResearch-9K.
 
 Rather than fixing \( Q_t \) ahead of time, modern serving stacks expose a scheduler \( \pi(s_t) \) that observes a state \( s_t \) and chooses both the quantization level and the reconstruction strategy for \( \Delta_i \). The state \( s_t \) includes current accelerator occupancy, thermal readings, query difficulty scores, and remaining energy quota. In Reinforcement Learning Foundations for Deep Research Systems (Santos et al. 2025) [https://export.arxiv.org/pdf/2509.06733] these schedulers are modeled as partially observable Markov decision processes where the reward is
+
 \[
 r_t = -\alpha \cdot \text{Latency}_t - \beta \cdot \text{AccuracyLoss}_t,
 \]
+
 with scalars \( \alpha, \beta \) that encode the service-level objective’s preference between tight latency and fidelity. The scheduler can thus lower \( Q_t \) when \( R_t \) labels a token as “low difficulty” and temporarily raise precision for tokens flagged as critical. Practical implementations expose those knobs through high-level APIs such as vLLM’s control structure and Triton’s asynchronous batches, translating policy decisions into quantized kernels and delta reconstruction orders.
 
 A synthesis sentence bridges Layer 2 to Layer 3: the scheduler’s policy must be validated on traces that reflect multi-tenant token mixes, otherwise a well-tuned policy for synthetic inputs will still break fairness and energy budgets when the tokens and tenant weights change.

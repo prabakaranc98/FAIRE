@@ -31,21 +31,27 @@ Backpropagation appears wherever a long loss–parameter chain demands dynamic p
 ### Forward pass, storage, and notation
 
 Every neural net can be written as a sequence of layers \(1 \leq l \leq L\), where layer \(l\) maps input activation \(x^{(l-1)} \in \mathbb{R}^{d_{l-1}}\) to output activation \(x^{(l)} \in \mathbb{R}^{d_l}\) via a weight matrix \(W^{(l)} \in \mathbb{R}^{d_l \times d_{l-1}}\), bias \(b^{(l)} \in \mathbb{R}^{d_l}\), and nonlinearity \(f^{(l)}\):
+
 \[
 z^{(l)} = W^{(l)} x^{(l-1)} + b^{(l)}, \qquad x^{(l)} = f^{(l)}(z^{(l)}),
 \]
+
 where \(z^{(l)} \in \mathbb{R}^{d_l}\) is the pre-activation whose components each depend on the layer’s parameters and the previous activation \(x^{(l-1)}\). The scalar loss \(L\) depends on the final activation \(x^{(L)}\) and optionally a label \(y\), \(L = \ell(x^{(L)}, y)\). Every \(z^{(l)}\) and \(x^{(l)}\) is cached during the forward pass because the backward pass needs local partials such as \(\partial x^{(l)} / \partial z^{(l)} = \operatorname{diag}(f^{(l)\prime}(z^{(l)}))\). Without caching, computing \(\partial L / \partial W^{(l)}\) would require replaying layers \(l\) through \(L\) for each parameter, leading to an exponential blow-up; caching makes it a linear, constant-factor pass that visits each layer once in backward order, which is why the chain rule becomes dynamic programming.
 
 ### Reverse pass and gradient equations
 
 The backward sweep propagates the error signal \(\delta^{(l)} \coloneqq \partial L / \partial z^{(l)}\), and the recurrence is
+
 \[
 \delta^{(l)} = (W^{(l+1)})^\top \delta^{(l+1)} \odot f^{(l)\prime}(z^{(l)}),
 \]
+
 with \(\delta^{(L)} = \nabla_x \ell(x^{(L)}, y)\), \((W^{(l+1)})^\top\) the transpose of a \(d_{l+1} \times d_l\) weight matrix, and \(f^{(l)\prime}(z^{(l)})\) the elementwise derivative vector at the cached pre-activation \(z^{(l)}\). Each layer multiplies the next layer’s delta by the transpose and by the local derivative, reusing the cached values to compute \(\delta^{(l)}\) without re-running layers \(l+1,\dots,L\). With \(\delta^{(l)}\) in hand, the gradients of the parameters are
+
 \[
 \frac{\partial L}{\partial W^{(l)}} = \delta^{(l)} (x^{(l-1)})^\top, \qquad \frac{\partial L}{\partial b^{(l)}} = \delta^{(l)},
 \]
+
 where \(x^{(l-1)} \in \mathbb{R}^{d_{l-1}}\) is the cached input to layer \(l\). These formulas illustrate the dynamic-programming intuition: the backward sweep only recomputes each \(\delta^{(l)}\) once, every cached \(x^{(l-1)}\) is used exactly once to compute its incoming gradients, and the cost is proportional to the forward pass.
 
 Digital implementations require that the backward operator mirror the forward weights so that the transpose \((W^{(l+1)})^\top\) is available. Neuromorphic and analog proposals cannot always afford to store both the forward matrix and its transpose, which is the weight transport problem. Feedback alignment, as discussed by Lillicrap et al. (2016) [https://arxiv.org/abs/1509.06461], replaces the transpose with a learned backward matrix; even though this matrix does not equal the forward weights, the error signal \(\delta^{(l)}\) defined above can still emerge because the backward weights learn to align with the forward gradients. To keep this heuristic connected to the dynamic-programming narrative, observe that both the \(\delta^{(l)}\) and the Lagrange multipliers \(\lambda^{(l)}\) that we introduce below represent the same error signal, so any variant—symmetric or not—must still respect the cached activations and the local multiplier to remain consistent.
@@ -53,9 +59,11 @@ Digital implementations require that the backward operator mirror the forward we
 ### Backpropagation as constrained optimization
 
 LeCun (1988) [https://new.math.uiuc.edu/MathMLseminar/seminarPapers/LeCunBackprop1988.pdf] treated each forward equation \(z^{(l)} = W^{(l)} x^{(l-1)} + b^{(l)}\) as an equality constraint and paired it with a Lagrange multiplier \(\lambda^{(l)} \in \mathbb{R}^{d_l}\). The augmented Lagrangian is
+
 \[
 \mathcal{L} = \ell(x^{(L)}, y) + \sum_{l=1}^L \lambda^{(l)\top} \left(z^{(l)} - W^{(l)} x^{(l-1)} - b^{(l)}\right),
 \]
+
 where each \(\lambda^{(l)}\) has the same dimensionality as \(z^{(l)}\) and the sum runs over layers \(l=1\) to \(L\). Stationarity with respect to \(z^{(l)}\) yields \(\lambda^{(l)} = \partial \ell / \partial z^{(l)} = \delta^{(l)}\), and differentiating with respect to \(W^{(l)}\) and \(b^{(l)}\) reproduces the gradient formulas above. This construction explains why constrained training recipes—safety constraints, hardware energy caps, weight sharing—can still rely on backpropagation: the multipliers enforce consistency between forward dynamics and constraints, and the backward pass updates multipliers and parameters together so the cached activations continue to carry the necessary local information. Plaut, Nowlan, and Hinton (1986) [https://www.cnbc.cmu.edu/~plaut/papers/pdf/PlautNowlanHinton86TR.backprop.pdf] demonstrated this explicitly for shared constraints, showing that error signals traverse shared components exactly as they do individual weights when the multipliers track shared structure.
 
 ### Backpropagation through time and memory trade-offs

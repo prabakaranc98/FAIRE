@@ -25,10 +25,13 @@ Transformers conquer long-range dependencies through attention, but attention it
 ## How it works
 
 Attention’s core computation is
+
 \[
 \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^\top}{\sqrt{d_k}}\right)V,
 \]
+
 where \(Q\) stacks the queries \(Q_i\), \(K\) stacks the keys \(K_j\), and \(V\) stacks the values \(V_j\); \(d_k\) is the dimensionality of each key vector and the softmax operates row-wise across the dot-product matrix. Because the raw dot products \(Q_i \cdot K_j\) are inherently symmetric under permutation of token indices, the only way to reintroduce “before/after” is to transform \(Q_i\) and \(K_j\) in a position-aware manner before the dot product. RoPE achieves this by rotating each pair of dimensions in the query and key vectors with a 2 × 2 rotation matrix \(R(\theta_{i,k})\), where \(i\) indexes the token position and \(k\) indexes the pair of dimensions (or effectively the head-frequency component). Each rotation is
+
 \[
 R(\theta_{i,k}) =
 \begin{bmatrix}
@@ -37,6 +40,7 @@ R(\theta_{i,k}) =
 \end{bmatrix}
 \quad\text{with}\quad \theta_{i,k} = \omega_k \cdot f(i).
 \]
+
 Here \(\omega_k\) is the base frequency assigned to the \(k\)-th pair of dimensions, \(i\) is the token index along the sequence, and \(f(i)\) is a scalar function that warps the absolute position into the rotation angle. This real-valued rotation mimics a multiplication by \(\exp(i \theta_{i,k})\) in the complex plane without actually requiring complex numbers. The rotation twists \(Q_i\) and \(K_j\) in opposite directions, so the resulting dot product encodes the relative displacement \(j-i\) through the phase difference. The norm of the vectors stays fixed because rotation is orthogonal, which means RoPE introduces geometry without disrupting the attention distribution’s scale.
 
 ### Group actions unify rotations and biases
@@ -46,9 +50,11 @@ The group representational view from Zhang et al. (2025) [https://arxiv.org/abs/
 ### Sculpting the frequency spectrum for scale
 
 Scale-invariant attention rephrases extrapolation as a requirement on \(f(i)\). Instead of setting \(f(i)=i\), the function is chosen so that \(f(\alpha i)=\alpha f(i)\) for scalar \(\alpha\), ensuring homogeneity under rescaling. Common choices are \(f(i)=\log(1+i)\) or \(f(i)=i^\beta\) with \(\beta\in(0,1)\), and for the rest of this page we fix \(f(i)=\log(1+i)\) because it grows sublinearly yet is still smooth and monotonically increasing. With that choice,
+
 \[
 \theta_{i,k} = \omega_k \cdot \log(1 + i),
 \]
+
 so increasing the context length reroutes new tokens along the same orbit but with slower angular growth. This keeps the set of phase differences bounded: \(\theta_{\alpha i} - \theta_i = \omega_k \cdot (\log(1 + \alpha i) - \log(1 + i))\) remains controlled even when \(\alpha\gg 1\). Empirical tests from the scale-invariant attention literature (2025) reveal that rescaling the rotation angles in this way maintains attention entropy and prevents the dot-product spectrum from collapsing into noise. The practical implementation is to replace the RoPE frequency schedule by computing \(R(\omega_k \cdot \log(1 + i))\) for each token and dimension pair before the dot product; the rest of the Transformer remains untouched, making this change compatible with existing checkpoints.
 
 ### Context-conditioned encodings

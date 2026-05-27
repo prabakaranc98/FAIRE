@@ -27,31 +27,39 @@ The territory also includes the observability and scheduling layers that make mo
 ## How it works
 
 The central observation is simple: the backward pass generates gradients whose magnitude can be orders of magnitude smaller than the forward activations. Consider a single linear layer whose input is \(x\in\mathbb{R}^d\), weights \(W\in\mathbb{R}^{d\times k}\), and loss \(L\). The default gradient update is
+
 \[
 W' = W - \eta \frac{\partial L}{\partial W},
 \]
+
 where \(\eta\) is the learning rate. Training in FP32 evaluates both \(W\) and \(\partial L / \partial W\) at 32-bit precision, so the subtraction retains the gradient contribution even when it is small. In mixed precision, \(W\) and \(\partial L / \partial W\) are stored or computed in FP16, whose mantissa can only express about 3 decimal digits. If a gradient falls below \(2^{-11}\), it is rounded to zero and the update disappears, so training stalls.
 
 ### The precision gap and the scaled loss
 
 The cure is to widen the floating-point funnel for gradients without losing the throughput gains of FP16 arithmetic. Micikevicius et al. (2017) did this by keeping a “master” copy of the weights in FP32 while still running matrix multiplies in FP16. Every forward pass casts the FP32 master to FP16 before entering the kernel, and every backward pass computes gradients in FP16 and then casts them back to FP32 before applying the update. That casting itself does not rescue underflow, so the authors also multiply the loss by a constant scale factor \(s\) before backpropagation:
+
 \[
 \tilde{L} = s \cdot L.
 \]
 
 Here, \(\tilde{L}\) is the scaled loss entering the backward pass and \(s > 1\) is chosen so that the gradients land in the representable range of FP16. After computing gradients, the scheme divides them by \(s\) before applying them to the FP32 master:
+
 \[
 G_{fp32} = \text{cast}_{fp32}(g_{fp16}) / s,
 \]
+
 where \(g_{fp16} = \nabla_L\tilde{L}\) is the raw gradient in FP16. The subtraction
+
 \[
 W'_{fp32} = W_{fp32} - \eta G_{fp32}
 \]
+
 happens in full precision, so the underflow has no chance to corrupt the master copy. This re-scaling is a bookkeeping step: the optimizer always sees the correctly scaled gradient, while FP16 math gets the benefit of extra dynamic range.
 
 ### Gradients, losses, and overflow detection
 
 Scaling also introduces the risk of overflow: if \(s\) is too large, the scaled gradients exceed the FP16 finite range and produce infinities or NaNs. The detection is built into the forward-backward loop: once the gradients are computed, the runtime searches the gradient tensors for any Inf or NaN. If any appear, the step is discarded and the scale \(s\) is reduced, typically by a safety factor such as \(1/2\). If the gradient passes the check for several consecutive steps, the scale is increased (e.g., multiplied by 2) in order to capture more of the FP16 mantissa. Zhao et al. (2019) formalized this adaptive process as “Adaptive Loss Scaling,” proposing the control law:
+
 \[
 s_{t+1} =
 \begin{cases}
@@ -60,6 +68,7 @@ s_t \cdot \alpha & \text{if success counter } \geq \beta,\\
 s_t & \text{otherwise},
 \end{cases}
 \]
+
 where \(s_t\) is the current scale, \(\alpha > 1\) is the increase factor (often 2), and \(\beta\) is the number of clean steps before scaling up. The success counter tracks how many recent steps produced finite gradients, and overflow detection is cheap because it only inspects the FP16 buffers that already exist for the gradients.
 
 This adaptive rule means engineers no longer have to search for a “magic” static scale. Instead, the runtime responds to the gradient distribution: if the gradients are tiny because of a small learning rate, the scale climbs to keep them visible; if a sudden failure mode yields large updates, the scale shrinks and the optimizer repeats the step.

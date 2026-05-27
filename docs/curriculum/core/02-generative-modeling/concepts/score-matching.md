@@ -27,33 +27,43 @@ The territory thus bridges statistical estimation, differential geometry, and ne
 ## How it works
 
 Score matching begins with the Fisher divergence \(D_F\) between the data score \(\nabla_{\mathbf{x}} \log p_{\text{data}}(\mathbf{x})\) and a parametric model score \(\mathbf{s}_\theta(\mathbf{x})\) that we will train. The divergence measures squared error of the vector fields:
+
 \[
 D_F(p_{\text{data}} \parallel q_\theta) = \mathbb{E}_{p_{\text{data}}(\mathbf{x})} \left[ \left\| \nabla_{\mathbf{x}} \log p_{\text{data}}(\mathbf{x}) - \mathbf{s}_\theta(\mathbf{x}) \right\|_2^2 \right],
 \]
+
 where \(\mathbf{x}\) is a \(d\)-dimensional data sample, \(q_\theta\) is the model density whose score we denote by \(\mathbf{s}_\theta(\mathbf{x})\), and \(\|\cdot\|_2\) is the Euclidean norm. Expanding the square and treating the cross term with integration by parts—justified when the model decays fast enough so the boundary term vanishes—yields
+
 \[
 D_F(p_{\text{data}} \parallel q_\theta) = \mathbb{E}_{p_{\text{data}}(\mathbf{x})} \left[ \| \mathbf{s}_\theta(\mathbf{x}) \|_2^2 + 2 \sum_{i=1}^d \partial_i s_{\theta, i}(\mathbf{x}) \right] + \text{const},
 \]
+
 where \(s_{\theta, i}(\mathbf{x})\) is the \(i\)-th component of the vector \(\mathbf{s}_\theta(\mathbf{x})\), \(\partial_i\) denotes the partial derivative with respect to coordinate \(x_i\), and the constant is the expected squared norm of the true data score that we cannot change. The key observation from Hyvärinen (2005) [https://www.jmlr.org/papers/volume6/hyvarinen05a/hyvarinen05a.pdf] is that this expression depends only on the model score \(\mathbf{s}_\theta\) and its divergence \(\sum_i \partial_i s_{\theta, i}(\mathbf{x})\); the intractable partition function disappears.
 
 This is why we no longer need to normalize \(q_\theta\): the score-matching loss minimizes a weighted sum of the squared vector magnitude and the divergence of the score model. Because both terms are expectations under the data, we can compute stochastic gradients by backpropagating through the divergence term just like any other neural field. The boundary conditions we assume are that the data and model have tails that decay faster than \(1/\|\mathbf{x}\|^{d-1}\) so that the integration-by-parts step holds; this is routinely satisfied by Gaussian smoothed data.
 
 The Fisher divergence objective is still somewhat abstract, so we turn to a more practical form: denoising score matching. Vincent (2011) [https://arxiv.org/abs/1106.5538] reinterpreted the Fisher divergence as learning to predict the clean data from noisy versions. Consider a corruption process \(\tilde{\mathbf{x}} = \mathbf{x} + \sigma \epsilon\), where \(\epsilon \sim \mathcal{N}(0, I)\) and \(\sigma\) is the noise scale. Under this process the true score of the noisy density \(p_\sigma(\tilde{\mathbf{x}})\) satisfies \(\nabla_{\tilde{\mathbf{x}}} \log p_\sigma(\tilde{\mathbf{x}}) = -\frac{1}{\sigma^2}(\tilde{\mathbf{x}} - \mathbb{E}[\mathbf{x}|\tilde{\mathbf{x}}])\), so regression of \(\tilde{\mathbf{x}} - \mathbf{x}\) against \(\tilde{\mathbf{x}}\) is equivalent to regressing the score field. A model \(\mathbf{s}_\theta(\tilde{\mathbf{x}}, \sigma)\) that sees both the noisy input and the scale returns a noise-conditional score that can be trained with the denoising loss
+
 \[
 \mathbb{E}_{p_{\text{data}}(\mathbf{x})\mathcal{N}(\epsilon; 0,I)}\left[ \left\| \mathbf{s}_\theta(\mathbf{x} + \sigma \epsilon, \sigma) + \frac{\epsilon}{\sigma} \right\|_2^2 \right],
 \]
+
 where \(\epsilon\) is the noise that produced \(\tilde{\mathbf{x}}\) and the model learns to point toward the clean \(\mathbf{x}\). Crucially, the loss no longer requires the true \(\nabla_{\mathbf{x}} \log p_{\text{data}}(\mathbf{x})\); learning happens through the noisy difference of \(\mathbf{x}\) and \(\tilde{\mathbf{x}}\), a quantity we can compute from samples.
 
 With the score function in hand, we can sample with Langevin dynamics by following the gradient field. Standard Langevin repeatedly applies
+
 \[
 \mathbf{x}_{k+1} = \mathbf{x}_k + \frac{\eta}{2} \mathbf{s}_\theta(\mathbf{x}_k) + \sqrt{\eta} \epsilon_k,
 \]
+
 where \(\eta\) is the step size and \(\epsilon_k \sim \mathcal{N}(0, I)\). The score term nudges the particle toward higher density, while the isotropic noise ensures the stationary distribution matches the target. However, when the learned score is only accurate near the data manifold, standard Langevin can diverge. The practical fix: annealed Langevin dynamics. In this variant, we cycle through decreasing noise scales \(\{\sigma_1, \dots, \sigma_L\}\) and run several Langevin steps at each \(\sigma_l\) using the noise-conditional score \(\mathbf{s}_\theta(\mathbf{x}, \sigma_l)\). Starting from pure Gaussian noise, we gradually reduce \(\sigma\), allowing the score network to home in on finer structures as the particles cool. This annealing was the key insight in Song & Ermon (2019) [https://arxiv.org/abs/1907.05600] and later formalized through stochastic differential equations in Song et al. (2021) [https://arxiv.org/abs/2011.13456].
 
 That connection is what makes diffusion models practical. When we express the forward process as a stochastic differential equation
+
 \[
 \mathrm{d}\mathbf{x}_t = f(\mathbf{x}_t, t)\,\mathrm{d}t + g(t)\,\mathrm{d}\mathbf{w}_t,
 \]
+
 where \(f\) and \(g\) control the mean and noise coefficients and \(\mathbf{w}_t\) is Brownian motion, we derive a reverse-time SDE whose drift term contains the score \(\nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)\). Learning this score as a function of \(t\) becomes the entire training objective. Once the network approximates the score for each noise level, we can integrate the reverse SDE from \(t=1\) (pure noise) back to \(t=0\) (data) and obtain samples. This formalism is why modern diffusion stacks such as Stable Diffusion rely on score matching under the hood—even though users think in terms of denoising autoencoders and UNets, the training loss is a weighted sum of squared errors on noise vectors, which is precisely denoising score matching in disguise.
 
 The practical failure modes stem from the same tension: the score is learned locally, so the sampler must stay within regions where the model behaves well. Too few noise levels or too large step sizes in annealed Langevin lead to explosions, while overfitting to a narrow data regime produces mode collapse. The remedy is careful noise scheduling, combined with multi-scale architectures that maintain expressivity across signal levels. This narrative is what distinguishes score matching from textbook density estimation: it gives us a regression target that is local in \(\mathbf{x}\), training-friendly, and directly usable inside samplers.
@@ -105,15 +115,19 @@ If you want the engineering story, → [[concepts/diffusion-models]] walks throu
 2. Data: load MNIST from Hugging Face, normalize pixels to \([-1,1]\), and write a dataset iterator that adds correlated Gaussian noise \(\epsilon \sim \mathcal{N}(0,I)\) at scales \(\sigma_l = 10^{-1 - 2l/L}\) for \(l=0,\dots,L-1\), where \(L=20\). Each sample returns \(\tilde{\mathbf{x}} = \mathbf{x} + \sigma_l \epsilon\), the noise vector \(\epsilon\), and the scale \(\sigma_l\).
 
 3. Train/fine-tune: define \(\mathbf{s}_\theta(\tilde{\mathbf{x}}, \sigma)\) as a small ConvNet encoder-decoder with FiLM layers to embed \(\log \sigma\). Optimize the denoising loss
+
    \[
    \mathbb{E}_{\mathbf{x},\epsilon,\sigma_l} \left\| \mathbf{s}_\theta(\tilde{\mathbf{x}}, \sigma_l) + \frac{\epsilon}{\sigma_l} \right\|_2^2
    \]
+
    with AdamW, learning rate \(10^{-4}\), batch size 128, and gradient clipping at 1.0. Expect the loss to drop from ~8.0 to ~0.4 in 40k steps. Log \(\ell_2\) sample noise matching to ensure the network outputs vector magnitudes comparable to \(1/\sigma\).
 
 4. Evaluate: run annealed Langevin by initializing \(\mathbf{x}_T \sim \mathcal{N}(0,I)\) and iterating backwards through the same \(\sigma_l\). At each level take 20 steps of
+
    \[
    \mathbf{x} \leftarrow \mathbf{x} + \frac{\alpha_l}{2} \mathbf{s}_\theta(\mathbf{x}, \sigma_l) + \sqrt{\alpha_l}\,\epsilon,
    \]
+
    where \(\alpha_l = \beta \sigma_l^2\) with \(\beta \approx 0.1\) and \(\epsilon \sim \mathcal{N}(0,I)\). Expect generated digits with readable shapes and pixel variance similar to the training set.
 
 5. What you now have: a checkpoint of \(\mathbf{s}_\theta\) that can take Gaussian noise and produce MNIST-style digits via gradient walks, plus evaluation scripts that render Langevin trajectories and loss curves.

@@ -33,15 +33,19 @@ The mechanism unfolds in four connected parts. First, augmentations are expectat
 ### Expectation over nuisance transformations
 
 Let the training set consist of pairs \((x_i, y_i)\) drawn from an empirical distribution \(\hat{p}(x,y)\). Data augmentation introduces a stochastic transform \(T_\phi\) parameterized by a nuisance variable \(\phi\), such as rotation angle, crop coordinates, or color scale. The augmented objective becomes
+
 \[
 L_{\text{aug}}(\theta) = \mathbb{E}_{(x,y)\sim \hat{p}} \mathbb{E}_{\phi\sim q(\phi\!\mid\!x)}\big[ \ell(f_\theta(T_\phi(x)), y)\big],
 \]
+
 where \(f_\theta\) is the model, \(\ell\) is the task loss that scores how far the prediction deviates from the label, and \(q(\phi\!\mid\!x)\) is the augmentation policy conditioned on the instance \(x\). This expectation forces the classifier to perform well on every transformation drawn from \(q\), concentrating the solution in parameter regions that respect invariance.
 
 Tanner and Wong originated this perspective in the Bayesian data augmentation framework—augmentations approximate a Monte Carlo marginalization over nuisance parameters, so the posterior becomes
+
 \[
 p(\theta\mid \mathcal{D}) \approx \frac{1}{N}\sum_{i=1}^N \int p(\theta\mid T_\phi(x_i), y_i)\, q(\phi\!\mid\! x_i)\,d\phi,
 \]
+
 where \(T_\phi(x_i)\) runs over rotations, scales, or other transformations and the integral enforces that \(\theta\) explains all views of a datum. The effect of the integral is to shrink posterior mass toward invariance-preserving solutions, which improves robustness to the variations encoded in \(q\). The Monte Carlo estimator, however, makes policy search expensive because each sample requires a forward pass through the child model, which foreshadows the practical limits we discuss in the synthesis paragraph. [Tanner & Wong 1987](https://doi.org/10.1080/01621459.1987.10478458)
 
 Early empirical work confirmed this intuition. Krizhevsky, Sutskever, and Hinton’s 2011 preprint demonstrated that simple translations and horizontal flips dramatically improved convolutional networks on large datasets [arXiv:1106.1813v1](https://arxiv.org/pdf/1106.1813v1.pdf), and Zhang et al. (2015) showed that the same transformations regularize neural nets on small datasets by smoothing decision boundaries [ar5iv:1510.02795](https://ar5iv.labs.arxiv.org/html/1510.02795). These studies gave rise to the modern view that \(q(\phi\mid x)\) can be shaped, learned, or interpolated to encode precise invariances rather than being a heuristic afterthought.
@@ -49,21 +53,27 @@ Early empirical work confirmed this intuition. Krizhevsky, Sutskever, and Hinton
 ### Vicinal risk minimization and interpolation strategies
 
 Vicinal risk minimization replaces the empirical estimate \(\hat{p}\) with a vicinal distribution \(\nu(x',y')\) defined around each \((x,y)\), producing
+
 \[
 R_\nu(\theta) = \mathbb{E}_{(x,y)\sim \hat{p}} \mathbb{E}_{(x',y')\sim \nu(x,y)}[\ell(f_\theta(x'), y')],
 \]
+
 where \(\nu(x,y)\) encapsulates the augmentation’s neighborhood. Mixup (Zhang et al. 2017) interprets \(\nu\) as convex combinations between \((x,y)\) and another sample \((x_j,y_j)\):
+
 \[
 \tilde{x} = \lambda x + (1-\lambda) x_j,\qquad 
 \tilde{y} = \lambda y + (1-\lambda) y_j,
 \]
+
 with \(\lambda\sim \text{Beta}(\alpha,\alpha)\) and \(j\) sampled uniformly, so the label interpolation follows the image interpolation. The network learns that the decision boundary should slide linearly between samples, which smooths the gradient in feature space and prevents a “hard margin” effect where the model attaches to a single dominant feature. [arxiv:1710.09412](https://arxiv.org/pdf/1710.09412)
 
 CutMix (Yun et al. 2019) replaces convex combinations with spatial mixing: a binary mask \(M\in \{0,1\}^{W\times H}\) indicates which patch of image \(x_i\) remains, and
+
 \[
 \tilde{x} = M \odot x_i + (1-M)\odot x_j,\qquad
 \tilde{y} = \lambda y_i + (1-\lambda) y_j,
 \]
+
 where \(\odot\) denotes element-wise multiplication and \(\lambda = \frac{\|M\|_1}{W\times H}\) is the fraction of pixels from \(x_i\). This geometry-aware vicinal distribution quilts two spatial contexts together, forcing the model to localize discriminative features across the output instead of relying on one region. [arxiv:1905.04899](https://arxiv.org/abs/1905.04899)
 
 Mixup and CutMix bridge the Bayesian marginalization view by making \(\nu(x,y)\) an explicit distribution over interpolated or patched instances. The smoothing of the loss landscape is the bridge: including intermediate points between classes keeps gradients consistent along the entire segment, which is the same regularization effect Tanner and Wong observed when integrating over nuisance parameters. In representation learning, these interpolations push the network to learn features that lie in the “intermediate” region between classes, which improves downstream probe performance and out-of-distribution robustness.
@@ -71,9 +81,11 @@ Mixup and CutMix bridge the Bayesian marginalization view by making \(\nu(x,y)\)
 ### Automated policy search
 
 Manual design of \(q(\phi\!\mid\!x)\) soon reaches the limits of human imagination. AutoAugment (Cubuk et al. 2018) frames augmentation selection as a sequential decision problem where a controller samples transformation sequences and uses validation accuracy as the reward [arXiv:1805.09501](https://ar5iv.labs.arxiv.org/html/1805.09501). A policy \(\pi\) is built from sub-policies \(s = [(op_1, prob_1, mag_1), (op_2, prob_2, mag_2)]\); the controller applies \(\pi\) to the training set, trains a child network, and returns validation accuracy \(R(\pi)\). The controller’s objective is
+
 \[
 J(\theta_c) = \mathbb{E}_{\pi\sim p_{\theta_c}}[R(\pi)],
 \]
+
 where \(\theta_c\) parameterizes the controller’s RNN. Policy gradient pushes the controller toward sequences of transformations that yield high reward, discovering chains engineers might never try manually.
 
 Variants lighten the budget: Faster AutoAugment (Lim et al. 2019) replaces the child-training loop with density matching [arXiv:1905.01392](https://arxiv.org/abs/1905.01392), PBA (Cubuk et al. 2019) re-parameterizes the policy schedule over epochs [arXiv:1901.05636](https://arxiv.org/abs/1901.05636), and RandAugment fixes the number of operations while only tuning magnitude [arXiv:1909.13719](https://arxiv.org/abs/1909.13719). All these methods assume a smooth augmentation landscape where good policies cluster; the search is worthwhile when the domain is specialized, such as medical imaging where rotations must stay anatomically plausible.

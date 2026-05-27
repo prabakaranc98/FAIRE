@@ -33,6 +33,7 @@ The mechanism of latent diffusion unwinds in four acts: compress, diffuse, predi
 ### Compress: encoding semantic structure
 
 The first act is a perceptual compression \(\mathcal{E}\). Instead of shrinking images with a fixed downsampling, an LDM trains an autoencoder whose encoder \(\mathcal{E}\) learns to preserve the features that matter to a downstream diffusion model, and whose decoder \(\mathcal{D}\) reconstructs the same features from the latent. The latent encoding is written as
+
 \[
 z = \mathcal{E}(x)
 \]
@@ -40,6 +41,7 @@ z = \mathcal{E}(x)
 where \(x\) is the high-resolution input image, \(\mathcal{E}\) is the encoder network, and \(z\) is the low-dimensional latent representation.
 
 The decoder reverses the process:
+
 \[
 \hat{x} = \mathcal{D}(z)
 \]
@@ -51,6 +53,7 @@ This autoencoder is often trained separately with a combination of reconstructio
 ### Diffuse: applying noise in latent space
 
 Once the latent \(z_0\) is available, we run the standard diffusion forward process on it. The latent forward process mirrors a DDPM: at each timestep \(t\), we mix \(z_0\) with Gaussian noise,
+
 \[
 z_t = \sqrt{\bar{\alpha}_t}\, z_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon
 \]
@@ -58,6 +61,7 @@ z_t = \sqrt{\bar{\alpha}_t}\, z_0 + \sqrt{1 - \bar{\alpha}_t}\, \epsilon
 where \(\epsilon \sim \mathcal{N}(0, I)\) is standard normal noise, \(\bar{\alpha}_t = \prod_{s=1}^t (1 - \beta_s)\) is the cumulative product of the noise schedule \(\beta_s\), and \(z_t\) is the noisy latent seen by the U-Net at timestep \(t\). The schedule \(\{\beta_s\}\) is chosen so that \(\bar{\alpha}_t\) decays smoothly from 1 to 0; common choices include cosine or sigmoid schedules, though the score-matching literature shows that smoothing the score estimation noise yields more stable training (To smooth a cloud or to pin it down: Guarantees and Insights on Score Matching i (2023) [arxiv:2305.09605v3]).
 
 Training then optimizes the latent-space noise prediction network \(\epsilon_\theta\) to match the sampled noise. The LDM loss is
+
 \[
 \mathcal{L}_{\text{LDM}} = \mathbb{E}_{x, t, \epsilon}\left[\|\epsilon - \epsilon_\theta(z_t, t)\|^2\right]
 \]
@@ -69,6 +73,7 @@ Because the encoder-decoder pair introduces some distortion, the U-Net’s predi
 ### Predict: conditioning and guidance
 
 Modern LDMs extend the vanilla noise predictor to handle conditioning signals such as text or editing masks. The UNet takes as input not only \(z_t\) and \(t\) but also cross-attended embeddings \(c\). During training, these embeddings can be text tokens, class labels, or image contexts. A common trick is classifier-free guidance: the network is trained on both conditioned and unconditioned pairs, and at sampling time the network’s outputs \(\epsilon_\theta(z_t, t, c)\) and \(\epsilon_\theta(z_t, t, \varnothing)\) are combined as
+
 \[
 \epsilon_\text{guided} = \epsilon_\theta(z_t, t, \varnothing) + w\left(\epsilon_\theta(z_t, t, c) - \epsilon_\theta(z_t, t, \varnothing)\right)
 \]

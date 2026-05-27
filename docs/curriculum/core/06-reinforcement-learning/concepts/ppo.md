@@ -25,11 +25,13 @@ In practice, PPO answers the question: how do you keep a policy from “overshoo
 ## How it works
 
 PPO’s core mechanism is an objective that punishes updates that change the policy too much while still following the advantage signal. Start with the policy ratio
+
 \[
 r_t(\theta) = \frac{\pi_\theta(a_t \mid s_t)}{\pi_{\theta_{\text{old}}}(a_t \mid s_t)}
 \]
 
 where \(\pi_\theta\) is the current policy parameterized by \(\theta\), \(\pi_{\theta_{\text{old}}}\) is the policy that generated the data, \(a_t\) is the chosen action (which in language alignment is the next token), and \(s_t\) is the prefix context or environment state. The surrogate loss clips this ratio:
+
 \[
 \mathcal{L}^{\text{CLIP}}(\theta) = \mathbb{E}_t\left[\min\left(r_t(\theta) \, \hat{A}_t,
 \text{clip}\!\left(r_t(\theta), 1-\epsilon, 1+\epsilon\right) \, \hat{A}_t \right)\right]
@@ -38,11 +40,13 @@ where \(\pi_\theta\) is the current policy parameterized by \(\theta\), \(\pi_{\
 where \(\hat{A}_t\) is the estimated advantage at timestep \(t\), \(\epsilon\) is the clip threshold (typically 0.1–0.3), and \(\text{clip}\) constrains \(r_t\) within \([1-\epsilon, 1+\epsilon]\). The min operator selects the conservative estimate: if the ratio tries to push too hard in the direction of positive advantage, clipping keeps the update tied to the old policy; if the ratio goes below \(1-\epsilon\), the same clip prevents collapses. In other words, clipping acts as a soft trust region, keeping the policy update within a band where Taylor approximations to the KL divergence remain valid.
 
 Each policy gradient step still needs \(\hat{A}_t\), and this is where the critic enters. PPO usually pairs the clipped loss with a value-function loss,
+
 \[
 \mathcal{L}^V(\theta) = \mathbb{E}_t\left[(V_\theta(s_t) - V^{\text{target}}_t)^2\right]
 \]
 
 where \(V_\theta(s_t)\) is the critic’s output for state \(s_t\), and \(V^{\text{target}}_t\) is the truncated multi-step return computed with GAE. The Generalized Advantage Estimation formula
+
 \[
 \hat{A}_t^{\text{GAE}(\lambda)} = \sum_{l=0}^{\infty} (\gamma \lambda)^l \delta_{t+l}
 \]
@@ -52,6 +56,7 @@ is where each TD error \(\delta_{t} = r_t + \gamma V_{\theta_{\text{old}}}(s_{t+
 The critic is expensive because it must either be a copy of the policy network (when sharing the transformer body) or a standalone head that sees every prefix. Each RLHF step now requires forward passes through both the policy (to compute log-probabilities for the ratio) and the critic (to compute the value target). Worse, the critic may itself be finetuned on the same 70B model architecture, doubling the weight storage in GPU memory and forcing mixed-precision engineering to avoid OOMs. That is the “critic tax” introduced in the hook: the stability payoff is real, but so is the hardware demand.
 
 To push PPO toward more practical settings, practitioners add one more regularizer—a KL penalty that anchors the updated policy to a reference policy. The full PPO loss becomes
+
 \[
 \mathcal{L}^{\text{PPO}}(\theta) = -\mathcal{L}^{\text{CLIP}}(\theta) + c_1 \mathcal{L}^V(\theta) + c_2 \mathbb{E}_t\left[\text{KL}\left(\pi_{\theta_{\text{old}}}(\cdot \mid s_t) \, \| \, \pi_\theta(\cdot \mid s_t)\right)\right]
 \]

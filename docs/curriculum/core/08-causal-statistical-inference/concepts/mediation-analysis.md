@@ -25,21 +25,27 @@ Mechanism is the question mediation analysis was invented to answer. Traditional
 ## How it works
 
 Mediation analysis begins inside a structural causal model with three types of nodes: a treatment \(A\) (for example, whether we prompt the model with chain-of-thought), a mediator \(M\) (the tokens the model emits when reasoning), and an outcome \(Y\) (the final answer accuracy). Each node is a deterministic function of its parents and an independent noise term; \(M = f_M(A, U_M)\) and \(Y = f_Y(A, M, U_Y)\), where \(U_M\) and \(U_Y\) are exogenous noises. The treatment \(A\) is manipulated, so there exists \(Y_a\), the outcome we would observe if we forced \(A\) to take value \(a\), and \(M_a\) is the mediator under that intervention. The total causal effect (TE) of changing the prompt from \(a'\) to \(a\) is
+
 \[
 TE = \mathbb{E}[Y_a - Y_{a'}],
 \]
+
 where expectations are over all randomness in the SCM, including unobserved noise. This TE captures every path from \(A\) to \(Y\), but it does not tell us whether the effect transits through \(M\). To disentangle the pathways, Pearl (2014) defines two nested counterfactuals: the natural direct effect (NDE) modifies \(A\) while holding the mediator at the value it would have taken under \(a'\), and the natural indirect effect (NIE) changes the mediator while holding the treatment fixed at \(a\). Their definitions are
+
 \[
 NDE = \mathbb{E}[Y_{a, M_{a'}} - Y_{a', M_{a'}}], \quad NIE = \mathbb{E}[Y_{a, M_{a}} - Y_{a, M_{a'}}],
 \]
+
 where \(Y_{a,m}\) is the outcome when \(A\) is fixed to \(a\) and \(M\) is fixed to \(m\), and \(M_{a'}\) is the mediator under treatment \(a'\). These expressions are called “cross-world” because they compare outcomes across hypothetical worlds where \(A\) and \(M\) take values that could not coexist under a single intervention. Their sum recovers the total effect: \(TE = NDE + NIE\), which is true whenever the mediator is well defined.
 
 ### Identification via the causal mediation formula
 
 To compute NDE and NIE from data, Pearl (2014) derives the causal mediation formula, which rewrites the cross-world expectation as an integral over observed variables:
+
 \[
 \mathbb{E}[Y_{a, M_{a'}}] = \sum_m \mathbb{E}[Y \mid A=a, M=m] \Pr(M=m \mid A=a').
 \]
+
 In this expression, \(A\) and \(M\) are the observed treatment and mediator; \(Y_{a,m}\) is replaced by the conditional expectation of \(Y\) given \(A=a\) and \(M=m\), while \(M_{a'}\) is replaced by the distribution of \(M\) under \(A=a'\). This substitution is valid when we assume sequential ignorability: conditional on pre-treatment covariates \(X\), there are no unobserved confounders of \(A\) and \(M\) nor of \(M\) and \(Y\), i.e., \(A \perp\!\!\!\perp M_{a'} \mid X\) and \(M \perp\!\!\!\perp Y_{a,m} \mid A,X\). Annotated, \(\mathbb{E}[Y \mid A=a, M=m]\) is a regression that predicts the outcome from treatment and mediator, and \(\Pr(M=m \mid A=a')\) is a mediator model that estimates what mediator value would have arisen without intervention. Sequential ignorability is strong, so we typically condition on a rich set of covariates \(X\)—for LLM reasoning this might include prompt difficulty, token frequency, or model temperature.
 
 An alternative, advocated by the interventionist approach, avoids cross-world counterfactuals altogether by defining mediation through randomized manipulations of the mediator itself. “An Interventionist Approach to Mediation Analysis” (2020) reframes the problem as estimating the effect of \(A\) on \(Y\) when we intervene on \(A\) and then either allow or block the mediator from changing. That work introduces the idea of using auxiliary experiments—randomizing the mediator or its observed proxies—to isolate the direct effect. For example, to approximate \(Y_{a,M_{a'}}\), we can hold the mediator constant at its value under \(a'\) while applying treatment \(a\) by reusing cached reasoning tokens or by training a simulator that freezes the mediator embeddings. The interventionist formulation clarifies which assumptions are testable: if we can randomize \(M\) while keeping \(A\) fixed, we can estimate the same contrast as the cross-world definition without invoking untestable independence between unseen noise terms. That design also makes it easier to think about LLM interventions where we actively replace the mediator stream with synthetic tokens to simulate “no reasoning” conditions.

@@ -29,23 +29,29 @@ This is where the model-based approach pays off. When you sketch a DAG and check
 ## How it works
 
 You build an SCM by specifying a DAG \(G\) and assigning to each observed node \(X_i\) (called endogenous) a structural equation driven by its parents \(PA_i\) within the graph and an independent noise term \(U_i\):
+
 \[
 X_i = f_i(PA_i, U_i)
 \]
+
 where \(f_i\) is the deterministic function describing how the parents cause \(X_i\), \(PA_i\) is the set of direct causes of \(X_i\) in the DAG, and \(U_i\) is a random variable representing background noise that is independent across equations according to the modeler’s assumptions. The pair \((G, \{f_i\})\) defines the structural causal model. The graph encodes conditional independencies; the equations encode the exact functional response.
 
 ### From observations to interventions
 
 Causal questions usually ask about interventions, so we need a different probability than the usual observational distribution \(P(X)\). In Pearl’s notation, the intervention \(do(X=x)\) surgically sets the variable \(X\) to \(x\) and removes all arrows into \(X\), producing a modified graph \(G_{do(X=x)}\). The interventional distribution is then
+
 \[
 P(Y \mid do(X=x)) = \sum_{U} P(Y \mid x, U) P(U)
 \]
+
 where \(Y\) is the outcome we care about, \(U\) is the vector of exogenous noise variables, and the summation marginalizes over the unobserved factors. This formula is the basis for counterfactual reasoning: the somber statement “we cannot directly observe \(P(Y \mid do(X=x))\)” becomes actionable because the SCM specifies how to compute it using the structural equations and the graph’s independencies. In practice, we use rules such as the back-door criterion to decide which variables to condition on so that the interventional effect equals an observational conditional.
 
 Back-door adjustment applies when there is a set \(Z\) that blocks all back-door paths from \(X\) to \(Y\). Written formally,
+
 \[
 P(Y \mid do(X=x)) = \sum_z P(Y \mid X=x, Z=z) P(Z=z)
 \]
+
 where \(Z\) is chosen so that conditioning removes confounding. The SCM graph guides that choice: if the graph shows an arrow \(Z \rightarrow X\) and \(Z \rightarrow Y\) with no other back-door paths, then the adjustment formula is valid. This is the practical procedure causal engineers follow when a simple regression would otherwise conflate several causal mechanisms.
 
 ### Counterfactuals and structural equations
