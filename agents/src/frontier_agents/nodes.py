@@ -1115,6 +1115,39 @@ PAGE TO REVIEW:
     else:
         per_dim["checklist_score"] = 1.0
 
+    # Deterministic arxiv-ID validator — catches hallucinated citations cheaply,
+    # without an HTTP call. Modern arxiv IDs are YYMM.NNNNN where YYMM cannot
+    # exceed the current year-month. Anything beyond that (e.g. 2604.12345 in
+    # 2026-05) is a writer hallucination. Penalty: -0.05 per bad ID, cap -0.20.
+    import re as _re_arxiv
+    from datetime import datetime as _dt_arxiv
+    arxiv_ids = set(_re_arxiv.findall(r"\b(\d{4}\.\d{4,5})(?:v\d+)?\b", draft))
+    now = _dt_arxiv.utcnow()
+    current_yymm = (now.year % 100) * 100 + now.month
+    bad_arxiv: list[str] = []
+    for aid in arxiv_ids:
+        yymm_str = aid.split(".", 1)[0]
+        try:
+            yymm = int(yymm_str)
+        except ValueError:
+            continue
+        month_part = yymm % 100
+        if month_part < 1 or month_part > 12 or yymm > current_yymm:
+            bad_arxiv.append(aid)
+    if bad_arxiv:
+        penalty_a = min(0.20, 0.05 * len(bad_arxiv))
+        confidence = max(0.0, confidence - penalty_a)
+        hallucination_msgs = [
+            f"Hallucinated arxiv ID {aid} — YYMM is in the future or malformed (today is {now:%Y-%m})"
+            for aid in bad_arxiv
+        ]
+        all_issues = list(all_issues) + hallucination_msgs
+        per_dim["arxiv_validity_score"] = max(0.0, 1.0 - penalty_a * 2)
+        if penalty_a >= 0.10:
+            approved = False
+    else:
+        per_dim["arxiv_validity_score"] = 1.0
+
     summary = (
         f"PASS: {structured.passed}\nConfidence: {confidence:.2f} "
         f"(rubric={structured.confidence:.2f}, panel_min={min((cs.score for cs in panel.values()), default=1.0):.2f})\n"
@@ -1258,8 +1291,30 @@ def _sanitize_draft(text: str) -> str:
     return stripped
 
 
+def _ensure_h1(text: str, topic: str) -> str:
+    """Promote the first heading after frontmatter to `# ` if no H1 exists.
+
+    Writer occasionally drifts and emits `## Topic` as the page title instead
+    of `# Topic`, which breaks mkdocs' page-title detection. Cheap regex fix.
+    """
+    import re as _re
+    fm_close = text.find("\n---\n", 4)
+    if fm_close == -1:
+        return text
+    body_start = fm_close + 5
+    head = text[body_start:body_start + 4000]
+    if _re.search(r"^# [^\n]", head, _re.MULTILINE):
+        return text
+    m = _re.search(r"^(#{2,6}) ([^\n]+)$", head, _re.MULTILINE)
+    if not m:
+        return text
+    new_head = head[:m.start()] + "# " + m.group(2) + head[m.end():]
+    return text[:body_start] + new_head + text[body_start + 4000:]
+
+
 def write_file_node(state: WikiPageState) -> WikiPageState:
     final = _sanitize_draft(state.get("draft", ""))
+    final = _ensure_h1(final, state.get("topic", ""))
 
     # Inject arc breadcrumb immediately after frontmatter closing ---
     arc_context = state.get("arc_context", {})
