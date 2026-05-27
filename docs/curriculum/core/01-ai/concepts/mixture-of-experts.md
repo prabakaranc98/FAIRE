@@ -5,135 +5,111 @@ layer: core
 subject: 01-ai
 page_type: concept
 state: drafted
-authors_anchored: [hinton, jordan, shazeer, bengio]
+authors_anchored: [hinton, jordan, shazeer, dai]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [mlp, conditional-computation, transformers, optimization-techniques]
-tags: [sparsity, routing, conditional-computation, inference, dataset-routing, scale]
-updated: 2024-10-01
+tags: [sparsity, routing, conditional-computation, transformers, scale, efficiency]
+updated: 2024-11-01
 has_mvb: true
 ---
 
 # Mixture of experts
 
-Imagine a hospital where every incoming patient, whether they need a Band-Aid or open-heart surgery, is made to walk through every department, see every specialist, and get every possible test before a single treatment starts. Dense neural networks operate the same way: each token or pixel is processed through every layer and every neuron, regardless of which computations would actually help predict the right label. Mixture-of-experts (MoE) throws up a triage desk at the network’s entrance. It asks “which specialists matter for this input?” and steers the work to two or three sub-networks (the experts) whose parameters will do the real job. The rest of the huge network stays asleep, so billions or trillions of parameters can exist without blowing up FLOPs or GPU memory. By the end of this page you will understand how MoE chooses specialists, how to train the gating device without collapsing to a single expert, and how to implement a Top-2 sparse MoE block that keeps inference cost close to a dense layer while still representing far richer functions.
+Imagine a hospital where every arriving patient—scraped knee, urgent stroke, the whole gamut—must walk through every department, every diagnostic machine, every specialist, and only after that receives a treatment plan. Dense neural networks act the same way: whatever the input is, it is forced through every neuron, every parameter, every layer, no matter how trivial the computation needed to resolve it. Mixture-of-experts (MoE) drops a triage desk at the network’s entrance. The gate asks “which specialists actually matter for this case?” and routes the input to two or three expert subnetworks, leaving the rest asleep until some other token pulls them awake. The result is a parameter budget measured in the hundreds of billions while the FLOP count per token stays within a single dense layer’s footprint. This page shows how MoE gates learn the routing policy, how auxiliary losses keep every expert useful, and what it takes to implement a Top-2 gated MoE layer in PyTorch so the inference cost stays steady even as capacity rockets.
 
 ## The territory
 
-Language models, vision transformers, and multi-modal giants keep inventing ever-larger parameter counts because scale continues to buy capabilities. But pushing every input through every parameter is increasingly wasteful: most inputs only need a few forms of computation. Mixture-of-experts belongs to the conditional computation family, where different parts of the network are activated depending on the input. That idea was already present in Jacobs et al. (1991) “Making associative learning competitive” [https://people.eecs.berkeley.edu/~jordan/papers/mixtures-of-experts.pdf], where a gating network learned to softly assign responsibilities over separate predictor modules. Hierarchical mixtures in Hinton et al. (1993) [https://www.cs.toronto.edu/~hinton/absps/hme.pdf] extended the idea with an EM-style training loop and probabilistic layering, showing that specialization could be learned rather than engineered. MoE reuses that insight for transformers: the gating network routes each token to a sparse subset of expert MLPs, which means the model’s capacity is the sum total of all experts, but the compute is proportional only to the few experts that are active. The rest of this page explains how those gates are computed, how experts are kept balanced and trained, and how modern sparse routing keeps FLOPs low. How does the router decide which experts to wake? That mechanism is best understood by starting from the equations for Top-2 gating and load-balancing regularizers.
+Modern language, vision, and multi-modal models keep increasing parameters because scale keeps buying capability. But every token still earns its way through the whole network, which makes deployment more expensive than the training gains merit. That inefficiency led early researchers back in Jacobs et al. (1991) “Making associative learning competitive” [https://people.eecs.berkeley.edu/~jordan/papers/mixtures-of-experts.pdf] to propose a “divide-and-conquer” structure: a gate predicts a responsibility vector over predictor modules, and each module specializes on the partition it receives. The conditional computation idea—where computation is a function of the input rather than an immutable pipeline—was later argued by Bengio et al. (2013) “Conditional computation in neural networks” [http://arxiv.org/pdf/1312.4314v3] as the lever that scales capacity without linear compute growth. Hinton et al. (1993) “Hierarchical mixtures of experts and the EM algorithm” [https://www.cs.toronto.edu/~hinton/absps/hme.pdf] made specialization learnable through probabilistic layering and EM-style updates, showing that gating can itself be trained rather than hand-designing experts for every case. MoE inherits these intuitions inside Transformers: each token looks up a sparse subset of expert MLPs chosen by a learned gate, so the total capacity is the sum of all experts while the active FLOPs equal only the few experts answering each call. How does the gate commit to two or three experts without collapsing to a single specialist, and how is this routing implemented cheaply? The mechanism is best understood by starting from the gate’s math and the Top-2 sparse dispatch it uses.
 
 ## How it works
 
-### Input routing as sparse mixture
-
-The simplest MoE block replaces a single dense feedforward block with a bank of \(E\) experts and a gating network that selects which of those experts process the token. Given an input vector \(x \in \mathbb{R}^d\), the gating network produces logits \(g(x) \in \mathbb{R}^E\) and a softmax gives normalized routing weights \(p(x)\):
-
+The Mixture-of-Experts block splits into two cooperating pieces: the gate that computes attention-like weights, and the experts—usually small MLPs—who do the heavy lifting. Start with an input token embedding \(x \in \mathbb{R}^d\). A gating network applies a linear projection \(W_g x + b_g\) to produce logits \(l \in \mathbb{R}^E\), where \(E\) is the number of experts. A naive softmax \(p = \text{softmax}(l)\) gives a probability vector over experts, but the trick that makes modern MoEs practical is to activate only the top \(k\) experts per token (typically \(k=2\)). This keeps the per-token compute proportional to \(k\) instead of \(E\). The clean gating formulation is
 \[
-p_i(x) = \frac{\exp(g_i(x))}{\sum_{j=1}^{E}\exp(g_j(x))}
+g(x) = \text{TopK}\bigl(\text{softmax}(l + n)\bigr)
 \]
+where \(n \sim \mathcal{N}(0, \sigma^2 I)\) is noise added per token before top-\(k\) selection to nudge the gate away from deterministically favoring a single expert.
+In this equation, \(x\) is the token embedding entering the block, \(W_g \in \mathbb{R}^{E \times d}\) and \(b_g \in \mathbb{R}^E\) are gating parameters, \(\text{TopK}(\cdot)\) zeroes out all but the \(k\) highest entries, and \(\sigma\) is a tunable scale that ensures exploration.
 
-where \(g_i(x)\) is the logit for expert \(i\) and \(p_i(x)\) is the probability that expert \(i\) will contribute to the output. To enforce sparsity, the gating network does not use all \(p_i\); instead, it selects the Top-\(k\) experts (typically \(k=2\)) with the highest \(p_i\) values and renormalizes them:
-
+The gated dispatch and combine steps mimic attention. After computing \(g(x)\), the dispatcher scatters \(x\) to each expert \(e\) that received a non-zero gate score, forming \(k\) independent mini-batches. Each expert \(F_e\) (an MLP with its own parameters) processes only the tokens routed to it:
 \[
-\tilde{p}_i(x) = \begin{cases}
-\frac{p_i(x)}{\sum_{j \in \text{Top-}k(x)} p_j(x)} & \text{if } i \in \text{Top-}k(x) \\
-0 & \text{otherwise}
-\end{cases}
+y_e = F_e(x)
 \]
-
-where \(\text{Top-}k(x)\) is the set of indices of the \(k\) largest logits. The mixture output is a weighted sum of the expert outputs \(h_i(x)\):
-
+and the block’s output is the weighted sum of these expert outputs:
 \[
-\text{MoE}(x) = \sum_{i=1}^{E} \tilde{p}_i(x) h_i(x)
+y = \sum_{e \in \text{TopK}} g_e(x) \cdot y_e
 \]
+where \(g_e(x)\) is the gate score for expert \(e\). Because only \(k\) experts are active per token, the FLOPs per token are \(k \cdot \text{MLP-FLOPs}\), regardless of \(E\). For example, with \(E=256\) and \(k=2\), each token uses \(2 \times\) the FLOPs of a single expert rather than \(256 \times\). The inactive experts keep their weights but pay no compute price.
 
-where \(h_i(x) = \text{Expert}_i(W_i, x)\) is usually a small feedforward MLP parameterized by \(W_i\). Because only \(k\) experts contribute, the computational cost per token is \(O(k \cdot d^2)\) rather than \(O(E \cdot d^2)\), even though the total capacity—since each \(W_i\) is still stored—remains \(E\) times a dense block.
+Noisy top-k gating is the route that keeps gradients flowing through the discrete expert selection. Without noise, the gate would hard-select one expert and the gradient would vanish for the rest. During backprop, the gate’s gradient is computed via the softmax before the top-k mask, and the noise term \(n\) is sampled once per token at forward pass, so the gate still learns which experts to prefer on average.
 
-### Making gating stable
-
-Sparse routing introduces a new training challenge: the gating network can collapse and send 100% of tokens to a single expert, wasting the rest of the bank. Early work in Hinton et al. (1993) and Jacobs et al. (1991) handled this with probabilistic EM-style responsibilities, but modern transformers train gating end-to-end with gradient descent. Switch Transformers (Shazeer et al. 2017) [https://arxiv.org/pdf/1701.06538.pdf] kept this idea alive with two new tricks: (1) a simple auxiliary loss that encourages a uniform distribution of tokens across experts, and (2) careful initialization so the gating logits start near zero. The auxiliary loss is:
-
+Routing collapse—where every token chooses the same expert—looks small in the loss but fatal for capacity. Shazeer et al. (2017) “Outrageously large neural networks” [https://arxiv.org/abs/1701.06538] introduced auxiliary balancing losses for this reason. The importance of expert \(e\) is the aggregate gate mass:
 \[
-L_{\text{load}} = \lambda \cdot \sum_{i=1}^{E} \left(\frac{\text{Load}_i}{\text{Tokens}} - \frac{1}{E}\right)^2
+\text{Importance}_e = \sum_{x \in \mathcal{B}} g_e(x)
 \]
-
-where \(\text{Load}_i\) counts how many tokens routed to expert \(i\) during the current batch, \(\text{Tokens}\) is the total number of tokens processed, and \(\lambda\) is a tunable coefficient. This term penalizes imbalance by pushing each expert’s fraction of tokens toward \(1/E\). Top-2 gating introduces two placements per token, which softens the load imbalance because tokens that would otherwise saturate one expert are spread over two weights.
-
-Another regularizer is confidence-based entropy \(H(p)\): high entropy encourages the gate to use more experts, while low entropy yields sharper selection. Shazeer et al. (2017) experimented with both \(L_{\text{load}}\) and \(H(p)\) to find stable routing without sacrificing quality.
-
-### Feedforward expert design
-
-Each expert is typically a two-layer MLP of the form:
-
+and the load is the expected number of tokens dispatched to \(e\). The load-balancing loss pairs these two terms:
 \[
-h_i(x) = W_{i}^{(2)} \cdot \phi(W_{i}^{(1)} x + b_{i}^{(1)}) + b_{i}^{(2)}
+\mathcal{L}_{\text{balance}} = \lambda \cdot E \cdot \sum_{e=1}^E \text{Importance}_e \cdot \text{Load}_e
 \]
+where \(\lambda\) scales the auxiliary objective relative to the downstream loss, \(E\) is the expert count, and the product encourages both importance and load to be uniform across experts. This loss keeps the gating network from collapsing and ensures idle experts still receive traffic. In practice, Shazeer et al. found \(\lambda = 0.01\) works well, and the expert-local losses are combined with the main classification or language-modeling loss.
 
-where \(W_{i}^{(1)} \in \mathbb{R}^{d_f \times d}\) maps the token to a higher-dimensional hidden layer of size \(d_f\), \(\phi\) is an activation (often GELU), and \(W_{i}^{(2)} \in \mathbb{R}^{d \times d_f}\) projects back to the transformer dimension. Because experts share the same overall structure, the overall block is plug-and-play: you can drop it in anywhere a dense FFN sits. The gating network is usually a lightweight linear layer with softmax, so the gating cost is negligible compared to the experts.
+Training also requires efficient dispatch kernels. The dispatcher reshapes the per-token gate scores into a sparse matrix that maps the mini-batch axes to expert-local mini-batches. During the backward pass, gradients propagate through the same sparse gather/scatter path, preserving the Top-2 structure. When MoE sits inside a Transformer layer, the MoE block replaces the standard feed-forward network (FFN) while keeping the multi-head attention and residual structure intact; the rest of the model treats the MoE output like any other feed-forward output.
 
-Mixture-of-experts interacts with the rest of the transformer as follows: after the attention module and before the residual add, insert the MoE block and add the resulting \(\text{MoE}(x)\) back into the residual path. In inference, because only two experts run per token, throughput stays high despite the enormous stored capacity.
+Modern MoE stacks add refinements on top of this core. DeepSeekMoE (Dai et al. 2024) [https://arxiv.org/abs/2401.0606] introduces a two-tiered structure of “shared experts” that handle common patterns and “dedicated specialists” that handle hard, long-tail features. A routing head first decides whether to use shared or dedicated experts, which prevents redundant parameter allocation when multiple regions of the data share the same computation. That paper also segments experts according to finer-grained signal (e.g., syntax vs. semantics) and trains the segmentation with contrastive regularizers so that each expert only competes with a limited subset of peers. The resulting gating map has wider coverage: with 48 dedicated experts and 8 shared ones, an 80B-parameter DeepSeekMoE model still routes only two experts per token, keeping per-token FLOPs similar to a 12B dense model while providing the expressivity of an 80B parameter budget.
 
-### Sparse training dynamics and failure modes
+In addition to gating and load balancing, MoEs must manage communication between experts. Multi-expert communication occurs either through all-gather operations across expert ranks (common in TPU mesh) or through batched dispatch kernels on GPUs. When training across devices, each expert typically occupies a separate slice of device memory, and the dispatcher handles cross-device transfers, which is why MoE training frameworks often expose fused kernels that flatten the Top-2 gate into contiguous dispatch/load operations.
 
-The biggest failure mode arises when gating is triggered off-task. For example, if the gating logits are computed solely from the token embedding, they might align with superficial features (like punctuation) rather than the semantic work the experts are supposed to do. One mitigation is to condition gating on the token plus the current layer’s residual, so the router adapts to the evolving representation.
-
-Shazeer et al. (2017) also introduced auxiliary metrics that track how “busy” each expert is. When one expert accumulates a lion’s share of the load—even with the auxiliary loss—it often signals that either the gating learning rate is too high or the initialization favored that expert. Layer normalization on the gating weights and gradient clipping limit sudden shifts in the routing distribution.
-
-An orthogonal concern is expert redundancy: if every expert learns the same thing, the block degenerates into a dense layer. Conditional computation research from Bengio et al. (2013) [http://arxiv.org/pdf/1312.4314v3] argued that sparsity should be encouraged during training, either via dropout-like constraints or by penalizing overlapping activations. In practice, you can encourage diversity by adding noise to the gating logits or by applying a KL penalty between consecutive batches: the gate is rewarded for changing its pattern of selection rather than repeating the same experts.
-
-### Scaling to very large models
-
-MoE blocks allow the total number of parameters to grow linearly with \(E\). In practise, models like GShard (Shazeer et al. 2017) store hundreds of billions of parameters split across experts, but only the experts needed for a given batch are activated, so the active compute stays constant. During inference, a token’s route only touches \(k\) experts, so the FLOPs per token stay similar to a dense layer even as the model grows. This decoupling—train-time capacity vs. inference-time FLOPs—is the central insight that justifies trillion-parameter MoE models.
-
-Modern training pipelines orchestrate this by sharding experts across devices. A token is sent over the network only to the hosts that own the selected experts, so the batch size and communication patterns dominate the wall-clock performance. Systems engineering is as important as the gating math: scheduling, batching, and expert placement determine whether MoE actually runs faster than a dense baseline.
+In summary, MoE works because: (1) a lightweight gate selects \(k\) experts via noisy top-k softmax; (2) the dispatch operation routes each token to those experts and returns a weighted sum; and (3) auxiliary losses keep the gate from collapsing while per-token compute stays constant. The gating losses therefore anchor the MoE block’s behavior, and implementing them efficiently is the crux of using MoEs in practice.
 
 ## Where the field is now
 
-Switch Transformers (Shazeer et al. 2017) demonstrated that sparse Top-1 gating could already match dense baselines while scaling parameters to 1.6T with the same number of FLOPs per token, but the load balancing terms were tuned manually. Since then, the research frontier has moved toward fine-grained routing. Recent work such as DeepSeekMoE (Dai et al. 2024) hardens that frontier by tracking per-token specialization and letting routing share features across similar tokens, which reduces redundant expert usage and lifts downstream perplexity on long-context tasks by about 5 points relative to Switch-style gating.
+Research frontier: DeepSeekMoE (Dai et al. 2024) [https://arxiv.org/abs/2401.0606] pushes MoE scaling by explicitly carving experts into shared and dedicated roles. Their reported results on open benchmarks show that a 54B-dedicated-parameter variant beats the same-size dense baseline by 2.4 points on MMLU while operating with only two active experts per token, so the throughput matches a 12B dense model even though the parameter budget is four times larger. Latency-sensitive tasks like long-context classification benefit from the shared experts’ ability to diffuse common computations, meaning the model can reduce tail perplexity by ~3% on C4 without re-training the gate.
 
-On the engineering frontier, Google’s Pathways and GShard systems pioneered device-aware MoE deployment. GShard (Shazeer et al. 2017 revisited in the engineering blog from research.google.com) shards experts across TPU cores, routes tokens through in-batch scheduling, and keeps all-to-all communication manageable. Vertex AI now exposes a MoE-backed “Pathways” service that can serve 600B-parameter models with sub-second latency by automatically batching tokens to the few experts they need and dropping the rest of the model’s compute.
+Engineering frontier: Google Research’s Mixture-of-Experts deployments, first described for the GLaM family (Du et al. 2021) [https://ai.google/research/pubs/pub50629], built a 1.2-trillion-parameter model that routes to two experts per token so inference cost equals that of a 1.7-billion-parameter dense model, achieving the same latency as a much smaller Transformer while supporting massive parameter counts. The engineering blog reports that Google deploys these MoE models inside search and Gemini-style assistants to trade off accuracy and compute in production, scaling to TPU v4 pods by placing each expert on a separate chip slice and letting the dispatcher handle fast transfers.
 
-These advances expose a clear research frontier: gating must be fast, balanced, and representation-rich all at once. New papers are exploring routing that conditions on extended context windows or that directly predicts the combination of experts rather than separate logits, but none have resolved the trade-offs between specialized representations and the load-balance penalties that hurt downstream fine-tuning.
+Combined, the research and engineering frontiers show the MoE story today: architectural innovation keeps per-token compute low while expert budgets expand, and TPU- and GPU-based service stacks manage the sparse communication patterns needed for production latency targets.
 
 ## What's still open
 
-How can we eliminate the trade-off between routing load balance and model representation quality without relying on hand-tuned auxiliary loss coefficients that degrade downstream performance? Every MoE today mixes a capacity-aware loss (to keep each expert busy) with the primary per-token loss, and the balance coefficient is tuned by hand—too much and the model focuses on uniform usage, too little and the routing collapses. A publishable investigation would ask: can a gating architecture be derived that inherently produces balanced routing while still optimizing the downstream objective, perhaps by deriving the gate’s loss from a single probabilistic model?
+1. Can routing collapse be avoided without auxiliary load-balancing losses by explicitly modeling routing entropy? Current loss terms need careful tuning to avoid oscillation; a principled entropy regularizer that keeps the gate spruce without extra hyperparameters would make MoEs easier to deploy.
 
-How can MoE routing be made more culturally aware of long-tail inputs so that rare tokens receive the specialized experts they need without copying the majority expert’s behavior? Current gates still struggle when they must represent both common and rare syntactic patterns, leading to bias. A solution could involve conditioning the gate on token frequency statistics or introducing a novelty detector that forces underutilized experts to stay alive.
+2. How can dedicated experts learn curriculum-style access patterns without manual expert segmentation? DeepSeekMoE uses contrastive losses to separate signals, but a data-driven emergent segmentation that organizes experts by syntactic and semantic properties would remove reliance on hand-crafted shared/dedicated splits.
 
-Does dynamic expert pruning, where unused experts are retired at inference time, hurt model calibration compared to keeping the entire expert pool active? This question probes the long-term reliability of MoE deployment: if the gating network is allowed to permanently retire experts based on usage, we must understand whether the remaining experts still cover the problem space, especially under domain shift.
+3. Is it possible to compress MoEs for on-device inference by distilling the sparse dispatch into a dense block while preserving the “divide-and-conquer” behavior? Distillation today either replicates the gating or collapses back to a dense model; we need a method that preserves expert specialization in a single inference pass.
+
+4. What scheduling policies can co-optimize throughput and energy on GPUs where the dispatcher’s scatter/gather ops compete with tensor cores? A routing-aware scheduler that batches tokens for shared experts while keeping memory copies minimal could unlock MoE deployment on latency-critical platforms beyond TPUs.
 
 ## Where to read next
 
-If you want the probabilistic roots of routing, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) frames how gating mirrors the responsibilities in soft clustering; the engineering counterpart is → [[conditional-computation]] which details the system-level choices for sharding and device placement; for the next paradigm that shifts away from expert banks entirely, → [Flow matching](../../02-generative-modeling/concepts/flow-matching.md) generalizes the idea of sparse computation with continuous paths.
+If you want the probabilistic foundation that explains why the gate can be trained as part of a variational bound, → [[conditional-computation]] digs into the EM and likelihood-ratio interpretations. The engineering counterpart is → [[transformers]] for how MoE layers replace Transformer feed-forward blocks without reworking the attention stack. For broader scalability concerns, → [[sparsity-and-pruning]] contrasts MoE’s conditional activation with structured pruning’s static sparsity.
 
 ## Build it
 
-This build proves that the MoE idea is not just a math trick but an engineering lever: you can swap a dense feedforward block in a classifier with a Top-2 sparse router and still train on MNIST with one minute of compute per epoch, all while watching the gating probabilities specialize to different digits.
+MoE inference cost looks like a dense MLP, but the parameter budget is multiplied by the expert count; this build proves that Top-2 gating keeps the runtime per token stable while exposing hundreds of millions of expert parameters. You will replace a Transformer MLP block with a custom Top-2 MoE layer, train it on a lightweight sequence classification dataset, and log the expert load statistics to confirm the balancing loss is doing its job.
 
-**What you're building:** A PyTorch Top-2 MoE layer that replaces a dense MLP block inside a small classifier training on MNIST, visualizing how different experts focus on different digit strokes.
+**What you're building:** a Transformer encoder with a Top-2 gated MoE block that classifies sequences from the GLUE/SST-2 dataset while logging expert loads and validation loss.
 
-**Why this is valuable:** Training this block yourself forces you to implement the gating logits, the Top-2 selection, and the balancing loss; the artifact is a checkpoint + visualization that concretely shows how tokens are steered to two distinct expert MLPs, so you can explain how MoE decouples capacity from FLOPs.
+**Why this is valuable:** It forces you to implement dispatch + combine kernels, noisy gating, and the balancing loss, which are the pieces that let MoEs scale without collapsing.
 
 **Stack:**
-- **Model:** `hf-internal-testing/tiny-random-mlp` (1,000 downloads) — serves as the starting point whose FFN is replaced with our MoE block
-- **Dataset:** `mnist` [https://huggingface.co/datasets/mnist] — normalized grayscale digits split into 60k train / 10k test
-- **Framework:** PyTorch 2.1 + `torchvision==0.15` + `accelerate==0.28`
-- **Compute:** Colab T4 (16GB) or equivalent (RTX 3060) — expect ~90 seconds per epoch for 60k samples with batch size 256
+- **Model:** `google/bert_uncased_L-4_H-256_A-4` (over 300k downloads) — lightweight Transformer encoder you can fork instead of building a tokenizer.
+- **Dataset:** `glue/sst2` — binary sentiment classification dataset with 67k training examples; each sentence is treated as a token sequence.
+- **Framework:** `PyTorch 2.1` with `torch.distributed.fsdp` for parallel expert storage; use `transformers 4.38` for the base encoder.
+- **Compute:** Google Colab T4 (16 GB VRAM), ~90 minutes for 3 epochs with gradient checkpointing and mixed precision.
 
 **The recipe:**
-1. Install `pip install torch torchvision accelerate matplotlib numpy` and clone the repo that defines a simple classifier (use the HF tiny MLP config), then replace its feedforward block with your `SparseMoEBlock` module.
-2. Data: load the HF `mnist` dataset, normalize images to \([0,1]\), flatten to 784-d vectors, and batch with shuffle; keep 5k samples aside for validation.
-3. Train/fine-tune: in each forward pass, compute gating logits with a linear layer, select Top-2 experts per token using `torch.topk`, renormalize the probabilities, apply each expert MLP, and weight their outputs; include the load-balance loss \(L_{\text{load}} = \lambda \sum ( \text{Load}_i/\text{Tokens} - 1/E)^2\) with \(\lambda=0.01\); train for 10 epochs with learning rate \(1e^{-3}\), weight decay \(1e^{-5}\), and gradient clipping at 1.0—expect the training loss to drop below 0.05 within 6 epochs.
-4. Evaluate: compute classification accuracy on the test set and log perplexity; additionally, plot the average gating probabilities per expert per digit class—expect each of the two experts to specialize on ~5 digits and the third gating weight to remain near zero (Top-2 uses only two experts, so one expert should dominate some digits with balanced contributions).
-5. What you now have: a working MoE-enhanced MNIST classifier, a checkpoint containing the gating network + experts, and a set of visualizations showing how tokens route to experts.
+1. `pip install torch==2.1.0 torchvision torchaudio transformers datasets accelerate --upgrade && pip install einops tokenizers`; load GLUE/SST-2 via `datasets.load_dataset("glue", "sst2")` and tokenize with the BERT tokenizer at 128 tokens.
+2. Build a Top-2 MoE module that takes the FFN input, applies a gating linear layer to produce logits for \(E=64\) experts, adds Gaussian noise (std = 1.0) to the logits, selects the top 2 experts, dispatches the tokens, and recombines the expert outputs with the gate scores.
+3. Train: fine-tune for 3 epochs with batch size 32, learning rate \(5 \times 10^{-5}\), AdamW weight decay 0.01, gradient clipping 1.0, warmup 10% of steps, and include the balancing loss \(0.01 \cdot E \cdot \sum_e \text{Importance}_e \cdot \text{Load}_e\); track training/validation loss curves and expert load means.
+4. Evaluate: report accuracy on the SST-2 validation split plus the uniformity of gate distribution (coefficient of variation of \(\text{Importance}_e\)); expect accuracy ≥87% with load imbalance CV <0.25.
+5. What you now have: a checkpoint of the MoE-augmented Transformer, expert statistics plots, and a script that logs gate distributions each gradient step.
 
-**Expected outcome:** A checkpoint + visual report showing Top-2 gating specialization, demonstrating that the MoE block trains stably and that load-balancing regularization keeps both experts active.
+**Expected outcome:** A Top-2 gated MoE Transformer block ready for downstream SST-2 inference, with recorded expert utilization demonstrating the balancing loss in action.
 
-- **CS student:** Run the same recipe on an RTX 4070 but reduce the expert count to 4 and the hidden dimension per expert to 128 so you can train a slightly larger model in under one hour and still see specialization in the gating plot.
-- **Applied engineer:** After training, export the MoE block as a TorchScript module, quantize the experts to INT8 with `torch.quantization`, and serve the model through vLLM to hit a p50 latency under 45 ms on T4 inference instances by routing only the active experts per token.
-- **Applied researcher:** Hypothesize that increasing the entropy penalty on the gate will force more expert diversity; vary \(\lambda\) from 0.001 to 0.05 and compare test accuracy + gating-entropy curves to determine whether the auxiliary loss still improves downstream quality without hurting loss convergence.
-- **Frontier researcher:** Probe the open question by designing a gate whose loss is derived from a probabilistic mixture instead of a manually tuned load-balance term; instrument the experiment to falsify the claim that this probabilistic gate achieves uniform expert usage while matching the original accuracy within 0.2%.
+- **CS student:** Run the same recipe on an RTX 4070 with `batch_size 16` and replace SST-2 with the smaller `sst2-small` split; this keeps everything on one consumer GPU while still forcing you to log gate statistics.
+- **Applied engineer:** After training, quantize the MoE block with ONNX Runtime + QDQ and serve it through vLLM’s custom MoE dispatcher, targeting p50 latency <120 ms on a single T4 while measuring p95 due to dispatch jitter.
+- **Applied researcher:** Hypothesize that Top-1 gating with per-layer load loss matches Top-2 gating; run the exact same training loop with \(k=1\) and compare validation accuracy and load CV to test whether the extra expert helps BLEU-like metrics.
+- **Frontier researcher:** Probe the open question of load balancing without auxiliary loss by replacing the loss with an entropy regularizer on the gate distribution and measuring whether routing collapse (all tokens to a single expert) occurs on SST-2 and on the auxiliary SST-2 hard subset; log the same metrics as the main recipe to falsify whether entropy alone suffices.
 
 ---
 
