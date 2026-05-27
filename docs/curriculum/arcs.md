@@ -7,7 +7,7 @@ description: Every arc is a diagonal path from a tool you already touch to a nam
 
 > An arc is a **diagonal** learning path: from a tool you already touch, through a broader frame, to a synthesised capability, landing at the intersection of two active research areas. Each arc names a **specific frontier destination** you build toward. The MVB at each step is the recipe; the arc is the journey.
 
-**4 live · 13 designed and next-up · 13 waiting on missing concept pages · 30 total**
+**8 live · 9 designed and next-up · 13 waiting on missing concept pages · 30 total**
 
 *Status meanings:* 🟢 **live** = readable on the site now. 🟡 **designed · next** = the arc is designed in the [roadmap](../system/arc-roadmap.md) and all 5 concept pages it needs exist; the autonomous loop will write it next time it runs. 🟠 **waiting on missing concept pages** = the arc is designed but one or more of its concept pages need to be written first; those concept pages get auto-seeded by the retrospective, then the arc unlocks.
 
@@ -139,18 +139,18 @@ description: Every arc is a diagonal path from a tool you already touch to a nam
 
 ## Statistical & Probabilistic ML
 
-### **`bayesian-deep-learning`**
+### [bayesian-deep-learning](core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/)
 
-🟡 designed · next to be written · **track:** [Statistical & Probabilistic ML](core/05-statistical-probabilistic-ml/index.md)
+🟢 live — read now · **track:** [Statistical & Probabilistic ML](core/05-statistical-probabilistic-ml/index.md)
 
 **Destination —** A Bayesian neural network on a real production-like dataset, reporting calibration error and showing the uncertainty is actionable (predictive entropy correlates with held-out errors)
 
 `bayesian-inference` → `variational-inference` → `bayesian-neural-networks` → `uncertainty-quantification` → `gaussian-processes`
 
 
-### **`probabilistic-programming-end-to-end`**
+### [probabilistic-programming-end-to-end](core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/)
 
-🟡 designed · next to be written · **track:** [Statistical & Probabilistic ML](core/05-statistical-probabilistic-ml/index.md)
+🟢 live — read now · **track:** [Statistical & Probabilistic ML](core/05-statistical-probabilistic-ml/index.md)
 
 **Destination —** A hierarchical Bayesian model fit in Pyro / NumPyro on a real dataset, with full posterior inference (MCMC or VI), posterior predictive checks, and a credible interval that beats a frequentist baseline
 
@@ -179,9 +179,9 @@ description: Every arc is a diagonal path from a tool you already touch to a nam
 `policy-gradient` → `ppo` → `actor-critic` → `reward-modeling` → `rlhf`
 
 
-### **`world-models-and-imagination`**
+### [world-models-and-imagination](core/06-reinforcement-learning/arcs/world-models-and-imagination/)
 
-🟡 designed · next to be written · **track:** [Reinforcement Learning](core/06-reinforcement-learning/index.md)
+🟢 live — read now · **track:** [Reinforcement Learning](core/06-reinforcement-learning/index.md)
 
 **Destination —** A Dreamer-class agent that learns a latent world model from environment rollouts and plans in imagination, beating a model-free baseline by ≥30% sample efficiency on a control task
 
@@ -232,9 +232,9 @@ description: Every arc is a diagonal path from a tool you already touch to a nam
 
 ## Causal & Statistical Inference
 
-### **`causal-deep-learning`**
+### [causal-deep-learning](core/08-causal-statistical-inference/arcs/causal-deep-learning/)
 
-🟡 designed · next to be written · **track:** [Causal & Statistical Inference](core/08-causal-statistical-inference/index.md)
+🟢 live — read now · **track:** [Causal & Statistical Inference](core/08-causal-statistical-inference/index.md)
 
 **Destination —** A neural net trained to predict counterfactual outcomes under a hidden confounder, recovering the true treatment effect within 10% on a semi-synthetic dataset
 

@@ -5,102 +5,99 @@
 > Checked items are archived automatically on the next scheduler run.
 
 ## Critical Fixes
-- [ ] probabilistic-programming | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Previous attempt errored (conf=0.80) — retry with current prompts -->
-
-## New Content
-- [ ] collective-communication | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] connected-topics-template-09-algorithms-systems-for-ai | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] curriculum-resampling | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] gradient-bucketing | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] long-context-models | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] reinforcement-learning | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] rlhf-infrastructure-overview | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] tensor-cores | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] transformers | 04-neural-networks-deep-learning | core-concept | applied  <!-- Stub page — not yet generated -->
-- [ ] what-can-you-build-next-template-04-neural-networks-deep-learning | 04-neural-networks-deep-learning | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] probabilistic-programming | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Previous attempt errored (conf=0.80) — retry with current prompts -->
 
 ## Arc Index
-- [ ] 01-ai-foundations-index | 01-ai | arc-index | frontier | arc:01-ai-foundations dest:"a working build that ties together the foundational concepts of 01-ai" total:5
+- [x] agentic-rlvr-reasoner-index | 01-ai | arc-index | frontier | arc:agentic-rlvr-reasoner dest:"A small LLM (1–7B) fine-tuned with RLVR on verifiable math/code rewards, evaluated on a held-out reasoning benchmark — measured to recover the R1-Zero-style behaviour at ≥60% of the published gain" total:4
 
 ## Arc Steps
-- [ ] alignment-safety | 01-ai | arc-step | applied | arc:01-ai-foundations pos:1 ch:1 ch_title:"step 1" prev: next:chain-of-thought prev_artifact:"" artifact:"alignment-safety build at step 1" total:5
-- [ ] chain-of-thought | 01-ai | arc-step | applied | arc:01-ai-foundations pos:2 ch:1 ch_title:"step 2" prev:alignment-safety next:mechanistic-interpretability prev_artifact:"(prior step artifact)" artifact:"chain-of-thought build at step 2" total:5
-- [ ] mechanistic-interpretability | 01-ai | arc-step | applied | arc:01-ai-foundations pos:3 ch:2 ch_title:"step 3" prev:chain-of-thought next:mixture-of-experts prev_artifact:"(prior step artifact)" artifact:"mechanistic-interpretability build at step 3" total:5
-- [ ] mixture-of-experts | 01-ai | arc-step | applied | arc:01-ai-foundations pos:4 ch:2 ch_title:"step 4" prev:mechanistic-interpretability next:reward-modeling prev_artifact:"(prior step artifact)" artifact:"mixture-of-experts build at step 4" total:5
-- [ ] reward-modeling | 01-ai | arc-step | applied | arc:01-ai-foundations pos:5 ch:3 ch_title:"step 5" prev:mixture-of-experts next: prev_artifact:"(prior step artifact)" artifact:"reward-modeling build at step 5" total:5
+- [x] chain-of-thought | 01-ai | arc-step | applied | arc:agentic-rlvr-reasoner pos:1 ch:1 ch_title:"step 1" prev: next:reward-modeling prev_artifact:"" artifact:"chain-of-thought build at step 1" total:4
+- [x] reward-modeling | 01-ai | arc-step | applied | arc:agentic-rlvr-reasoner pos:2 ch:1 ch_title:"step 2" prev:chain-of-thought next:rlhf prev_artifact:"(prior step artifact)" artifact:"reward-modeling build at step 2" total:4
+- [x] rlhf | 01-ai | arc-step | applied | arc:agentic-rlvr-reasoner pos:3 ch:2 ch_title:"step 3" prev:reward-modeling next:mixture-of-experts prev_artifact:"(prior step artifact)" artifact:"rlhf build at step 3" total:4
+- [x] mixture-of-experts | 01-ai | arc-step | applied | arc:agentic-rlvr-reasoner pos:4 ch:2 ch_title:"step 4" prev:rlhf next: prev_artifact:"(prior step artifact)" artifact:"mixture-of-experts build at step 4" total:4
 
 ## Arc Index
-- [ ] generative-stack-index | 02-generative-modeling | arc-index | frontier | arc:generative-stack dest:"5 trained generative models with comparable FID, ending in a distilled consistency model" total:5
+- [x] generative-stack-index | 02-generative-modeling | arc-index | frontier | arc:generative-stack dest:"Five trained generative models (DDPM, score-based, latent diffusion, flow-matching, consistency distillation) compared head-to-head on the same dataset with reported FID, sample diversity, and inference latency" total:5
 
 ## Arc Steps
-- [ ] diffusion-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:1 ch:1 ch_title:"step 1" prev: next:score-matching prev_artifact:"" artifact:"diffusion-models build at step 1" total:5
-- [ ] score-matching | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:2 ch:1 ch_title:"step 2" prev:diffusion-models next:latent-diffusion-models prev_artifact:"(prior step artifact)" artifact:"score-matching build at step 2" total:5
-- [ ] latent-diffusion-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:3 ch:2 ch_title:"step 3" prev:score-matching next:flow-matching prev_artifact:"(prior step artifact)" artifact:"latent-diffusion-models build at step 3" total:5
-- [ ] flow-matching | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:4 ch:2 ch_title:"step 4" prev:latent-diffusion-models next:consistency-models prev_artifact:"(prior step artifact)" artifact:"flow-matching build at step 4" total:5
-- [ ] consistency-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:5 ch:3 ch_title:"step 5" prev:flow-matching next: prev_artifact:"(prior step artifact)" artifact:"consistency-models build at step 5" total:5
+- [x] diffusion-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:1 ch:1 ch_title:"step 1" prev: next:score-matching prev_artifact:"" artifact:"diffusion-models build at step 1" total:5
+- [x] score-matching | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:2 ch:1 ch_title:"step 2" prev:diffusion-models next:latent-diffusion-models prev_artifact:"(prior step artifact)" artifact:"score-matching build at step 2" total:5
+- [x] latent-diffusion-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:3 ch:2 ch_title:"step 3" prev:score-matching next:flow-matching prev_artifact:"(prior step artifact)" artifact:"latent-diffusion-models build at step 3" total:5
+- [x] flow-matching | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:4 ch:2 ch_title:"step 4" prev:latent-diffusion-models next:consistency-models prev_artifact:"(prior step artifact)" artifact:"flow-matching build at step 4" total:5
+- [x] consistency-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:5 ch:3 ch_title:"step 5" prev:flow-matching next: prev_artifact:"(prior step artifact)" artifact:"consistency-models build at step 5" total:5
 
 ## Arc Index
-- [ ] 03-representation-learning-foundations-index | 03-representation-learning | arc-index | frontier | arc:03-representation-learning-foundations dest:"a working build that ties together the foundational concepts of 03-representation-learning" total:5
+- [x] self-supervised-vision-foundations-index | 03-representation-learning | arc-index | frontier | arc:self-supervised-vision-foundations dest:"A vision encoder trained without labels on a 100k-image dataset (SimCLR + MAE hybrid) that transfers to ImageNet linear-probe ≥75% top-1" total:5
 
 ## Arc Steps
-- [ ] contrastive-learning | 03-representation-learning | arc-step | applied | arc:03-representation-learning-foundations pos:1 ch:1 ch_title:"step 1" prev: next:data-augmentation prev_artifact:"" artifact:"contrastive-learning build at step 1" total:5
-- [ ] data-augmentation | 03-representation-learning | arc-step | applied | arc:03-representation-learning-foundations pos:2 ch:1 ch_title:"step 2" prev:contrastive-learning next:jepa prev_artifact:"(prior step artifact)" artifact:"data-augmentation build at step 2" total:5
-- [ ] jepa | 03-representation-learning | arc-step | applied | arc:03-representation-learning-foundations pos:3 ch:2 ch_title:"step 3" prev:data-augmentation next:masked-autoencoders prev_artifact:"(prior step artifact)" artifact:"jepa build at step 3" total:5
-- [ ] masked-autoencoders | 03-representation-learning | arc-step | applied | arc:03-representation-learning-foundations pos:4 ch:2 ch_title:"step 4" prev:jepa next:representation-learning prev_artifact:"(prior step artifact)" artifact:"masked-autoencoders build at step 4" total:5
-- [ ] representation-learning | 03-representation-learning | arc-step | applied | arc:03-representation-learning-foundations pos:5 ch:3 ch_title:"step 5" prev:masked-autoencoders next: prev_artifact:"(prior step artifact)" artifact:"representation-learning build at step 5" total:5
+- [x] simclr | 03-representation-learning | arc-step | applied | arc:self-supervised-vision-foundations pos:1 ch:1 ch_title:"step 1" prev: next:contrastive-learning prev_artifact:"" artifact:"simclr build at step 1" total:5
+- [x] contrastive-learning | 03-representation-learning | arc-step | applied | arc:self-supervised-vision-foundations pos:2 ch:1 ch_title:"step 2" prev:simclr next:data-augmentation prev_artifact:"(prior step artifact)" artifact:"contrastive-learning build at step 2" total:5
+- [x] data-augmentation | 03-representation-learning | arc-step | applied | arc:self-supervised-vision-foundations pos:3 ch:2 ch_title:"step 3" prev:contrastive-learning next:masked-autoencoders prev_artifact:"(prior step artifact)" artifact:"data-augmentation build at step 3" total:5
+- [x] masked-autoencoders | 03-representation-learning | arc-step | applied | arc:self-supervised-vision-foundations pos:4 ch:2 ch_title:"step 4" prev:data-augmentation next:representation-learning prev_artifact:"(prior step artifact)" artifact:"masked-autoencoders build at step 4" total:5
+- [x] representation-learning | 03-representation-learning | arc-step | applied | arc:self-supervised-vision-foundations pos:5 ch:3 ch_title:"step 5" prev:masked-autoencoders next: prev_artifact:"(prior step artifact)" artifact:"representation-learning build at step 5" total:5
 
 ## Arc Index
-- [ ] training-fundamentals-index | 04-neural-networks-deep-learning | arc-index | frontier | arc:training-fundamentals dest:"a trained-from-scratch convolutional network with documented loss curves, normalization, and a learned schedule" total:5
+- [x] training-fundamentals-index | 04-neural-networks-deep-learning | arc-index | frontier | arc:training-fundamentals dest:"A from-scratch CNN trained on CIFAR-10 to ≥85% test accuracy with documented loss curves, normalization choices, and a learned schedule — written up like a small lab notebook" total:5
 
 ## Arc Steps
-- [ ] backpropagation | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:1 ch:1 ch_title:"step 1" prev: next:gradient-descent prev_artifact:"" artifact:"backpropagation build at step 1" total:5
-- [ ] gradient-descent | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:2 ch:1 ch_title:"step 2" prev:backpropagation next:adaptive-optimizers prev_artifact:"(prior step artifact)" artifact:"gradient-descent build at step 2" total:5
-- [ ] adaptive-optimizers | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:3 ch:2 ch_title:"step 3" prev:gradient-descent next:regularization prev_artifact:"(prior step artifact)" artifact:"adaptive-optimizers build at step 3" total:5
-- [ ] regularization | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:4 ch:2 ch_title:"step 4" prev:adaptive-optimizers next:batch-normalization prev_artifact:"(prior step artifact)" artifact:"regularization build at step 4" total:5
-- [ ] batch-normalization | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:5 ch:3 ch_title:"step 5" prev:regularization next: prev_artifact:"(prior step artifact)" artifact:"batch-normalization build at step 5" total:5
+- [x] backpropagation | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:1 ch:1 ch_title:"step 1" prev: next:gradient-descent prev_artifact:"" artifact:"backpropagation build at step 1" total:5
+- [x] gradient-descent | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:2 ch:1 ch_title:"step 2" prev:backpropagation next:adaptive-optimizers prev_artifact:"(prior step artifact)" artifact:"gradient-descent build at step 2" total:5
+- [x] adaptive-optimizers | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:3 ch:2 ch_title:"step 3" prev:gradient-descent next:regularization prev_artifact:"(prior step artifact)" artifact:"adaptive-optimizers build at step 3" total:5
+- [x] regularization | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:4 ch:2 ch_title:"step 4" prev:adaptive-optimizers next:batch-normalization prev_artifact:"(prior step artifact)" artifact:"regularization build at step 4" total:5
+- [x] batch-normalization | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:5 ch:3 ch_title:"step 5" prev:regularization next: prev_artifact:"(prior step artifact)" artifact:"batch-normalization build at step 5" total:5
 
 ## Arc Index
-- [ ] 05-statistical-probabilistic-ml-foundations-index | 05-statistical-probabilistic-ml | arc-index | frontier | arc:05-statistical-probabilistic-ml-foundations dest:"a working build that ties together the foundational concepts of 05-statistical-probabilistic-ml" total:5
+- [x] bayesian-deep-learning-index | 05-statistical-probabilistic-ml | arc-index | frontier | arc:bayesian-deep-learning dest:"A Bayesian neural network on a real production-like dataset, reporting calibration error and showing the uncertainty is actionable (predictive entropy correlates with held-out errors)" total:5
 
 ## Arc Steps
-- [ ] bayesian-inference | 05-statistical-probabilistic-ml | arc-step | applied | arc:05-statistical-probabilistic-ml-foundations pos:1 ch:1 ch_title:"step 1" prev: next:bayesian-neural-networks prev_artifact:"" artifact:"bayesian-inference build at step 1" total:5
-- [ ] bayesian-neural-networks | 05-statistical-probabilistic-ml | arc-step | applied | arc:05-statistical-probabilistic-ml-foundations pos:2 ch:1 ch_title:"step 2" prev:bayesian-inference next:bayesian-optimization prev_artifact:"(prior step artifact)" artifact:"bayesian-neural-networks build at step 2" total:5
-- [ ] bayesian-optimization | 05-statistical-probabilistic-ml | arc-step | applied | arc:05-statistical-probabilistic-ml-foundations pos:3 ch:2 ch_title:"step 3" prev:bayesian-neural-networks next:em-algorithm prev_artifact:"(prior step artifact)" artifact:"bayesian-optimization build at step 3" total:5
-- [ ] em-algorithm | 05-statistical-probabilistic-ml | arc-step | applied | arc:05-statistical-probabilistic-ml-foundations pos:4 ch:2 ch_title:"step 4" prev:bayesian-optimization next:expectation-maximization prev_artifact:"(prior step artifact)" artifact:"em-algorithm build at step 4" total:5
-- [ ] expectation-maximization | 05-statistical-probabilistic-ml | arc-step | applied | arc:05-statistical-probabilistic-ml-foundations pos:5 ch:3 ch_title:"step 5" prev:em-algorithm next: prev_artifact:"(prior step artifact)" artifact:"expectation-maximization build at step 5" total:5
+- [x] bayesian-inference | 05-statistical-probabilistic-ml | arc-step | applied | arc:bayesian-deep-learning pos:1 ch:1 ch_title:"step 1" prev: next:variational-inference prev_artifact:"" artifact:"bayesian-inference build at step 1" total:5
+- [x] variational-inference | 05-statistical-probabilistic-ml | arc-step | applied | arc:bayesian-deep-learning pos:2 ch:1 ch_title:"step 2" prev:bayesian-inference next:bayesian-neural-networks prev_artifact:"(prior step artifact)" artifact:"variational-inference build at step 2" total:5
+- [x] bayesian-neural-networks | 05-statistical-probabilistic-ml | arc-step | applied | arc:bayesian-deep-learning pos:3 ch:2 ch_title:"step 3" prev:variational-inference next:uncertainty-quantification prev_artifact:"(prior step artifact)" artifact:"bayesian-neural-networks build at step 3" total:5
+- [x] uncertainty-quantification | 05-statistical-probabilistic-ml | arc-step | applied | arc:bayesian-deep-learning pos:4 ch:2 ch_title:"step 4" prev:bayesian-neural-networks next:gaussian-processes prev_artifact:"(prior step artifact)" artifact:"uncertainty-quantification build at step 4" total:5
+- [x] gaussian-processes | 05-statistical-probabilistic-ml | arc-step | applied | arc:bayesian-deep-learning pos:5 ch:3 ch_title:"step 5" prev:uncertainty-quantification next: prev_artifact:"(prior step artifact)" artifact:"gaussian-processes build at step 5" total:5
 
 ## Arc Index
-- [ ] 06-reinforcement-learning-foundations-index | 06-reinforcement-learning | arc-index | frontier | arc:06-reinforcement-learning-foundations dest:"a working build that ties together the foundational concepts of 06-reinforcement-learning" total:5
+- [x] probabilistic-programming-end-to-end-index | 05-statistical-probabilistic-ml | arc-index | frontier | arc:probabilistic-programming-end-to-end dest:"A hierarchical Bayesian model fit in Pyro / NumPyro on a real dataset, with full posterior inference (MCMC or VI), posterior predictive checks, and a credible interval that beats a frequentist baseline" total:5
 
 ## Arc Steps
-- [ ] actor-critic | 06-reinforcement-learning | arc-step | applied | arc:06-reinforcement-learning-foundations pos:1 ch:1 ch_title:"step 1" prev: next:mdp prev_artifact:"" artifact:"actor-critic build at step 1" total:5
-- [ ] mdp | 06-reinforcement-learning | arc-step | applied | arc:06-reinforcement-learning-foundations pos:2 ch:1 ch_title:"step 2" prev:actor-critic next:model-based-reinforcement-learning prev_artifact:"(prior step artifact)" artifact:"mdp build at step 2" total:5
-- [ ] model-based-reinforcement-learning | 06-reinforcement-learning | arc-step | applied | arc:06-reinforcement-learning-foundations pos:3 ch:2 ch_title:"step 3" prev:mdp next:policy-gradient prev_artifact:"(prior step artifact)" artifact:"model-based-reinforcement-learning build at step 3" total:5
-- [ ] policy-gradient | 06-reinforcement-learning | arc-step | applied | arc:06-reinforcement-learning-foundations pos:4 ch:2 ch_title:"step 4" prev:model-based-reinforcement-learning next:policy-gradients prev_artifact:"(prior step artifact)" artifact:"policy-gradient build at step 4" total:5
-- [ ] policy-gradients | 06-reinforcement-learning | arc-step | applied | arc:06-reinforcement-learning-foundations pos:5 ch:3 ch_title:"step 5" prev:policy-gradient next: prev_artifact:"(prior step artifact)" artifact:"policy-gradients build at step 5" total:5
+- [x] probabilistic-programming | 05-statistical-probabilistic-ml | arc-step | applied | arc:probabilistic-programming-end-to-end pos:1 ch:1 ch_title:"step 1" prev: next:bayesian-inference prev_artifact:"" artifact:"probabilistic-programming build at step 1" total:5
+- [x] bayesian-inference | 05-statistical-probabilistic-ml | arc-step | applied | arc:probabilistic-programming-end-to-end pos:2 ch:1 ch_title:"step 2" prev:probabilistic-programming next:variational-inference prev_artifact:"(prior step artifact)" artifact:"bayesian-inference build at step 2" total:5
+- [x] variational-inference | 05-statistical-probabilistic-ml | arc-step | applied | arc:probabilistic-programming-end-to-end pos:3 ch:2 ch_title:"step 3" prev:bayesian-inference next:mcmc prev_artifact:"(prior step artifact)" artifact:"variational-inference build at step 3" total:5
+- [x] mcmc | 05-statistical-probabilistic-ml | arc-step | applied | arc:probabilistic-programming-end-to-end pos:4 ch:2 ch_title:"step 4" prev:variational-inference next:gaussian-processes prev_artifact:"(prior step artifact)" artifact:"mcmc build at step 4" total:5
+- [x] gaussian-processes | 05-statistical-probabilistic-ml | arc-step | applied | arc:probabilistic-programming-end-to-end pos:5 ch:3 ch_title:"step 5" prev:mcmc next: prev_artifact:"(prior step artifact)" artifact:"gaussian-processes build at step 5" total:5
 
 ## Arc Index
-- [ ] 07-attention-memory-reasoning-continual-foundations-index | 07-attention-memory-reasoning-continual | arc-index | frontier | arc:07-attention-memory-reasoning-continual-foundations dest:"a working build that ties together the foundational concepts of 07-attention-memory-reasoning-continual" total:5
+- [x] world-models-and-imagination-index | 06-reinforcement-learning | arc-index | frontier | arc:world-models-and-imagination dest:"A Dreamer-class agent that learns a latent world model from environment rollouts and plans in imagination, beating a model-free baseline by ≥30% sample efficiency on a control task" total:5
 
 ## Arc Steps
-- [ ] attention | 07-attention-memory-reasoning-continual | arc-step | applied | arc:07-attention-memory-reasoning-continual-foundations pos:1 ch:1 ch_title:"step 1" prev: next:in-context-learning prev_artifact:"" artifact:"attention build at step 1" total:5
-- [ ] in-context-learning | 07-attention-memory-reasoning-continual | arc-step | applied | arc:07-attention-memory-reasoning-continual-foundations pos:2 ch:1 ch_title:"step 2" prev:attention next:long-context prev_artifact:"(prior step artifact)" artifact:"in-context-learning build at step 2" total:5
-- [ ] long-context | 07-attention-memory-reasoning-continual | arc-step | applied | arc:07-attention-memory-reasoning-continual-foundations pos:3 ch:2 ch_title:"step 3" prev:in-context-learning next:multi-head-attention prev_artifact:"(prior step artifact)" artifact:"long-context build at step 3" total:5
-- [ ] multi-head-attention | 07-attention-memory-reasoning-continual | arc-step | applied | arc:07-attention-memory-reasoning-continual-foundations pos:4 ch:2 ch_title:"step 4" prev:long-context next:positional-encoding prev_artifact:"(prior step artifact)" artifact:"multi-head-attention build at step 4" total:5
-- [ ] positional-encoding | 07-attention-memory-reasoning-continual | arc-step | applied | arc:07-attention-memory-reasoning-continual-foundations pos:5 ch:3 ch_title:"step 5" prev:multi-head-attention next: prev_artifact:"(prior step artifact)" artifact:"positional-encoding build at step 5" total:5
+- [x] mdp | 06-reinforcement-learning | arc-step | applied | arc:world-models-and-imagination pos:1 ch:1 ch_title:"step 1" prev: next:policy-gradient prev_artifact:"" artifact:"mdp build at step 1" total:5
+- [x] policy-gradient | 06-reinforcement-learning | arc-step | applied | arc:world-models-and-imagination pos:2 ch:1 ch_title:"step 2" prev:mdp next:model-based-reinforcement-learning prev_artifact:"(prior step artifact)" artifact:"policy-gradient build at step 2" total:5
+- [x] model-based-reinforcement-learning | 06-reinforcement-learning | arc-step | applied | arc:world-models-and-imagination pos:3 ch:2 ch_title:"step 3" prev:policy-gradient next:world-models prev_artifact:"(prior step artifact)" artifact:"model-based-reinforcement-learning build at step 3" total:5
+- [x] world-models | 06-reinforcement-learning | arc-step | applied | arc:world-models-and-imagination pos:4 ch:2 ch_title:"step 4" prev:model-based-reinforcement-learning next:q-learning prev_artifact:"(prior step artifact)" artifact:"world-models build at step 4" total:5
+- [x] q-learning | 06-reinforcement-learning | arc-step | applied | arc:world-models-and-imagination pos:5 ch:3 ch_title:"step 5" prev:world-models next: prev_artifact:"(prior step artifact)" artifact:"q-learning build at step 5" total:5
 
 ## Arc Index
-- [ ] 08-causal-statistical-inference-foundations-index | 08-causal-statistical-inference | arc-index | frontier | arc:08-causal-statistical-inference-foundations dest:"a working build that ties together the foundational concepts of 08-causal-statistical-inference" total:5
+- [x] causal-deep-learning-index | 08-causal-statistical-inference | arc-index | frontier | arc:causal-deep-learning dest:"A neural net trained to predict counterfactual outcomes under a hidden confounder, recovering the true treatment effect within 10% on a semi-synthetic dataset" total:5
 
 ## Arc Steps
-- [ ] causal-discovery | 08-causal-statistical-inference | arc-step | applied | arc:08-causal-statistical-inference-foundations pos:1 ch:1 ch_title:"step 1" prev: next:causal-representation-learning prev_artifact:"" artifact:"causal-discovery build at step 1" total:5
-- [ ] causal-representation-learning | 08-causal-statistical-inference | arc-step | applied | arc:08-causal-statistical-inference-foundations pos:2 ch:1 ch_title:"step 2" prev:causal-discovery next:counterfactuals prev_artifact:"(prior step artifact)" artifact:"causal-representation-learning build at step 2" total:5
-- [ ] counterfactuals | 08-causal-statistical-inference | arc-step | applied | arc:08-causal-statistical-inference-foundations pos:3 ch:2 ch_title:"step 3" prev:causal-representation-learning next:do-calculus prev_artifact:"(prior step artifact)" artifact:"counterfactuals build at step 3" total:5
-- [ ] do-calculus | 08-causal-statistical-inference | arc-step | applied | arc:08-causal-statistical-inference-foundations pos:4 ch:2 ch_title:"step 4" prev:counterfactuals next:instrumental-variables prev_artifact:"(prior step artifact)" artifact:"do-calculus build at step 4" total:5
-- [ ] instrumental-variables | 08-causal-statistical-inference | arc-step | applied | arc:08-causal-statistical-inference-foundations pos:5 ch:3 ch_title:"step 5" prev:do-calculus next: prev_artifact:"(prior step artifact)" artifact:"instrumental-variables build at step 5" total:5
+- [x] structural-causal-models | 08-causal-statistical-inference | arc-step | applied | arc:causal-deep-learning pos:1 ch:1 ch_title:"step 1" prev: next:do-calculus prev_artifact:"" artifact:"structural-causal-models build at step 1" total:5
+- [x] do-calculus | 08-causal-statistical-inference | arc-step | applied | arc:causal-deep-learning pos:2 ch:1 ch_title:"step 2" prev:structural-causal-models next:counterfactuals prev_artifact:"(prior step artifact)" artifact:"do-calculus build at step 2" total:5
+- [x] counterfactuals | 08-causal-statistical-inference | arc-step | applied | arc:causal-deep-learning pos:3 ch:2 ch_title:"step 3" prev:do-calculus next:causal-representation-learning prev_artifact:"(prior step artifact)" artifact:"counterfactuals build at step 3" total:5
+- [x] causal-representation-learning | 08-causal-statistical-inference | arc-step | applied | arc:causal-deep-learning pos:4 ch:2 ch_title:"step 4" prev:counterfactuals next:potential-outcomes prev_artifact:"(prior step artifact)" artifact:"causal-representation-learning build at step 4" total:5
+- [ ] potential-outcomes | 08-causal-statistical-inference | arc-step | applied | arc:causal-deep-learning pos:5 ch:3 ch_title:"step 5" prev:causal-representation-learning next: prev_artifact:"(prior step artifact)" artifact:"potential-outcomes build at step 5" total:5
 
 ## Arc Index
-- [ ] serve-an-llm-efficiently-index | 09-algorithms-systems-for-ai | arc-index | frontier | arc:serve-an-llm-efficiently dest:"a quantized 7B model served behind an endpoint with measured p95 latency under 100ms" total:5
+- [ ] causal-discovery-in-practice-index | 08-causal-statistical-inference | arc-index | frontier | arc:causal-discovery-in-practice dest:"Run NOTEARS / PC algorithm on a real observational dataset (e.g. gene expression), recover a causal graph, validate against held-out interventions, report identifiability limits" total:5
+
+## Arc Steps
+- [ ] causal-discovery | 08-causal-statistical-inference | arc-step | applied | arc:causal-discovery-in-practice pos:1 ch:1 ch_title:"step 1" prev: next:structural-causal-models prev_artifact:"" artifact:"causal-discovery build at step 1" total:5
+- [x] structural-causal-models | 08-causal-statistical-inference | arc-step | applied | arc:causal-discovery-in-practice pos:2 ch:1 ch_title:"step 2" prev:causal-discovery next:instrumental-variables prev_artifact:"(prior step artifact)" artifact:"structural-causal-models build at step 2" total:5
+- [ ] instrumental-variables | 08-causal-statistical-inference | arc-step | applied | arc:causal-discovery-in-practice pos:3 ch:2 ch_title:"step 3" prev:structural-causal-models next:mediation-analysis prev_artifact:"(prior step artifact)" artifact:"instrumental-variables build at step 3" total:5
+- [ ] mediation-analysis | 08-causal-statistical-inference | arc-step | applied | arc:causal-discovery-in-practice pos:4 ch:2 ch_title:"step 4" prev:instrumental-variables next:potential-outcomes prev_artifact:"(prior step artifact)" artifact:"mediation-analysis build at step 4" total:5
+- [ ] potential-outcomes | 08-causal-statistical-inference | arc-step | applied | arc:causal-discovery-in-practice pos:5 ch:3 ch_title:"step 5" prev:mediation-analysis next: prev_artifact:"(prior step artifact)" artifact:"potential-outcomes build at step 5" total:5
+
+## Arc Index
+- [ ] serve-an-llm-efficiently-index | 09-algorithms-systems-for-ai | arc-index | frontier | arc:serve-an-llm-efficiently dest:"A quantized 7B model served behind an endpoint with measured p95 latency under 100 ms, with kv-cache + FlashAttention + INT8 quantization wired and benchmarked at batch sizes 1, 4, 16" total:5
 
 ## Arc Steps
 - [ ] flash-attention | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:1 ch:1 ch_title:"step 1" prev: next:kv-cache prev_artifact:"" artifact:"flash-attention build at step 1" total:5
@@ -110,11 +107,36 @@
 - [ ] llm-inference | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:5 ch:3 ch_title:"step 5" prev:quantization next: prev_artifact:"(prior step artifact)" artifact:"llm-inference build at step 5" total:5
 
 ## Arc Index
-- [ ] 10-complexity-cognition-natural-intelligence-foundations-index | 10-complexity-cognition-natural-intelligence | arc-index | frontier | arc:10-complexity-cognition-natural-intelligence-foundations dest:"a working build that ties together the foundational concepts of 10-complexity-cognition-natural-intelligence" total:5
+- [ ] train-at-scale-index | 09-algorithms-systems-for-ai | arc-index | frontier | arc:train-at-scale dest:"Distributed training of a 1B-parameter model across 8 GPUs with mixed precision, ZeRO-3 sharding, and pipeline parallelism — reporting tokens/sec/GPU vs the single-GPU baseline and identifying the dominant cost (compute vs communication)" total:5
 
 ## Arc Steps
-- [ ] compositionality | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:10-complexity-cognition-natural-intelligence-foundations pos:1 ch:1 ch_title:"step 1" prev: next:double-descent prev_artifact:"" artifact:"compositionality build at step 1" total:5
-- [ ] double-descent | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:10-complexity-cognition-natural-intelligence-foundations pos:2 ch:1 ch_title:"step 2" prev:compositionality next:emergence prev_artifact:"(prior step artifact)" artifact:"double-descent build at step 2" total:5
-- [ ] emergence | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:10-complexity-cognition-natural-intelligence-foundations pos:3 ch:2 ch_title:"step 3" prev:double-descent next:generalization prev_artifact:"(prior step artifact)" artifact:"emergence build at step 3" total:5
-- [ ] generalization | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:10-complexity-cognition-natural-intelligence-foundations pos:4 ch:2 ch_title:"step 4" prev:emergence next:scaling-collapse prev_artifact:"(prior step artifact)" artifact:"generalization build at step 4" total:5
-- [ ] scaling-collapse | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:10-complexity-cognition-natural-intelligence-foundations pos:5 ch:3 ch_title:"step 5" prev:generalization next: prev_artifact:"(prior step artifact)" artifact:"scaling-collapse build at step 5" total:5
+- [ ] distributed-training | 09-algorithms-systems-for-ai | arc-step | applied | arc:train-at-scale pos:1 ch:1 ch_title:"step 1" prev: next:data-parallelism prev_artifact:"" artifact:"distributed-training build at step 1" total:5
+- [ ] data-parallelism | 09-algorithms-systems-for-ai | arc-step | applied | arc:train-at-scale pos:2 ch:1 ch_title:"step 2" prev:distributed-training next:tensor-parallelism prev_artifact:"(prior step artifact)" artifact:"data-parallelism build at step 2" total:5
+- [ ] tensor-parallelism | 09-algorithms-systems-for-ai | arc-step | applied | arc:train-at-scale pos:3 ch:2 ch_title:"step 3" prev:data-parallelism next:pipeline-parallelism prev_artifact:"(prior step artifact)" artifact:"tensor-parallelism build at step 3" total:5
+- [ ] pipeline-parallelism | 09-algorithms-systems-for-ai | arc-step | applied | arc:train-at-scale pos:4 ch:2 ch_title:"step 4" prev:tensor-parallelism next:mixed-precision-training prev_artifact:"(prior step artifact)" artifact:"pipeline-parallelism build at step 4" total:5
+- [ ] mixed-precision-training | 09-algorithms-systems-for-ai | arc-step | applied | arc:train-at-scale pos:5 ch:3 ch_title:"step 5" prev:pipeline-parallelism next: prev_artifact:"(prior step artifact)" artifact:"mixed-precision-training build at step 5" total:5
+
+## Arc Index
+- [ ] scaling-laws-empirical-index | 10-complexity-cognition-natural-intelligence | arc-index | frontier | arc:scaling-laws-empirical dest:"Empirically fit Chinchilla-style scaling laws on a 3-point series of model sizes (10M / 100M / 300M) on a fixed dataset, reporting the compute-optimal ratio you recover vs the published one" total:4
+
+## Arc Steps
+- [ ] emergence | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:scaling-laws-empirical pos:1 ch:1 ch_title:"step 1" prev: next:double-descent prev_artifact:"" artifact:"emergence build at step 1" total:4
+- [ ] double-descent | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:scaling-laws-empirical pos:2 ch:1 ch_title:"step 2" prev:emergence next:generalization prev_artifact:"(prior step artifact)" artifact:"double-descent build at step 2" total:4
+- [ ] generalization | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:scaling-laws-empirical pos:3 ch:2 ch_title:"step 3" prev:double-descent next:scaling-collapse prev_artifact:"(prior step artifact)" artifact:"generalization build at step 3" total:4
+- [ ] scaling-collapse | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:scaling-laws-empirical pos:4 ch:2 ch_title:"step 4" prev:generalization next: prev_artifact:"(prior step artifact)" artifact:"scaling-collapse build at step 4" total:4
+
+## Arc Index
+- [ ] emergence-and-double-descent-index | 10-complexity-cognition-natural-intelligence | arc-index | frontier | arc:emergence-and-double-descent dest:"An empirical demo of double descent on a small classifier (vary model width across the bias-variance frontier), AND show one emergence-style task where capability appears suddenly with scale" total:4
+
+## Arc Steps
+- [ ] double-descent | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:emergence-and-double-descent pos:1 ch:1 ch_title:"step 1" prev: next:generalization prev_artifact:"" artifact:"double-descent build at step 1" total:4
+- [ ] generalization | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:emergence-and-double-descent pos:2 ch:1 ch_title:"step 2" prev:double-descent next:emergence prev_artifact:"(prior step artifact)" artifact:"generalization build at step 2" total:4
+- [ ] emergence | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:emergence-and-double-descent pos:3 ch:2 ch_title:"step 3" prev:generalization next:compositionality prev_artifact:"(prior step artifact)" artifact:"emergence build at step 3" total:4
+- [ ] compositionality | 10-complexity-cognition-natural-intelligence | arc-step | applied | arc:emergence-and-double-descent pos:4 ch:2 ch_title:"step 4" prev:emergence next: prev_artifact:"(prior step artifact)" artifact:"compositionality build at step 4" total:4
+
+## New Content
+- [ ] collective-communication | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] long-context-models | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] reinforcement-learning | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [x] rlhf-infrastructure-overview | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated -->
+- [ ] what-can-you-build-next-template-04-neural-networks-deep-learning | 04-neural-networks-deep-learning | core-concept | applied  <!-- Stub page — not yet generated -->

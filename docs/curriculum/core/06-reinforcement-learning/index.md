@@ -30,7 +30,7 @@ updated: 2026-05-27
 
 ## Arcs through this subject
 
-*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+- **[Arc: World Models And Imagination](arcs/world-models-and-imagination/)**
 
 ## Key thinkers
 

@@ -31,7 +31,7 @@ updated: 2026-05-27
 
 ## Arcs through this subject
 
-*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+- **[Causal Deep Learning](arcs/causal-deep-learning/)**
 
 ## Key thinkers
 
