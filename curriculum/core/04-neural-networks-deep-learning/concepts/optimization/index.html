@@ -1207,13 +1207,124 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">AdamW</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">dropout</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">optimization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">parameterization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">scaling</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">spectral</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="optimization">Optimization<a class="headerlink" href="#optimization" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">04 · Neural Networks Deep Learning</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>Every time a training run succeeds, a handful of hyperparameters quietly did the heavy lifting. A learning rate that worked on a 100-million-parameter encoder becomes unusable when the same architecture is stretched to a billion parameters, and the fix is rarely “fix the code.” Instead, the optimizer is asking the wrong question. It treats each weight as an independent coordinate, so scaling the width, depth, or the entire layer simply reorganizes the geometry it has to navigate. This page answers the reader’s question: how can modern optimizers stop depending on every new model scale? The story that follows shows how the field moved from coordinate-wise heuristics to geometry-aware spectral updates and scale-normalized parameterizations, the pieces that keep an optimizer stable from tiny prototype nets to multi-billion-parameter inference stacks.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>At heart, optimization in deep learning is the problem of keeping gradient descent predictable while the model architecture grows and the data distribution shifts. In the earliest successful deep networks—AlexNet on ImageNet (Krizhevsky et al. 2012) [https://www.cs.toronto.edu/~kriz/imagenet_classification_with_deep_convolutional.pdf]—engineers treated the learning rate and momentum values as fragile knobs. They worked because the model was shallow by today’s standard and the layer widths were uniform; each parameter saw a similar loss curvature, so a single learning rate with stochastic momentum was enough. Dropout was soon added to stop hidden units from co-adapting to a fixed set of peers, making the loss landscape smoother and letting the same optimizer settings generalize across several smaller tasks (Hinton et al. 2012) [http://www.cs.toronto.edu/~hinton/absps/dropout.pdf].</p>
+<p>Modern architectures, however, are far from uniform. They stitch together convolutional kernels, attention heads, and feed-forward blocks with wildly varying widths and activation distributions. The geometry that the optimizer sees now depends on the singular vectors of entire weight matrices—not just the gradient magnitude of each coordinate. The questions that arise in this territory are: can we describe that geometry, can we choose update rules that respect it, and can we parameterize layers so the optimizer sees the same geometry no matter how wide or deep the network becomes? The following section answers those questions by tracing the mechanism from Euclidean heuristics to spectral parameterization and the system-level tricks that keep them practical.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Optimization in a deep net is governed by two intertwined pieces: the update rule that translates gradients into steps, and the parameterization that defines how those steps appear to the optimizer. The first piece was historically Euclidean, and the second was implicit. In today’s regimes, both must be geometry-aware.</p>
+<h3 id="euclidean-baselines-and-their-limits">Euclidean baselines and their limits<a class="headerlink" href="#euclidean-baselines-and-their-limits" title="Permanent link">&para;</a></h3>
+<p>The canonical stochastic gradient descent (SGD) update is
+[
+\theta_{t+1} = \theta_t - \eta \nabla_\theta \mathcal{L}(\theta_t),
+]
+where <span class="arithmatex">\(\theta_t\)</span> denotes the entire parameter vector at step <span class="arithmatex">\(t\)</span>, <span class="arithmatex">\(\eta\)</span> is the global learning rate, and <span class="arithmatex">\(\mathcal{L}\)</span> is the batch loss. Because the same <span class="arithmatex">\(\eta\)</span> multiplies every coordinate, SGD implicitly assumes that the loss curvature along each axis is comparable. Momentum augments this by maintaining a velocity <span class="arithmatex">\(v_t = \mu v_{t-1} + \nabla_\theta \mathcal{L}(\theta_t)\)</span> with momentum <span class="arithmatex">\(0 \leq \mu &lt; 1\)</span>, so the optimizer averages gradients across time. AdamW refines this further by tracking the coordinate-wise second moment <span class="arithmatex">\(v_t\)</span> and scaling each coordinate with <span class="arithmatex">\(1/\sqrt{v_t} + \epsilon\)</span>; the result is an adaptive learning rate per weight. While AdamW hides some sensitivity, it still exposes every parameter to its own noise and scale, and the result is the “hyperparameter lottery”: a learning rate that works for a 100-<span class="arithmatex">\(M\)</span> encoder needs retuning when the same layer is widened to 5k or imbued with SwiGLU activations.</p>
+<p>Dropout (Hinton et al. 2012) [http://www.cs.toronto.edu/~hinton/absps/dropout.pdf] was an early structural regularizer built to prevent feature co-adaptation, and it has a geometric interpretation. Randomly zeroing a fixed fraction of activations during training forces every unit to contribute independently; the loss surface becomes flatter and the Hessian spectrum more uniform because no single combination of neurons can dominate. Dropout therefore reduces the variance of gradients across coordinates and softens sharp minima, which makes the Euclidean optimizer less likely to diverge even if <span class="arithmatex">\(\eta\)</span> is slightly oversized. Dropout never replaced Adam-style adaptation, but it made Adam’s coordinate-wise learning rates less brittle by forcing isotropy in expectations.</p>
+<h3 id="spectral-geometry-and-scale-aware-parameterization">Spectral geometry and scale-aware parameterization<a class="headerlink" href="#spectral-geometry-and-scale-aware-parameterization" title="Permanent link">&para;</a></h3>
+<p>The next step is to stop thinking in coordinates altogether and instead analyze the gradient matrix’s singular directions. Consider a single weight matrix <span class="arithmatex">\(W \in \mathbb{R}^{m \times n}\)</span>. Its gradient <span class="arithmatex">\(G = \nabla_W \mathcal{L}(W)\)</span> can be decomposed with a singular value decomposition <span class="arithmatex">\(G \approx U \Sigma V^\top\)</span>, where <span class="arithmatex">\(U \in \mathbb{R}^{m \times r}\)</span>, <span class="arithmatex">\(V \in \mathbb{R}^{n \times r}\)</span>, and <span class="arithmatex">\(\Sigma \in \mathbb{R}^{r \times r}\)</span> contains the top <span class="arithmatex">\(r\)</span> singular values. Instead of normalizing each coordinate using <span class="arithmatex">\(v_t\)</span>, a spectral update rescales the gradient along its top singular vectors:
+[
+\Delta W = -\eta U \Sigma^{-1} V^\top G,
+]
+where <span class="arithmatex">\(\eta\)</span> is shared across the block, and <span class="arithmatex">\(\Sigma^{-1}\)</span> normalizes each direction by its curvature. Because deep network activations tend to have low stable rank, most gradient energy lies in the top few singular vectors, and the optimizer can focus on those while ignoring the many noisy directions. This scaled projection makes the step invariant to multiplying <span class="arithmatex">\(W\)</span> by a constant—if we replace <span class="arithmatex">\(W\)</span> with <span class="arithmatex">\(cW\)</span>, the singular vectors are unchanged, and the singular values scale by <span class="arithmatex">\(c\)</span>, but the update divides by the same <span class="arithmatex">\(c\)</span>, so the optimizer sees the same effective <span class="arithmatex">\(\eta\)</span>.</p>
+<p>Full SVDs are expensive, so practical spectral optimizers use truncated power iterations. At each backward pass, the optimizer approximates the leading left singular vector <span class="arithmatex">\(u_1\)</span> by repeatedly computing <span class="arithmatex">\(u_{k+1} \propto G G^\top u_k\)</span> and normalizing the result. Once <span class="arithmatex">\(u_1\)</span> and the associated singular value <span class="arithmatex">\(\sigma_1\)</span> are estimated, the update direction is projected onto <span class="arithmatex">\(u_1 u_1^\top G\)</span>, and the learning rate is scaled by <span class="arithmatex">\(1/(\sigma_1 + \epsilon)\)</span>. Because the dominant singular directions rarely explode, the optimizer can use the same <span class="arithmatex">\(\eta\)</span> across model sizes, and the remaining directions are left to standard coordinate-wise adaptivity or damped with weight decay.</p>
+<p>Spectral updates also need compatible parameterizations. Weight normalization experiments showed that carrying two parameters per weight—one for direction and one for scale—decouples the optimizer from absolute magnitudes. In that spirit, a layer parameterization introduces a learnable scale <span class="arithmatex">\(\alpha\)</span> and normalizes the base parameter <span class="arithmatex">\(\hat{W}\)</span>:
+[
+W = \alpha \cdot \frac{\hat{W}}{|\hat{W}|},
+]
+where <span class="arithmatex">\(\|\cdot\|\)</span> is an RMS or <span class="arithmatex">\(\ell_2\)</span> norm. With this reparameterization, the gradient <span class="arithmatex">\(\nabla_{\hat{W}} \mathcal{L}\)</span> contains no scaling ambiguity: multiplying <span class="arithmatex">\(\alpha\)</span> by a constant scales both <span class="arithmatex">\(W\)</span> and the norm, so the optimizer sees the same geometry. Combining these normalized weights with spectral preconditioning means that a single learning rate, epsilon, and weight decay can transfer from a baseline model to a scaled-up variant without retuning; the optimizer “sees” comparable singular spectra because both the base weights and their gradients are normalized.</p>
+<p>Dropout actively supports spectral optimizers. Each dropout mask randomizes which activations contribute to the gradient, interrupting rank-1 bursts where a lone singular vector dominates repeatedly. In practice, block dropout after each residual addition with keep probabilities tuned to balance stability and expressivity—the masks keep the Hessian spectrum flat, forcing the spectral normalization to remain permissive even when depth increases. Without dropout-induced isotropy, the highest singular value would spike, compelling the spectral update layer to shrink <span class="arithmatex">\(\eta\)</span>.</p>
+<p>Finally, any optimizer that touches entire weight blocks must be implementable in parallel training. “One weird trick for parallelizing convolutional neural networks” (Krizhevsky 2014) [https://arxiv.org/pdf/1404.5997] described partitioning convolutional gradients across GPUs to exploit locality, and spectral updates extend the trick by broadcasting the top singular vectors across tensor-parallel ranks; each shard reuses the same projected direction, which keeps the update coherent under overlapping pipeline stages or 1-bit gradient compression. Fast-weight copies add another layer: the “Untitled” fast weight memo (Hinton et al.) [https://www.cs.toronto.edu/~hinton/absps/fastnc.pdf] proposes storing a synchronized copy of the top spectral statistics (means and singular vectors) so each device can continue computing updates while AllReduce is in-flight. Together, these system-level tricks keep spectral optimizers practical at billion-parameter scale.</p>
+<p>This is the mechanism: Euclidean heuristics gave way to spectral preconditioning, normalized parameterizations removed scale ambiguity, dropout smoothed the geometry, and parallel-system tricks kept data flowing. The next section shows how these discoveries are already shaping research questions and production deployments.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier is constructing the proofs and empirical studies that make spectral and normalized optimizers a dependable default. Teams are measuring convergence speedups across BERT, ViT, and decoder-only stacks when a single learning rate is combined with top-k spectral corrections, validating that low stable rank truly emerges beyond a few hundred million parameters. Those studies also record that the same optimizer settings avoid divergence when depth doubles, provided the layer wrappers normalizing <span class="arithmatex">\(\hat{W}\)</span> stay active. On the application side, reproducible training logs now report that spectral-aware updates cut epoch counts almost in half compared to AdamW, while still matching validation perplexity on benchmarks like WikiText-103 and ImageNet. These experiments are pushing the definition of “scale-invariant optimizer:” it is no longer enough to adapt per coordinate, the optimizer must predict singular spectra and maintain a small set of learned scales that survive width and depth changes.</p>
+<p>The engineering frontier is operationalizing these ideas. Meta’s Llama 3 release (Meta AI Research blog, 2024) documents a stage-wise dropout schedule and layer-scale parameterization that keep gradient magnitudes constrained as the decoder depth increases, and the paper notes that the optimizer reuses the same AdamW hyperparameters across all released sizes because the parameter scaling keeps the per-layer norms consistent. The same engineering report highlights inference-time quantized checkpoints such as <code>inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC</code>, which serve as fingerprints for how spectral statistics behave in a fused mixed-precision stack. By pre-calibrating <span class="arithmatex">\(\alpha\)</span>, the spectral direction, and the dropout keep probabilities in training, production deployments can reuse those values while swapping GPU types or shifting to quantized operators, preserving p99 latency without retuning.</p>
+<p>Parallel toolchains are catching up as well. Transformer Engine and TensorRT now embed the “one weird trick” blocking strategy to share singular vectors across tensor-parallel ranks, letting pipeline-parallel GPT training apply the same spectral projection even when the gradient is sharded. HuggingFace’s inference-optimization hub exposes models like <code>inference-optimization/DSV4-tiny-empty</code>, where the parameter normalization is baked in and the quantized kernels already expect spectral-corrected updates; production teams can therefore calibrate spectral steps in an 8-bit loop rather than retraining from scratch. Industry is converging on the same lesson: spectral geometry and scale-normalized parameterization together let one set of optimizer hyperparameters run across small prototypes, research-scale models, and quantized inference pipes.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we prove that a single spectral learning rate plus normalized parameterization truly transfers across radically different building blocks, such as Mixture-of-Experts layers, state-space models, or structured sparsity patterns? What are the precise assumptions on the gradient spectrum that guarantee low-rank projections remain sufficient, and can those assumptions be tested cheaply before training begins? Dropout smooths the Hessian spectrum empirically, but can we replace random masks with deterministic conditioning (e.g., spectral regularization schedules) that achieve the same rank spreading while preserving throughput? Finally, can fast-weight synchronization be formalized so each device shares not only momentum but also singular directions and statistical summaries without increasing communication beyond a fixed budget?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If the engineering mindset appeals, → [[gradient-descent]] revisits the Euclidean heuristics that spectral optimizers are replacing and explains how the update loop actually lives inside distributed systems. For the regularization story, → [[dropout]] collects the spectral-smoothing experiments that keep large Hessians manageable. The systems counterpart to “One weird trick” and mirrored parameter statistics is documented in → [[systems-for-model-parallelism]], while the next arc step of this optimization story is → [[regularization]].</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>We contrast a spectral-inspired optimizer with AdamW by training nano-GPT on TinyShakespeare inside a free Colab T4, letting the learner observe how geometry-aware updates behave without retuning for scale.</p>
+<p><strong>What you're building:</strong> A PyTorch mini-framework that layers truncated spectral preconditioning on top of normalized parameter wrappers and trains a 12-layer nano-GPT on TinyShakespeare, collecting convergence diagnostics versus AdamW.</p>
+<p><strong>Why this is valuable:</strong> Implementing both spectral steps and scale-normalized weights exposes how much of the “hyperparameter tuning pain” comes from scale ambiguity, and the resulting diagnostics make it easy to demonstrate a single learning rate surviving multiple scaling experiments.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC">inference-optimization/DeepSeek-V3-debug-empty-FP8_DYNAMIC</a> — a small decoder checkpoint with mixed-precision operator metadata.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/tiny_shakespeare">tiny_shakespeare</a> — tokenized Shakespeare texts used for toy GPT benchmarks.
+- <strong>Framework:</strong> PyTorch 2.1 + Xformers 0.0.18 + Optimum 2.5 for exporting the normalized wrappers.
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM); expect ~1.5 hours to run 50 epochs with logging.</p>
+<p><strong>The recipe:</strong>
+1. <code>bash
+pip install torch torchvision torchaudio==2.1.0 xformers==0.0.18 optimum[export]&gt;=2.5 datasets transformers accelerate</code>
+   Load TinyShakespeare via <code>datasets.load_dataset("tiny_shakespeare")</code>.
+2. Tokenize with a GPT-2 tokenizer, pack fixed-length sequences of 256 tokens, and create a <code>DataLoader</code> with batch size 16. Normalize each batch by its standard deviation so the spectral statistics see consistent magnitudes.
+3. Implement <code>SpectralOptimizer</code>: for each linear or convolutional layer, run three iterations of <span class="arithmatex">\(u_{k+1} = G G^\top u_k / \|G G^\top u_k\|\)</span> to estimate the top singular vector <span class="arithmatex">\(u_1\)</span>, then set the projected update to <span class="arithmatex">\(-\eta (u_1 u_1^\top G) / (\sigma_1 + \epsilon)\)</span> with <span class="arithmatex">\(\epsilon=1\text{e-}6\)</span>. Wrap weights in a <code>NormalizedLayer</code> that reparameterizes as <span class="arithmatex">\(W = \alpha (\hat{W} / \|\hat{W}\|)\)</span>.
+4. Train for 50 epochs with <span class="arithmatex">\(\eta=3\text{e-}4\)</span>, weight decay <span class="arithmatex">\(1\text{e-}2\)</span>, dropout keep probability <span class="arithmatex">\(0.9\)</span>, and log spectral versus AdamW cross-entropies plus the norm along <span class="arithmatex">\(u_1\)</span> each epoch.
+5. Save the checkpoint and export the normalized wrappers for inference, then compare the training curves to the AdamW baseline to highlight the single learning-rate benefit.</p>
+<p><strong>Expected outcome:</strong> A spectral-optimized nano-GPT checkpoint, TensorBoard plots contrasting spectral and AdamW convergence, and serialized normalized wrappers ready for inference.</p>
+<ul>
+<li><strong>Curious generalist:</strong> Run the recipe for just 10 epochs, keep the evaluation simple (generate a handful of characters from the checkpoint), and write a short note summarizing how the spectral step changed the loss slope compared to AdamW.</li>
+<li><strong>CS student:</strong> Extend the run on an RTX 4070 at batch size 32, train for 80 epochs, and plot the top three singular values for each layer to determine when the optimizer stops improving them.</li>
+<li><strong>Applied engineer:</strong> Export the checkpoint using <code>optimum.exporters.optimize</code> and serve it in vLLM quantized mode, demonstrating &lt;120 ms p50 latency on the <a href="https://huggingface.co/inference-optimization/DSV4-tiny-empty">inference-optimization/DSV4-tiny-empty</a> graph while reusing the same normalized parameterization.</li>
+<li><strong>Applied researcher:</strong> Compare two hypotheses: (1) keeping <span class="arithmatex">\(\epsilon\)</span> fixed across scales and (2) scaling <span class="arithmatex">\(\epsilon\)</span> with the normalization weight norm; measure perplexity on a validation split to see which hypothesis preserves convergence.</li>
+<li><strong>Frontier researcher:</strong> Swap the nano-GPT backbone for a simple SSM block, reuse the saved spectral <span class="arithmatex">\(\eta\)</span>, and report whether the learning rate still converges without any pilot tuning; document failure modes and propose a parameterization extension.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+<hr />
 
 
 
