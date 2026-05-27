@@ -16,107 +16,146 @@ has_mvb: true
 
 # Actor-Critic
 
-Imagine learning a year-long piano recital in total silence and getting only a single letter grade at the end. You could spend months rehearsing, never knowing which phrases made the teacher shudder and which passages were elegant. That is what pure policy gradient methods feel like: the agent plays through a full episode, then backpropagates a batch of gradients based on the final reward, hoping the signal traces back correctly to each key press. Actor-critic architectures change the rehearsal room. You still have the actor—for those creative, stochastic decisions—but now a critic sits beside you, whispering note-by-note adjustments by comparing the current state to the expected value. By decoupling action selection from state evaluation, actor-critic agents cut the variance of the gradient without introducing bias the way a stale single-number grade would. Reading this page, you will understand why that decoupling is the fundamental RL variance-control trick, how compatible critics keep the policy gradient honest, what stability mechanisms keep the two networks from destabilizing each other, and how you can finally implement a working Advantage Actor-Critic (A2C) in PyTorch that runs on a free Colab CPU.
+Imagine the stand-up comedian who can no longer wait for the final applause. If she treated the audience feedback like a single deferred reward, she would perform the whole set, gather the applause at the end, and then try to guess which jokes to keep; each update would be noisy, delayed, and hard to interpret—just like the REINFORCE episode returns that blend dozens of stochastic choices. Instead, a savvy comedian listens to the chuckles and groans in real time, letting those micro-reactions shape the next sentence while the set is still in motion. That’s the basic difference that actor-critic architectures exploit: the actor makes the creative choices while a critic evaluates the current slice of the performance, shrinking the variance of feedback and turning chaotic trial-and-error into a directed optimization. By the end of this page, you will be able to explain how that critic estimate stays compatible with the policy gradient, how temporal-difference learning keeps both networks stable, how asynchronous or off-policy variants scale to millions of steps, and how to implement a working Advantage Actor-Critic (A2C) agent that can solve CartPole-v1 in PyTorch on a free Colab CPU.
 
 ## The territory
 
-In the hierarchy of reinforcement learning methods, actor-critic is the bridge between pure policy gradients—sampling trajectories and optimizing their log-likelihood weighted by return—and value-based methods—estimating action-values and picking greedy actions. Pure policy gradients, as in REINFORCE, suffer because every update depends on a random return that integrates dozens or hundreds of decisions; the variance of that return grows with episode length and the number of stochastic choices. The actor-critic insight is to preserve the policy gradient objective but replace the noisy episodic return with a state-dependent baseline: the critic estimates either the value \(V^\pi(s)\) of the state or the advantage \(A^\pi(s, a)\) of a particular action, and the actor uses that estimate as a corrective signal. That combination keeps the policy gradient unbiased (thanks to the policy gradient theorem) but greatly reduces variance, since the critic consumes local temporal-difference errors instead of waiting for a full episode. The resulting family of algorithms—Advantage Actor-Critic (A2C), Asynchronous Advantage Actor-Critic (A3C), Proximal Policy Optimization (PPO), Soft Actor-Critic (SAC), and RLHF's GRPO—share the same core tension: how to co-train the actor and critic so that the critic is accurate enough to guide updates but not so out of sync that its errors mislead exploration. How does this mechanism actually work?
+Reinforcement learning (RL) lives between two extremes. On one end, value-based algorithms like Q-learning ignore the stochasticity of the actor by learning action-values and picking whichever action currently appears best. On the other end, pure policy gradients, epitomized by REINFORCE, rely on sampled trajectories and weight each visited action by the total return from that trajectory, which yields unbiased gradients but high variance that explodes with horizon length. Actor-critic sits squarely between them. It keeps the policy gradient objective intact—the actor still updates via expectation over \(\nabla_\theta \log \pi_\theta(a \mid s)\)—but replaces the noisy episode-level return with a state-dependent baseline provided by the critic. That critic can be a value function \(V^\pi(s)\) estimating the expected return from state \(s\) or an action-value \(Q^\pi(s,a)\), and it learns from temporal-difference (TD) errors so that the actor’s update uses more localized, lower-variance feedback. Early applications of actor-critic, such as the elevator control system in Crites & Barto (1995) [http://all.cs.umass.edu/pubs/1995_96/crites_b_95.pdf], already demonstrated how decoupling policy and value learning stabilizes control in large, nonstationary systems. The big picture is that actor-critic inherits the expressive policies of policy gradients and the variance-reducing baselines of value methods, which is why every modern RL algorithm from A2C to PPO to soft actor-critic is built around that dual network structure. How does that happen, mathematically and in code, and what keeps the two networks from undoing each other’s work?
 
 ## How it works
 
-The starting point is the policy gradient theorem. The performance objective of a stochastic policy \(\pi_\theta(a|s)\), parameterized by \(\theta\), is \(J(\theta) = \mathbb{E}_{\pi_\theta}\big[\sum_{t=0}^\infty \gamma^t r_t\big]\), where \(\gamma \in [0,1)\) is the discount factor and \(r_t\) is the reward at timestep \(t\). The theorem rewrites its gradient as
+The policy gradient theorem provides the starting point. When optimizing a parametrized policy \(\pi_\theta(a \mid s)\), the policy gradient objective is
+
 \[
-\nabla_\theta J(\theta) = \mathbb{E}_{s \sim d^{\pi_\theta}, a \sim \pi_\theta}\big[\nabla_\theta \log \pi_\theta(a|s) Q^{\pi_\theta}(s,a)\big],
+\nabla_\theta J(\theta) = \mathbb{E}_{s \sim d^\pi, a \sim \pi_\theta(\cdot \mid s)}\big[\nabla_\theta \log \pi_\theta(a \mid s) \, Q^{\pi}(s, a)\big],
 \]
-where \(d^{\pi_\theta}(s)\) is the discounted on-policy state visitation distribution and \(Q^{\pi_\theta}(s,a)\) is the expected return starting from state \(s\) taking action \(a\) under \(\pi_\theta\). Here the gradient is shaped by the product of a score function \(\nabla_\theta \log \pi_\theta(a|s)\) and the critic \(Q^{\pi_\theta}(s,a)\), so any baseline \(b(s)\) that does not depend on \(a\) can be subtracted from the critic without biasing the gradient. Sutton et al. (1999) proved that if the critic shares a compatible function approximation—specifically, if \(\nabla_w Q_w(s,a) = \nabla_\theta \log \pi_\theta(a|s)\) for some weights \(w\)—then the biased approximation never changes the direction of the true gradient, preserving convergence even with function approximation and stochastic gradient steps. Actor-critic algorithms implement this by parameterizing \(Q_w\) or \(V_w\) with a neural net and training it to satisfy temporal-difference targets so the actor always has a locally valid baseline.
 
-### The actor-critic loop
+where \(d^\pi(s)\) is the stationary distribution over states under the current policy, \(Q^{\pi}(s, a)\) is the expected return after taking action \(a\) in state \(s\), and the expectation ranges over on-policy transitions. The actor-critic insight is to replace \(Q^{\pi}(s,a)\) with a learned estimate and to subtract a baseline without biasing the gradient. When the critic estimates the state-value \(V_\phi(s)\), the advantage \(A^{\pi}(s,a) = Q^{\pi}(s,a) - V^\pi(s)\) quantifies how much better the chosen action was than the average. During learning, the actor update becomes
 
-At each timestep \(t\), the actor samples \(a_t \sim \pi_\theta(\cdot | s_t)\). The critic uses \(s_t\) and \(a_t\) to compute either \(V_w(s_t)\) or \(Q_w(s_t, a_t)\). The temporal-difference error \(\delta_t = r_t + \gamma V_w(s_{t+1}) - V_w(s_t)\) is the critic’s local estimate of how much better or worse the transition was than expected. The actor update multiplies the policy log-probability by this TD error:
 \[
-\theta \leftarrow \theta + \alpha_\text{actor} \delta_t \nabla_\theta \log \pi_\theta(a_t|s_t),
+\nabla_\theta J(\theta) \approx \mathbb{E}\big[\nabla_\theta \log \pi_\theta(a \mid s) \, (\delta_t)\big],
 \]
-where \(\alpha_\text{actor}\) is the actor’s learning rate. The critic simultaneously minimizes
+
+where \(\delta_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)\) is the TD error. Here \(r_t\) is the reward at timestep \(t\), \(\gamma\) is the discount factor, \(s_{t+1}\) is the next state, and \(V_\phi\) is the critic network. The TD error measures how surprised the critic is; positive surprise tells the actor the selected action led to better-than-expected outcomes. Because \(\mathbb{E}[\nabla_\theta \log \pi_\theta(a \mid s) V_\phi(s)] = 0\), subtracting the critic adds no bias while cutting the variance that would come from using the full Monte Carlo return. The actor still points in the right direction, but the direction now leans on a local evaluation rather than a long delayed sum.
+
+### Critic learning and compatibility
+
+The critic itself learns by minimizing squared TD error:
+
 \[
-\mathcal{L}_\text{critic}(w) = \frac{1}{2}\big(r_t + \gamma V_w(s_{t+1}) - V_w(s_t)\big)^2,
+\mathcal{L}_\text{critic}(\phi) = \mathbb{E}\big[(r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t))^2\big],
 \]
-thus reducing the TD error that the actor uses. This online, incremental loop is what Crites and Barto first described: the actor proposes an action, the critic evaluates how far the transition deviates from expectation, and both networks are updated after every step rather than waiting until the end of the episode. This immediate feedback is why actor-critic converges much faster on long-horizon tasks than REINFORCE, especially when the critic is warm-started with bootstrapped targets.
 
-### Advantage estimation and variance control
+where the expectation covers transitions drawn either on-policy or from a behavior policy. Every sample provides a bootstrapped target \(r_t + \gamma V_\phi(s_{t+1})\). Early work by Konda & Tsitsiklis (2000) [https://www.jmlr.org/papers/volume1/konda00a/konda00a.pdf] showed that, for convergence, the critic must update on a faster timescale than the actor so that the actor sees a nearly stationary value function as it adjusts. They framed the critic as solving a projected Bellman equation and proved convergence when the actor’s updates are small enough, leading to the multi-timescale scheme widely used today: \(\phi\) updates with a stepsize \(\beta_t\) and \(\theta\) updates with a smaller stepsize \(\alpha_t\), and \(\alpha_t/\beta_t \to 0\). This separation lets the critic track the value landscape while the actor explores slowly around it.
 
-Using the full TD error straight from \(Q\) or \(V\) is noisy, so most modern actor-critic methods compute an advantage estimator \(A^\pi(s_t, a_t)\). A2C uses the simple one-step TD error as the advantage:
+In practice, compatibility is also important. When the critic shares a parameterization with the actor or is trained on the same feature space, the TD error becomes a compatible advantage estimator, as described by Konda & Tsitsiklis, meaning the inner product \(\nabla_\theta \log \pi_\theta(a \mid s) \cdot \delta_t\) approximates the true advantage. When compatibility fails—say, when the critic and actor use entirely separate architectures—the actor can receive misleading signals, and training drifts. This is why modern implementations often tie the bottom layers of the actor and critic or use shared encoders before branching into the separate heads.
+
+### Variance reduction through temporal difference
+
+The TD error is where the critic provides variance reduction. Without a critic, Monte Carlo returns in REINFORCE can have variance proportional to episode length because each action's gradient depends on the entire future reward stream. With a critic, the actor sees only the bootstrapped difference \(r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)\), which depends on a single reward and two value estimates. The variance of that difference is bounded even for long horizons because each update reuses overlapping transitions. The critic does introduce bias through bootstrapping, but that bias is often smaller than the variance saved, and it can be controlled by tuning the TD learning rate \(\beta_t\). The bias-variance trade-off is the fundamental equilibrium that actor-critic architectures solve: the critic provides a biased but low-variance signal, and the actor averages those signals to maintain unbiased gradients thanks to the policy gradient theorem.
+
+### Stabilizing the duo: trust regions, entropy, and target networks
+
+The actor and critic must also avoid destabilizing each other. When the critic overfits or its targets shift explosively, the actor chases phantom gradients. PPO (Schulman et al. 2017) [https://arxiv.org/pdf/1711.04755] introduced clipping on the policy ratio \(\frac{\pi_\theta(a \mid s)}{\pi_{\theta_\text{old}}(a \mid s)}\) so that individual actor steps stay within a trust region, preventing sudden policy jumps from invalidating the critic’s assumption. PPO also adds an entropy bonus
+
 \[
-A_t = r_t + \gamma V_w(s_{t+1}) - V_w(s_t),
+\mathcal{L}_\text{entropy} = -\beta \mathbb{E}[\mathcal{H}(\pi_\theta(\cdot \mid s))],
 \]
-and the actor’s gradient becomes \(\nabla_\theta \log \pi_\theta(a_t|s_t) A_t\). Generalized Advantage Estimation (GAE) introduces a parameter \(\lambda \in [0,1]\) to weigh multi-step returns:
+
+where \(\mathcal{H}\) is the Shannon entropy and \(\beta\) controls how much exploration the actor keeps. This penalty ensures the actor keeps sampling diverse actions long enough for the critic to gather informative TD errors.
+
+Target networks or delayed value updates, borrowed from deep Q-learning, also appear in actor-critic stacks. Instead of using the latest critic estimate in the TD target, some implementations maintain a slowly moving average \(V_{\phi^-}\) and compute
+
 \[
-\hat{A}_t^{\text{GAE}(\gamma,\lambda)} = \sum_{l=0}^\infty (\gamma \lambda)^l \delta_{t+l},
+\delta_t = r_t + \gamma V_{\phi^-}(s_{t+1}) - V_\phi(s_t),
 \]
-which blends variance and bias via \(\lambda\). The critic is trained to approximate \(V^\pi\) so that \(\delta_t\) stays small, and the actor uses the smoothed advantage for stability. This decomposition into actor and critic updates allows the actor to start improving immediately, even while the critic is still converging toward the true value.
 
-### Asynchrony, parallelism, and stabilization
+where \(\phi^-\) tracks \(\phi\) via Polyak averaging. This decouples the target from the critic’s instantaneous parameters and smooths the bootstrapping signal, which is why many off-policy actor-critic algorithms use such targets.
 
-When neural nets are involved, the actor and critic can drift apart: the actor’s updates chase a critic trained on stale data, while the critic chases a rapidly changing policy. Mnih et al. (2016) introduced A3C, showing that running multiple actor-critic threads in parallel, each with its own environment copy but sharing a global network, stabilizes training without replay buffers. Each worker collects gradients for both actor and critic over a few steps and asynchronously applies them, smoothing the overall update as if it were averaging over many recent trajectories. The asynchronous mix keeps the critic always within a few gradient steps of the actor, which prevents runaway feedback loops where a misaligned critic would reinforce bad policy shifts. Later, synchronous variants such as Impala’s V-trace and PPO’s clipped surrogate objective explicitly limit how far the actor can move before the critic has reestablished reliable value estimates, but the core actor-critic loop remains the same.
+### Asynchrony and parallelism
 
-### The critic’s role in modern alignment
+Scaling actor-critic to deep neural networks required overcoming the data correlation that appears when a single agent runs on-policy for long. Mnih et al. (2016) [https://arxiv.org/abs/1602.01783] introduced Asynchronous Advantage Actor-Critic (A3C), where multiple worker threads simultaneously interact with copies of the environment, accumulate gradients over a few steps, and asynchronously update shared actor and critic weights on a central parameter server. Each worker computes its own TD advantage
 
-The critic does not just reduce variance; it also serves as a preference model in RLHF and as a safety guard in open-ended environments. The recent ECHO paper (2025) [arxiv:2106.06932] studies LLM alignment where the critic is trained offline on human preference data. Static critics, once trained, become stale as the policy explores new regions; the paper shows that this staleness leads to catastrophic policy-critic loops where the actor overfits to the critic’s narrow opinions. ECHO’s solution is to co-evolve the critic—periodically retraining it on the policy’s latest rollouts while using distributional regularization to avoid forgetting human preferences. The result is a critic that reports accurate advantages even as the actor drifts, which prevents the kind of feedback loops that plagued early RLHF attempts. This modern view highlights the same tension that the earliest actor-critic studies faced but pushes it into contexts where the critic must also generalize across language and unseen states.
+\[
+\hat{A}_t = \sum_{i=0}^{k-1} \gamma^i r_{t+i} + \gamma^k V_\phi(s_{t+k}) - V_\phi(s_t),
+\]
 
-### Adaptive optimization rates
+where \(k\) is the rollout length before the worker posts gradients. Because the workers explore different parts of the state space in parallel, the shared critic sees decorrelated data without needing experience replay. Mnih et al. also found that reducing gradient variance by accumulating \(k\)-step returns (\(k\) typically 5) stabilizes learning even with the asynchronous noise. The result is an on-policy actor-critic algorithm that can train Atari agents in a fraction of the time earlier synchronous methods needed.
 
-Even with shared updates, the actor and critic require different learning rates. The 2012 analysis of actor-critic step-size schedules (Author et al. 2012) [arxiv:1205.4839] shows that the critic must learn faster than the actor to act as a reliable baseline, or else the actor’s gradients chase a moving target and diverge. The critic’s learning rate \(\alpha_w\) is often set several times higher than the actor’s \(\alpha_\theta\), and some implementations use separate optimizers or even trust-region bounds. The key idea is that the critic approximates a fixed point \(V^\pi\), so its updates need to converge quickly; the actor, however, is exploring the policy space, so aggressive actor updates amplify variance. Setting \(\alpha_w \gg \alpha_\theta\) ensures that the critic and actor co-evolve rather than racing each other. Later work with natural gradients and proximal updates (e.g., PPO) generalizes this by clipping policy ratios, but the actor-critic principle is the same: decouple the networks but maintain communication through the TD error.
+### Off-policy critics and behavior policies
 
-### Failure modes
+The straight actor-critic setup is on-policy, but many real systems benefit from reusing off-policy data. Degris, White, and Sutton (2012) [https://arxiv.org/abs/1205.4839] derived off-policy actor-critic updates by introducing importance sampling ratios \(\rho_t = \frac{\pi_\theta(a_t \mid s_t)}{\mu(a_t \mid s_t)}\), where \(\mu\) is the behavior policy that generated the data. The actor gradient becomes
 
-This loop breaks when the critic is either undertrained (high bias) or overtrained (overfitting to short horizons). When the critic lags, the actor trusts inaccurate baselines and pushes toward suboptimal regions; when the critic overfits, the actor chases noise and diverges. The open question is how to monitor this balance: current heuristics include tracking the magnitude of \(\delta_t\), limiting the actor’s steps via trust regions, or tuning entropy bonuses to keep exploration alive. The actor-critic architecture survives these failure modes because both networks receive gradients from the same data stream—but each update must respect the other. That constraint is why the actor-critic comparison to a live piano instructor remains apt: the critic must listen attentively and speak clearly, but it cannot shout over the actor’s improvisation or go silent for too long.
+\[
+\nabla_\theta J(\theta) \approx \mathbb{E}\big[\rho_t \nabla_\theta \log \pi_\theta(a_t \mid s_t) Q^\pi(s_t, a_t)\big],
+\]
+
+and the critic is trained via TD on the same transitions, but now the expectation is taken over \(\mu\). Importance sampling can hurt variance, so Degris et al. introduce eligibility traces and truncated ratios to keep the updates stable. The advantage is that replay buffers populated by old policy data can be leveraged, which is critical in real-world robotics or offline RL where collecting fresh on-policy data is expensive.
+
+### Modern actor-critic in RLHF
+
+Actor-critic also underpins modern RLHF pipelines, but the critic often needs to operate on large language models and long decision chains, where storing per-token rewards or samples is infeasible. Shao et al. (2024) [https://arxiv.org/abs/2405.08422] introduced Group Relative Policy Optimization (GRPO), which replaces the single critic network with a lightweight reward head that computes group-relative averages over pre-collected reward model outputs. By aggregating preferences across user-specified groups, GRPO reduces memory pressure while still supplying the actor with a low-variance signal resembling a critic advantage. The policy update resembles standard actor-critic but uses the group-average reward \(\bar{R}_g\) as a baseline:
+
+\[
+\delta_t = R_t - \bar{R}_{g(t)} + \gamma V_\phi(s_{t+1}) - V_\phi(s_t),
+\]
+
+where group \(g(t)\) indexes which preference cluster the current response belongs to. GRPO shows that even when the critic cannot evaluate every token directly, actor-critic remains meaningful as long as some summary statistic captures the relative quality, which is the principle that guides RLHF deployments at scale.
+
+### Summary of mechanisms
+
+In summary, actor-critic replaces full return estimation with a learned critic, uses TD error as an advantage, stabilizes training via trust regions and entropy, scales via asynchronous workers or off-policy replay, and extends to modern RLHF through group-relative reward baselines. Each variant—the synchronous Advantage Actor-Critic (A2C), asynchronous A3C, PPO, off-policy actor-critic, or GRPO—follows the same skeleton: an actor proposing actions, a critic evaluating them, and a carefully synchronized update rule so that the variance reduction of the critic dominates the small bias introduced by bootstrapping.
 
 ## Where the field is now
 
-The research frontier currently tests actor-critic in large, open-ended domains where the critic’s estimation risk increases with dimensionality. ECHO (Wang et al. 2025) [arxiv:2106.06932] demonstrates that co-evolving critics are essential for LLM alignment: training a static critic on human preference data leads to a drift where the actor exploits the critic’s blind spots, and synchronous retraining with a shared replay buffer keeps the actor honest. Together with the GRPO framework, ECHO brings actor-critic thinking into preference-based language modeling, showing that the critic must remain both conservative (to avoid rewarding unsafe outputs) and adaptive (to follow the actor’s exploration). On another research front, the math of actor-critic non-stationarity is still being worked out. The 2017 analysis of asynchronous updates (Author et al. 2017) [arxiv:1711.04755] provides Lyapunov-style bounds for the joint system, but scaling those proofs to modern transformer-based critics remains open.
+On the research frontier, GRPO (Shao et al. 2024) sharpened the actor-critic lens for RLHF by showing that the critic can be replaced with aggregated group-relative rewards without losing the essential variance reduction. This freed practitioners from maintaining per-token global reward buffers and enabled faster partial updates during preference learning. The engineering frontier keeps actor-critic central too: OpenAI’s RLHF blog (OpenAI 2024) explains that PPO, an actor-critic method with clipped ratios, is the workhorse for aligning large language models because it balances high-throughput training with stability, and the entire pipeline—from reward modeling to policy optimization—depends on the critic to deliver gradients that respect human preferences without exploding. PPO’s design, which adds a loss term \(\mathcal{L}_\text{clip} = \mathbb{E}[\min(r_t \hat{A}_t, \text{clip}(r_t, 1-\epsilon, 1+\epsilon)\hat{A}_t)]\) where \(r_t\) is the probability ratio, is why RLHF in production can safely proceed with large batches of autoregressive tokens without destabilizing the policy.
 
-From an engineering perspective, actor-critic is the production workhorse. OpenAI’s Dota 2 bots used asynchronous actor-critic agents trained on thousands of CPU workers, beating professional players on a superhuman scale (OpenAI Five, 2018). Those agents relied on A3C-style updates with a synchronized critic to keep the actor stable over the complex multi-agent environment. Around the same time, DeepMind deployed IMPALA in the cloud with actor-critic learners across 4,000 CPU cores and GPU-based learners for the critic, achieving high throughput on Atari and 3D tasks thanks to V-trace corrections that prevented off-policy drift. More recently, RLHF deployments at Anthropic and OpenAI use PPO—an actor-critic variant with clipped probability ratios—to fine-tune large language models with reward models acting as critics; the same variance-reducing principle enables the models to learn from preference data without catastrophic policy shifts. The engineering frontier thus focuses on systems that manage scale (thousands of rollouts per second) while keeping the actor and critic in lockstep through asynchronous updates, trust-region constraints, and distributed logging.
+A small table summarizing the contemporary landscape helps make this concrete.
+
+| Algorithm | Variance control | Parallelism | Production touchpoint |
+|-----------|------------------|-------------|-----------------------|
+| A2C | TD advantage baseline | Single-actor | Training small robotics prototypes |
+| A3C | Multiple workers reduce correlation | Async workers | Early Atari and robotics labs |
+| PPO | Clipped ratio + entropy bonus | Batch mini-updates | OpenAI RLHF alignment pipeline |
+| GRPO | Group-relative reward baseline | Data aggregation | RLHF with token-level reward constraints |
+
+The research frontier question is whether actor-critic can keep reducing variance while handling extremely long horizons, like those encountered in reasoning chains or multi-agent simulation. The production frontier is set by how quickly an actor-critic policy can be retrained as the critic (or reward model) changes, because real systems like RLHF deployments retrain multiple times per week, and each retraining must end without destabilizing the behavior policy. That’s why system teams monitor the critic’s loss, the activation norms, and the PPO ratio histograms to ensure the dual networks remain synchronized.
 
 ## What's still open
 
-1. How can we dynamically balance actor and critic learning rates so that the critic remains accurate enough to reduce variance but not so aggressive that its noisy estimates destabilize the actor? Any formal rule would need to monitor the TD-error drift and automatically adjust optimizers, yet most implementations still rely on hand-tuned schedules.
-
-2. Can we quantify the “stale critic” problem in preference learning by constructing a divergence metric between policy rollouts and the critic’s training distribution, and then design a critic-retraining cadence that guarantees bounded policy regret? Without such a metric, deployment teams hedge with arbitrary early stopping.
-
-3. In multi-agent and LLM environments where exploration leads to entirely new state distributions, what are the sufficient conditions for a critic to generalize rather than overfit, and can we encode those conditions in regularizers or architectures (e.g., ensembles or implicit models) that are provably robust to policy drift?
-
-4. For model-based actor-critic hybrids, does the critic or the learned model dominate the bias in the policy gradient, and how can we disentangle their contributions so we can selectively improve the higher-variance component?
+Can actor-critic be made to perform mathematically rigorous, token-level credit assignment in reasoning tasks where the reward is sparse, the chain is long, and labeling each reasoning step is impractical? In such settings, the critic must hallucinate intermediate value estimates from partial context, and any misestimation can send the actor toward reward hacking. A second open question is whether group-relative baselines like GRPO can be generalized beyond preference clusters to continuous latent spaces, enabling the critic to operate on embeddings instead of discrete reward groups. Third, does asynchronous actor-critic still dominate once we add noisy oracles into the mix—are there convergent update rules when each worker’s critic is allowed to drift before its gradients are aggregated? Each of these questions can seed a research sprint: formalizing token-level value functions, proving convergence with latent group summaries, and designing new synchronization strategies for noisy critics.
 
 ## Where to read next
 
-If you want the probabilistic foundation that underlies the policy gradient theorem, → [[policy-gradient-methods]] rewrites the objective from first principles and shows why the advantage estimator keeps the gradient unbiased. For implementations that grow the actor-critic loop into large-scale systems, → [[distributed-rl-systems]] details how asynchronous workers, replay buffers, and V-trace corrections keep the actor and critic in sync at production throughput. The next conceptual jump to model-based critics is covered by → [[model-based-reinforcement-learning]], which explains how learned dynamics can feed into both the actor’s exploration and a critic that evaluates imagined rollouts.
+If you want the probabilistic foundation that makes policy gradients sound, → [Policy gradient](policy-gradient.md) explains why the log-derivative trick yields unbiased gradients and how baselines cancel variance. The engineering counterpart is → [[value-functions]], which shows how TD learning and bootstrapping work for the critic you just implemented. For the RLHF story beyond PPO and GRPO, → [[reward-modeling]] covers how human feedback is collected and converted into the reward signals consumed by actor-critic optimizers.
 
 ## Build it
 
-This build lets you see the actor-critic duet working in real time: you will code up an Advantage Actor-Critic (A2C) agent that learns CartPole-v1 purely from scratch in PyTorch, watching both the actor and critic losses evolve as the environment stabilizes. The recipe proves that reducing variance via a live critic—rather than waiting for the episode return—makes the policy converge in minutes on CPU.
+Training Advantage Actor-Critic from scratch on CartPole verifies you understand how the actor, critic, TD error, and rollout intertwine.
 
-**What you're building:** A PyTorch A2C agent that balances OpenAI Gym’s CartPole-v1 environment using synchronous updates from a tiny shared actor-critic network.
+**What you're building:** A PyTorch Advantage Actor-Critic agent that solves `CartPole-v1` in Gym, running on a free Colab CPU in under two minutes so you can see the dual networks and TD advantage in action.
 
-**Why this is valuable:** By building each component (actor loss, critic loss, advantage computation, entropy bonus) from scratch, you see how the actor uses the critic’s TD error as immediate feedback, verifying the variance reduction claim empirically.
+**Why this is valuable:** The build forces you to instantiate both networks, compute the TD error \(\delta_t = r_t + \gamma V(s_{t+1}) - V(s_t)\), and update the actor with the resulting advantage instead of the episode return, making the variance-reduction mechanics explicit.
 
 **Stack:**
-- **Model:** no pretrained HuggingFace model—define a 2-layer MLP actor-critic (≈64 hidden units each) in PyTorch.
-- **Dataset:** OpenAI Gym CartPole-v1 (available through `gymnasium` or `gym`); episodes serve as the training data.
-- **Framework:** PyTorch 2.1 with TorchVision 0.16 for utilities; optionally use `gymnasium==0.30` for the environment loop.
-- **Compute:** free Google Colab CPU (≤2 min per training run); no GPU needed.
+- **Model:** Custom actor-critic network—two separate heads sharing a three-layer MLP (no external HF model required).
+- **Dataset:** `CartPole-v1` from Gym (provided by `gymnasium==0.28.1`, environment length ≤ 500).
+- **Framework:** PyTorch 2.1 (with `torch.optim.AdamW`), Gymnasium, NumPy.
+- **Compute:** Free Colab CPU (2 vCPUs, ≤2 minutes per run).
 
 **The recipe:**
-1. Install packages: `pip install torch==2.1.0 gymnasium==0.30 wandb` and import `torch`, `torch.nn`, `gymnasium`, `numpy`, and `collections.deque`.
-2. Define the actor-critic module: a shared `nn.Sequential` trunk feeding two heads—one softmax actor outputting action probabilities for `CartPole-v1`’s two actions, and one linear critic returning \(V(s)\). Normalize observations with running mean/std from the replay buffer.
-3. In each rollout of 5 steps (A2C style), store \((s_t, a_t, r_t, s_{t+1}, \text{done})\), compute \(V(s_t)\) and \(V(s_{t+1})\), form the advantage \(A_t = r_t + \gamma V(s_{t+1}) \cdot (1 - \text{done}) - V(s_t)\), and accumulate actor/critic losses plus an entropy bonus. Use separate Adam optimizers: \(\alpha_\text{actor}=3e-4\), \(\alpha_\text{critic}=1e-3\), \(\gamma=0.99\), entropy weight \(=0.01\).
-4. After each rollout, backpropagate the sum of losses—actor loss \(-\log \pi(a_t|s_t) A_t\), critic MSE \(A_t^2\), and entropy—and step both optimizers. Clip gradients to 0.5 for stability. Track episode length and average reward over 100 episodes; expect it to rise toward 200 within ~1500 updates.
-5. Evaluate every 100 episodes by running the policy deterministically (choose argmax) for 10 episodes, printing the mean reward. Save the actor-critic state dict when the evaluation reward exceeds 195 and log the loss curves to WandB or TensorBoard.
+1. Install the stack with `pip install torch==2.1.0 gymnasium==0.28.1 torchtyping`, and seed both NumPy and PyTorch for reproducible runs.
+2. Create the CartPole environment, normalize observations if desired, and batch transitions into mini-rollouts of 5 steps to compute multi-step returns.
+3. Define the actor-critic network: shared MLP to 128 units, then separate linear heads for policy logits and value \(V_\phi(s)\). Use AdamW with actor learning rate \(1e-4\) and critic learning rate \(5e-4\); inside the training loop, compute \(\delta_t = r_t + \gamma V_\phi(s_{t+1}) - V_\phi(s_t)\) and the policy loss \(-\log \pi_\theta(a_t \mid s_t) \cdot \delta_t\).
+4. Evaluate by running 20 test episodes every 1000 steps and report the average return; expect returns exceeding 475 within 5k gradient updates.
+5. What you now have is a checkpointed actor-critic policy that solves CartPole with a stable TD advantage, plus logs of \(V_\phi\) vs. Monte Carlo returns showing the critic’s accuracy.
 
-**Expected outcome:** A checkpointed A2C agent that reliably gets ≥195 average reward on CartPole-v1 and an accompanying plot showing actor loss, critic loss, and TD error magnitude converging.
+**Expected outcome:** A working A2C checkpoint and plotted learning curves proving that the TD error drives the actor toward stable behavior.
 
-- **CS student:** Run step 3 with a pure notebook (no WandB) and add a Colab slider to adjust \(\gamma\) and watch how the critic’s TD error changes, proving that the critic’s accuracy determines the actor’s convergence rate.
-- **Applied engineer:** Package the trained PyTorch model with TorchScript, quantize the actor head to int8, and serve it via a FastAPI endpoint that responds to JSON state vectors with action probabilities, measuring 10ms latency on an A10.
-- **Applied researcher:** Hypothesize that doubling the critic’s depth improves convergence; clone the recipe, add a second hidden layer to the critic only, and run two runs (baseline vs. deeper critic) to compare variance in the advantage estimate over time.
-- **Frontier researcher:** Probe the open question on dynamic learning rates by introducing an exponential moving average of the critic TD error to adjust \(\alpha_\text{actor}\) and \(\alpha_\text{critic}\) online, and measure whether the system avoids policy-critic feedback loops identified in ECHO (2025).
+- **CS student:** Run the same recipe on Colab but log the critic loss and plot the advantage estimates per step to see how the critic de-noises the reward.
+- **Applied engineer:** Quantize the actor’s policy head to int8 with PyTorch’s static quantization, wrap the policy in a simple Flask app, and target a 50 ms inference latency on an A10 instance.
+- **Applied researcher:** Replace the TD error with a truncated importance-sampled variant from Degris et al. (2012) and compare convergence curves to test whether off-policy data accelerates learning.
+- **Frontier researcher:** Extend GRPO’s group-relative baseline to token-level reasoning by keeping per-token reward buckets and defining a falsification test: if the actor’s policy gradient improves while the critic’s bucketed variance increases, the baseline is insufficient.
 
 ---
 
