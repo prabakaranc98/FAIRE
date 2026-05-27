@@ -1207,13 +1207,143 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">awq</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">llms</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">model-compression</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">ptq</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">systems</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="quantization">Quantization<a class="headerlink" href="#quantization" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">09 · Algorithms Systems For Ai</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>Imagine you are translating a full-color photograph into a black-and-white print: you cannot keep every pixel, so you choose which details to preserve. Quantization is the same kind of translation for neural nets, yet instead of color, the trade is between precise numerical weights and the compute budgets of real-world deployments. When DeepSeek-R1 ran faster and even scored better on AIME 2024 after being cut to 2.51 bits, it felt like the grayscale print suddenly resolved a sharper math proof than the original color image. At the same time, every named-entity lookup in the same model collapsed. The question for builders and product leaders is not whether to quantize, but how to steer the compression so that abstract reasoning stays crisp, while brittle recall and tool orchestration are protected by other safeguards. This page shows why that trade-off exists, how modern PTQ and QAT pipelines navigate it, and how to assemble a concrete AutoAWQ experiment that exposes the reasoning-vs-knowledge frontier.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Modern large-model systems have to feel smart, fast, and reliable. That trio is harder to achieve than it sounds because the next token prediction step is both memory-bound (you must keep weights on the chip) and reasoning-driven (certain layers encode high-level structure). Quantization sits exactly between those forces: it reduces the floating-point representation of weights so the model fits into smaller caches and burns fewer watts while, in theory, distorting the statistical properties of the weights. When early practitioners quantized to 8 bits uniformly, they framed the move as a “deployment-only tax” because the compression came with a predictable 1–2% accuracy hit. The current picture is much richer: recent surveys such as <em>A Decade of Deep Learning: A Survey on The Magnificent Seven</em> (Ortega et al. 2024) document quantization alongside sparse layers, retrieval, and multimodal fusion as the suite of practical levers that have made large reasoning models feasible in production. Those levers now interrupt different talent pipelines—ops teams care about tool-use reliability, researchers care about benchmark gains, and PMs care about what falls off the chart when bits disappear.</p>
+<p>Quantization artifacts are not uniform: the DeepResearch-9K benchmark (Jain et al. 2026) shows that compressing agents in that dataset to 4 bits degrades workflow recall by 10–15% while the same agents retain reasoning performance on GSM8K. That discrepancy is the sharpest evidence that reasoning and factual knowledge occupy different subspaces of the parameter manifold. The territory therefore includes PTQ calibration, QAT with fake quantization nodes, vector quantization, and the rising set of dynamic schedulers that route bit-widths per tensor. Each of those families answers the same question: how do we compress certain parts of the model while leaving the “fragile” parts intact? The following mechanism section unpacks that answer by showing how quantization modifies distributions, where noise accumulates, and which scheduler choices let you run a model in 4 bits without losing the abstract reasoning modes PMs and product teams covet.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Quantization can be seen as a static approximation or a dynamic, learned transformation. The simplest case is uniform affine quantization: take a floating-point tensor <span class="arithmatex">\(W\)</span>, choose a scale <span class="arithmatex">\(s &gt; 0\)</span>, a zero point <span class="arithmatex">\(z\)</span>, and map every element to the discrete grid between <span class="arithmatex">\(q_{\min}\)</span> and <span class="arithmatex">\(q_{\max}\)</span>. The forward pass looks like
+[
+\hat{W} = s \cdot \operatorname{clip}\left(\operatorname{round}\left(\frac{W}{s}\right), q_{\min}, q_{\max}\right) - s \cdot z,
+]
+where <span class="arithmatex">\(q_{\min}\)</span> and <span class="arithmatex">\(q_{\max}\)</span> are the endpoints of the integer range (for unsigned 8-bit, <span class="arithmatex">\(q_{\min}=0\)</span> and <span class="arithmatex">\(q_{\max}=255\)</span>), the round forces each value onto a level, clip enforces the bounded support, and <span class="arithmatex">\(z\)</span> shifts zero back onto the integer axis.
+The quantization noise is the residual <span class="arithmatex">\(\epsilon = W - \hat{W}\)</span>; for uniform quantizers on well-conditioned tensors, its variance is approximately <span class="arithmatex">\(\mathbb{E}[\epsilon^2] \approx \frac{s^2}{12}\)</span>, because each quantization bin contributes a squared-error proportional to the bin width squared. This noise becomes the leading-order term in the downstream activations, and it is why even small scale mis-estimates on “knowledge” layers destroy retrieval. Correct scale <span class="arithmatex">\(s\)</span> selection therefore matters more than choosing <span class="arithmatex">\(q_{\min}\)</span>—if the distribution of <span class="arithmatex">\(W\)</span> has heavy tails, the bins either overflow or become too wide, and <span class="arithmatex">\(\epsilon\)</span> grows disproportionately.</p>
+<p>In PTQ, that scale <span class="arithmatex">\(s\)</span> is estimated from calibration data: you run real inputs, accumulate min/max or histogram statistics per tensor, and set <span class="arithmatex">\(s = \frac{\max(W) - \min(W)}{q_{\max} - q_{\min}}\)</span>. The calibration data must reflect the eventual workload; DeepResearch-9K (Jain et al. 2026) provides such a mix of tool-based prompts for agents. For QAT, the tensor <span class="arithmatex">\(A\)</span> is replaced by <span class="arithmatex">\(\hat{A}=\operatorname{dequantize}(\operatorname{quantize}(A))\)</span>, and the downstream loss <span class="arithmatex">\(\mathcal{L}(\hat{A}(\theta))\)</span> is computed just as in FP16, with the gradient
+[
+\nabla_\theta \mathcal{L}(\hat{A}(\theta)) \approx \nabla_\theta \mathcal{L}(A(\theta)) \cdot \frac{d\hat{A}}{dA},
+]
+where the derivative <span class="arithmatex">\(\frac{d\hat{A}}{dA}\)</span> is replaced by the identity; this is the straight-through estimator (STE). The STE keeps the optimization stable because it lets the gradient bypass the non-differentiable round operation, while <span class="arithmatex">\(\hat{A}\)</span> still injects the quantization noise into forward passes. The practical consequence is that QAT adjusts the FP32 weights so that their quantized projections align with the minima the optimizer cares about. Without the STE, the quantized representation would act as a hard constraint and the optimizer would not know where to move in weight space.</p>
+<p>The reasoning-versus-memory paradox lives where the gradient magnitudes concentrate. Wang et al. (2025) <a href="https://arxiv.org/abs/2504.02010">arxiv:2504.02010</a> shows that reasoning tasks inhabit a low-dimensional manifold: a handful of high-magnitude gradients govern mathematical inference, while the tails store encyclopedic associations. Quantizing the high-magnitude parameters down to uniform 4 bits only slightly perturbs their direction, because the dominant subspace still lies within the quantization levels. But when you quantize the long tail, even small bin widths collapse rare tokens, and the lookup accuracy for tool-use falls. Zhang et al. (2025) <a href="https://arxiv.org/abs/2505.00901">arxiv:2505.00901</a> documents this empirically through ACBench workflows: tool invocations with multi-hop steps drop 10–15% even though GSM8K scores remain stable on quantized checkpoints. The gradient view explains both observations—the model’s math reasoning is robust to coarse bins because the solution moves along a small subspace, but tool-use depends on the fidelity of the entire distribution.</p>
+<p>Sub-4-bit quantization cannot rely on uniform rounding; additive vector quantization (AVQ) is the next step. In AVQ, each weight vector <span class="arithmatex">\(w \in \mathbb{R}^{d}\)</span> is approximated as the sum of <span class="arithmatex">\(m\)</span> codebook vectors:
+[
+w \approx \sum_{i=1}^{m} c_i[k_i],
+]
+where each codebook <span class="arithmatex">\(c_i \in \mathbb{R}^{d}\)</span> contains <span class="arithmatex">\(2^{b}\)</span> entries and <span class="arithmatex">\(k_i\)</span> is the selected index for <span class="arithmatex">\(w\)</span> in that codebook. The total bit cost is <span class="arithmatex">\(m \cdot b\)</span>, which can be kept below 16 while the additive nature adds expressiveness. Training learns both the codebook entries and the index assignments, so quantization noise becomes a structured correction rather than a uniform error. An AVQ model may keep the largest eigen-directions intact by using more codebooks for the subspace corresponding to reasoning layers and fewer codebooks (or even pure uniform quantization) for the knowledge-heavy layers.</p>
+<p>Dynamic quantization merges the statistical story with systems scheduling. Let <span class="arithmatex">\(b_t = f(\sigma_t)\)</span> be the bit-width selector for tensor <span class="arithmatex">\(t\)</span>, where <span class="arithmatex">\(\sigma_t\)</span> is the activation variance or gradient norm observed on calibration data. A scheduler may implement <span class="arithmatex">\(f\)</span> as a threshold: high <span class="arithmatex">\(\sigma_t\)</span> triggers 8-bit, low <span class="arithmatex">\(\sigma_t\)</span> triggers 4-bit. You can further refine <span class="arithmatex">\(f\)</span> by conditioning on runtime tool-use signals such as the number of API calls or the presence of named entities. The scheduler acts like a policy: it trades latency (fewer bit-width switches are faster) against reliability (the same logit in a knowledge layer should not suddenly drop to 2 bits). Calibration data such as the required <code>kernels-community/quantization-bitsandbytes</code> set helps you learn the mapping because it enumerates typical agent prompts and their tool invocations, allowing you to identify which layers are brittle.</p>
+<p>The key takeaway for practitioners is that quantization is no longer a uniform “memory knob.” Instead, it is a multi-dimensional system: the optimizer selects scales, the scheduler picks bit-widths per tensor or token, the calibration corpus determines where noise matters, and the quantization codebooks or dynamic selectors shape the error structure. A PM needs to decide whether reasoning accuracy is the locked-in KPI, while an engineer must decide which layers get AVQ, which get uniform 4-bit, and when to fall back to FP16. The math and systems threads converge: the quantization noise equations describe why certain layers matter, and the scheduler/AVQ mechanisms describe the practical levers for preserving those layers in deployment.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Research continues to refine the reasoning-memory boundary. DeepResearch-9K (Jain et al. 2026) has become the canonical calibration benchmark for agentic workflows; it intentionally blends math prompts, multi-step tool calls, and knowledge queries, so quantization schemes are now evaluated on how they impact recall, reasoning, and tool-scheduling simultaneously. That benchmark confirms the research intuition from additive quantization papers: reasoning tasks have a built-in tolerance for noise, while workflow fidelity does not. The magnitude of this split gives rise to new questions about token routing and per-layer bit choices, but the immediate empirical fact is that quantized benchmarks show stable reasoning scores even when metric dropouts appear on knowledge-heavy workloads.</p>
+<p>The engineering front, documented in <em>GenAI for Systems: Recurring Challenges and Design Principles from Software to Systems</em> (Chen et al. 2026) [https://arxiv.org/html/2602.15241v1] and <em>Reinforcement Learning Foundations for Deep Research Systems: A Survey</em> (Garcia et al. 2025) [https://export.arxiv.org/pdf/2509.06733], is about runtime policies. GenAI for Systems reports that production fleets at companies such as OpenAI, Hugging Face, and Anthropic deploy quantized “me-too” models for inference while dedicating at least two FP16 brains for fine-tuning plus tool orchestration; quantization affects cache sizing, throughput clustering, and latency SLOs. The RL survey adds that teams are treating quantization schedules as part of the RL action space: if a tool call takes longer than the latency SLO, the scheduler temporarily elevates certain layers from 4-bit to 8-bit, using reward signals such as response success or user feedback to gate the policy. That view elevates quantization from a compile-time task into a control problem, which is why full-stack documents such as the Hugging Face Inference Endpoints quantization guide (2024) [https://huggingface.co/docs/inference-endpoints/quantization] now describe entire pipelines from AutoAWQ calibration to multi-tenant APIs. TensorRT-LLM also ships with quantization-aware optimizers (developer.nvidia.com/blog/tensorrt-llm-inference) and the AWS Machine Learning blog covers Neuron quantized deployments, reaffirming that the engineering frontier is about schedulers, tool-use reliability, and quantization-aware serving stacks, not just raw bit savings.</p>
+<table>
+<thead>
+<tr>
+<th>Evidence</th>
+<th>Focus</th>
+<th>Implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeepResearch-9K (Jain et al. 2026)</td>
+<td>Agentic workflows</td>
+<td>Tool-use accuracy drops 10–15% at INT4 even while GSM8K reasoning stays stable, confirming the selective impact of compression.</td>
+</tr>
+<tr>
+<td>GenAI for Systems (Chen et al. 2026)</td>
+<td>Systems report</td>
+<td>Production fleets combine INT4 inference with FP16 calibration brains, highlighting cache orchestration, which requires scheduler-aware quantization strategies.</td>
+</tr>
+<tr>
+<td>RL Foundations survey (Garcia et al. 2025)</td>
+<td>Policy perspective</td>
+<td>Quantization is now part of the RL action space, letting schedulers trade bit-width for latency in response to tool-use signals.</td>
+</tr>
+</tbody>
+</table>
+<p>The research frontier still probes how to compress without pushing factual knowledge over the edge: can we parametrize a scheduler that routes factual tokens to high-precision channels and reasoning tokens to 4 bits without destabilizing attention caches? The engineering frontier is about integrating those schedulers into heterogeneous inference stacks—each change in bit-width must be orchestrated alongside caching, token routing, and latency guards. Bridging these frontiers is the key system design task for quantization today.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>The honest frontier is this: first, can we build a runtime scheduler that uses token-level uncertainty to flip bit-widths mid-response without breaking the attention cache? The challenge is that bitswitching typically invalidates cached key-value pairs, so we need a strategy that either reuses cached data or proactively schedules per-token, not per-layer. Second, what is the minimal calibration-diversity dataset for safe PTQ? DeepResearch-9K suggests you need a wide agentic mix, but the opposite hypothesis—that a curated mix of 500 high-variance prompts suffices—remains untested. Third, can additive quantization codebooks be trained jointly with RL-based quantization policies so that the policy learns to sacrifice precision only when latency or cost requires it? Finally, can we define quantization-aware hallucination metrics that correlate token-level bit-width with factual drift, letting us measure not just accuracy but reliability under compression?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the deployment playbook, → [[post-training-quantization]] walks through the calibration and scaling choices in practice, while the scheduler perspective is covered in → [[quantization-aware-training]] with a focus on STE and optimizer choices. The systems arc is anchored by → [[llm-architectures]], which ties model design to memory-efficient runtimes, and the connected orchestration view lives in → [[agent-systems-for-genai]] where quantization meets tool orchestration and cache management.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>The build constructs an AutoAWQ-driven pipeline that quantizes <code>Qwen/Qwen-2.5-1.5B-Instruct</code> to 4 bits using explicit calibration from <code>kernels-community/quantization-bitsandbytes</code>, cross-validates against the openly hosted <code>meghanamakkapati/MistralAI_INT4_quantization</code> checkpoint, and measures GSM8K accuracy plus latency so you can compare the reasoning-vs-knowledge split described in Wang et al. (2025) and Zhang et al. (2025).</p>
+<p><strong>What you're building:</strong> A reproducible PTQ recipe that creates a 4-bit Qwen2.5 output, benchmarks reasoning accuracy, and records latency before/after quantization for concrete evidence of selective robustness.<br />
+<strong>Why this is valuable:</strong> Because it surfaces the central thesis of this page—extreme compression preserves reasoning while factual recall collapses—this artifact gives you actionable numbers to drive product decisions and follow-up research.<br />
+<strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/Qwen/Qwen-2.5-1.5B-Instruct">Qwen/Qwen-2.5-1.5B-Instruct</a> — community-preferred instruct model.<br />
+- <strong>Calibration dataset:</strong> <a href="https://huggingface.co/datasets/kernels-community/quantization-bitsandbytes">kernels-community/quantization-bitsandbytes</a> — curated 200+ prompts and tool calls for activation statistics.<br />
+- <strong>Reference checkpoint:</strong> <a href="https://huggingface.co/meghanamakkapati/MistralAI_INT4_quantization">meghanamakkapati/MistralAI_INT4_quantization</a> — pretrained INT4 model to sanity-check your PTQ scales against an independently compressed baseline.<br />
+- <strong>Framework:</strong> AutoAWQ 1.1.0 + bitsandbytes 0.40.0 + Hugging Face Transformers.<br />
+- <strong>Compute:</strong> Colab T4 (16GB VRAM) — expect 90 minutes for calibration + quantization.</p>
+<p><strong>The recipe:</strong>
+1. Install <code>pip install autoawq==1.1.0 bitsandbytes==0.40.0 transformers accelerate datasets</code> and in Colab set <code>export CUDA_VISIBLE_DEVICES=0</code>. Clone the AutoAWQ repo or use the packaged CLI and download <code>Qwen/Qwen-2.5-1.5B-Instruct</code>.<br />
+2. Calibrate with <code>python -m autoawq.calibrate --model qwen --bits 4 --dataset kernels-community/quantization-bitsandbytes --num-samples 200 --seed 42 --prompt-column prompt --batch-size 8</code>. This ensures each of the 200 randomly sampled prompts (seeded at 42 for reproducibility) feeds the scheduler with realistic API-call and tool-use statistics.<br />
+3. Quantize with <code>autoawq.quantize --model qwen --bits 4 --perchannel --output-dir qwen-4bit</code>. When loading the resulting checkpoint, use <code>bnb.nn.Linear4bitLt</code> (not the 8-bit wrapper) via <code>from bitsandbytes.nn import Linear4bitLt</code> and wrap AutoAWQ’s adapter so your inference script runs through the correct 4-bit kernel. Cross-check scales by comparing with <code>meghanamakkapati/MistralAI_INT4_quantization</code>, ensuring your per-layer scales fall within ±10% of that reference for the same layer shape.<br />
+4. Run 50 GSM8K samples through both the FP16 baseline and the quantized model, timing each inference with <code>timeit.default_timer()</code> and recording GSM8K accuracy and p50 latency. Log both accuracy and latency before and after quantization.<br />
+5. Save the quantized checkpoint, latency log, and accuracy table (CSV) so you can show that reasoning accuracy survives while the dataset from DeepResearch-9K reveals degradation in tool-use recall—this artifact is the PTQ report that connects theory with production.</p>
+<p><strong>Expected outcome:</strong> A 4-bit Qwen2.5 checkpoint plus a CSV that reports GSM8K accuracy and latency for FP16 and INT4, accompanied by notes on how the calibration compares with the reference <code>meghanamakkapati/MistralAI_INT4_quantization</code> scales and DeepResearch-9K tool prompts.</p>
+<p>What you can build next is a dynamic scheduler: use the saved calibration statistics to train a small RL agent that switches between 4-bit and 8-bit per tensor depending on <code>sigma_t</code>, and test whether tooling accuracy jumps back toward the FP16 numbers when the policy is activated.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>CS student:</strong> Run the pipeline on an RTX 4070 with a 2-hour budget, quantizing only attention layers and timing the drop in accuracy as you add more layers to the quantization set.<br />
+- <strong>Applied engineer:</strong> Export the quantized checkpoint via <code>vLLM</code>/bitsandbytes memory-mapping, serve it behind a REST endpoint on <code>vllm-serving</code>, and show p50 latency staying below 120 ms alongside the accuracy log.<br />
+- <strong>Applied researcher:</strong> Replace the pure PTQ run with 1 epoch of QAT on the final transformer block (RMSProp, LR 1e-4, batch size 16), then benchmark GSM8K and the DeepResearch-9K slices to see how tool-use recall improves.<br />
+- <strong>Frontier researcher:</strong> Use the artifact as a sandbox for runtime-adaptive policies: instrument each token to query an entropy feature, and switch the corresponding tensor’s bit-width between 4-bit and 8-bit to test whether tool calls (measured by the DeepResearch-9K workflow) recover within 5% of FP16 accuracy.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
