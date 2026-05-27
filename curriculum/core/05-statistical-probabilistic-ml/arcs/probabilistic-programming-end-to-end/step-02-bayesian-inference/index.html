@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-02-bayesian-inference/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../../../../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Generative Stack Index - Frontier Wiki</title>
+        <title>Step 2 — Implement Bayesian Inference via Metropolis-Hastings - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-territory" class="md-skip">
+        <a href="#step-2-implement-bayesian-inference-via-metropolis-hastings" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Generative Stack Index
+              Step 2 — Implement Bayesian Inference via Metropolis-Hastings
             
           </span>
         </div>
@@ -209,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -250,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../about/" class="md-tabs__link">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -306,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -336,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -443,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -471,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../01-ai/" class="md-nav__link">
+      <a href="../../../../01-ai/" class="md-nav__link">
         
   
   
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -527,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../03-representation-learning/" class="md-nav__link">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -555,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -611,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -639,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -695,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -723,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -810,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -838,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -925,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -953,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -981,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1009,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1044,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1072,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1100,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1128,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1156,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/observer/" class="md-nav__link">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1212,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1240,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1297,21 +1297,28 @@
       
       
       
-        <span class="md-tag">evaluation</span>
+        <span class="md-tag">bayesian</span>
       
     
       
       
       
       
-        <span class="md-tag">generative</span>
+        <span class="md-tag">inference</span>
       
     
       
       
       
       
-        <span class="md-tag">stacks</span>
+        <span class="md-tag">mcmc</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">metropolishastings</span>
       
     
   </nav>
@@ -1322,63 +1329,78 @@
 
 
 <blockquote>
-<p><strong>Arc syllabus</strong> — this page is the entry point to the <strong>Generative Stack</strong> arc.</p>
+<p><strong>Arc:</strong> <a href="../../arcs/probabilistic-programming-end-to-end.md">Probabilistic Programming End To End</a> — Step 2 of 5</p>
+<p><strong>Arc:</strong> <a href="../index.md">Probabilistic Programming End To End</a> — Step 2 of 5<br />
+← <a href="../step-01-probabilistic-programming/">Previous Step</a> &nbsp;&nbsp; <a href="../step-03-variational-inference/">Next Step →</a></p>
 </blockquote>
-<p>Imagine a control room where dozens of generative models flicker across dashboards: each one sourced from a different modality, each one trained with a different objective, and all of them expected to behave predictably when a new prompt, new context, or new regulator walks in. Operations leaders stop asking whether individual models can produce interesting output; they start asking how to characterize the health of the entire pipeline—how representation, generation, and evaluation coexist so that a swap in the front-end encoder does not crash the late-stage scoring system.</p>
-<p>The generative stack index is the vocabulary for that question. Rather than cataloging isolated models, it frames a single, differentiable pipeline where an encoder <span class="arithmatex">\(E_\phi\)</span> shares latents with every conditional generator under evaluation and where metrics actually influence the encoder’s parameters. That continuous view is what makes going from prototypes to hundreds of production models feasible.</p>
-<p>Prerequisites: familiarity with [[diffusion-models]], [[vae]], and [[gan]] so the stack-index story can reuse their encoder–sampler–evaluator roles.</p>
-<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
-<p>Every deployment that does more than one generative task admits a stack: some process converts raw data into latent codes, a sampler produces outputs conditioned on those codes, and an evaluation layer decides whether the results are good enough to ship. Historically the industry invested in allowing each layer to specialize in isolation—GANs for texture, VAEs for compact latent spaces, autoregressive networks for text, and diffusion models for high-fidelity synthesis. Teams had to glue these specialized pipelines together, hand-tuning interfaces and keeping meticulous documentation on which encoder served which generator. That fragility is what the generative stack index dissolves.</p>
-<p>The index is not merely a dashboard; it is the disciplined view that these three layers share a common conditioning vector <span class="arithmatex">\(c\)</span>. The representation stage stops being an artifact of a single generator and instead reuses the same deep embeddings that feed downstream kernels—the convolutional hierarchies first showcased by Krizhevsky et al. 2012 [https://arxiv.org/pdf/1401.4082] already warmed up by multiple downstream decoders. The generative stage becomes a family of interchangeable samplers: GANs (Goodfellow et al. 2014, [https://arxiv.org/pdf/1406.2661]) and diffusion processes now all read the same conditioning vector <span class="arithmatex">\(c\)</span> so that swapping kernels is simply a matter of switching loss functions rather than reengineering front ends. The evaluation stage likewise becomes a differentiable scoring layer, closing the loop in a way that influences the encoder whenever the metrics deviate from expectations. In short, the territory is not “a model that generates,” it is “a continuous path from data to value.”</p>
-<p>This is also where the page sits within the larger arc: the generative-stack arc uses this index to bridge the foundational vocabulary laid out in [[generative-foundations]] with the practical sampling engines detailed in [[diffusion-models]], and it shows where core assessments of the stack happen.</p>
+<h1 id="step-2-implement-bayesian-inference-via-metropolis-hastings">Step 2 — Implement Bayesian Inference via Metropolis-Hastings<a class="headerlink" href="#step-2-implement-bayesian-inference-via-metropolis-hastings" title="Permanent link">&para;</a></h1>
+<p>Can the readings from a slightly sticky sensor teach you how wrong your previous guess about its bias was? Imagine you had a factory of identical sensors, one of them drifting just enough to ruin a downstream calibrator; you can hand-tune a single parameter, but it never tells you how uncertain that correction is or how confident you should be that the next sensor behaves similarly. By the end of this step you will not only answer what the bias is, but also why the data keeps the 95 % credible interval within a tight dance around the truth—it is the posterior distribution itself that plays the role of a reliability report card. That posterior is the human answer to the question “How should what I believed change when these new readings arrive?” and the mechanism that transforms your prior guess into a probabilistic forecast you can trust.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>The field has long treated Bayes’ original essay as the turning point where belief became math. Bayes (1763) <a href="https://bayes.wustl.edu/Manual/an.essay.pdf">LII. An Essay towards solving a Problem in the Doctrine of Chances</a> introduced the conditional probability machine that takes prior belief plus evidence and spits out a posterior; without that update there is no principled story for how new data modifies what we think is plausible. Later work—SIAM-AMS (2012) “Ambiguity and Bayesian re-interpretation” [https://bayes.wustl.edu/etj/articles/ambiguity.pdf]—reminds us that ambiguity creeps back in if we only look at point estimates, because the same average could hide multiple conflicting possibilities, so we must reason about the entire distribution over hypotheses. Modern cognitive neuroscience echoes this point: the report from “D:\larry\Output.prn.pdf” (a canonical Bayes-net brain model) [https://bayes.wustl.edu/etj/articles/how.does.the.brain.orig.pdf] shows that the brain keeps track of posterior ratios precisely so that perception reflects both “what happened” and “how strongly it happened.” That is why this step exists between a generative story and a variational approximation: we move from expressing the model to actually sampling its posterior, and through that we accumulate evidence about uncertainty that informs the rest of the arc.</p>
+<p>The territory is thus the probabilistic pipeline: a prior encodes what you knew before seeing data, a likelihood encodes how the model would generate readings given a hypothesis, and a posterior information counter balances the two. “PRIOR” [https://bayes.wustl.edu/etj/articles/prior.information.pdf] formalizes how to choose that prior without being arbitrarily confident, so that the posterior continues to reflect information brought in by the sensor rather than the biases you baked into the model. In this way, the human problem—reporting both a bias estimate and how reliable that estimate is—becomes a mathematical one: how do you represent the posterior and how do you draw from it? That is the question we now answer with Metropolis-Hastings, bridging the storytelling from Step 1 to the optimization experiments in Step 3.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<h3 id="representation-and-latent-conditioning">Representation and latent conditioning<a class="headerlink" href="#representation-and-latent-conditioning" title="Permanent link">&para;</a></h3>
-<p>The stack index begins with an encoder <span class="arithmatex">\(E_\phi\)</span> that maps a clean observation <span class="arithmatex">\(x_0\)</span> in modality <span class="arithmatex">\(M\)</span> (image, audio, text, or another measured vector in <span class="arithmatex">\(\mathbb{R}^d\)</span>) to a latent <span class="arithmatex">\(z\)</span>, typically conditioned by context <span class="arithmatex">\(c\)</span> representing prompts, metadata, or another modality’s embedding. The training objective for this stage is the negative evidence lower bound, which enforces that <span class="arithmatex">\(z\)</span> retains the information the sampler and evaluator will need. More precisely,</p>
+<p>The goal is to sample from the posterior <span class="arithmatex">\(p(\theta \mid y)\)</span>, because sampling lets you estimate any summary (mean, credible interval, probability mass) rather than just a point. The posterior itself is</p>
 <div class="arithmatex">\[
-\mathcal{L}_\text{encoder}(\phi,\theta) = -\mathbb{E}_{q_\phi(z|x_0,c)}\left[\log p_\theta(x_0|z,c)\right] + \mathrm{KL}\left(q_\phi(z|x_0,c)\,\|\,p(z)\right),
+p(\theta \mid y) = \frac{p(y \mid \theta)\,p(\theta)}{p(y)}\,,
 \]</div>
-<p>where <span class="arithmatex">\(q_\phi(z|x_0,c)\)</span> is the approximate posterior, <span class="arithmatex">\(p_\theta(x_0|z,c)\)</span> is the decoder likelihood, <span class="arithmatex">\(p(z)\)</span> is a prior (usually standard Normal), and <span class="arithmatex">\(\mathrm{KL}\)</span> denotes the Kullback-Leibler divergence. Minimizing this loss ties the encoder, decoder, and prior together so that the latent <span class="arithmatex">\(z\)</span> becomes a reusable representation. One-shot generalization (Rezende et al. 2016, [https://arxiv.org/abs/1603.05106]) built on the same alignment between context <span class="arithmatex">\(c\)</span>, latent <span class="arithmatex">\(z\)</span>, and likelihood <span class="arithmatex">\(p_\theta\)</span> to allow conditioning on new classes with very few examples. Because the stack index keeps this ELBO as part of the pipeline, any new modality adapter only has to produce a <span class="arithmatex">\(c\)</span> value that the rest of the stack already understands.</p>
-<p>A modality adapter is therefore just another attention-augmented encoder—a lesson borrowed from Bahdanau et al. 2015 (arXiv:1503.03585). They showed that different source encoders can align via attention weights; in the stack index, each adapter aligns with the shared conditioning vector <span class="arithmatex">\(c\)</span>, letting speech, text, or graphics embeddings plug into the same generator without rebuilding the sampler.</p>
-<h3 id="composable-generative-kernels">Composable generative kernels<a class="headerlink" href="#composable-generative-kernels" title="Permanent link">&para;</a></h3>
-<p>With the conditioned latent <span class="arithmatex">\(c = E_\phi(x_0)\)</span> fixed, the next layer is a sampler <span class="arithmatex">\(G_\theta(z,c)\)</span>, and this is where the choice between GANs, diffusion, or flows becomes a decision about the loss function rather than the representation. GANs introduce a discriminator <span class="arithmatex">\(D_\psi\)</span> and optimize the minimax objective</p>
+<p>where <span class="arithmatex">\(\theta\)</span> is the sensor bias, <span class="arithmatex">\(y=(y_1,\dots,y_N)\)</span> are the observed readings, <span class="arithmatex">\(p(y \mid \theta)\)</span> is the likelihood, <span class="arithmatex">\(p(\theta)\)</span> is the prior belief density, and <span class="arithmatex">\(p(y)\)</span> is the normalization constant or evidence. The expression’s intuition is simple: it reweights prior belief by how well each potential bias explains the data. Because computing <span class="arithmatex">\(p(y)\)</span> requires integrating over the entire parameter space, we instead sample from the unnormalized posterior <span class="arithmatex">\(p(y \mid \theta)p(\theta)\)</span>—Metropolis-Hastings does exactly that by constructing a Markov chain whose stationary distribution matches the posterior we care about.</p>
+<h3 id="writing-the-posterior-for-the-sensor">Writing the posterior for the sensor<a class="headerlink" href="#writing-the-posterior-for-the-sensor" title="Permanent link">&para;</a></h3>
+<p>Our sensor model assumes each observation satisfies</p>
 <div class="arithmatex">\[
-\min_\theta\max_\psi \,\mathbb{E}_{x_0\sim p_\text{data}}[\log D_\psi(x_0,c)] + \mathbb{E}_{z\sim p(z)}[\log(1-D_\psi(G_\theta(z,c)))],
+y_i = \theta + \epsilon_i\,,\qquad \epsilon_i \sim \mathcal{N}(0, \sigma^2)\,,
 \]</div>
-<p>where <span class="arithmatex">\(p_\text{data}\)</span> is the empirical data distribution and <span class="arithmatex">\(p(z)\)</span> is the prior over latents. Because the generator produces samples while keeping <span class="arithmatex">\(z\)</span> and <span class="arithmatex">\(c\)</span> available, swapping in a different kernel simply means replacing the objective while keeping the encoder and evaluator untouched.</p>
-<p>Diffusion models, such as DDPM (Ho et al. 2020, [https://arxiv.org/abs/2006.11239]), replace the adversarial training signal with a sequential denoising process. The forward process corrupts <span class="arithmatex">\(x_0\)</span> into <span class="arithmatex">\(x_t\)</span> for <span class="arithmatex">\(t\in\{0,\dots,T\}\)</span> by sampling noise <span class="arithmatex">\(\epsilon\sim\mathcal{N}(0,I)\)</span> and setting <span class="arithmatex">\(x_t = \sqrt{\bar{\alpha}_t}x_0 + \sqrt{1-\bar{\alpha}_t}\epsilon\)</span>, where <span class="arithmatex">\(\bar{\alpha}_t\)</span> is derived from a beta schedule. The loss minimized is</p>
+<p>where <span class="arithmatex">\(\sigma=0.5\)</span> and <span class="arithmatex">\(\epsilon_i\)</span> captures measurement noise. The likelihood of a single observation given <span class="arithmatex">\(\theta\)</span> is</p>
 <div class="arithmatex">\[
-\mathcal{L}_\text{diffusion} = \mathbb{E}_{t,x_0,\epsilon}\left[\|\epsilon - \epsilon_\theta(x_t,t,c)\|^2\right],
+p(y_i \mid \theta) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(y_i-\theta)^2}{2\sigma^2}\right)\,,
 \]</div>
-<p>where <span class="arithmatex">\(\epsilon_\theta\)</span> predicts the noise added at timestep <span class="arithmatex">\(t\)</span> conditioned on both the noisy sample <span class="arithmatex">\(x_t\)</span> and <span class="arithmatex">\(c\)</span>. Even though the GAN and diffusion objectives look different, both are ultimately trying to align the generated conditional distribution <span class="arithmatex">\(G_\theta(x|c)\)</span> with <span class="arithmatex">\(p_\text{data}(x|c)\)</span>. The GAN does so by minimizing a divergence via the discriminator, while diffusion does so by matching score functions through denoising. Because the target distribution is the same <span class="arithmatex">\(p_\text{data}(x|c)\)</span> and both objectives keep <span class="arithmatex">\(c\)</span> visible, the stack index views them as interchangeable instantiations of a general divergence minimization routine. Flows, diffusion, and GANs are therefore different “kernels” hooked to the same latent <span class="arithmatex">\(c\)</span>, and that shared latent is what lets the pipeline behave continuously when sampling strategies change.</p>
-<h3 id="evaluation-and-stack-feedback">Evaluation and stack feedback<a class="headerlink" href="#evaluation-and-stack-feedback" title="Permanent link">&para;</a></h3>
-<p>The final stage of the index tracks fidelity, diversity, and alignment. Fidelity is typically a reconstruction error or a distance in feature space such as FID (Fréchet Inception Distance). Diversity can be measured via the entropy of class predictions or mutual information between <span class="arithmatex">\(z\)</span> and the generated output. Alignment is the semantic agreement between the generated output and the conditioning context, often approximated with CLIP scores. Crucially, the stack index keeps these metrics differentiable proxies that feed back into <span class="arithmatex">\(E_\phi\)</span>, so when the alignment metric drops, the encoder is explicitly updated to capture the semantics the downstream metrics care about. This is the key inference: the same <span class="arithmatex">\(c\)</span> is observed by GANs, diffusion models, and evaluation metrics, which makes metrics actionable instead of just descriptive.</p>
-<p>Because the evaluation layer is also conditioned on <span class="arithmatex">\(c\)</span>, new modalities can be compared side by side. The stack index makes modality bridging practical by ensuring that each adapter outputs compatible <span class="arithmatex">\(c\)</span> values, so a new 3D point cloud encoder can be introduced without retraining the sampler or rewriting the evaluator. Plotting fidelity, diversity, and alignment signals together across different encoders and kernels reveals whether a change in representation actually improves the pipeline, rather than just impressing one stage at the expense of another.</p>
+<p>where <span class="arithmatex">\(y_i\)</span> is the <span class="arithmatex">\(i\)</span>-th reading and <span class="arithmatex">\(\sigma\)</span> is known ahead of time. Assuming independent noise, the likelihood of the entire dataset <span class="arithmatex">\(y\)</span> is the product over <span class="arithmatex">\(i=1,\dots,N\)</span>; together with the prior, this product defines the unnormalized posterior density <span class="arithmatex">\(\pi(\theta)=p(y \mid \theta)p(\theta)\)</span> that Metropolis-Hastings will sample.</p>
+<h3 id="the-metropolis-hastings-acceptance-rule">The Metropolis-Hastings acceptance rule<a class="headerlink" href="#the-metropolis-hastings-acceptance-rule" title="Permanent link">&para;</a></h3>
+<p>The sampler proposes a new candidate <span class="arithmatex">\(\theta^\prime\)</span> from a symmetric proposal distribution <span class="arithmatex">\(q(\theta^\prime \mid \theta)\)</span> (here a Gaussian centered on the current state). The acceptance probability is</p>
+<div class="arithmatex">\[
+\alpha = \min\!\left(1, \frac{\pi(\theta^\prime)}{\pi(\theta)} \times \frac{q(\theta \mid \theta^\prime)}{q(\theta^\prime \mid \theta)}\right)\,,
+\]</div>
+<p>where <span class="arithmatex">\(\pi(\cdot)\)</span> is the unnormalized posterior defined above, <span class="arithmatex">\(q(\theta^\prime \mid \theta)\)</span> is the proposal density, and <span class="arithmatex">\(\theta\)</span> is the current chain state while <span class="arithmatex">\(\theta^\prime\)</span> is the proposed state. Because <span class="arithmatex">\(q\)</span> is symmetric in our scalar example, the ratio simplifies to <span class="arithmatex">\(\pi(\theta^\prime)/\pi(\theta)\)</span>. Cox (1946) showed that any rational system of beliefs must obey the probability calculus, which justifies the acceptance ratio’s role in preserving detailed balance; the Markov chain will therefore converge to the true posterior, visiting high-density regions more often but still exploring tails occasionally.</p>
+<p>To avoid overflow when <span class="arithmatex">\(\pi(\theta^\prime)/\pi(\theta)\)</span> is extreme, work in log space: compute the log-acceptance difference <span class="arithmatex">\(\Delta = \log\pi(\theta^\prime) - \log\pi(\theta)\)</span>, clip <span class="arithmatex">\(\Delta\)</span> to a safe range (e.g., <span class="arithmatex">\([-50, 50]\)</span>) before exponentiating, and accept the proposal if <span class="arithmatex">\(\log u &lt; \Delta\)</span> where <span class="arithmatex">\(u\sim\mathrm{Uniform}(0,1)\)</span>. This log-domain trick matches the stable practice used in Stan and TensorFlow Probability, preventing rare but catastrophic NaN or Inf values when <span class="arithmatex">\(\theta^\prime\)</span> lands in a region with negligible posterior density. The acceptance decision keeps the chain faithful to Bayes’ logic but also injects controlled randomness, so the sampler can escape local modes if the proposal variance is tuned appropriately.</p>
+<h3 id="diagnostics-in-the-scalar-case">Diagnostics in the scalar case<a class="headerlink" href="#diagnostics-in-the-scalar-case" title="Permanent link">&para;</a></h3>
+<p>We track three diagnostics: the sliding credible interval, the acceptance rate, and the posterior mean. Each iteration stores whether the proposal was accepted as a boolean in an <code>accepts</code> array; the acceptance rate is then <span class="arithmatex">\(\texttt{accepts.mean()}\)</span>, which counts exactly the number of accepted transitions rather than relying on numerical differences between states. This explicit counting enables us to react when the acceptance rate leaves the sweet spot around 0.35: too low means the chain is stuck, too high means it behaves like independent samples.</p>
+<p>After the loop we compute the 95 % credible interval by taking percentiles of the stored chain. The width of this interval indicates uncertainty: if the empirical width stays under 0.4 and the interval contains the known true bias, the inference strategy has successfully combined prior belief and likelihood information. The log-posterior function that underpins all of this is</p>
+<div class="arithmatex">\[
+\log \pi(\theta) = -\frac{1}{2}\theta^2 -\sum_{i=1}^N \frac{(y_i - \theta)^2}{2\sigma^2}\,,
+\]</div>
+<p>where <span class="arithmatex">\(\theta^2/2\)</span> comes from the Gaussian prior and the sum collects contributions from each likelihood term; <span class="arithmatex">\(\sigma\)</span> is the known noise scale, and <span class="arithmatex">\(y_i\)</span> is the <span class="arithmatex">\(i\)</span>-th reading. This form is efficient because it lets you reuse precomputed sums and avoids recalculating constants that cancel in the ratio.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>Research frontiers focus on two kinds of compositionality. Latent diffusion models (Rombach et al. 2022, [https://arxiv.org/abs/2112.10752]) demonstrated that the generative kernel can operate on a compact latent jointly learned with the encoder, letting massive generative models sample from low-dimensional spaces while evaluation leverages the same latent representation. DreamFusion 2 (Poole et al. 2024, [https://arxiv.org/abs/2401.11942]) extends that principle into NeRF-based 3D domains: the representation stage now captures lighting normals and textures, the diffusion kernel functions over the 3D latent, and the rendering engine—serving as the evaluation stage—sees the same context <span class="arithmatex">\(c\)</span> so the stack index tracks 3D fidelity and alignment without losing consistency.</p>
-<p>On the engineering frontier, the stack index is the blueprint for operating at scale. Amazon’s GenAIops playbook (AWS blog 2024) describes a centralized observability plane where every encoder’s embeddings, every generator’s outputs, and every evaluator’s metrics live in the same lake, enabling Bedrock to orchestrate inference across multiple models while policy checks and drift detection run on the identical embeddings. The same paradigm is emerging at Stability AI and Meta, where teams instrument generative pipelines so a single alert can trace an alignment drop either to a misbehaving sampler or to an undertrained encoder. These production systems measure compute, latency, and metric drift uniformly, which is precisely what the generative stack index quantifies.</p>
-<p>This page therefore appears in the [[generative-stack]] arc as the connective tissue between [[generative-foundations]] (which introduces the basic encoder–decoder vocabulary) and [[diffusion-models]] (which supplies concrete sampling engines). It is also tied to the ongoing conversation about [[evaluation-metrics-for-generative-models]], which documents the metrics that close the loop in the stack index.</p>
+<p>Recent work continues to push Metropolis-Hastings towards richer proposal families and better diagnostics. Hoffman and Gelman (2014) “The No-U-Turn Sampler” [https://arxiv.org/abs/1111.4246] set a research benchmark by automating trajectory lengths in Hamiltonian Monte Carlo, showing that automatic tuning can outperform naive Gaussian proposals in high dimensions. Welling and Teh (2011) “Bayesian Learning via Stochastic Gradient Langevin Dynamics” [https://arxiv.org/abs/1101.5123] keeps influencing the frontier, because embedding MCMC updates within stochastic gradients lets you scale posterior sampling to deep networks without losing the guarantees of detailed balance. On the engineering side, TensorFlow Probability’s documentation for \texttt{MetropolisHastings} and its TPU/XLA backend [https://www.tensorflow.org/probability/api_docs/python/tfp/mcmc/MetropolisHastings] details how production teams now run batches of chains at once—leveraging vectorized proposals and jit-compiled log densities to maintain credible intervals at 90 ms latencies on accelerators. These two fronts—research on adaptive proposals and engineering on scalable, batched execution—show that Metropolis-Hastings remains relevant both as a theoretical benchmark and as an engine that links probabilistic programs to reliable inference in products.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>One question is how to prove convergence for an index that simultaneously contains multiple generative kernels. Existing theory bounds either GANs or diffusion samplers separately, but not a mixed objective in which each kernel is trying to align the same conditional distribution <span class="arithmatex">\(p_\text{data}(x|c)\)</span>. A convergence guarantee would guide automated kernel selection and prevent chasing transient improvements in one kernel that hurt another.</p>
-<p>Another question asks what the minimal representations are for cross-modal generalization. Rezende et al. 2016 showed that compact latent spaces can capture new classes with few examples, but modern stacks operate on embeddings that are orders of magnitude larger. Determining whether reducing dimensionality stabilizes evaluation metrics (without sacrificing fidelity) would help engineers trade representational cost for robustness.</p>
-<p>Finally, there is no consensus on evaluation metrics that remain differentiable after a context switch. Alignment metrics often rely on large-scale human labels or non-differentiable classifiers, while fidelity metrics focus on reconstruction errors that do not capture semantic drift. Developing differentiable proxies that correlate with human judgment and that can backpropagate into the encoder would make the stack index a closed-loop system instead of a monitoring dashboard.</p>
+<p>How much does the convergence curve change when you limit the chain to 5 000 iterations, and what system-level metrics (variance of the credible interval, effective sample size) should you trust when sampling from a scalar posterior with a tight proposal? The scalar bias story lets you observe this directly, but the more general question is whether small-memory devices can return calibrated credible intervals without long warm-up phases, so studying adaptive proposals that “learn” the right scale within the 5 000-iteration cap remains an open challenge. Another open question is how best to propagate the sampler’s empirical uncertainty into downstream decision-making when the prior itself is hand-designed: if the prior is slightly misspecified, can you correct for bias by weighting recent observations more heavily while still preserving the sampler’s theoretical guarantees? Finally, even in this toy problem the stored <code>accepts</code> array is a weak proxy for mixing; designing diagnostics attuned to online production deployments—where you only get 10 samples per minute—means rethinking both the chain length and the credible interval criterion so that you can still flag when the inference quality drifts.</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>For the engineering story of operationalizing the stack index, → [[aws-genaiops-playbook]] examines how Amazon Bedrock orchestrates multiple embeddings and metrics via a central observability plane; for the theoretical grammar that lets different kernels share one latent, → [[score-matching]] lays out the probabilistic foundations of conditional sampling; the practical sampler you are monitoring is unraveled in → [[diffusion-models]]; and the evaluation metrics that make multisignal dashboards meaningful are distilled in → [[evaluation-metrics-for-generative-models]], which explains how to compare outputs across modalities without inventing new reporting languages.</p>
+<p>If you want the engineering side, → [[probabilistic-programming-inference-systems]] explains how TensorFlow Probability and Stan deploy Metropolis-Hastings chains across CPU/GPU pools. If you want the theory, → [[bayesian-inference]] lays out the full probability calculus that motivates the updates you are sampling here. The next arc node, → [[variational-inference]], contrasts these exact samplers with mean-field approximations so you can see which uncertainties survive the approximation.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p>A generative stack index notebook is the artifact: it runs a pre-trained encoder, decoder, and evaluator on CIFAR-10 while jointly capturing fidelity, diversity, and alignment metrics, giving a concrete monitor for how a representation swap affects every downstream signal.</p>
-<p>This monitor is valuable because it turns what used to be an engineer’s guess—“did the new backbone hurt quality?”—into measurable, reproducible evidence that spans encoder, generator, and evaluator simultaneously.</p>
-<p>Stack: the generator is <code>google/ddpm-cifar10-32</code>, the dataset is HuggingFace <code>cifar10</code>, the framework combines <code>diffusers</code> 0.25.1 with <code>evaluate</code>, <code>datasets</code>, and <code>torchvision</code>, and the target compute is a single NVIDIA RTX 4060 (8 GB VRAM) or Colab T4 (12 GB VRAM) for inference and metric logging; expect the full pipeline to run in about 25 minutes once the CIFAR-10 embeddings are cached.</p>
-<p>The recipe:
-1. Install the environment with <code>pip install torch torchvision diffusers[torch] evaluate datasets accelerate matplotlib open_clip_torch</code>. This ensures access to the DDPM pipeline, the Einsum-accelerated schedulers, the CIFAR-10 dataset, and CLIP for alignment measurement.
-2. Preprocess CIFAR-10: load <code>datasets.load_dataset("cifar10")</code>, resize to 32×32 if needed, and normalize images to <span class="arithmatex">\([-1,1]\)</span> because <code>google/ddpm-cifar10-32</code> was trained on that range; set the torch manual seed to 42 before generating the ResNet-18 embeddings via <code>torchvision.models.resnet18(pretrained=True)</code> so the representation stage is deterministic for the first 1,000 samples.
-3. Sample with <code>diffusers.DDPMPipeline(model_id="google/ddpm-cifar10-32")</code>, passing in the same fixed <code>generator=torch.manual_seed(42)</code> and using the pipeline’s default <code>beta_schedule="linear"</code> with <code>beta_start=0.0001</code>, <code>beta_end=0.02</code>, and <code>num_train_timesteps=1000</code> to match the model card; run 64 samples per inference pass while keeping each generated image paired with the original ResNet embedding for later fidelity comparison.
-4. Evaluate every batch: compute FID against the cached 1,000 real images, calculate ResNet prediction entropy across the CIFAR-10 classes for diversity, and run CLIP ViT-B/32 on both generated images and the text prompt “CIFAR-10 photo” to approximate alignment; log the metrics after each inference pass so their time series can be plotted together.
-5. What you now have is a complete index notebook that reports all three metrics inside one figure while storing the embeddings and samples that make replay and kernel replacement (GAN vs diffusion) straightforward.</p>
-<p>Expected outcome: a reproducible notebook that outputs the fidelity/diversity/alignment plot alongside 64 generated images, showing how swapping the encoder (ResNet-18 to CLIP) or replacing the sampler (diffusion to any other conditional kernel) updates the downstream metrics without breaking the pipeline.</p>
-<p>Variants per persona:
-- <strong>Applied AI/ML engineer (forward-deployed):</strong> Deploy the notebook as part of an AWS Bedrock inference flow, log stack index metrics to CloudWatch, and trigger an alert when the CLIP alignment score drops by more than 0.04 compared to its moving average; an alignment drop beyond that threshold should initiate a retraining or fine-tuning workflow because it signals a meaningful semantic shift.
-- <strong>Research engineer:</strong> Reproduce <code>google/ddpm-cifar10-32</code>’s reported FID (target within ±3) and CLIP score (within ±0.02) by strictly following the model card’s preprocessing, scheduler, and seed settings, then log the table of fidelity, entropy, and alignment for publication-ready reproduction.
-- <strong>Applied researcher:</strong> Hypothesis: replacing the ResNet-18 encoder with CLIP-ViT-B/32 will raise the CLIP alignment score by at least 0.05 while keeping FID degradation under 4 points; use the stack index plot to falsify that hypothesis by running both encoders over the same fixed seeds and comparing the metric trajectories.</p>
-<p>What can you build next? Extend this index to any new modality (for example, hook a NeRF encoder to the same critic) and observe how the unified metrics behave.</p>
+<p><strong>What you're building:</strong> A NumPy-based Metropolis-Hastings sampler for a scalar sensor bias whose 95 % credible interval converges to the true bias within 0.4 width after 5 000 iterations, along with diagnostics stored to disk.</p>
+<p><strong>Why this is valuable:</strong> You prove to yourself how Bayes’ rule becomes a posterior sample by implementing the acceptance logic, quantifying uncertainty, and understanding the impact of proposal scale—the same diagnostics you will compare against when introducing variational methods.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> Custom scalar bias model with Gaussian prior <span class="arithmatex">\(\theta \sim \mathcal{N}(0,1)\)</span> and Gaussian likelihood <span class="arithmatex">\(y_i \sim \mathcal{N}(\theta, \sigma^2)\)</span> where <span class="arithmatex">\(\sigma=0.5\)</span>.
+- <strong>Dataset:</strong> Synthetic sensor readings drawn in-script to match the scalar bias story; we generate 50 examples from <span class="arithmatex">\(y_i = 1.0 + \epsilon_i\)</span> with <span class="arithmatex">\(\epsilon_i \sim \mathcal{N}(0,0.5^2)\)</span> because no public HuggingFace dataset captures this calibrated bias scenario exactly.
+- <strong>Framework:</strong> NumPy 2.2 for numerics, Matplotlib 3.9 for plots, and PyArrow for saving diagnostics if desired.
+- <strong>Compute:</strong> Google Colab T4 (15 GB) or any GPU/CPU with 8 GB RAM; the sampler runs in under five minutes on a Colab session.</p>
+<p><strong>Estimated time:</strong> 1.5 hours on Colab T4 and a few extra minutes to review diagnostics.</p>
+<p><strong>Success criterion:</strong> After 5 000 iterations the 95 % credible interval width is &lt;0.4, the interval contains the ground-truth bias of 1.0, and the logged acceptance rate stays between 0.2 and 0.5.</p>
+<p><strong>The recipe:</strong>
+1. Install the stack with <code>pip install numpy==2.2 matplotlib==3.9 pyarrow==12.0</code> and import <code>numpy as np</code>, <code>matplotlib.pyplot as plt</code>, and <code>pathlib.Path</code>.
+2. Fix the seed <code>np.random.default_rng(0)</code> and generate observations with <code>observations = rng.normal(loc=1.0, scale=0.5, size=50)</code>; confirm <code>observations.shape == (50,)</code> to match downstream interfaces.
+3. Define <code>log_posterior(theta)</code> returning <code>-0.5 * theta**2 - 0.5 * np.sum((observations - theta)**2) / sigma**2</code>; call it once at <code>theta=1.0</code> to ensure the function stays finite and prints a sanity check.
+4. Initialize <code>chain = np.empty(5000)</code> and <code>accepts = np.zeros(5000, dtype=bool)</code>, set <code>theta = 0.0</code>, and loop 5 000 times proposing <code>theta_prime = theta + rng.normal(0, 0.3)</code>. Compute <code>delta = log_posterior(theta_prime) - log_posterior(theta)</code>, clip it to <code>[-50, 50]</code>, draw <code>u = np.log(rng.random())</code>, accept if <code>u &lt; delta</code>, update <code>theta</code> and record <code>accepts[i]</code>, then set <code>chain[i] = theta</code>. This stores the acceptance explicitly and keeps <code>np.exp</code> calls safe.
+5. Compute <code>acceptance_rate = accepts.mean()</code>, <code>lower, upper = np.percentile(chain, [2.5, 97.5])</code>, and <code>posterior_mean = chain.mean()</code>; print all statistics and assert <code>0.2 &lt;= acceptance_rate &lt;= 0.5</code>.
+6. Plot the histogram of <code>chain</code>, overlay the true bias line at 1.0, label the credible interval, save as <code>posterior_hist.png</code>, and optionally store the diagnostics table via <code>pyarrow</code> for later comparators.</p>
+<p><strong>Expected outcome:</strong> You have a histogram image showing a credible interval narrower than 0.4, numeric logs confirming the acceptance rate, and a diagnostic file you can reuse when comparing to Step 3. The script prints the interval <code>[lower, upper]</code>, the mean, and the acceptance rate, making it obvious if any assertion fails.</p>
+<p><strong>Stretch goals</strong>
+1. Incorporate a simple proportional-derivative controller that adapts the proposal standard deviation to track a target acceptance rate of 0.35 and plot how the interval width changes over the first 2 000 iterations.
+2. Re-run the sampler with <span class="arithmatex">\(\sigma=1.0\)</span> but the same observations, then compute the KL divergence between the two posterior histograms to visualize how likelihood confidence controls posterior concentration.
+3. Swap the Gaussian prior to a Laplace prior <span class="arithmatex">\(\text{Laplace}(0,1)\)</span> and compare the resulting credible interval width and bias; this highlights how different priors compete with data in shaping uncertainty.</p>
+<p>Variants per persona
+- <strong>Applied AI/ML engineer:</strong> Wrap the sampler in a Flask endpoint that accepts new batches of 10 readings, reruns 5 000 iterations of MH, and returns the credible interval JSON; benchmark the endpoint on a T4 to confirm p95 latency under 220 ms and monitor CPU/GPU utilization.
+- <strong>Research engineer:</strong> Reproduce the acceptance rate and credible interval from Section 4.2 of Hoffman and Gelman (2014) by implementing the same No-U-Turn Sampler proposal for this scalar model and matching the reported ESS per second within ±10 %.
+- <strong>Applied researcher:</strong> Test the hypothesis “A clipped log-acceptance advantage stabilizes diagnostics” by running three MH variants (no clip, clip at ±20, clip at ±50) over the same observations, then plot credible interval width vs. acceptance rate and consider the clip that best preserves coverage without inflating width.</p>
+<hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>
@@ -1466,12 +1488,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

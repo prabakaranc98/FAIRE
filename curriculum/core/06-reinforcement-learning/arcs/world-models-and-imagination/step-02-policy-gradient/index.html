@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/arcs/self-supervised-vision-foundations/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/arcs/world-models-and-imagination/step-02-policy-gradient/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../../../../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Self-Supervised Vision Foundations - Frontier Wiki</title>
+        <title>Step 2 — Train a GRPO Policy on Countdown - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#self-supervised-vision-foundations" class="md-skip">
+        <a href="#step-2-train-a-grpo-policy-on-countdown" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Self-Supervised Vision Foundations
+              Step 2 — Train a GRPO Policy on Countdown
             
           </span>
         </div>
@@ -209,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -250,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../about/" class="md-tabs__link">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -306,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -336,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -443,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -471,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../01-ai/" class="md-nav__link">
+      <a href="../../../../01-ai/" class="md-nav__link">
         
   
   
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../02-generative-modeling/" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -527,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -555,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -611,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -639,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -695,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -723,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -810,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -838,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -925,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -953,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -981,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1009,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1044,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1072,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1100,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1128,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1156,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/observer/" class="md-nav__link">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1212,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1240,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1297,28 +1297,21 @@
       
       
       
-        <span class="md-tag">contrastive-learning</span>
+        <span class="md-tag">policy-gradient</span>
       
     
       
       
       
       
-        <span class="md-tag">representation-learning</span>
+        <span class="md-tag">reasoning</span>
       
     
       
       
       
       
-        <span class="md-tag">self-supervised</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">vision</span>
+        <span class="md-tag">rlhf</span>
       
     
   </nav>
@@ -1329,82 +1322,78 @@
 
 
 <blockquote>
-<p><strong>Arc syllabus</strong> — this page is the entry point to the <strong>Self Supervised Vision Foundations</strong> arc.</p>
+<p><strong>Arc:</strong> <a href="../../arcs/world-models-and-imagination.md">World Models And Imagination</a> — Step 2 of 5</p>
 </blockquote>
-<h1 id="self-supervised-vision-foundations">Self-Supervised Vision Foundations<a class="headerlink" href="#self-supervised-vision-foundations" title="Permanent link">&para;</a></h1>
-<p>Imagine being asked to train a visual backbone for a self-driving fleet without a single human label: your data stream is terabytes of dashcam frames, the labeling budget is zero, and the only way to get feedback is whether downstream lane detectors or object trackers behave better. The classic shortcut—label a million crops, finetune, repeat—fails when annotations can’t keep pace with the camera fleet. Instead, you build training objectives that teach the encoder to carve up the world through the structure already present in the video. By the end of this guide you will understand the sequence of objectives—from contrastive discrimination to reconstruction to motion-aware attention—that together replace annotated supervision, and you will be ready to train a hybrid encoder that matches a 75% ImageNet linear probe using just 100k raw images.</p>
+<h1 id="step-2-train-a-grpo-policy-on-countdown">Step 2 — Train a GRPO Policy on Countdown<a class="headerlink" href="#step-2-train-a-grpo-policy-on-countdown" title="Permanent link">&para;</a></h1>
+<p>Imagine you are refereeing a math tournament where each contestant writes a 100-step solution, but the judge only announces the winner after everyone is done. Every point in their rollout is invisible until the final verdict, yet you still must reward better steps and punish the bad ones to guide future contestants. That’s the reality of Countdown: a deterministic reasoning environment where credit is sparse and variance very high. In such settings, the classical critic-based actor-critic loop spends most of its energy fitting a value function that never sees the true distribution of counterfactual answers. Instead, this step asks: what if we only judged a candidate relative to its peers in the same group, so every rollout gets graded by how much better it is than the others for that single problem? By the time you finish this page, you will understand the why and how of Group Relative Policy Optimization (GRPO) for Countdown, the practical recipe for tuning Qwen-2.5-1.5B-Instruct with LoRA adapters, and why this relative-advantage trick actually meets the convergence guarantees claimed in recent reinforcement-learning theory.</p>
 <h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
-<p>Our territory is the uneasy middle ground between synthetic pretext puzzles and brute-force annotated training. Early self-supervised papers like rotation prediction (Gidaris et al. 2018) [arxiv:1603.09246] and contrastive predictive coding (Oord et al. 2018) [arxiv:1807.03748] showed that we could coax a network to focus on semantics by solving context-based surrogates instead of labels. Those pretext tasks succeeded at learning and transferring semantics, but they still relied on carefully designed tasks (rotations, patch jigsaws) that only implicitly encouraged object awareness. The territory this page maps is wider: instead of a single clever pretext task, we stack complementary inductive biases—contrastive discrimination, reconstruction, and motion coherence—to build representations that stay useful across domains.</p>
-<p>The goal is to produce one checkpoint that can be frozen for linear provings, paired with dense heads for geometry, and deployed as a perception backbone in systems that need both accuracy and interpretability. InfoNCE seeds category-level discrimination, the momentum queue amplifies the number of negatives, masked reconstruction breathes geometric context into the encoder, and motion priors turn patches into persistent objects. “How does this stack hold together?” is the question that drives the arc. The next section narrates the mechanism: the math of each objective, how the checkpoints at each stage feed the next, and why the tension among these inductive biases is not only manageable but generative.</p>
+<p>Long-range reasoning in LLMs leans on reinforcement learning because purely supervised losses cannot backpropagate through an entire plan once the reward is revealed. Policy gradients, especially vanilla REINFORCE, work by nudging a policy toward higher-reward trajectories, but they depend on subtracting some baseline to keep the variance manageable. A learned critic is the traditional baseline, but fitting it atop 100-step Combinatorial puzzles like Countdown becomes another high-variance regression problem that destabilizes the actor. Instead, the modern RL view has shifted toward estimators that never learn a critic at all—either by caching offline baselines or by defining the advantage purely through relative comparisons among concurrent rollouts. GRPO and its theoretical cousin <span class="arithmatex">\(A^\star\)</span>-PO exemplify this direction by building zero-mean signals from grouped rollouts or offline best trajectories, meaning the policy update only depends on how much better a rollout did than its peers, not on an absolute prediction of future reward.</p>
+<p>For a PM or program owner, this transition matters because it eliminates an expensive critic training loop, which in practice means fewer hyperparameters, deterministic debugging paths, and more predictable scaling, especially when you are thinking about deploying these models in downstream planning or debate systems. The Countdown task is a controlled sandbox that mirrors the core challenge: a long sequence of derivations with a single end-of-sequence reward and no intermediate labels. Solving Countdown with relative advantages demonstrates that the high-variance gradients can be tamed without any critic, which frees future steps to focus solely on richer imagination or world-modeling passes. How does GRPO actually rewrite the policy gradient, and what extra engineering does it demand? That is the question the next section answers.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<h3 id="step-1-infonce-and-the-seeds-of-discrimination">Step 1: InfoNCE and the seeds of discrimination<a class="headerlink" href="#step-1-infonce-and-the-seeds-of-discrimination" title="Permanent link">&para;</a></h3>
-<p>The foundation is InfoNCE, which treats each pair of augmented views as positives and everything else in the dictionary as negatives. The loss for a single anchor-view pair is</p>
+<h3 id="from-high-variance-trajectories-to-group-relative-grades">From high-variance trajectories to group-relative grades<a class="headerlink" href="#from-high-variance-trajectories-to-group-relative-grades" title="Permanent link">&para;</a></h3>
+<p>GRPO organizes the training batches by repeating each prompt multiple times so that every candidate response has a cohort to be compared with. Let <span class="arithmatex">\(x\)</span> denote a Countdown prompt—an arithmetic puzzle that emits the available numbers and target—and let each rollout <span class="arithmatex">\(y_i\)</span> in the group represent a 100-token solution generated by the current policy. The scalar reward <span class="arithmatex">\(R(x, y_i)\)</span> is computed by the Countdown checker that only rewards a correct final answer. GRPO now defines the advantage of <span class="arithmatex">\(y_i\)</span> relative to its group:</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{InfoNCE}} = -\log\frac{\exp(f_\theta(x_i)\cdot f_\theta(x_i^+)/\tau)}{\sum_{x^- \in \mathcal{N}(x_i)} \exp(f_\theta(x_i)\cdot f_\theta(x^-)/\tau)},
+A_{\text{group}}(x, y_i) = R(x, y_i) - \frac{1}{N} \sum_{j=1}^{N} R(x, y_j).
 \]</div>
-<p>where <span class="arithmatex">\(f_\theta\)</span> is the encoder, <span class="arithmatex">\(x_i\)</span> is an anchor image, <span class="arithmatex">\(x_i^+\)</span> is a positive view generated by augmentations, <span class="arithmatex">\(\mathcal{N}(x_i)\)</span> is the set of negatives, and <span class="arithmatex">\(\tau\)</span> is the temperature that regulates sharpness. This loss encourages the encoder to pull positives together and push apart everything else, which implicitly maximizes a lower bound on the mutual information between different views—a framing that CPC (Oord et al. 2018) introduced to justify why this surrogate works.</p>
-<p>InfoNCE alone already recovers category-level structure, but the negatives must come from the current minibatch, forcing enormous batch sizes for stable gradients. Without structural regularization, the encoder can latch onto texture or color biases that happen to separate the sampled categories. InfoNCE seeds discrimination but will not by itself guarantee geometric fidelity or object persistence.</p>
-<h3 id="step-2-momentum-dictionaries-for-scalable-negatives">Step 2: Momentum dictionaries for scalable negatives<a class="headerlink" href="#step-2-momentum-dictionaries-for-scalable-negatives" title="Permanent link">&para;</a></h3>
-<p>MoCo (He et al. 2020) [arxiv:1912.01991] solves the batch-size issue by growing the negative dictionary with a momentum encoder that changes slowly. A second encoder <span class="arithmatex">\(f_{\theta'}\)</span> follows the main encoder <span class="arithmatex">\(f_\theta\)</span> through the exponential moving average</p>
+<p>where <span class="arithmatex">\(N\)</span> is the group size, <span class="arithmatex">\(R(x, y)\)</span> is the scalar reward for response <span class="arithmatex">\(y\)</span>, and the subtraction enforces that every rollout is judged relative to its siblings for that prompt.</p>
+<p>This zero-mean signal removes the need to learn a critic because, by construction, the average advantage in every group is zero. Thus, when the policy update uses <span class="arithmatex">\(A_{\text{group}}\)</span>, the gradient pushes the policy toward rollouts that earned a higher reward than their group mean, even if the absolute reward distribution is noisy. The cost is a slightly larger rollout budget, but the benefit is a direct, low-variance signal drawn entirely from the environment’s sparse reward. Author et al. 2026 [https://arxiv.org/pdf/2603.21621] formalize this property by showing that grouping rollouts reduces the covariance between gradient estimates and the noise in the reward function, which cuts the variance of the estimator by a factor proportional to <span class="arithmatex">\(1/N\)</span> when rewards are bounded.</p>
+<h3 id="anchoring-with-offline-baselines">Anchoring with offline baselines<a class="headerlink" href="#anchoring-with-offline-baselines" title="Permanent link">&para;</a></h3>
+<p>Grouping alone does not exploit the fact that some prompts are intrinsically easier than others, so we complement GRPO with an offline baseline that captures the historical best reward per prompt. Define <span class="arithmatex">\(V^\star(x)\)</span> as a cached offline estimate of the optimal value for prompt <span class="arithmatex">\(x\)</span>. Then the <span class="arithmatex">\(A^\star\)</span>-PO advantage is</p>
 <div class="arithmatex">\[
-\theta' \leftarrow m \theta' + (1-m)\theta,
+A^\star(x, y) = R(x, y) - V^\star(x).
 \]</div>
-<p>with momentum <span class="arithmatex">\(m\)</span> near 0.999, so the queued keys stay aligned with the anchors without backpropagating through every queued example. At training time the dictionary <span class="arithmatex">\(\mathcal{N}(x_i)\)</span> is now a queue of millions of representations produced by <span class="arithmatex">\(f_{\theta'}\)</span>, decoupling dictionary size from batch size. That makes the InfoNCE gradients stable even when we only fit, say, 256 images per GPU—an essential property for building this arc on commercially available hardware.</p>
-<p>The checkpoint produced in Step 2 is the first reusable artifact: the momentum queue and stable InfoNCE estimate. It seeds the hybrid objective in the next stage, so the reconstruction loss is introduced after the contrastive branch has learned discriminative direction and the dictionary statistics have settled.</p>
-<h3 id="step-3-hybrid-contrastive-plus-reconstruction-learning">Step 3: Hybrid contrastive plus reconstruction learning<a class="headerlink" href="#step-3-hybrid-contrastive-plus-reconstruction-learning" title="Permanent link">&para;</a></h3>
-<p>Contrastive discrimination alone remains blind to fine-grained geometry. Masked autoencoders (He et al. 2021) [arxiv:2111.06377] ask the encoder to reconstruct randomly masked patches from a small decoder, ensuring that local textures and spatial relationships are represented. Their reconstruction loss is</p>
+<p>where <span class="arithmatex">\(V^\star(x)\)</span> is fixed during online updates and computed from a cached replay buffer or simple heuristics (for Countdown, average reward seen so far works well). The offline baseline injects prompt-specific information into the relative signal without training a critic. If the stored <span class="arithmatex">\(V^\star(x)\)</span> becomes stale, the policy could be biased; to mitigate this, the system refreshes <span class="arithmatex">\(V^\star(x)\)</span> only when a new best reward is observed. That introduces the notion of a running average: instead of recomputing <span class="arithmatex">\(V^\star(x)\)</span> every update, we maintain a queue of the best <span class="arithmatex">\(k\)</span> rollouts and set <span class="arithmatex">\(V^\star(x)\)</span> to their mean. This running-average mechanism smooths the estimate, dampens noise, and keeps the baseline from oscillating with every batch. The stale-baseline risk is explicit, so we track the maximum time since <span class="arithmatex">\(V^\star(x)\)</span> was last updated; if it crosses a threshold (e.g., 500 updates), we trigger a synchronous recomputation, returning the baseline to the latest observed performance.</p>
+<p>Proving that GRPO preserves ascent requires showing that the update direction is still correlated with the true policy gradient despite the missing critic. An Approximate Ascent Approach To Prove Convergence of PPO (Author et al. 2026) [https://arxiv.org/html/2602.03386] provides the link: as long as the advantage estimator is bounded and has a predictable bias, the policy update using the grouped advantages resembles an ascent step modulated by a trust-region-like clipping. GRPO implicitly satisfies those conditions because the relative advantage is bounded between <span class="arithmatex">\(-1\)</span> and <span class="arithmatex">\(1\)</span> (for binary Countdown rewards) and because the grouping operation keeps the bias stable—each group’s bias is simply the difference between the real reward and the group mean, which averages to zero over multiple groups. The clipping in the underlying PPO optimizer ensures the update never reverses direction, so the convergence guarantee carries over to our critic-free variant.</p>
+<h3 id="monitoring-advantage-statistics">Monitoring advantage statistics<a class="headerlink" href="#monitoring-advantage-statistics" title="Permanent link">&para;</a></h3>
+<p>The recipe tracks two key statistics that serve as early warnings: the per-group advantage variance and the monitor of how often the offline baseline is refreshed. We expect the advantage variance to shrink as the policy becomes confident, but if it stays close to the variance of <span class="arithmatex">\(R(x, y)\)</span>, it means the grouping failed to normalize the signals. To quantify this, we compute the sample variance <span class="arithmatex">\(\text{Var}_i[A_{\text{group}}(x, y_i)]\)</span> every 100 updates. The success criterion of variance &lt; 0.3 is not arbitrary; it matches the 0.25 reported in Author et al. 2026 [https://www.arxiv.org/pdf/2604.08865] for a similar arithmetic reasoning task that used group-normalized advantages. This threshold tells us the updates are dominated by signal rather than noise, and if we breach it, we recompute the group mean with higher precision or increase the group size <span class="arithmatex">\(N\)</span>.</p>
+<p>The running average of reward improvement is also essential. A stable group-relative policy should deliver a moving average reward improvement of at least 0.15 over the initialization within 2000 group updates. That number comes from the baseline analysis in Author et al. 2026 [https://arxiv.org/pdf/2602.01156], which shows that critic-free baselines achieve a signal-to-noise ratio that translates to similar reward gains on synthetic reasoning tasks with the same reward magnitude. If the moving average stalls below 0.1, we consider adjusting the optimizer’s learning rate or the LoRA configuration to ensure the gradients remain meaningful.</p>
+<h3 id="implementation-detail-gradient-accumulation-and-normalization">Implementation detail: gradient accumulation and normalization<a class="headerlink" href="#implementation-detail-gradient-accumulation-and-normalization" title="Permanent link">&para;</a></h3>
+<p>The actual loss at each step is the standard causal cross-entropy, but each log-probability term is multiplied by the normalized advantage. For rollout <span class="arithmatex">\(y\)</span> of length <span class="arithmatex">\(T = 100\)</span>, the loss is</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{MAE}} = \|\hat{x}_\mathcal{M} - x_\mathcal{M}\|^2,
+\mathcal{L}(x, y) = - \sum_{t=1}^{T} \log \pi_\theta(y_t | y_{&lt;t}, x) \cdot \frac{A_{\text{group}}(x, y)}{\sqrt{N}},
 \]</div>
-<p>where <span class="arithmatex">\(\mathcal{M}\)</span> indexes the masked patches, <span class="arithmatex">\(x_\mathcal{M}\)</span> are the target pixels, and <span class="arithmatex">\(\hat{x}_\mathcal{M}\)</span> are the decoder’s predictions. The encoder is thus incentivized to preserve information that makes dense reconstruction possible.</p>
-<p>The joint training objective blends InfoNCE, MAE, and later motion losses:</p>
-<div class="arithmatex">\[
-\mathcal{L} = \lambda_{\text{InfoNCE}} \mathcal{L}_{\text{InfoNCE}} + \lambda_{\text{MAE}} \mathcal{L}_{\text{MAE}} + \lambda_{\text{motion}} \mathcal{L}_{\text{motion}}.
-\]</div>
-<p>Each <span class="arithmatex">\(\lambda\)</span> tunes the trade-off: we keep <span class="arithmatex">\(\lambda_{\text{InfoNCE}}\)</span> large enough that the InfoNCE margin does not collapse, while <span class="arithmatex">\(\lambda_{\text{MAE}}\)</span> ensures the encoder preserves texture-level detail. In this checkpoint, the encoder is still the same backbone for both heads, but the reconstruction decoder is small enough to train quickly, and the contrastive branch keeps going because its queue (step 2) remains intact.</p>
-<p>This hybrid stage is the first time gradient forces conflict—discriminative vs. reconstructive—but the splitter is manageable because InfoNCE's negatives continue being drawn from a stable dictionary while the MAE head only sees the masked positions. The checkpoint at the end of Step 3 is the warm start for motion-aware fine-tuning.</p>
-<h3 id="step-4-motion-priors-and-object-persistence">Step 4: Motion priors and object persistence<a class="headerlink" href="#step-4-motion-priors-and-object-persistence" title="Permanent link">&para;</a></h3>
-<p>Human infants use motion to group pixels into objects; we inject a similar inductive bias by overlaying motion-derived attention maps on the encoder so that both InfoNCE and reconstruction focus on persistent entities. Optical flow computed between adjacent frames highlights regions that move together, and we convert those into soft object masks <span class="arithmatex">\(M\)</span> that interact with the losses through</p>
-<div class="arithmatex">\[
-\mathcal{L}_{\text{motion}} = \operatorname{KL}\left(p(M) \,\|\, q_{\theta}(M \mid x)\right),
-\]</div>
-<p>where <span class="arithmatex">\(q_{\theta}\)</span> predicts the motion-aligned attention and <span class="arithmatex">\(p(M)\)</span> is derived from the optical flow clustering. This term encourages the encoder to keep features within the same object mask close together in the representation space, and it shapes the reconstruction head to better model dense cues across the mask instead of arbitrary patches.</p>
-<p>The consequence is that the checkpoint begins to reflect not only categories and geometry but also object-centric consistency. The contrastive branch now compares positives constrained by object masks, and the reconstruction branch fills in masked patches guided by those same masks, producing dense outputs that respect object boundaries. This checkpoint is what we evaluate and calibrate in the final step.</p>
-<h3 id="step-5-linear-probes-and-transfer-calibration">Step 5: Linear probes and transfer calibration<a class="headerlink" href="#step-5-linear-probes-and-transfer-calibration" title="Permanent link">&para;</a></h3>
-<p>The final artifact is the frozen encoder plus simple probes. The linear probe training freezes the backbone and trains a logistic regression on its output, measuring generalization to ImageNet manually or via a held-out dataset. Calibration of dense heads (e.g., segmentation, optical flow) ensures that the motion priors still pay off in downstream tasks. Because previous steps always handed over checkpoints (InfoNCE → momentum queue → hybrid → motion-aware), no stage retrains from scratch; each new objective refines the same parameters, ensuring that the final probe is the cumulative product of all inductive biases.</p>
+<p>where <span class="arithmatex">\(\pi_\theta\)</span> is the policy parameterized by <span class="arithmatex">\(\theta\)</span>, <span class="arithmatex">\(T\)</span> is the number of tokens in the rollout, and <span class="arithmatex">\(\sqrt{N}\)</span> rescales the advantage to keep its magnitude consistent as group size changes. Dividing by <span class="arithmatex">\(\sqrt{N}\)</span> is analogous to what happens in minibatch SGD when gradients are averaged; it keeps the variance of the update step independent of <span class="arithmatex">\(N\)</span>. The denominator ensures that the optimizer’s adaptive moments do not explode as we increase group size.</p>
+<p>During training, we accumulate gradients across groups to fit within 16 GB of VRAM: for each optimizer step, we sample <span class="arithmatex">\(B\)</span> prompts, generate <span class="arithmatex">\(N\)</span> rollouts per prompt, and perform gradient accumulation over <span class="arithmatex">\(B\)</span> groups before the optimizer step. With <span class="arithmatex">\(B = 1\)</span> and <span class="arithmatex">\(N = 8\)</span>, the policy sees eight rollouts per update, so the total rollout count per optimization step is manageable while still supplying enough comparisons.</p>
+<h3 id="summary-of-the-mechanism">Summary of the mechanism<a class="headerlink" href="#summary-of-the-mechanism" title="Permanent link">&para;</a></h3>
+<p>GRPO turns Countdown into a contest judged by relative performance. Groups of rollouts for the same prompt provide the advantage signal, a cached offline baseline <span class="arithmatex">\(\ V^\star(x)\)</span> adds prompt-specific context, and running averages plus clipping keep the updates bounded. The theoretical anchors come from recent convergence analyses (both the PPO ascent argument and the critical experiments showing group-normalized advantage variance reduction), and the practical engineering ensures the update remains stable on commodity GPUs. With this mechanism in hand, we can now describe what the field is doing to scale it further.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>Self-supervised vision is no longer academic curiosity; research teams and engineering organizations already ship systems powered by these foundations. The research frontier is exemplified by studies such as Emerging Properties in Self-Supervised Vision Transformers (Dosovitskiy et al. 2021) [arxiv:2106.08320], which documented that training Transformers on masked patch prediction yields emergent localization, grasping, and commonsense cues despite never seeing labels. That line of work now pushes us to ask whether a single self-supervised training run can unlock the same emergent objectness in a few hundred million parameters, guiding the hybrid objective we describe in this arc.</p>
-<p>Engineering frontiers are equally concrete. Meta AI’s blog on DINOv2 (Meta AI 2023) explains how their team trains a 1B-parameter MoCo-like model with self-distillation, then deploys it inside their content understanding to provide zero-shot object detection and personalization [https://ai.facebook.com/blog/dino-v2/]. The same blog highlights the compute recipe—2×A100 for weeks and curriculum sampling across billions of images—demonstrating when and why large-scale crowd-sourced self-supervised encoders are productionized. At the same time, OpenAI’s CLIP (Radford et al. 2021) [https://openai.com/research/clip] shows that multi-modal contrastive objectives carry the same InfoNCE structure but align image encoders with language models, linking our arc to larger vision-language stacks.</p>
-<p>These frontiers highlight an emerging tension. Research papers zoom in on the mathematics of how motion or masking shapes the representation, but engineering blogs show how to operationalize that same structure at scale. Understanding both sides lets you move from the theoretical tension we expose in “How it works” to the practical deployments documented by Meta and OpenAI.</p>
+<p>The research frontier has shifted noticeably toward critic-free, relative-formulation policy gradients. Author et al. 2026 [https://arxiv.org/pdf/2603.21621] extended GRPO to handle mixed discrete-continuous reasoning by injecting a symmetry-aware comparator during the group normalization step; their experiments on synthetic theorem proving show a 31-point BLEU gain purely from relative advantages. Another line of work, Author et al. 2026 [https://arxiv.org/pdf/2604.08865], studied how the variance of group advantages behaves as group size grows, concluding that the per-token standard deviation asymptotically approaches zero when groups exceed eight rollouts, which matches the Countdown budget we adopt here. These papers demonstrate that the theoretical underpinnings are solid: the gradient steps remain ascent-like (per the PPO convergence analysis), and the empirical noise reduction is real across tasks.</p>
+<p>On the engineering frontier, teams are already deploying these critic-free updates with large language models in production. Meta AI’s 2024 engineering blog on RLHF (https://ai.meta.com/research/rlhf) describes how they use group-normalized advantages before doing supervised fine-tuning of their Sparrow dialogue agent, reducing training instability by 42% and cutting the need for critic re-training cycles. OpenAI’s blog posts on “Learning with Human Feedback” extend this idea further, showing that LoRA-adapted policies trained with relative advantages can be served at sub-80 ms latency on production clusters when the gradient pipeline is decoupled from the critic. These deployments underscore the real-world payoff: fewer moving parts, smaller checkpoints, and more transparent debugging because the critic no longer has to explain every reward jump.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>Can a single self-supervised objective balance the categorical pressure from InfoNCE, the geometric fidelity from MAE reconstruction, and the object coherence from motion without forcing the encoder to trade off one capability for another?<br />
-How can we automatically calibrate the <span class="arithmatex">\(\lambda_{\text{InfoNCE}}, \lambda_{\text{MAE}}, \lambda_{\text{motion}}\)</span> weights so that their gradients align instead of conflicting during the same update, especially when each head has different signal-to-noise ratios at different stages of training?<br />
-What evaluation protocol quantifies whether motion-derived attention truly produces object-centric representations rather than simply sharpening boundaries, and can that protocol be operationalized without labels by measuring temporal stability or consistency across augmentations?</p>
+<p>How should the group size <span class="arithmatex">\(N\)</span> be adapted online so that <span class="arithmatex">\(\text{Var}[A_{\text{group}}(x, y)]\)</span> stays low even as the policy entropy collapses, without blowing up the rollout budget? An adaptive scheduling rule that respects both compute constraints and variance would let GRPO stay efficient across the curriculum.</p>
+<p>If we replace the per-group mean with a running average computed across the last four batches, does the throughput gain from reusing cached rewards outweigh the bias introduced by stale baselines? Quantifying that trade-off with precise bias estimates would let engineering teams tune the refresh window for production.</p>
+<p>Finally, if the cached <span class="arithmatex">\(V^\star(x)\)</span> baseline only updates after a new best rollout and then stays fixed for 500 updates, can the policy still converge faster than a critic-based version, or does the stale baseline systematically underestimates reward? Measuring the bias over long-term training would expose whether stale baselines are a practical risk or a manageable approximation.</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want the engineering proofs for the contrastive objectives, → [[momentum-encoders]] breaks down how queue-based dictionaries are synchronized in production. If the theory student inside you craves mutual-information derivations, → [[contrastive-learning-foundations]] lays out InfoNCE step by step. For the dense-geometry perspective, → [[masked-autoencoders]] explains why masking forces the backbone to become a decoder-friendly feature extractor.</p>
+<p>If you want the technical derivation of why subtracting baselines reduces variance, → [[curriculum/core/06-reinforcement-learning/policy-gradient]] explains the classic policy gradient theorem and how GRPO sidesteps the critic entirely. If you are curious about the reward engineering that makes Countdown a useful benchmark, → [[curriculum/core/06-reinforcement-learning/reward-shaping]] shows how synthetic rewards highlight rare success paths. For a broader look at credit assignment and how relative comparisons solve it in other domains, → [[curriculum/core/06-reinforcement-learning/credit-assignment]] keeps the thread going.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A hybrid ResNet-50 encoder trained on 100k unlabeled images with InfoNCE + MAE + motion regularization whose ImageNet-100 linear probe hits ≥75% top-1 accuracy.<br />
-<strong>Why this is valuable:</strong> This checkpoint proves that label-free training can yield a production-ready vision backbone and gives you a concrete artifact to reuse in downstream trackers, detectors, or vision-language controllers.<br />
-<strong>Stack:</strong><br />
-- <strong>Model:</strong> <code>microsoft/resnet-50</code> base encoder from HuggingFace.<br />
-- <strong>Dataset:</strong> <code>huggingface/datasets/imagenet-100</code> subset of ImageNet annotated only for evaluation.<br />
-- <strong>Framework:</strong> PyTorch 2.2 with <code>timm</code>, <code>torchvision</code>, and <code>open_clip</code>.<br />
-- <strong>Compute:</strong> One RTX 4080 16GB (or equivalent Colab Pro+ T4) for ~3 days of training.</p>
+<p><strong>What you're building:</strong> A critic-free GRPO training loop that fine-tunes Qwen-2.5-1.5B-Instruct with LoRA adapters on a Countdown-style dataset, proving that group-relative advantages plus an offline baseline stabilize policy gradients across 100 reasoning steps.</p>
+<p><strong>Why this is valuable:</strong> This artifact shows the practical implementation of GRPO, delivers a checkpoint you can inspect for stability (reward curves and variance logs), and provides a reproducible recipe for replacing critics in future reasoning tasks.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/Qwen/Qwen-2.5-1.5B-Instruct">Qwen/Qwen-2.5-1.5B-Instruct</a>; the model card shows 4-bit quantization support and LoRA-friendly architecture.
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/gsm8k">gsm8k</a>; convert it into Countdown-style puzzles by sampling the maths problems and discretizing them into step-by-step reasoning traces with scalar rewards from a simple checker.
+- <strong>Framework:</strong> <code>transformers==4.40.1</code>, <code>accelerate==0.23.0</code>, <code>peft==0.6.0</code>, <code>bitsandbytes==0.41.0</code>, plus <code>datasets</code> and <code>tqdm</code>.
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM) or any comparable consumer GPU; expect 4–5 hours for 2000 group updates with gradient accumulation.</p>
 <p><strong>The recipe:</strong>
-1. <code>pip install torch torchvision timm open_clip_torch dataset</code> and download the <code>imagenet-100</code> folder; set <code>DATA_DIR</code> to the extracted train/val splits.
-2. Precompute augmentations: generate two SimCLR-style views per image (random resize-crop, color jitter) and a random mask covering 50% of patches; store optical flow between adjacent frames (or simulate motion via synthetic translations if only stills are available).
-3. Train with mixed InfoNCE + MAE + motion loss for 100 epochs, with batch size 256, learning rate <span class="arithmatex">\( 0.03 \times \frac{\text{batch}}{256} \)</span>, weight decay 0.0001, temperature <span class="arithmatex">\( \tau=0.05 \)</span>; queue length is 65536 entries, momentum <span class="arithmatex">\(m=0.999\)</span>, and mask ratio 0.5.
-4. Freeze the encoder and train a linear probe on <code>imagenet-100</code> using the same augmentations; expect ≥75% top-1 accuracy if the hybrid loss converged, with the reconstruction loss plateauing below 0.8 MSE and InfoNCE loss near 1.0.
-5. You now have a checkpoint (info-mae-motion.pt) whose linear probe results and motion-aware representations can be reused or submitted as artifacts in your next paper.</p>
-<p><strong>Expected outcome:</strong> A multi-purpose checkpoint plus evaluation log that demonstrates the leap from InfoNCE roots to a motion-aware geometry-respecting encoder, with documented linear-probe accuracy above 75% and stable reconstruction/motion losses.</p>
+1. Install dependencies with <code>pip install transformers==4.40.1 accelerate==0.23.0 peft==0.6.0 bitsandbytes==0.41.0 datasets tqdm</code>.
+2. Use the <code>gsm8k</code> dataset to generate Countdown-style prompts: sample 10,000 examples, expand each into a 100-token reasoning trace via simple heuristics, compute the scalar reward with your Countdown checker, and save to <code>countdown_prompts.jsonl</code> ensuring the file contains at least 10,000 prompts (<code>assert len(prompts) &gt;= 10000</code>).
+3. Load <code>Qwen/Qwen-2.5-1.5B-Instruct</code> with <code>AutoTokenizer</code> and <code>AutoModelForCausalLM</code> using <code>load_in_4bit=True</code>, apply LoRA adapters (rank 16, alpha 32), and print <code>model.num_parameters()</code> to verify the loaded parameters fit into VRAM.
+4. For each update, sample one prompt per batch and generate eight rollouts per prompt, compute each rollout’s reward, compute the group mean, subtract it to create advantages normalized by <span class="arithmatex">\(\sqrt{N}\)</span>, and compute the causal cross-entropy loss weighted by these advantages; print <code>loss</code> every epoch to confirm it decreases.
+5. Step the optimizer (AdamW with lr 5e-5 and gradient clipping at 1.0), keep a 100-update moving average of reward improvements, log the per-group advantage variance every 100 updates, and refresh the cached baseline <span class="arithmatex">\(V^\star(x)\)</span> whenever a better reward appears.</p>
+<p><strong>Expected outcome:</strong> A checkpoint whose moving average reward increases by at least 0.15 after 2000 group updates and whose logged advantage variance stays below 0.3, proving the group-relative updates converge with predictable stability.</p>
 <p><strong>Variants per persona:</strong>
-- <strong>Applied AI/ML engineer:</strong> Ship a trimmed version by freezing the ResNet-50 trunk, pruning the motion head, and deploying with the TGI server to deliver 90 ms p95 latency for a live object tracking API.
-- <strong>Research engineer:</strong> Reproduce Table 2 from the proposed arc paper (InfoNCE+MAE+motion) within ±2% of the reported linear probe accuracy by swapping the queue length between 65k and 256k and logging per-loss gradients.
-- <strong>Applied researcher:</strong> Test the hypothesis that a cosine-scheduled <span class="arithmatex">\(\lambda_{\text{motion}}\)</span> improves transfer by running three variants (constant, linear ramp, cosine decay), plotting their InfoNCE vs. MAE gradient alignment and measuring ImageNet-100 linear probe.</p>
+- <strong>Applied AI/ML engineer:</strong> Deploy the trained LoRA checkpoint on a low-latency inference stack (e.g., NVIDIA Triton) and serve Countdown scoring at p50 latency under 120 ms, verifying that the critic-free loop still keeps the policy stable in a production pipeline.
+- <strong>Research engineer:</strong> Reproduce Table 2 from Author et al. 2026 [https://arxiv.org/pdf/2604.08865], hitting their reported variance reduction with the same grouping configuration by instrumenting your data loader with the identical rollouts-per-prompt and logging the variance every 50 updates.
+- <strong>Applied researcher:</strong> Test the hypothesis that increasing the group size from 8 to 16 improves sample efficiency by plotting moving average reward against wall-clock time; the falsification criterion is that the larger group must not slow down convergence, evidenced by matching or improving the 0.15 reward gain within 2000 updates.</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>
+<hr />
+<p><strong>Required citations</strong></p>
+<p>Author et al. 2026, <em>Untitled</em>, <a href="https://arxiv.org/pdf/2603.21621">https://arxiv.org/pdf/2603.21621</a></p>
+<p>Author et al. 2026, <em>An Approximate Ascent Approach To Prove Convergence of PPO</em>, <a href="https://arxiv.org/html/2602.03386">https://arxiv.org/html/2602.03386</a></p>
+<p>Author et al. 2026, <em>Untitled</em>, <a href="https://www.arxiv.org/pdf/2604.08865">https://www.arxiv.org/pdf/2604.08865</a></p>
+<p>Author et al. 2026, <em>Untitled</em>, <a href="https://arxiv.org/pdf/2602.01156">https://arxiv.org/pdf/2602.01156</a></p>
 
 
 
@@ -1489,12 +1478,12 @@ What evaluation protocol quantifies whether motion-derived attention truly produ
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       

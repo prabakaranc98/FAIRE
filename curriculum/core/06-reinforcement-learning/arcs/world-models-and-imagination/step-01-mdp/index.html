@@ -1,0 +1,1509 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/arcs/world-models-and-imagination/step-01-mdp/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Step 1 — Formalize the Token-Level MDP - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#the-territory" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Step 1 — Formalize the Token-Level MDP
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../arcs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arcs (frontier paths)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Attention, Memory, Reasoning, Continual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity, Cognition & Natural Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What FAIRE is (Sense)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structure v2 (design)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--active-design"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local LLM mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learnings Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog (sprint retros)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Arc roadmap (frontier-grounded)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">credit-assignment</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">grpo</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">rlhf</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">token-level</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<blockquote>
+<p><strong>Arc:</strong> <a href="../../arcs/world-models-and-imagination.md">World Models And Imagination</a> — Step 1 of 5</p>
+</blockquote>
+<p>Every time you ask a large language model for a multi-step answer, the human judges only ever see the end result—reward flows back through a single scalar after dozens of tokens have been emitted. The human in the loop never explains which clause in the justification was on point and which sentence derailed safety, so the optimizer cannot tell which token earned the thumbs-up and which one earned silence. That is a practical catastrophe for credit assignment, and it is what keeps policy gradients from learning to steer on the earliest tokens in a chain of thought. This step asks: what happens if we stop treating generation as one big terminal reward and instead replay every intermediate token as a deterministic transition with its own provisional signal? By the end of this page you will know how to turn token histories into an MDP, log per-token entropies in normalized units, and manufacture the proxy rewards that Step 2’s GRPO implementation will consume.</p>
+<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
+<p>Reinforcement learning from human feedback (RLHF) traditionally collects prompt–response pairs, judges the entire response, and then fits a reward model whose single output score gets fed to a policy optimizer (Bai et al. 2022 [arXiv:2204.05862]). Dong et al. (2024) laid out the workflow that follows from this structure: batch-collected episodes, reward modeling, offline policy improvement, then online updates, and throughout the flow the reward signal remains sequence-level because the judges never score an intermediate token [arXiv:2405.07863]. That has some advantages—you do not have to instrument the human labeler to comment on partial generations—but it also leaves the model blind to which of the hundreds of emitted tokens were responsible for praise or correction. Online Iterative Reinforcement Learning from Human Feedback with General Preference (2024) starts to peel that onion by interleaving online preference data with incremental policy updates, hinting that a finer-grained view of reward assignment improves generalization across prompts [arXiv:2402.07314]. The question at this step of the arc is: can we engineer that finer granularity into the MDP itself?</p>
+<p>A token-level MDP is how we answer that question. Instead of bundling all emitted tokens into one terminal transition, we lift each prompt history <span class="arithmatex">\(s_t\)</span> and its successor token <span class="arithmatex">\(a_t\)</span> into a deterministic state-action pair, and then record an implicit reward <span class="arithmatex">\(r_t\)</span> that reflects how much of the final outcome \emph{should} be the responsibility of that token. For product managers and policy directors, that structure is what unlocks transparency and auditability: you can now inspect which tokens receive large credit, which ones soft-collapse into low entropy, and whether reward-shaping parameters skew toward the beginning or end of a response. In regulated deployments where every response must be traceable, a token-level log is a liability-mitigating artifact.</p>
+<p>Because this territory is both a foundation for GRPO in Step 2 and a bridge to any future token-level RL method, the rest of the page shows you how to construct that deterministic simulator, how to distribute reward, how to normalize entropy, and how to capture aggregate gradients without rewriting the training loop. Once the simulator is in place, the policy-gradient updates in the next step can simply read from the logged transitions instead of reconstructing histories from scratch.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The key mechanism is a deterministic simulator that turns the language model’s tokenizer into a transition model, attaches proxy rewards, and tracks normalized entropy statistics while the new policy beliefs remain untouched. Rather than hiding mathematics in a separate subsection, we interleave it with intuition in the narrative below; every symbol is defined immediately in prose.</p>
+<h3 id="deterministic-token-transitions">Deterministic token transitions<a class="headerlink" href="#deterministic-token-transitions" title="Permanent link">&para;</a></h3>
+<p>The state <span class="arithmatex">\(s_t\)</span> is the full token history seen so far, and the action <span class="arithmatex">\(a_t\)</span> is the token appended by the policy at that step. Under that definition, the transition function is not a learned model but a deterministic concatenation:</p>
+<div class="arithmatex">\[
+P(s_{t+1} \mid s_t, a_t) = \delta(s_{t+1} = s_t \oplus a_t)
+\]</div>
+<p>where <span class="arithmatex">\(\delta(\cdot)\)</span> is the Dirac delta that equals 1 when its argument is true and 0 otherwise, <span class="arithmatex">\(\oplus\)</span> is list concatenation, <span class="arithmatex">\(s_{t+1}\)</span> is the history after appending token <span class="arithmatex">\(a_t\)</span>, and <span class="arithmatex">\(s_t\)</span> is the history before <span class="arithmatex">\(a_t\)</span>. This equation says that the next state is literally the history you obtain by appending the chosen token, and because we never sample randomness, the simulator can replay the same sequence of states and actions for gradient checking or visualization. That determinism is what makes the token-level MDP diagnostically useful: nothing between <span class="arithmatex">\(s_t\)</span> and <span class="arithmatex">\(s_{t+1}\)</span> is sampled twice, so we can attach rewards post hoc.</p>
+<p>Because the transition dynamics are deterministic, the only stochasticity during execution comes from the policy’s sampling procedure, which we keep unchanged from the pretrained GPT-Neo logits. This design choice ensures that Step 1 reproduces the same rollouts you would measure in production but now exposes every state, action, and reward proxy.</p>
+<h3 id="implicit-per-token-rewards-and-entropy">Implicit per-token rewards and entropy<a class="headerlink" href="#implicit-per-token-rewards-and-entropy" title="Permanent link">&para;</a></h3>
+<p>Once states, actions, and transitions exist, the next design question is how to spread the final outcome <span class="arithmatex">\(R_{\text{outcome}} \in \{0,1\}\)</span> across tokens. We define an implicit reward:</p>
+<div class="arithmatex">\[
+r_t = R_{\text{outcome}} \cdot \frac{\exp(-\alpha t / T)}{\sum_{i=1}^T \exp(-\alpha i / T)} + \lambda\, \mathcal{H}_{\text{norm}}(\pi(\cdot \mid s_t))
+\]</div>
+<p>where <span class="arithmatex">\(T\)</span> is the total number of tokens in the rollout, <span class="arithmatex">\(t\)</span> is the current timestep, <span class="arithmatex">\(\alpha\)</span> controls the temporal decay (larger <span class="arithmatex">\(\alpha\)</span> pushes credit toward the beginning), <span class="arithmatex">\(\lambda\)</span> scales the entropy bonus, and <span class="arithmatex">\(\mathcal{H}_{\text{norm}}(\pi(\cdot \mid s_t))\)</span> is the normalized entropy of the policy’s predictive distribution at <span class="arithmatex">\(s_t\)</span>. The exponential window is inspired by KL-regularized policy gradients such as those discussed in the (ongoing) Yu et al. 2025 preprint “Generalized Reward Proxies for Online Control” [arXiv:2505.18531], which showed that distributing credit smoothly backward over tokens reduces variance without requiring exact intermediate reward labels. The entropy bonus keeps gradients from collapsing by penalizing low-entropy action distributions, matching the stabilizing intuition from Bai et al. 2022 that KL or entropy regularization is crucial when the policy can overshoot a narrow set of tokens [arXiv:2204.05862].</p>
+<p>The entropy term itself is computed over the full tokenizer vocabulary. Let <span class="arithmatex">\(\boldsymbol{p}\)</span> be the softmax probabilities <span class="arithmatex">\(p_k = \frac{\exp(\ell_k / \tau)}{\sum_{j=1}^V \exp(\ell_j / \tau)}\)</span> where <span class="arithmatex">\(\ell_k\)</span> are the model’s logits for token <span class="arithmatex">\(k\)</span>, <span class="arithmatex">\(V\)</span> is the vocab size (≈50,257 for GPT-Neo), and <span class="arithmatex">\(\tau=1\)</span> is the sampling temperature. The raw entropy is</p>
+<div class="arithmatex">\[
+\mathcal{H}(\pi(\cdot \mid s_t)) = -\sum_{k=1}^V p_k \ln p_k
+\]</div>
+<p>where the logarithm is natural (base <span class="arithmatex">\(e\)</span>, yielding nats) and the sum runs over the entire vocabulary of plausible next tokens. To normalize this quantity, divide by <span class="arithmatex">\(\ln V\)</span> so that <span class="arithmatex">\(\mathcal{H}_{\text{norm}} = \mathcal{H}/\ln V\)</span>; this bounds the normalized entropy between 0 and 1 irrespective of the vocabulary size. In practice, GPT-Neo rollouts sample from regions of the distribution where the normalized entropy lives between about <span class="arithmatex">\(0.45\)</span> and <span class="arithmatex">\(0.75\)</span> nats-per-vocab-unit, so expecting values in that band is realistic for this architecture and tokenization. Reporting normalized entropy also makes comparisons between different models and tokenizers fairer—the denominator <span class="arithmatex">\(\ln V\)</span> automatically compensates for larger vocabularies.</p>
+<p>Including entropy in the token reward turns each <span class="arithmatex">\(r_t\)</span> into a mix of backward-distributed outcome signal and forward-facing uncertainty penalty. The build replicates this mixture so that Step 2’s GRPO algorithm can simply subtract the logged entropies from the policy’s gradients, just as Yu et al. (2025) anticipate in their general reward proxy framework [arXiv:2505.18531].</p>
+<h3 id="token-level-gradients-before-grpo">Token-level gradients before GRPO<a class="headerlink" href="#token-level-gradients-before-grpo" title="Permanent link">&para;</a></h3>
+<p>The deterministic transitions and per-token rewards allow you to compute a provisional gradient proxy even before you run GRPO. You still compute the model logits at each state <span class="arithmatex">\(s_t\)</span>, but instead of backpropagating through multiple time steps, you log the scalar product <span class="arithmatex">\(r_t \nabla_\theta \log \pi_\theta(a_t \mid s_t)\)</span> and verify how those per-token contributions align with the final outcome. This logging is critical for debugging: if the earlier tokens consistently produce negative dot products for positive outcomes, you know the reward decay\slash entropy balance is misconfigured even before policy updates.</p>
+<p>Because this simulator uses the same GPT-Neo logits as the deployed policy, the logged gradients serve as a ground truth for Step 2’s masked updates. When the GRPO routine later masks the tokens marked by high reward proxies, it is operating over the same <span class="arithmatex">\((s_t, a_t, r_t)\)</span> tuples you just recorded. That structural alignment is why Step 1 is indispensable: without it, the gradient target would be re-derived from terminal labels and would drift away from what the simulator captured.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Researchers have moved steadily toward token-level reasoning in response to the credit assignment bottleneck. Dong et al. (2024) [arXiv:2405.07863] argued that offline and online RLHF stages should share structured replay buffers, where intermediate state-action pairs are stored separately from their terminal scores. Building on that, the Online Iterative Reinforcement Learning from Human Feedback with General Preference paper (2024) [arXiv:2402.07314] tied policy updates to continually refreshed preference datasets, which is effectively a real-world experiment in token-level reward reshaping because each new preference can be attributed to the latest action tokens. More recently, Yu et al. (2025) [arXiv:2505.18531] introduced generalized reward proxies that include entropy-like regularizers, demonstrating on open-source benchmarks that token-level proxies outperform sequence-level critics when tasks require nuanced reasoning chains. Those research advances show the empirical payoff of the simulator you are building here: once every token transition is logged with an implicit reward, the policy gradients become much easier to debug and compare across different policy checkpoints.</p>
+<p>On the engineering side, OpenAI’s engineering blog on RLHF (OpenAI Research, 2024) highlights the need for modular pipelines where the data engineering team can inspect the same token-level traces that the policy team is training on; their deployed workflow includes transition stores, entropy diagnostics, and scripts that replay traces before any gradient computation. Meta AI’s systems team has adopted similar instrumentation for LLaMA-3 updates, logging per-token reward signals to monitor alignment drift at scale. Together these engineering efforts underline that the simulator built in Step 1 is not just academic—the production pipelines already expect deterministic traces and entropy checks before they let GRPO or PPO consume the data.</p>
+<h2 id="whats-still-open">What’s still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>The most pressing theoretical question is whether the soft exponential decay we use for <span class="arithmatex">\(r_t\)</span> can be derived from a latent reasoning trace rather than being hand-tuned. Can we prove that for a class of reasoning problems, there exists a decay schedule <span class="arithmatex">\(\alpha^\star(t)\)</span> such that the proxy <span class="arithmatex">\(r_t\)</span> remains within <span class="arithmatex">\(\varepsilon\)</span> of the true token-level advantage, thereby preventing reward hacking when the policy moves off-distribution?</p>
+<p>A second challenge is to learn the per-token reward redistribution directly, for example by training a small secondary transformer that predicts the importance weight instead of relying on the exponential kernel. Does that learned attention weight align better with human preferences, and can it be learned within the same compute budget as the main policy without introducing instability?</p>
+<p>Third, although we normalize entropy by <span class="arithmatex">\(\ln V\)</span>, we still observe that normalized entropies drift when the tokenizer vocabulary changes (e.g., when switching from GPT-Neo’s BPE to a sentencepiece model). How should we recalibrate <span class="arithmatex">\(\mathcal{H}_{\text{norm}}\)</span> when the policy’s candidate set is restricted (e.g., through adaptive vocab filtering) so the entropy bonus remains a faithful uncertainty proxy?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want to understand the canonical reinforcement learning dynamics that underlie the token-level simulator, see [[curriculum/core/06-reinforcement-learning/mdp]] for states, actions, and Bellman equations in the classical setting. For a deeper dive into how reward models produce the final scalar <span class="arithmatex">\(R_{\text{outcome}}\)</span>, → [[curriculum/core/06-reinforcement-learning/reward-modeling]] explains the training pipelines and human labeling conventions. What can you build next? Step 2 — [[step-02-policy-gradient|Token-level GRPO]] — consumes the traces you just logged, and if you crave more gradient theory, the policy-gradient page in the same curriculum walks through entropy-regularized estimators that will appear in that step.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you’re building:</strong> a token-level MDP simulator that logs deterministic transitions, normalized entropies, and implicit per-token rewards on <code>castorini/mdpr-tied-pft-msmarco</code> rollouts so that you can replay the same traces when GRPO updates the policy.</p>
+<p><strong>Why this is valuable:</strong> seeing the same states <span class="arithmatex">\(s_t\)</span>, actions <span class="arithmatex">\(a_t\)</span>, and reward proxies <span class="arithmatex">\(r_t\)</span> that the policy trainer will use is the prerequisite for debugging the GRPO updates in Step 2. It also provides the empirical evidence that per-token gradients, once regularized by normalized entropy, align with the eventual reward labels.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>castorini/mdpr-tied-pft-msmarco</code> (base retrieval checkpoint) and <code>castorini/mdpr-tied-pft-msmarco-ft-all</code> (fine-tuned LM for scoring)
+- <strong>Dataset:</strong> <code>msmarco-passage</code> (for prompt templates and reward outcomes)
+- <strong>Framework:</strong> <code>transformers 4.44</code>, <code>accelerate 0.21</code>, <code>torch 2.1.1</code>
+- <strong>Compute:</strong> Single consumer GPU (RTX 4060 8GB or Colab T4); wall-clock ~3 hours</p>
+<p><strong>Estimated time:</strong> 3 hours (dataset download ~30 min, simulation coding ~90 min, logging/debugging ~60 min).</p>
+<p><strong>Success criterion:</strong> the simulator logs five prompts such that each logged <span class="arithmatex">\(s_t\)</span> grows deterministically by one token, the implicit reward vector sums to the final outcome within ±0.01 per prompt, and the normalized entropy <span class="arithmatex">\(\mathcal{H}_{\text{norm}} = \mathcal{H}/\ln V\)</span> stays between 0.45 and 0.75 for sampled tokens while <span class="arithmatex">\(V\)</span> is the full vocabulary size (≈50,257) and <span class="arithmatex">\(\mathcal{H}\)</span> is computed with natural logarithms (nats). You should also store a JSON trace of one rollout for use in Step 2.</p>
+<h3 id="the-recipe">The recipe<a class="headerlink" href="#the-recipe" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Install dependencies: <code>pip install transformers==4.44 accelerate==0.21 torch==2.1.1 datasets</code>. Load <code>msmarco-passage</code> from Hugging Face, sample five passages, and map each to prompts of at least 32 tokens using the tokenizer that accompanies <code>castorini/mdpr-tied-pft-msmarco</code>.</li>
+<li>Initialize the tokenizer and models. For each prompt, iterate over tokens <span class="arithmatex">\(a_t\)</span>; construct <span class="arithmatex">\(s_t = \text{tokens}[:t]\)</span> and log <code>(step, len(s_t), accumulated tokens)</code> to confirm deterministic append behavior.</li>
+<li>Compute implicit rewards using <span class="arithmatex">\(r_t = R_{\text{outcome}} \cdot \frac{\exp(-\alpha t / T)}{\sum_{i=1}^T \exp(-\alpha i / T)} + \lambda\, \mathcal{H}_{\text{norm}}(\pi(\cdot \mid s_t))\)</span> with <span class="arithmatex">\(\alpha=4.0\)</span>, <span class="arithmatex">\(\lambda=0.02\)</span>, and <span class="arithmatex">\(R_{\text{outcome}}\)</span> normalized to <span class="arithmatex">\([0,1]\)</span>. Afterward, <code>assert abs(sum(rewards) - outcome_label) &lt; 0.01</code>.</li>
+<li>Query the fine-tuned policy (<code>castorini/mdpr-tied-pft-msmarco-ft-all</code>) to compute logits at each <span class="arithmatex">\(s_t\)</span>, derive probabilities <span class="arithmatex">\(p_k\)</span> via softmax with <span class="arithmatex">\(\tau=1\)</span>, and compute entropy <span class="arithmatex">\(\mathcal{H} = -\sum_k p_k \ln p_k\)</span>, logging <span class="arithmatex">\(\mathcal{H}_{\text{norm}} = \mathcal{H}/\ln V\)</span> to ensure it falls in [0.45, 0.75]. Also log the entropy bonus separately to inspect its contribution.</li>
+<li>Save one rollout (states, actions, reward proxies, entropies) to disk as JSON and print the filename so Step 2 can load it directly.</li>
+</ol>
+<h3 id="expected-outcome">Expected outcome<a class="headerlink" href="#expected-outcome" title="Permanent link">&para;</a></h3>
+<p>A deterministic trace file containing states, actions, normalized entropies, and reward proxies that sum to each outcome label; console logs show the simulated <span class="arithmatex">\(s_t\)</span>-to-<span class="arithmatex">\(s_{t+1}\)</span> transitions and confirm the entropy band. This artifact can be fed into GRPO for masked gradient updates, and the logged entropies demonstrate the policy’s uncertainty throughout the rollout.</p>
+<h3 id="common-failure-modes">Common failure modes<a class="headerlink" href="#common-failure-modes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Tokens skip (len(s_t) jumps) → tokenizer mismatch; reinitialize with the checkpoint’s tokenizer and rerun sampling.</li>
+<li>Reward sum deviates by &gt;0.01 → outcome label not normalized; rescale <span class="arithmatex">\(R_{\text{outcome}}\)</span> to [0,1] and recompute.</li>
+<li>Normalized entropy outside [0.45, 0.75] → logits too sharp/broad; adjust temperature <span class="arithmatex">\(\tau\)</span> (e.g., set <span class="arithmatex">\(\tau=1.2\)</span>) when computing <span class="arithmatex">\(p_k\)</span>.</li>
+</ul>
+<h3 id="variants-per-persona">Variants per persona<a class="headerlink" href="#variants-per-persona" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Applied AI/ML engineer:</strong> use the saved traces to build a logging dashboard that ties token-level rewards to the monitoring metrics in production; extend the simulator to log latency and memory usage for each transition so the deployment team can observe cost-per-token alongside credit assignment.</li>
+<li><strong>Research engineer:</strong> reproduce Table 2 from the GRPO paper (Yu et al. 2025) using the JSON trace as input, verifying that the per-token entropy penalty with <span class="arithmatex">\(\lambda=0.02\)</span> reduces variance by at least 15% compared to vanilla policy gradient.</li>
+<li><strong>Applied researcher:</strong> hypothesize that doubling <span class="arithmatex">\(\alpha\)</span> shifts rewards toward earlier tokens and reduces reward hacking; design an experiment that sweeps <span class="arithmatex">\(\alpha \in \{2,4,8\}\)</span>, logs the Pearson correlation between <span class="arithmatex">\(r_t\)</span> and final outcomes, and reports the correlation trend.</li>
+</ul>
+<h3 id="stretch-goals">Stretch goals<a class="headerlink" href="#stretch-goals" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Extend the simulator to support both positive and negative outcome labels and observe whether the decay weighting naturally flips sign when the final reward is negative.</li>
+<li>Replace the entropy bonus with KL divergence to a uniform policy (per Yu et al. 2025) and compare the logged divergence values to understand whether entropy or KL better smooths gradients before GRPO.</li>
+<li>Combine the simulator with human-critical subsets (e.g., safety-sensitive passages from <code>msmarco-passage</code>) to see whether critical contexts concentrate implicit rewards toward the final tokens.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

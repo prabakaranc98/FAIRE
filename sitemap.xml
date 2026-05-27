@@ -293,6 +293,22 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-01-probabilistic-programming/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-02-bayesian-inference/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-03-variational-inference/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-05-gaussian-processes/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/concepts/bayesian-inference/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -334,6 +350,14 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/arcs/world-models-and-imagination/step-01-mdp/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/06-reinforcement-learning/arcs/world-models-and-imagination/step-02-policy-gradient/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>

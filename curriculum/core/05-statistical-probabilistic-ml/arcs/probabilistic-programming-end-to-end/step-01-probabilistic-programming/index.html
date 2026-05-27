@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/probabilistic-programming-end-to-end/step-01-probabilistic-programming/">
       
       
       
@@ -18,19 +18,19 @@
         
       
       
-      <link rel="icon" href="../../../../../img/favicon.svg">
+      <link rel="icon" href="../../../../../../img/favicon.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
       
-        <title>Generative Stack Index - Frontier Wiki</title>
+        <title>Step 1 — Invert the Sensor Simulator with NumPyro - Frontier Wiki</title>
       
     
     
-      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../../../../../../assets/stylesheets/main.484c7ddc.min.css">
       
         
-        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -49,9 +49,9 @@
       
     
     
-      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-territory" class="md-skip">
+        <a href="#step-1-invert-the-sensor-simulator-with-numpyro" class="md-skip">
           Skip to content
         </a>
       
@@ -90,7 +90,7 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Generative Stack Index
+              Step 1 — Invert the Sensor Simulator with NumPyro
             
           </span>
         </div>
@@ -209,7 +209,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../../../../.." class="md-tabs__link">
+      <a href="../../../../../.." class="md-tabs__link">
         
   
   
@@ -230,7 +230,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../" class="md-tabs__link">
+        <a href="../../../../../" class="md-tabs__link">
           
   
   
@@ -250,7 +250,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+        <a href="../../../../../../references/seminal-papers/" class="md-tabs__link">
           
   
   
@@ -270,7 +270,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../../../../about/" class="md-tabs__link">
+        <a href="../../../../../../about/" class="md-tabs__link">
           
   
   
@@ -306,7 +306,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+    <a href="../../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
@@ -336,7 +336,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../.." class="md-nav__link">
+      <a href="../../../../../.." class="md-nav__link">
         
   
   
@@ -415,7 +415,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../" class="md-nav__link">
+      <a href="../../../../../" class="md-nav__link">
         
   
   
@@ -443,7 +443,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../arcs/" class="md-nav__link">
+      <a href="../../../../../arcs/" class="md-nav__link">
         
   
   
@@ -471,7 +471,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../01-ai/" class="md-nav__link">
+      <a href="../../../../01-ai/" class="md-nav__link">
         
   
   
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../" class="md-nav__link">
+      <a href="../../../../02-generative-modeling/" class="md-nav__link">
         
   
   
@@ -527,7 +527,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../03-representation-learning/" class="md-nav__link">
+      <a href="../../../../03-representation-learning/" class="md-nav__link">
         
   
   
@@ -555,7 +555,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+      <a href="../../../../04-neural-networks-deep-learning/" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -611,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+      <a href="../../../../06-reinforcement-learning/" class="md-nav__link">
         
   
   
@@ -639,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+      <a href="../../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
         
   
   
@@ -667,7 +667,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+      <a href="../../../../08-causal-statistical-inference/" class="md-nav__link">
         
   
   
@@ -695,7 +695,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+      <a href="../../../../09-algorithms-systems-for-ai/" class="md-nav__link">
         
   
   
@@ -723,7 +723,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+      <a href="../../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
         
   
   
@@ -810,7 +810,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+      <a href="../../../../../../references/seminal-papers/" class="md-nav__link">
         
   
   
@@ -838,7 +838,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../references/glossary/" class="md-nav__link">
+      <a href="../../../../../../references/glossary/" class="md-nav__link">
         
   
   
@@ -925,7 +925,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../about/" class="md-nav__link">
+      <a href="../../../../../../about/" class="md-nav__link">
         
   
   
@@ -953,7 +953,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/sense/" class="md-nav__link">
+      <a href="../../../../../../system/sense/" class="md-nav__link">
         
   
   
@@ -981,7 +981,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/architecture/" class="md-nav__link">
+      <a href="../../../../../../system/architecture/" class="md-nav__link">
         
   
   
@@ -1009,7 +1009,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+      <a href="../../../../../../system/structure-v2/" class="md-nav__link">
         
   
   
@@ -1044,7 +1044,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/local-mode/" class="md-nav__link">
+      <a href="../../../../../../system/local-mode/" class="md-nav__link">
         
   
   
@@ -1072,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+      <a href="../../../../../../system/learnings-log/" class="md-nav__link">
         
   
   
@@ -1100,7 +1100,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/backlog/" class="md-nav__link">
+      <a href="../../../../../../system/backlog/" class="md-nav__link">
         
   
   
@@ -1128,7 +1128,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/arc-roadmap/" class="md-nav__link">
+      <a href="../../../../../../system/arc-roadmap/" class="md-nav__link">
         
   
   
@@ -1156,7 +1156,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/status/" class="md-nav__link">
+      <a href="../../../../../../system/status/" class="md-nav__link">
         
   
   
@@ -1184,7 +1184,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/observer/" class="md-nav__link">
+      <a href="../../../../../../system/observer/" class="md-nav__link">
         
   
   
@@ -1212,7 +1212,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/changelog/" class="md-nav__link">
+      <a href="../../../../../../system/changelog/" class="md-nav__link">
         
   
   
@@ -1240,7 +1240,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../../system/supervisor/" class="md-nav__link">
+      <a href="../../../../../../system/supervisor/" class="md-nav__link">
         
   
   
@@ -1291,94 +1291,70 @@
                 
                   
 
-  <nav class="md-tags" >
-    
-      
-      
-      
-      
-        <span class="md-tag">evaluation</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">generative</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">stacks</span>
-      
-    
-  </nav>
-
 
   
   
 
 
 <blockquote>
-<p><strong>Arc syllabus</strong> — this page is the entry point to the <strong>Generative Stack</strong> arc.</p>
+<p><strong>Arc:</strong> <a href="../../arcs/probabilistic-programming-end-to-end.md">Probabilistic Programming End To End</a> — Step 1 of 5</p>
 </blockquote>
-<p>Imagine a control room where dozens of generative models flicker across dashboards: each one sourced from a different modality, each one trained with a different objective, and all of them expected to behave predictably when a new prompt, new context, or new regulator walks in. Operations leaders stop asking whether individual models can produce interesting output; they start asking how to characterize the health of the entire pipeline—how representation, generation, and evaluation coexist so that a swap in the front-end encoder does not crash the late-stage scoring system.</p>
-<p>The generative stack index is the vocabulary for that question. Rather than cataloging isolated models, it frames a single, differentiable pipeline where an encoder <span class="arithmatex">\(E_\phi\)</span> shares latents with every conditional generator under evaluation and where metrics actually influence the encoder’s parameters. That continuous view is what makes going from prototypes to hundreds of production models feasible.</p>
-<p>Prerequisites: familiarity with [[diffusion-models]], [[vae]], and [[gan]] so the stack-index story can reuse their encoder–sampler–evaluator roles.</p>
-<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
-<p>Every deployment that does more than one generative task admits a stack: some process converts raw data into latent codes, a sampler produces outputs conditioned on those codes, and an evaluation layer decides whether the results are good enough to ship. Historically the industry invested in allowing each layer to specialize in isolation—GANs for texture, VAEs for compact latent spaces, autoregressive networks for text, and diffusion models for high-fidelity synthesis. Teams had to glue these specialized pipelines together, hand-tuning interfaces and keeping meticulous documentation on which encoder served which generator. That fragility is what the generative stack index dissolves.</p>
-<p>The index is not merely a dashboard; it is the disciplined view that these three layers share a common conditioning vector <span class="arithmatex">\(c\)</span>. The representation stage stops being an artifact of a single generator and instead reuses the same deep embeddings that feed downstream kernels—the convolutional hierarchies first showcased by Krizhevsky et al. 2012 [https://arxiv.org/pdf/1401.4082] already warmed up by multiple downstream decoders. The generative stage becomes a family of interchangeable samplers: GANs (Goodfellow et al. 2014, [https://arxiv.org/pdf/1406.2661]) and diffusion processes now all read the same conditioning vector <span class="arithmatex">\(c\)</span> so that swapping kernels is simply a matter of switching loss functions rather than reengineering front ends. The evaluation stage likewise becomes a differentiable scoring layer, closing the loop in a way that influences the encoder whenever the metrics deviate from expectations. In short, the territory is not “a model that generates,” it is “a continuous path from data to value.”</p>
-<p>This is also where the page sits within the larger arc: the generative-stack arc uses this index to bridge the foundational vocabulary laid out in [[generative-foundations]] with the practical sampling engines detailed in [[diffusion-models]], and it shows where core assessments of the stack happen.</p>
+<h1 id="step-1-invert-the-sensor-simulator-with-numpyro">Step 1 — Invert the Sensor Simulator with NumPyro<a class="headerlink" href="#step-1-invert-the-sensor-simulator-with-numpyro" title="Permanent link">&para;</a></h1>
+<p>What happens when the airplane has already landed in the lake, the telemetry is gone, and all you have left are the smeared crash coordinates and a log of noisy temperature and pressure readouts? Inverting the simulator means solving that inverse problem: instead of running a code that spits out sensor traces, you write a probabilistic program that treats the simulator itself as the generative story and runs it "backwards" to infer the latent wind drift, engine bias, or the moment a sensor glitched. By the end of this step you will have built a NumPyro model that takes a synthetic sensor log, declares priors over latent drift and glitch rates, and lets NUTS sample the posterior that generated the crash. That capability is what opens the rest of the arc—suddenly inference is not a bespoke optimizer you craft each time but a reusable probabilistic program that maps messy observations to interpretable causes.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Probabilistic programming languages (PPLs) like NumPyro sit between two chores: writing the simulator code that samples sensor traces and designing the math-heavy sampler that turns observations into parameter posteriors. This step holds the bridge. The simulator we inherited already speaks the language of causality—it samples drift, mixes in outliers, and outputs sensor readings—but it cannot answer, “Given the one trajectory we actually observe, what latent drift and glitch probabilities created it?” NumPyro lets you keep the simulator’s story in plain Python while swapping in generic inference algorithms (NUTS, importance sampling, SVI), so you never have to re-derive gradients or coded likelihoods from scratch.  </p>
+<p>Where this capability appears matters: aerospace safety teams use similar patterns when reconstructing crashes from black-box flight data recorders, robotics labs invert simulators to diagnose sensor failure modes, and epidemiologists invert infectious-disease models to uncover hidden spread from sparse case counts. In each case a PPL decouples the generative definition—the simulator—from the math of posterior estimation, freeing domain experts to write the simulator logic while inference experts tune NUTS or SVI. The next sections explain how this decoupling occurs mathematically, what libraries make it practical, and why it matters for future arc steps.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<h3 id="representation-and-latent-conditioning">Representation and latent conditioning<a class="headerlink" href="#representation-and-latent-conditioning" title="Permanent link">&para;</a></h3>
-<p>The stack index begins with an encoder <span class="arithmatex">\(E_\phi\)</span> that maps a clean observation <span class="arithmatex">\(x_0\)</span> in modality <span class="arithmatex">\(M\)</span> (image, audio, text, or another measured vector in <span class="arithmatex">\(\mathbb{R}^d\)</span>) to a latent <span class="arithmatex">\(z\)</span>, typically conditioned by context <span class="arithmatex">\(c\)</span> representing prompts, metadata, or another modality’s embedding. The training objective for this stage is the negative evidence lower bound, which enforces that <span class="arithmatex">\(z\)</span> retains the information the sampler and evaluator will need. More precisely,</p>
+<p>The simulator exposes data as a list of timestamps <span class="arithmatex">\(t_n\)</span> and noisy measurements <span class="arithmatex">\(y_n\)</span>. NumPyro turns that story into latent variables: a continuous drift <span class="arithmatex">\(\beta\)</span> and intercept <span class="arithmatex">\(\mu\)</span> that drive the main signal plus a discrete outlier indicator <span class="arithmatex">\(\delta_n\)</span> that flags sensor glitches. We declare the outlier probability as</p>
 <div class="arithmatex">\[
-\mathcal{L}_\text{encoder}(\phi,\theta) = -\mathbb{E}_{q_\phi(z|x_0,c)}\left[\log p_\theta(x_0|z,c)\right] + \mathrm{KL}\left(q_\phi(z|x_0,c)\,\|\,p(z)\right),
+\delta_n \sim \mathrm{Bernoulli}(p_{\text{out}}),
 \]</div>
-<p>where <span class="arithmatex">\(q_\phi(z|x_0,c)\)</span> is the approximate posterior, <span class="arithmatex">\(p_\theta(x_0|z,c)\)</span> is the decoder likelihood, <span class="arithmatex">\(p(z)\)</span> is a prior (usually standard Normal), and <span class="arithmatex">\(\mathrm{KL}\)</span> denotes the Kullback-Leibler divergence. Minimizing this loss ties the encoder, decoder, and prior together so that the latent <span class="arithmatex">\(z\)</span> becomes a reusable representation. One-shot generalization (Rezende et al. 2016, [https://arxiv.org/abs/1603.05106]) built on the same alignment between context <span class="arithmatex">\(c\)</span>, latent <span class="arithmatex">\(z\)</span>, and likelihood <span class="arithmatex">\(p_\theta\)</span> to allow conditioning on new classes with very few examples. Because the stack index keeps this ELBO as part of the pipeline, any new modality adapter only has to produce a <span class="arithmatex">\(c\)</span> value that the rest of the stack already understands.</p>
-<p>A modality adapter is therefore just another attention-augmented encoder—a lesson borrowed from Bahdanau et al. 2015 (arXiv:1503.03585). They showed that different source encoders can align via attention weights; in the stack index, each adapter aligns with the shared conditioning vector <span class="arithmatex">\(c\)</span>, letting speech, text, or graphics embeddings plug into the same generator without rebuilding the sampler.</p>
-<h3 id="composable-generative-kernels">Composable generative kernels<a class="headerlink" href="#composable-generative-kernels" title="Permanent link">&para;</a></h3>
-<p>With the conditioned latent <span class="arithmatex">\(c = E_\phi(x_0)\)</span> fixed, the next layer is a sampler <span class="arithmatex">\(G_\theta(z,c)\)</span>, and this is where the choice between GANs, diffusion, or flows becomes a decision about the loss function rather than the representation. GANs introduce a discriminator <span class="arithmatex">\(D_\psi\)</span> and optimize the minimax objective</p>
+<p>where <span class="arithmatex">\(p_{\text{out}}\)</span> is the prior mean rate of glitches and <span class="arithmatex">\(n=1,\dots,N\)</span> indexes the <span class="arithmatex">\(N\)</span> sensor samples. The indicator lets the model route occasional corrupt readings through a heavier-tailed distribution while keeping the main drift estimate tight.</p>
+<p>Conditioned on <span class="arithmatex">\(\delta_n\)</span>, the observation follows a Student‑<span class="arithmatex">\(t\)</span> distribution whose location drifts linearly with time and whose scale inflates for glitches:</p>
 <div class="arithmatex">\[
-\min_\theta\max_\psi \,\mathbb{E}_{x_0\sim p_\text{data}}[\log D_\psi(x_0,c)] + \mathbb{E}_{z\sim p(z)}[\log(1-D_\psi(G_\theta(z,c)))],
+y_n \sim \mathrm{StudentT}(\nu, \mu + \beta t_n, \sigma + \delta_n\cdot \sigma_{\text{out}}),
 \]</div>
-<p>where <span class="arithmatex">\(p_\text{data}\)</span> is the empirical data distribution and <span class="arithmatex">\(p(z)\)</span> is the prior over latents. Because the generator produces samples while keeping <span class="arithmatex">\(z\)</span> and <span class="arithmatex">\(c\)</span> available, swapping in a different kernel simply means replacing the objective while keeping the encoder and evaluator untouched.</p>
-<p>Diffusion models, such as DDPM (Ho et al. 2020, [https://arxiv.org/abs/2006.11239]), replace the adversarial training signal with a sequential denoising process. The forward process corrupts <span class="arithmatex">\(x_0\)</span> into <span class="arithmatex">\(x_t\)</span> for <span class="arithmatex">\(t\in\{0,\dots,T\}\)</span> by sampling noise <span class="arithmatex">\(\epsilon\sim\mathcal{N}(0,I)\)</span> and setting <span class="arithmatex">\(x_t = \sqrt{\bar{\alpha}_t}x_0 + \sqrt{1-\bar{\alpha}_t}\epsilon\)</span>, where <span class="arithmatex">\(\bar{\alpha}_t\)</span> is derived from a beta schedule. The loss minimized is</p>
+<p>where <span class="arithmatex">\(\nu\)</span> controls the kurtosis of the tails, <span class="arithmatex">\(\sigma\)</span> is the nominal sensor noise, and <span class="arithmatex">\(\sigma_{\text{out}}\)</span> lets glitches “open the door” to much wider variance. Student-<span class="arithmatex">\(t\)</span> is chosen because it is a continuous mixture over normals with varying variance, so it naturally represents both the normal drift and the heavy-tailed outliers inside one likelihood.</p>
+<p>The posterior we target multiplies this likelihood with priors on every latent:</p>
 <div class="arithmatex">\[
-\mathcal{L}_\text{diffusion} = \mathbb{E}_{t,x_0,\epsilon}\left[\|\epsilon - \epsilon_\theta(x_t,t,c)\|^2\right],
+p(\theta \mid \mathbf{y}) \propto \left( \prod_{n=1}^{N} p(y_n \mid \theta, t_n) \right) p(\theta),
 \]</div>
-<p>where <span class="arithmatex">\(\epsilon_\theta\)</span> predicts the noise added at timestep <span class="arithmatex">\(t\)</span> conditioned on both the noisy sample <span class="arithmatex">\(x_t\)</span> and <span class="arithmatex">\(c\)</span>. Even though the GAN and diffusion objectives look different, both are ultimately trying to align the generated conditional distribution <span class="arithmatex">\(G_\theta(x|c)\)</span> with <span class="arithmatex">\(p_\text{data}(x|c)\)</span>. The GAN does so by minimizing a divergence via the discriminator, while diffusion does so by matching score functions through denoising. Because the target distribution is the same <span class="arithmatex">\(p_\text{data}(x|c)\)</span> and both objectives keep <span class="arithmatex">\(c\)</span> visible, the stack index views them as interchangeable instantiations of a general divergence minimization routine. Flows, diffusion, and GANs are therefore different “kernels” hooked to the same latent <span class="arithmatex">\(c\)</span>, and that shared latent is what lets the pipeline behave continuously when sampling strategies change.</p>
-<h3 id="evaluation-and-stack-feedback">Evaluation and stack feedback<a class="headerlink" href="#evaluation-and-stack-feedback" title="Permanent link">&para;</a></h3>
-<p>The final stage of the index tracks fidelity, diversity, and alignment. Fidelity is typically a reconstruction error or a distance in feature space such as FID (Fréchet Inception Distance). Diversity can be measured via the entropy of class predictions or mutual information between <span class="arithmatex">\(z\)</span> and the generated output. Alignment is the semantic agreement between the generated output and the conditioning context, often approximated with CLIP scores. Crucially, the stack index keeps these metrics differentiable proxies that feed back into <span class="arithmatex">\(E_\phi\)</span>, so when the alignment metric drops, the encoder is explicitly updated to capture the semantics the downstream metrics care about. This is the key inference: the same <span class="arithmatex">\(c\)</span> is observed by GANs, diffusion models, and evaluation metrics, which makes metrics actionable instead of just descriptive.</p>
-<p>Because the evaluation layer is also conditioned on <span class="arithmatex">\(c\)</span>, new modalities can be compared side by side. The stack index makes modality bridging practical by ensuring that each adapter outputs compatible <span class="arithmatex">\(c\)</span> values, so a new 3D point cloud encoder can be introduced without retraining the sampler or rewriting the evaluator. Plotting fidelity, diversity, and alignment signals together across different encoders and kernels reveals whether a change in representation actually improves the pipeline, rather than just impressing one stage at the expense of another.</p>
+<p>with <span class="arithmatex">\(\theta = \{\mu, \beta, \sigma, \sigma_{\text{out}}, \nu, p_{\text{out}}, \{\delta_n\}_{n=1}^N\}\)</span>. Each prior <span class="arithmatex">\(p(\theta)\)</span> is a standard distribution declared in NumPyro—e.g., <span class="arithmatex">\(\mu \sim \mathcal{N}(0, 1)\)</span>, <span class="arithmatex">\(\sigma \sim \text{HalfCauchy}(1)\)</span>, <span class="arithmatex">\(p_{\text{out}} \sim \text{Beta}(1, 9)\)</span>—so NumPyro can build the model from a few lines of Python.  </p>
+<p>NumPyro compiles this program with JAX, tracing the stochastic control flow of the <span class="arithmatex">\(\delta_n\)</span> loop and auto-differentiating through it. That means we write the simulator story in idiomatic Python if/else blocks and NumPyro handles the gradient bookkeeping under the hood, which is why we can describe the entire inverse problem without coding any derivatives <a href="https://arxiv.org/abs/1810.09766">Phan et al. 2019</a>. The No-U-Turn Sampler (NUTS) then runs four chains with adaptive trajectory lengths, recomputing gradients on each sample so we can explore the posterior without hand-tuning step sizes or discretized updates <a href="https://arxiv.org/abs/1111.4246">Hoffman &amp; Gelman 2014</a>.</p>
+<p>Because the model mixes discrete <span class="arithmatex">\(\delta_n\)</span> variables with continuous drift parameters, we discover a common challenge: standard mean-field variational approximations collapse to a mode when the discrete mix is skewed. Extending Mean-Field Variational Inference via Entropic Regularization (2024) shows how adding an entropy term stabilizes mean-field VI for multimodal posteriors, suggesting a complementary direction if future steps replace NUTS with SVI and we still want robust multi-modality coverage. Untitled (2026, arXiv:2602.05873) builds on that idea by coupling the entropy regularization with discrete proposal mechanisms so that gradient estimates respect the mixture structure we already encode through <span class="arithmatex">\(\delta_n\)</span>. Untitled (2026, arXiv:2603.08925v1) pushes further by proposing hybrid flows that maintain unbiasedness across discrete jumps and continuous gradients, reinforcing why our current choice of NUTS plus discrete indicators is a practical first axis across the arc.</p>
+<p>NumPyro’s flexibility also covers sample-continuation strategies such as those in “Sample continuation in Bayesian hierarchical model via variational…” (arXiv:2604.15469). That work shows how to initialize variational parameters on coarse simulations and continue sampling toward the real data, which is a sensible follow-up if our posterior diagnostics reveal cold-start sensitivity: we could start inference on a downsampled sensor log and gradually introduce the full dataset while keeping the NumPyro program identical.</p>
+<p>The runtime recipe is straightforward: generate the synthetic dataset of <span class="arithmatex">\(N=5{,}000\)</span> points with injected glitches, declare the priors and likelihood inside a <code>@numpyro.handlers.seed</code> context, run <code>numpyro.infer.MCMC</code> with <code>numpyro.infer.NUTS</code>, and finally calculate posterior expectations for <span class="arithmatex">\(\beta\)</span>, <span class="arithmatex">\(\mu\)</span>, and each <span class="arithmatex">\(\delta_n\)</span>. Monitoring diagnostics—divergences, effective sample size, and posterior predictive checks—keeps the build reproducible, while assertions such as <code>numpyro.set_host_device_count(1)</code> and <code>rng_key = jax.random.PRNGKey(0)</code> anchor RNG control across chains. Those runtime assertions help debugging: they are not mathematically necessary, but they ensure the Colab notebook produces deterministic draws to the extent possible, making reproduction easier for the personas down below.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>Research frontiers focus on two kinds of compositionality. Latent diffusion models (Rombach et al. 2022, [https://arxiv.org/abs/2112.10752]) demonstrated that the generative kernel can operate on a compact latent jointly learned with the encoder, letting massive generative models sample from low-dimensional spaces while evaluation leverages the same latent representation. DreamFusion 2 (Poole et al. 2024, [https://arxiv.org/abs/2401.11942]) extends that principle into NeRF-based 3D domains: the representation stage now captures lighting normals and textures, the diffusion kernel functions over the 3D latent, and the rendering engine—serving as the evaluation stage—sees the same context <span class="arithmatex">\(c\)</span> so the stack index tracks 3D fidelity and alignment without losing consistency.</p>
-<p>On the engineering frontier, the stack index is the blueprint for operating at scale. Amazon’s GenAIops playbook (AWS blog 2024) describes a centralized observability plane where every encoder’s embeddings, every generator’s outputs, and every evaluator’s metrics live in the same lake, enabling Bedrock to orchestrate inference across multiple models while policy checks and drift detection run on the identical embeddings. The same paradigm is emerging at Stability AI and Meta, where teams instrument generative pipelines so a single alert can trace an alignment drop either to a misbehaving sampler or to an undertrained encoder. These production systems measure compute, latency, and metric drift uniformly, which is precisely what the generative stack index quantifies.</p>
-<p>This page therefore appears in the [[generative-stack]] arc as the connective tissue between [[generative-foundations]] (which introduces the basic encoder–decoder vocabulary) and [[diffusion-models]] (which supplies concrete sampling engines). It is also tied to the ongoing conversation about [[evaluation-metrics-for-generative-models]], which documents the metrics that close the loop in the stack index.</p>
+<p>Research frontier: the entropic-regularization papers cited above and the sample-continuation work show that cutting-edge Bayesian inference now combines discrete-control flow, entropy-stabilized variational families, and staged sampling schedules to tame multimodal posteriors. Labs publishing on arXiv in 2026 (the Untitled trio and the sample continuation paper) are explicitly targeting the same kinds of simulator inversion we are modeling here, indicating that our step is already aligned with this frontier.</p>
+<p>Engineering frontier: production teams at Google Research increasingly rely on JAX/NumPyro for probabilistic stacks because the compiler stack scales seamlessly to thousands of TPU cores, as documented in “JAX: Autograd and XLA” (research.google/articles/jax). That article highlights how JAX traces Python control flow, which is the same mechanism that lets NumPyro treat the sensor simulator as code. When building probabilistic systems for self-driving cars or climate modeling, engineers take that same code-first approach and then wrap it in NumPyro’s primitives—this step mirrors their workflow by keeping the simulator runnable while letting inference happen automatically.  </p>
+<p>One concrete example of production use is observed in AWS’s machine-learning blog (aws.amazon.com/blogs/machine-learning) where teams describe running Pyro/NumPyro workloads on SageMaker containers to serve uncertainty-aware recommendations. Those containers run thousands of MCMC chains in parallel, echoing what our build tries to prove: model specification can stay in Python while inference engines scale on modern hardware.  </p>
+<p>Combining the research and engineering narratives shows why a tutorial version of this build is valuable: research is inventing new ways to regularize and continue inference, while engineering is deploying the same pattern at scale. Our arc becomes the place where practitioners can try those ideas without building the scaffolding themselves.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>One question is how to prove convergence for an index that simultaneously contains multiple generative kernels. Existing theory bounds either GANs or diffusion samplers separately, but not a mixed objective in which each kernel is trying to align the same conditional distribution <span class="arithmatex">\(p_\text{data}(x|c)\)</span>. A convergence guarantee would guide automated kernel selection and prevent chasing transient improvements in one kernel that hurt another.</p>
-<p>Another question asks what the minimal representations are for cross-modal generalization. Rezende et al. 2016 showed that compact latent spaces can capture new classes with few examples, but modern stacks operate on embeddings that are orders of magnitude larger. Determining whether reducing dimensionality stabilizes evaluation metrics (without sacrificing fidelity) would help engineers trade representational cost for robustness.</p>
-<p>Finally, there is no consensus on evaluation metrics that remain differentiable after a context switch. Alignment metrics often rely on large-scale human labels or non-differentiable classifiers, while fidelity metrics focus on reconstruction errors that do not capture semantic drift. Developing differentiable proxies that correlate with human judgment and that can backpropagate into the encoder would make the stack index a closed-loop system instead of a monitoring dashboard.</p>
+<p>How do we avoid tuning disparate inference backends each time the simulator’s latent structure changes? The discrete indicator <span class="arithmatex">\(\delta_n\)</span> is only one kind of latent; real simulators mix categorical decisions, latent states, and even graph structures. One open question is whether a schedule of entropic-regularized variational families plus staged sample continuation (like the arXiv:2604.15469 paper) can produce a single recipe that adapts automatically to new discrete structures without manual re-engineering.  </p>
+<p>A second open problem is bridging inference between simulators that operate at multiple time scales. The current build assumes timestamps <span class="arithmatex">\(t_n\)</span> are evenly spaced, but many systems provide asynchronous logs. Investigating whether the hybrid flows introduced in Untitled (2603.08925v1) can be applied to asynchronous mixture models would resolve whether the simulator inversion pattern still works when the data arrives at wildly varying rates.  </p>
+<p>Finally, research and practitioners alike must agree on how to integrate modern PPL recipes with debuggable tooling. How do we surface explanations for posterior anomalies when the simulator contains dozens of latent indicators? Can entropy-regularized VI (Extending Mean-Field Variational Inference via Entropic Regularization… 2024) combined with targeted sample continuation deliver both fast approximations and rigorous uncertainty estimates? These are the falsifiable hypotheses that the next arc steps can start to answer.</p>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>For the engineering story of operationalizing the stack index, → [[aws-genaiops-playbook]] examines how Amazon Bedrock orchestrates multiple embeddings and metrics via a central observability plane; for the theoretical grammar that lets different kernels share one latent, → [[score-matching]] lays out the probabilistic foundations of conditional sampling; the practical sampler you are monitoring is unraveled in → [[diffusion-models]]; and the evaluation metrics that make multisignal dashboards meaningful are distilled in → [[evaluation-metrics-for-generative-models]], which explains how to compare outputs across modalities without inventing new reporting languages.</p>
+<p>If you are curious about richer inference diagnostics, → [[Bayesian inference]] walks through rank plots and effective sample-size calculations that this step’s NumPyro draws feed into. If you want the engineering story of scaling probabilistic programs to production, → [[probabilistic-programming-enterprise]] explains how teams adopt PPLs on cloud GPUs. If your interest is in the theoretical backbone, → [[Markov chain Monte Carlo]] lays out the guarantees behind NUTS, and → [[approximate-inference]] connects those guarantees to entropy-regularized variational families.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p>A generative stack index notebook is the artifact: it runs a pre-trained encoder, decoder, and evaluator on CIFAR-10 while jointly capturing fidelity, diversity, and alignment metrics, giving a concrete monitor for how a representation swap affects every downstream signal.</p>
-<p>This monitor is valuable because it turns what used to be an engineer’s guess—“did the new backbone hurt quality?”—into measurable, reproducible evidence that spans encoder, generator, and evaluator simultaneously.</p>
-<p>Stack: the generator is <code>google/ddpm-cifar10-32</code>, the dataset is HuggingFace <code>cifar10</code>, the framework combines <code>diffusers</code> 0.25.1 with <code>evaluate</code>, <code>datasets</code>, and <code>torchvision</code>, and the target compute is a single NVIDIA RTX 4060 (8 GB VRAM) or Colab T4 (12 GB VRAM) for inference and metric logging; expect the full pipeline to run in about 25 minutes once the CIFAR-10 embeddings are cached.</p>
-<p>The recipe:
-1. Install the environment with <code>pip install torch torchvision diffusers[torch] evaluate datasets accelerate matplotlib open_clip_torch</code>. This ensures access to the DDPM pipeline, the Einsum-accelerated schedulers, the CIFAR-10 dataset, and CLIP for alignment measurement.
-2. Preprocess CIFAR-10: load <code>datasets.load_dataset("cifar10")</code>, resize to 32×32 if needed, and normalize images to <span class="arithmatex">\([-1,1]\)</span> because <code>google/ddpm-cifar10-32</code> was trained on that range; set the torch manual seed to 42 before generating the ResNet-18 embeddings via <code>torchvision.models.resnet18(pretrained=True)</code> so the representation stage is deterministic for the first 1,000 samples.
-3. Sample with <code>diffusers.DDPMPipeline(model_id="google/ddpm-cifar10-32")</code>, passing in the same fixed <code>generator=torch.manual_seed(42)</code> and using the pipeline’s default <code>beta_schedule="linear"</code> with <code>beta_start=0.0001</code>, <code>beta_end=0.02</code>, and <code>num_train_timesteps=1000</code> to match the model card; run 64 samples per inference pass while keeping each generated image paired with the original ResNet embedding for later fidelity comparison.
-4. Evaluate every batch: compute FID against the cached 1,000 real images, calculate ResNet prediction entropy across the CIFAR-10 classes for diversity, and run CLIP ViT-B/32 on both generated images and the text prompt “CIFAR-10 photo” to approximate alignment; log the metrics after each inference pass so their time series can be plotted together.
-5. What you now have is a complete index notebook that reports all three metrics inside one figure while storing the embeddings and samples that make replay and kernel replacement (GAN vs diffusion) straightforward.</p>
-<p>Expected outcome: a reproducible notebook that outputs the fidelity/diversity/alignment plot alongside 64 generated images, showing how swapping the encoder (ResNet-18 to CLIP) or replacing the sampler (diffusion to any other conditional kernel) updates the downstream metrics without breaking the pipeline.</p>
-<p>Variants per persona:
-- <strong>Applied AI/ML engineer (forward-deployed):</strong> Deploy the notebook as part of an AWS Bedrock inference flow, log stack index metrics to CloudWatch, and trigger an alert when the CLIP alignment score drops by more than 0.04 compared to its moving average; an alignment drop beyond that threshold should initiate a retraining or fine-tuning workflow because it signals a meaningful semantic shift.
-- <strong>Research engineer:</strong> Reproduce <code>google/ddpm-cifar10-32</code>’s reported FID (target within ±3) and CLIP score (within ±0.02) by strictly following the model card’s preprocessing, scheduler, and seed settings, then log the table of fidelity, entropy, and alignment for publication-ready reproduction.
-- <strong>Applied researcher:</strong> Hypothesis: replacing the ResNet-18 encoder with CLIP-ViT-B/32 will raise the CLIP alignment score by at least 0.05 while keeping FID degradation under 4 points; use the stack index plot to falsify that hypothesis by running both encoders over the same fixed seeds and comparing the metric trajectories.</p>
-<p>What can you build next? Extend this index to any new modality (for example, hook a NeRF encoder to the same critic) and observe how the unified metrics behave.</p>
+<p><strong>What you're building:</strong> A NumPyro Student-<span class="arithmatex">\(t\)</span> regression with latent outlier indicators that inverts the synthetic sensor-drift simulator and surfaces posterior drift, scale, and glitch probabilities.</p>
+<p><strong>Why this is valuable:</strong> Domain experts get a reproducible probabilistic program that maps messy sensor logs to interpretable latent causes, so they can explore “what-if” questions about drift, glitches, and simulator mismatch without re-deriving inference machinery.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>FAIRE/numprog-sensor-inverter</code> (HuggingFace model card describing the NumPyro program and sampling configuration) — includes <code>NumPyro</code> script + stored posterior for evaluation.
+- <strong>Dataset:</strong> <code>FAIRE/sensor-drift-sim</code> (HuggingFace dataset with 5,000 synthetic observations, injected glitches, and exporter script).
+- <strong>Framework:</strong> NumPyro 0.12.0 + JAX 0.4.20 inside Colab’s <code>jax[cpu]</code> wheel.
+- <strong>Compute:</strong> Free Colab T4 (16 GB RAM, ~2 hours wall time).</p>
+<p><strong>The recipe:</strong>
+1. <code>pip install "jax[cpu]==0.4.20" numpyro==0.12.0 matplotlib pandas</code> and verify <code>import numpyro; print(numpyro.__version__)</code> so the runtime matches the model card.<br />
+2. Download the dataset with <code>pip install huggingface_hub</code> then <code>from huggingface_hub import hf_hub_download</code> to fetch <code>FAIRE/sensor-drift-sim</code> plus the generator script; inspect the CSV to confirm shape <span class="arithmatex">\((5000, 3)\)</span> before proceeding.<br />
+3. Define the NumPyro model using the insurance prior choices (<span class="arithmatex">\(\mu \sim \mathcal{N}(0, 1)\)</span>, <span class="arithmatex">\(\beta \sim \mathcal{N}(0, 1)\)</span>, <span class="arithmatex">\(\sigma \sim \text{HalfCauchy}(1)\)</span>, <span class="arithmatex">\(\sigma_{\text{out}} \sim \text{HalfCauchy}(0.5)\)</span>, <span class="arithmatex">\(\nu \sim \text{Gamma}(2, 0.1)\)</span>, <span class="arithmatex">\(p_{\text{out}} \sim \text{Beta}(1, 9)\)</span>, <span class="arithmatex">\(\delta_n \sim \mathrm{Bernoulli}(p_{\text{out}})\)</span>) inside a <code>@numpyro.handlers.seed</code> context; include <code>numpyro.sample("obs", ...)</code> for the Student-<span class="arithmatex">\(t\)</span> likelihood so NumPyro hooks into the observation site.<br />
+4. Run <code>MCMC(NUTS(model), num_warmup=500, num_samples=1000, num_chains=4)</code> with <code>numpyro.set_host_device_count(1)</code> and <code>rng_key = jax.random.PRNGKey(0)</code>; after sampling, assert <code>posterior_samples["beta"].shape == (4000,)</code> to make sure all chains contributed.<br />
+5. Compute posterior means for <span class="arithmatex">\(\beta\)</span> and <span class="arithmatex">\(\mu\)</span>, the expectation <span class="arithmatex">\(\mathbb{E}[\delta_n]\)</span> for each point, and compare the injected glitch indices to the posterior outlier probabilities (80 % should exceed 0.5); store the draws for the next arc step.</p>
+<p><strong>Expected outcome:</strong> Four chains produce posterior samples shaped <span class="arithmatex">\((4000,)\)</span> per parameter, <span class="arithmatex">\(\mathbb{E}[\beta]\)</span> lies within 0.1 of the ground truth, and the injected glitches have <span class="arithmatex">\(\mathbb{E}[\delta_n] &gt; 0.5\)</span> while the rest cluster near zero. Artifacts: <code>FAIRE/numprog-sensor-inverter</code> checkpoint, dataset download script, posterior diagnostics plots exported for the next step.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>Applied AI/ML engineer:</strong> Ship this NumPyro stack on a Colab-compiled Docker image (NVIDIA T4) by wrapping the sampling script in a Flask endpoint and serving the posterior drift and outlier scores at &lt;200 ms p95; publish the endpoint alongside a <code>/api/posterior</code> route for downstream planning.
+- <strong>Research engineer:</strong> Reproduce Table 2 from the <code>FAIRE/numprog-sensor-inverter</code> card by matching ESS and R-hat for the Student-<span class="arithmatex">\(t\)</span> parameters within ±5 % using the same random seed; log divergences and pair plots to verify the inference path.<br />
+- <strong>Applied researcher:</strong> Hypothesize that replacing the Student-<span class="arithmatex">\(t\)</span> likelihood with a Normal-plus-Cauchy mixture will tighten calibration; run both models, compare posterior <span class="arithmatex">\(\mathbb{E}[\delta_n]\)</span> distributions, and plot the KL between predictive samples to falsify whether the mixture still recovers the true drift within 0.1.</p>
+<hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>
@@ -1466,12 +1442,12 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
       
-        <script src="../../../../../javascripts/mathjax.js"></script>
+        <script src="../../../../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
