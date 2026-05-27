@@ -5,109 +5,93 @@ description: Live coverage and quality metrics for every wiki page
 
 # Generation Status
 
-> Last updated: **2026-05-26 12:59 UTC** · 118 total runs
+> Last updated: **2026-05-27 08:13 UTC** · 106 total runs
 
 ## Summary
 
 | Metric | Value |
 |---|---|
-| Pages generated | **87** |
-| Approved (conf ≥ 0.8) | **28** (32%) |
+| Pages generated | **71** |
+| Approved (conf ≥ 0.8) | **64** (90%) |
 | With MVB | **0** |
-| Avg reviewer confidence | **0.71** |
-| Committed to git | **28** |
+| Avg reviewer confidence | **0.77** |
+| Committed to git | **63** |
 
 ## Pages
 
 | Track | Topic | Type | Status | Conf | MVB | Rev | Committed |
 |---|---|---|---|---|---|---|---|
-| 01-ai | agent-architectures | core-concept | ❌ error | 0.85 | — | 2 | — |
-| 01-ai | classical-planning | core-concept | ❌ error | 0.85 | — | 2 | — |
-| 01-ai | constraint-satisfaction | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 02-generative-modeling | consistency-models | core-concept | ❌ error | 0.77 | — | 2 | — |
-| 02-generative-modeling | diffusion-models | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 02-generative-modeling | energy-based-models | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 02-generative-modeling | flow-matching | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 02-generative-modeling | generative-adversarial-networks | core-concept | ✅ approved | 0.85 | — | 0 | ✓ |
-| 03-representation-learning | bootstrapping-methods | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
-| 03-representation-learning | contrastive-learning | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 04-neural-networks-dl | backpropagation | core-concept | ✅ approved | 0.84 | — | 2 | ✓ |
-| 04-neural-networks-dl | bpe-tokenizer | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 04-neural-networks-dl | cnn | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 04-neural-networks-dl | gpt2-pretrain | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 04-neural-networks-dl | mlp-mnist | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 04-neural-networks-dl | rnn-shakespeare | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 04-neural-networks-dl | scalar-autograd | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 04-neural-networks-dl | scaling-laws | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 05-statistical-probabilistic-ml | bayesian-inference | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
-| 05-statistical-probabilistic-ml | bayesian-nn | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 05-statistical-probabilistic-ml | directed-graphical-models | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 05-statistical-probabilistic-ml | distribution-shift | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 05-statistical-probabilistic-ml | em | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
-| 05-statistical-probabilistic-ml | gaussian-processes | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 06-reinforcement-learning | actor-critic | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 06-reinforcement-learning | distributional-rl | core-concept | ❌ error | 0.82 | — | 2 | — |
-| 06-reinforcement-learning | dqn | core-concept | ❌ error | 0.71 | — | 2 | — |
-| 06-reinforcement-learning | dynamic-programming | core-concept | ❌ error | 0.85 | — | 2 | — |
-| 06-reinforcement-learning | rlvr-verifiable | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | chain-of-thought | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
-| 07-attention-memory-reasoning | decoder-transformer | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | dpo-alternative | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | efficient-attention | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 07-attention-memory-reasoning | positional-encoding | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | rlhf-reward-ppo | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | scaled-transformer | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | sft-instruction | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 07-attention-memory-reasoning | single-head-attention | arc-step | ✅ approved | 1.00 | — | 0 | ✓ |
-| 07-attention-memory-reasoning | transformer-block | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | backdoor-adjustment | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | causal-discovery | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | causal-rl | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | counterfactual-twin | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | counterfactuals | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
-| 08-causal-statistical-inference | dag-dsep | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | disentanglement | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 08-causal-statistical-inference | do-calculus | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 08-causal-statistical-inference | do-calculus-query | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 08-causal-statistical-inference | estimation | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 08-causal-statistical-inference | scm-equations | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 09-algorithms-systems-ai | ai-hardware | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 09-algorithms-systems-ai | classical-algorithms | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 09-algorithms-systems-ai | custom-kernels | core-concept | ❌ error | 0.76 | — | 2 | — |
-| 09-algorithms-systems-ai | data-parallelism | core-concept | ❌ error | 0.85 | — | 2 | — |
-| 09-algorithms-systems-ai | gpu-architecture | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 09-algorithms-systems-ai | kv-cache-impl | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 09-algorithms-systems-ai | paged-attention-lm | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 09-algorithms-systems-ai | speculative-decoding-lm | arc-step | ❌ error | 0.70 | — | 2 | — |
-| 10-complexity-cognition | animal-intelligence | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 10-complexity-cognition | attention-cognition | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 10-complexity-cognition | circuit-complexity | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
-| 10-complexity-cognition | cognitive-architectures | core-concept | ✅ approved | 0.75 | — | 2 | ✓ |
-| 10-complexity-cognition | complex-systems | core-concept | ❌ error | 0.83 | — | 2 | — |
-| 10-complexity-cognition | complexity-classes | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 10-complexity-cognition | emergent-capabilities | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 11-robotics-embodied-ai | control-theory | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 11-robotics-embodied-ai | foundation-models-robotics | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 12-physics-scientific-ai | climate-ai | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 12-physics-scientific-ai | deeponet | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 12-physics-scientific-ai | equivariant-networks | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 12-physics-scientific-ai | fno | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 12-physics-scientific-ai | geometric-dl | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 13-graph-relational-ai | combinatorial-opt | core-concept | ❌ error | 0.71 | — | 2 | — |
-| 13-graph-relational-ai | equivariant-gnn | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 13-graph-relational-ai | geometric-unification | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 14-biology-life-sciences | admet | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 14-biology-life-sciences | cell-simulation | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 14-biology-life-sciences | dna-sequence-models | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 14-biology-life-sciences | drug-target | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 14-biology-life-sciences | epigenomics | core-concept | ✅ approved | 0.82 | — | 0 | ✓ |
-| 14-biology-life-sciences | gene-networks | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 15-ml-theory-foundations | bias-variance | core-concept | ✅ approved | 0.70 | — | 2 | ✓ |
-| 15-ml-theory-foundations | concentration | core-concept | ✅ approved | 0.85 | — | 2 | ✓ |
-| 15-ml-theory-foundations | convex-optimization | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
-| 15-ml-theory-foundations | double-descent | core-concept | ❌ error | 0.70 | — | 2 | — |
-| 15-ml-theory-foundations | entropy | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
-| 15-ml-theory-foundations | generalization-deep | core-concept | ⚠️ flagged | 0.50 | — | 2 | — |
+| 01-ai | alignment-safety | core-concept | ✅ approved | 0.75 | — | 0 | ✓ |
+| 01-ai | chain-of-thought | core-concept | ✅ approved | 0.76 | — | 2 | ✓ |
+| 01-ai | mechanistic-interpretability | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 01-ai | mixture-of-experts | core-concept | ✅ approved | 0.76 | — | 0 | ✓ |
+| 01-ai | reward-modeling | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 01-ai | rlhf | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
+| 01-ai | transformer | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 02-generative-modeling | consistency-models | core-concept | ✅ approved | 0.83 | — | 2 | ✓ |
+| 02-generative-modeling | diffusion-models | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 02-generative-modeling | flow-matching | core-concept | ✅ approved | 0.71 | — | 2 | ✓ |
+| 02-generative-modeling | generative-adversarial-networks | core-concept | ✅ approved | 0.84 | — | 2 | ✓ |
+| 02-generative-modeling | latent-diffusion-models | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 02-generative-modeling | score-matching | core-concept | ✅ approved | 0.86 | — | 2 | ✓ |
+| 02-generative-modeling | variational-autoencoders | core-concept | ✅ approved | 0.82 | — | 0 | ✓ |
+| 03-representation-learning | contrastive-learning | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 03-representation-learning | jepa | core-concept | ✅ approved | 0.72 | — | 0 | ✓ |
+| 03-representation-learning | masked-autoencoders | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 03-representation-learning | representation-learning | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 03-representation-learning | self-supervised-learning | core-concept | ✅ approved | 0.77 | — | 0 | ✓ |
+| 03-representation-learning | simclr | core-concept | ✅ approved | 0.82 | — | 0 | ✓ |
+| 04-neural-networks-deep-learning | backpropagation | core-concept | ✅ approved | 0.76 | — | 2 | ✓ |
+| 04-neural-networks-deep-learning | batch-normalization | core-concept | ✅ approved | 0.82 | — | 0 | ✓ |
+| 04-neural-networks-deep-learning | optimization | core-concept | ✅ approved | 0.71 | — | 1 | ✓ |
+| 04-neural-networks-deep-learning | regularization | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 04-neural-networks-deep-learning | residual-connections | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 04-neural-networks-deep-learning | scaling-laws | core-concept | ✅ approved | 0.83 | — | 2 | ✓ |
+| 05-statistical-probabilistic-ml | bayesian-inference | core-concept | ❌ error | 0.81 | — | 2 | ✓ |
+| 05-statistical-probabilistic-ml | bayesian-neural-networks | core-concept | ❌ error | 0.71 | — | 2 | ✓ |
+| 05-statistical-probabilistic-ml | em-algorithm | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 05-statistical-probabilistic-ml | expectation-maximization | core-concept | ✅ approved | 0.86 | — | 0 | ✓ |
+| 05-statistical-probabilistic-ml | gaussian-processes | core-concept | ✅ approved | 0.83 | — | 2 | ✓ |
+| 05-statistical-probabilistic-ml | mcmc | core-concept | ✅ approved | 0.77 | — | 0 | ✓ |
+| 05-statistical-probabilistic-ml | uncertainty-quantification | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 05-statistical-probabilistic-ml | variational-inference | core-concept | ⚠️ flagged | 0.66 | — | 2 | — |
+| 06-reinforcement-learning | actor-critic | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 06-reinforcement-learning | mdp | core-concept | ✅ approved | 0.69 | — | 0 | — |
+| 06-reinforcement-learning | model-based-reinforcement-learning | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 06-reinforcement-learning | policy-gradient | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 06-reinforcement-learning | policy-gradients | core-concept | ✅ approved | 0.86 | — | 0 | ✓ |
+| 06-reinforcement-learning | ppo | core-concept | ✅ approved | 0.78 | — | 0 | ✓ |
+| 06-reinforcement-learning | q-learning | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 06-reinforcement-learning | world-models | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 07-attention-memory-reasoning-continual | attention | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 07-attention-memory-reasoning-continual | in-context-learning | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 07-attention-memory-reasoning-continual | long-context | core-concept | ✅ approved | 0.75 | — | 0 | ✓ |
+| 07-attention-memory-reasoning-continual | multi-head-attention | core-concept | ✅ approved | 0.82 | — | 0 | ✓ |
+| 07-attention-memory-reasoning-continual | positional-encoding | core-concept | ✅ approved | 0.81 | — | 2 | ✓ |
+| 07-attention-memory-reasoning-continual | retrieval-augmented-generation | core-concept | ✅ approved | 0.84 | — | 0 | ✓ |
+| 08-causal-statistical-inference | causal-discovery | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 08-causal-statistical-inference | causal-representation-learning | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 08-causal-statistical-inference | counterfactuals | core-concept | ✅ approved | 0.77 | — | 0 | ✓ |
+| 08-causal-statistical-inference | do-calculus | core-concept | ⚠️ flagged | 0.63 | — | 2 | — |
+| 08-causal-statistical-inference | instrumental-variables | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 08-causal-statistical-inference | mediation-analysis | core-concept | ✅ approved | 0.76 | — | 0 | ✓ |
+| 08-causal-statistical-inference | policy-evaluation | core-concept | ⚠️ flagged | 0.60 | — | 2 | — |
+| 08-causal-statistical-inference | structural-causal-models | core-concept | ✅ approved | 0.71 | — | 2 | ✓ |
+| 09-algorithms-systems-for-ai | data-parallelism | core-concept | ⚠️ flagged | 0.61 | — | 2 | — |
+| 09-algorithms-systems-for-ai | distributed-training | core-concept | ✅ approved | 0.68 | — | 1 | — |
+| 09-algorithms-systems-for-ai | flash-attention | core-concept | ✅ approved | 0.70 | — | 0 | ✓ |
+| 09-algorithms-systems-for-ai | inference-optimization | core-concept | ✅ approved | 0.74 | — | 0 | ✓ |
+| 09-algorithms-systems-for-ai | kv-cache | core-concept | ✅ approved | 0.73 | — | 0 | ✓ |
+| 09-algorithms-systems-for-ai | model-parallelism | core-concept | ✅ approved | 0.67 | — | 0 | — |
+| 09-algorithms-systems-for-ai | pipeline-parallelism | core-concept | ❌ error | 0.81 | — | 2 | ✓ |
+| 09-algorithms-systems-for-ai | quantization | core-concept | ✅ approved | 0.88 | — | 2 | — |
+| 09-algorithms-systems-for-ai | quantization-aware-training | core-concept | ✅ approved | 0.72 | — | 2 | ✓ |
+| 09-algorithms-systems-for-ai | tensor-parallelism | core-concept | ✅ approved | 0.90 | — | 2 | ✓ |
+| 10-complexity-cognition-natural-intelligence | compositionality | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 10-complexity-cognition-natural-intelligence | double-descent | core-concept | ✅ approved | 0.81 | — | 0 | ✓ |
+| 10-complexity-cognition-natural-intelligence | emergence | core-concept | ✅ approved | 0.79 | — | 1 | ✓ |
+| 10-complexity-cognition-natural-intelligence | generalization | core-concept | ✅ approved | 0.79 | — | 0 | ✓ |
+| 10-complexity-cognition-natural-intelligence | scaling-collapse | core-concept | ✅ approved | 0.77 | — | 0 | ✓ |
 
 ---
 

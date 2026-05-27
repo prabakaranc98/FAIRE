@@ -2246,3 +2246,1268 @@ No runs recorded yet. Run the agent to populate this log.
 - **Writer model:** google/gemini-3.1-flash-lite
 
 ---
+
+### 2026-05-26 20:03 UTC — generative-adversarial-networks
+
+❌ **error** · conf=0.72
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 20:04 UTC — diffusion-models
+
+⚠️ **flagged** · conf=0.25
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 20:05 UTC — flow-matching
+
+❌ **error** · conf=0.77
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 20:05 UTC — score-matching
+
+❌ **error** · conf=0.77
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 20:10 UTC — variational-autoencoders
+
+⚠️ **flagged** · conf=0.65
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 20:17 UTC — diffusion-models
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 20:17 UTC — variational-autoencoders
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:20 UTC — mechanistic-interpretability
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:23 UTC — flow-matching
+
+❌ **error** · conf=0.74
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:23 UTC — do-calculus
+
+⚠️ **flagged** · conf=0.20
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:24 UTC — generative-adversarial-networks
+
+✅ **approved** · conf=0.84 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:25 UTC — score-matching
+
+❌ **error** · conf=0.72
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:26 UTC — transformer
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-26 22:29 UTC — structural-causal-models
+
+❌ **error** · conf=0.79
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 01:17 UTC — score-matching
+
+✅ **approved** · conf=0.86 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 01:17 UTC — flow-matching
+
+✅ **approved** · conf=0.71 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 01:18 UTC — do-calculus
+
+❌ **error** · conf=0.78 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 01:18 UTC — structural-causal-models
+
+✅ **approved** · conf=0.71 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 05:06 UTC — gradient-descent
+
+✅ **approved** · conf=0.95
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** mlx-community/gemma-3-4b-it-qat-4bit
+
+---
+
+### 2026-05-27 05:11 UTC — do-calculus
+
+✅ **approved** · conf=0.90 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** mlx-community/gemma-3-4b-it-qat-4bit
+
+---
+
+### 2026-05-27 05:14 UTC — backpropagation
+
+✅ **approved** · conf=0.90 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** mlx-community/gemma-3-4b-it-qat-4bit
+
+---
+
+### 2026-05-27 05:29 UTC — bayesian-inference
+
+✅ **approved** · conf=0.95 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** mlx-community/gemma-3-4b-it-qat-4bit
+
+---
+
+### 2026-05-27 05:31 UTC — contrastive-learning
+
+✅ **approved** · conf=0.90 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** mlx-community/gemma-3-4b-it-qat-4bit
+
+---
+
+### 2026-05-27 05:34 UTC — flash-attention
+
+✅ **approved** · conf=0.95 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** mlx-community/gemma-3-4b-it-qat-4bit
+
+---
+
+### 2026-05-27 06:14 UTC — attention
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 07-attention-memory-reasoning-continual
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:14 UTC — batch-normalization
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:15 UTC — alignment-safety
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:17 UTC — causal-discovery
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:17 UTC — compositionality
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 10-complexity-cognition-natural-intelligence
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:19 UTC — actor-critic
+
+❌ **error** · conf=0.76 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:20 UTC — chain-of-thought
+
+✅ **approved** · conf=0.76 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:23 UTC — double-descent
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 10-complexity-cognition-natural-intelligence
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:23 UTC — consistency-models
+
+✅ **approved** · conf=0.83 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:24 UTC — counterfactuals
+
+❌ **error** · conf=0.80 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:24 UTC — distributed-training
+
+✅ **approved** · conf=0.68
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 1
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:25 UTC — em-algorithm
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:26 UTC — generalization
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 10-complexity-cognition-natural-intelligence
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:26 UTC — emergence
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 10-complexity-cognition-natural-intelligence
+- **Page type:** core-concept
+- **Revisions:** 1
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:27 UTC — in-context-learning
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 07-attention-memory-reasoning-continual
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:28 UTC — inference-optimization
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:28 UTC — instrumental-variables
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:29 UTC — jepa
+
+✅ **approved** · conf=0.72 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:30 UTC — gaussian-processes
+
+✅ **approved** · conf=0.83 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:30 UTC — kv-cache
+
+✅ **approved** · conf=0.73 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:31 UTC — long-context
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 07-attention-memory-reasoning-continual
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:32 UTC — masked-autoencoders
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:33 UTC — mcmc
+
+✅ **approved** · conf=0.77 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:33 UTC — mdp
+
+✅ **approved** · conf=0.69
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:34 UTC — latent-diffusion-models
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 02-generative-modeling
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:34 UTC — mediation-analysis
+
+✅ **approved** · conf=0.76 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:35 UTC — model-parallelism
+
+✅ **approved** · conf=0.67
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:36 UTC — multi-head-attention
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 07-attention-memory-reasoning-continual
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:37 UTC — policy-gradient
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:38 UTC — mixture-of-experts
+
+❌ **error** · conf=0.81 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:39 UTC — ppo
+
+✅ **approved** · conf=0.78 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:40 UTC — q-learning
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:41 UTC — optimization
+
+❌ **error** · conf=0.72 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:42 UTC — regularization
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:43 UTC — positional-encoding
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 07-attention-memory-reasoning-continual
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:44 UTC — residual-connections
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:44 UTC — rlhf
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:44 UTC — retrieval-augmented-generation
+
+✅ **approved** · conf=0.84 · git committed
+
+- **Track:** 07-attention-memory-reasoning-continual
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:45 UTC — quantization
+
+❌ **error** · conf=0.71 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:46 UTC — scaling-collapse
+
+✅ **approved** · conf=0.77 · git committed
+
+- **Track:** 10-complexity-cognition-natural-intelligence
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:47 UTC — simclr
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:48 UTC — uncertainty-quantification
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:49 UTC — self-supervised-learning
+
+⚠️ **flagged** · conf=0.61
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:50 UTC — scaling-laws
+
+✅ **approved** · conf=0.83 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:50 UTC — world-models
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 06:53 UTC — variational-inference
+
+❌ **error** · conf=0.72 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:20 UTC — causal-representation-learning
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:27 UTC — expectation-maximization
+
+✅ **approved** · conf=0.86 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:49 UTC — mixture-of-experts
+
+✅ **approved** · conf=0.76 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:49 UTC — actor-critic
+
+✅ **approved** · conf=0.80 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:50 UTC — do-calculus
+
+✅ **approved** · conf=0.63
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:51 UTC — counterfactuals
+
+✅ **approved** · conf=0.80 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 1
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:52 UTC — quantization
+
+✅ **approved** · conf=0.69
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:52 UTC — actor-critic
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:52 UTC — self-supervised-learning
+
+✅ **approved** · conf=0.79
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:52 UTC — counterfactuals
+
+✅ **approved** · conf=0.77 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:52 UTC — optimization
+
+✅ **approved** · conf=0.72 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:53 UTC — variational-inference
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:54 UTC — self-supervised-learning
+
+✅ **approved** · conf=0.77 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:55 UTC — do-calculus
+
+⚠️ **flagged** · conf=0.63
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:55 UTC — optimization
+
+✅ **approved** · conf=0.71 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 1
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:57 UTC — backpropagation
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 1
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:58 UTC — contrastive-learning
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:58 UTC — quantization
+
+✅ **approved** · conf=0.88
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:58 UTC — bayesian-inference
+
+✅ **approved** · conf=0.82 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:58 UTC — variational-inference
+
+⚠️ **flagged** · conf=0.66
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:59 UTC — bayesian-neural-networks
+
+❌ **error** · conf=0.74 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 07:59 UTC — bayesian-inference
+
+❌ **error** · conf=0.81 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:00 UTC — contrastive-learning
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:00 UTC — flash-attention
+
+✅ **approved** · conf=0.77 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:01 UTC — data-parallelism
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:02 UTC — backpropagation
+
+✅ **approved** · conf=0.76 · git committed
+
+- **Track:** 04-neural-networks-deep-learning
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:02 UTC — model-based-reinforcement-learning
+
+✅ **approved** · conf=0.79 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:02 UTC — pipeline-parallelism
+
+✅ **approved** · conf=0.75 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:02 UTC — flash-attention
+
+✅ **approved** · conf=0.70 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:03 UTC — policy-evaluation
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:03 UTC — model-based-reinforcement-learning
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:04 UTC — data-parallelism
+
+⚠️ **flagged** · conf=0.61
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:04 UTC — policy-gradients
+
+✅ **approved** · conf=0.77 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:04 UTC — quantization-aware-training
+
+✅ **approved** · conf=0.85 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:05 UTC — bayesian-neural-networks
+
+❌ **error** · conf=0.71 · git committed
+
+- **Track:** 05-statistical-probabilistic-ml
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:05 UTC — representation-learning
+
+✅ **approved** · conf=0.81 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:06 UTC — policy-gradients
+
+✅ **approved** · conf=0.86 · git committed
+
+- **Track:** 06-reinforcement-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:06 UTC — reward-modeling
+
+✅ **approved** · conf=0.73 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:08 UTC — policy-evaluation
+
+⚠️ **flagged** · conf=0.60
+
+- **Track:** 08-causal-statistical-inference
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:08 UTC — representation-learning
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 03-representation-learning
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:09 UTC — pipeline-parallelism
+
+❌ **error** · conf=0.81 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:10 UTC — reward-modeling
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 01-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:11 UTC — tensor-parallelism
+
+✅ **approved** · conf=0.74 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 0
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:12 UTC — tensor-parallelism
+
+✅ **approved** · conf=0.90 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
+
+### 2026-05-27 08:13 UTC — quantization-aware-training
+
+✅ **approved** · conf=0.72 · git committed
+
+- **Track:** 09-algorithms-systems-for-ai
+- **Page type:** core-concept
+- **Revisions:** 2
+- **Writer model:** openai/gpt-5.1-codex-mini
+
+---
