@@ -5,13 +5,16 @@
 > Checked items are archived automatically on the next scheduler run.
 
 ## Critical Fixes
-- [ ] probabilistic-programming | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Previous attempt errored (conf=0.70) — retry with current prompts -->
+- [x] probabilistic-programming | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Previous attempt errored (conf=0.70) — retry with current prompts -->
 
 ## New Content
-- [ ] automatic-differentiation | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
-- [ ] constrained-learning | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
+- [x] automatic-differentiation | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
+- [ ] collective-communication | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
+- [x] constrained-learning | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 - [ ] convex-optimization | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 - [ ] curriculum-learning | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
+- [ ] curriculum-resampling | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
+- [ ] gradient-bucketing | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 - [ ] long-context-models | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 - [ ] policy-gradient-theory | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 - [ ] reinforcement-learning | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
@@ -19,32 +22,14 @@
 - [ ] tensor-cores | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 - [ ] transformers | 04-neural-networks-deep-learning | core-concept | applied  <!-- Stub page — not yet generated [reduced budget: cheaper model] -->
 
-## Arc Index
-- [ ] generative-stack-index | 02-generative-modeling | arc-index | frontier | arc:generative-stack dest:"5 trained generative models with comparable FID, ending in a distilled consistency model" total:5
-
-## Arc Steps
-- [ ] diffusion-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:1 ch:1 ch_title:"step 1" prev: next:score-matching prev_artifact:"" artifact:"diffusion-models build at step 1" total:5
-- [ ] score-matching | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:2 ch:1 ch_title:"step 2" prev:diffusion-models next:latent-diffusion-models prev_artifact:"(prior step artifact)" artifact:"score-matching build at step 2" total:5
-- [ ] latent-diffusion-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:3 ch:2 ch_title:"step 3" prev:score-matching next:flow-matching prev_artifact:"(prior step artifact)" artifact:"latent-diffusion-models build at step 3" total:5
-- [ ] flow-matching | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:4 ch:2 ch_title:"step 4" prev:latent-diffusion-models next:consistency-models prev_artifact:"(prior step artifact)" artifact:"flow-matching build at step 4" total:5
-- [ ] consistency-models | 02-generative-modeling | arc-step | applied | arc:generative-stack pos:5 ch:3 ch_title:"step 5" prev:flow-matching next: prev_artifact:"(prior step artifact)" artifact:"consistency-models build at step 5" total:5
-
-## Arc Index
-- [ ] serve-an-llm-efficiently-index | 09-algorithms-systems-for-ai | arc-index | frontier | arc:serve-an-llm-efficiently dest:"a quantized 7B model served behind an endpoint with measured p95 latency under 100ms" total:5
-
-## Arc Steps
-- [ ] flash-attention | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:1 ch:1 ch_title:"step 1" prev: next:kv-cache prev_artifact:"" artifact:"flash-attention build at step 1" total:5
-- [ ] kv-cache | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:2 ch:1 ch_title:"step 2" prev:flash-attention next:kv-cache-management prev_artifact:"(prior step artifact)" artifact:"kv-cache build at step 2" total:5
-- [ ] kv-cache-management | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:3 ch:2 ch_title:"step 3" prev:kv-cache next:quantization prev_artifact:"(prior step artifact)" artifact:"kv-cache-management build at step 3" total:5
-- [ ] quantization | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:4 ch:2 ch_title:"step 4" prev:kv-cache-management next:llm-inference prev_artifact:"(prior step artifact)" artifact:"quantization build at step 4" total:5
-- [ ] llm-inference | 09-algorithms-systems-for-ai | arc-step | applied | arc:serve-an-llm-efficiently pos:5 ch:3 ch_title:"step 5" prev:quantization next: prev_artifact:"(prior step artifact)" artifact:"llm-inference build at step 5" total:5
-
-## Arc Index
-- [ ] training-fundamentals-index | 04-neural-networks-deep-learning | arc-index | frontier | arc:training-fundamentals dest:"a trained-from-scratch convolutional network with documented loss curves, normalization, and a learned schedule" total:5
-
-## Arc Steps
-- [ ] backpropagation | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:1 ch:1 ch_title:"step 1" prev: next:gradient-descent prev_artifact:"" artifact:"backpropagation build at step 1" total:5
-- [ ] gradient-descent | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:2 ch:1 ch_title:"step 2" prev:backpropagation next:adaptive-optimizers prev_artifact:"(prior step artifact)" artifact:"gradient-descent build at step 2" total:5
-- [ ] adaptive-optimizers | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:3 ch:2 ch_title:"step 3" prev:gradient-descent next:regularization prev_artifact:"(prior step artifact)" artifact:"adaptive-optimizers build at step 3" total:5
-- [ ] regularization | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:4 ch:2 ch_title:"step 4" prev:adaptive-optimizers next:batch-normalization prev_artifact:"(prior step artifact)" artifact:"regularization build at step 4" total:5
-- [ ] batch-normalization | 04-neural-networks-deep-learning | arc-step | applied | arc:training-fundamentals pos:5 ch:3 ch_title:"step 5" prev:regularization next: prev_artifact:"(prior step artifact)" artifact:"batch-normalization build at step 5" total:5
+## Primer Improvements
+- [ ] actor-critic | 06-reinforcement-learning | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] alignment-safety | 01-ai | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] attention | 07-attention-memory-reasoning-continual | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] attention-mechanisms | 09-algorithms-systems-for-ai | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] backpropagation | 04-neural-networks-deep-learning | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] batch-normalization | 04-neural-networks-deep-learning | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] bayesian-inference | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] bayesian-neural-networks | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] bayesian-optimization | 05-statistical-probabilistic-ml | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->
+- [ ] causal-discovery | 08-causal-statistical-inference | core-concept | applied  <!-- Primer-quality improve pass (primer=unscored) -->

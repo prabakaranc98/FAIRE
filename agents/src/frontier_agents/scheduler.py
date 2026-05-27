@@ -436,6 +436,21 @@ def full_cycle_job(dry_run: bool = False) -> dict:
         except Exception:
             pass  # never break the cycle on cosmetic regeneration
 
+    # Step 4.6: Queue primer-quality improve passes. Pages with primer-quality
+    # score < 0.85 (or unscored, which means generated before critic-primer-quality
+    # existed) get appended to current.md as `## Primer Improvements`. Capped at
+    # 10 per cycle to avoid flooding the queue. Over a few cycles the entire
+    # corpus is lifted to primer grade.
+    if not dry_run:
+        try:
+            import subprocess as _sp
+            from pathlib import Path as _P
+            repo_root = _P(__file__).resolve().parent.parent.parent.parent
+            _sp.run(["python3", "scripts/queue_primer_improvements.py"],
+                    cwd=repo_root, capture_output=True, text=True, timeout=30)
+        except Exception:
+            pass  # cosmetic; never block the cycle
+
     # Step 5: Retrospective — backlog agent closes the loop. Aggregates patterns
     # from this cycle's runs, runs an LLM scrum-style retrospective, auto-applies
     # safe proposals (stub seeds), writes everything to docs/system/backlog.md
