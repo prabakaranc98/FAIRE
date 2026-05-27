@@ -6,17 +6,17 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Run FAIRE entirely on an Apple Silicon Mac (M4 Pro recommended) with no cloud spend.">
+        <meta name="description" content="Honest write-ups of what the FAIRE system discovered each session — what worked, what didn't, what's been re-thought. Human-curated, session-by-session. Distinct from the auto-generated Agent Changelog (which tracks each page run).">
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/system/local-mode/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/system/learnings-log/">
       
       
-        <link rel="prev" href="../structure-v2/">
+        <link rel="prev" href="../local-mode/">
       
       
-        <link rel="next" href="../learnings-log/">
+        <link rel="next" href="../status/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Local LLM Mode - Frontier Wiki</title>
+        <title>Learnings Log - Frontier Wiki</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#local-llm-mode" class="md-skip">
+        <a href="#learnings-log" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +114,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Local LLM Mode
+              Learnings Log
             
           </span>
         </div>
@@ -1024,6 +1024,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../local-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local LLM mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1043,7 +1071,7 @@
   <span class="md-ellipsis">
     
   
-    Local LLM mode
+    Learnings Log
   
 
     
@@ -1061,7 +1089,7 @@
   <span class="md-ellipsis">
     
   
-    Local LLM mode
+    Learnings Log
   
 
     
@@ -1087,65 +1115,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-start-apple-silicon-mlx" class="md-nav__link">
+  <a href="#2026-05-27-local-mode-reality-check-on-m4-24gb-unified-ram" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Quick start (Apple Silicon, MLX)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#verify" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Verify
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#model-recommendations-m4-pro-48gb" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Model recommendations (M4 Pro 48GB)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#going-back-to-cloud" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Going back to cloud
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#other-local-servers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Other local servers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#when-local-quality-isnt-enough" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        When local quality isn't enough
+        2026-05-27 — Local-mode reality check on M4 24GB unified RAM
       
     </span>
   </a>
@@ -1156,34 +1129,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../learnings-log/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Learnings Log
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1376,119 +1321,133 @@
   
 
 
-<h1 id="local-llm-mode">Local LLM Mode<a class="headerlink" href="#local-llm-mode" title="Permanent link">&para;</a></h1>
-<p>FAIRE talks to LLMs through <code>langchain_openai.ChatOpenAI</code>, which speaks the
-standard OpenAI Chat Completions protocol. By default we POST to OpenRouter
-(cloud). To run locally, <strong>point <code>OPENAI_API_BASE</code> at any OpenAI-compatible
-endpoint</strong> — MLX, Ollama, vLLM, LMStudio, anything. That's the entire
-integration. No code branches, no parallel pipelines.</p>
-<h2 id="quick-start-apple-silicon-mlx">Quick start (Apple Silicon, MLX)<a class="headerlink" href="#quick-start-apple-silicon-mlx" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># One-time: install mlx-lm, download ~24GB of pre-quantized Qwen models,</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># launch a server on :8080. Keep this terminal open.</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>./scripts/local-setup.sh
-</code></pre></div>
-<p>Then in <code>agents/.env</code>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nv">OPENAI_API_BASE</span><span class="o">=</span>http://127.0.0.1:8080/v1
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># These names must match what your local server exposes</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="nv">WRITER_MODEL</span><span class="o">=</span>mlx-community/Qwen2.5-Coder-32B-Instruct-4bit
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="nv">MVB_MODEL</span><span class="o">=</span>mlx-community/Qwen2.5-Coder-32B-Instruct-4bit
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="nv">REVIEWER_MODEL</span><span class="o">=</span>mlx-community/Qwen2.5-7B-Instruct-4bit
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="nv">CRITIC_MODEL</span><span class="o">=</span>mlx-community/Qwen2.5-7B-Instruct-4bit
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="nv">RESEARCH_MODEL</span><span class="o">=</span>mlx-community/Qwen2.5-7B-Instruct-4bit
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="nv">FALLBACK_MODEL</span><span class="o">=</span>mlx-community/Qwen2.5-7B-Instruct-4bit
-</code></pre></div>
-<p>Restart the agent normally — everything else works as-is:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>./start.sh<span class="w"> </span>--interval<span class="w"> </span><span class="m">1</span><span class="w"> </span>--run-now
-</code></pre></div>
-<h2 id="verify">Verify<a class="headerlink" href="#verify" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Server is up and serving the model</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>curl<span class="w"> </span>http://127.0.0.1:8080/v1/models
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># A live page generation hits the local server (watch the MLX terminal)</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8765/generate?topic=foo&amp;track=01-ai&amp;page_type=core-concept&amp;depth_emphasis=applied&quot;</span>
-</code></pre></div>
-<p>In <code>agents/logs/server.log</code> you'll see the usual cycle output. The MLX server's
-own log shows the inference calls — that's how you confirm cloud isn't being
-hit.</p>
-<h2 id="model-recommendations-m4-pro-48gb">Model recommendations (M4 Pro 48GB)<a class="headerlink" href="#model-recommendations-m4-pro-48gb" title="Permanent link">&para;</a></h2>
+<h1 id="learnings-log">Learnings Log<a class="headerlink" href="#learnings-log" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p>A growing record of what we actually learned about the system, the models,
+and the pedagogy as the wiki was built. <strong>Distinct from the auto-generated
+Agent Changelog</strong> (per-page runs) — this is a human-curated record of
+sessions where something non-obvious surfaced and is worth carrying forward.</p>
+</blockquote>
+<hr />
+<h2 id="2026-05-27-local-mode-reality-check-on-m4-24gb-unified-ram">2026-05-27 — Local-mode reality check on M4 24GB unified RAM<a class="headerlink" href="#2026-05-27-local-mode-reality-check-on-m4-24gb-unified-ram" title="Permanent link">&para;</a></h2>
+<p><strong>Goal of the session:</strong> validate that the FAIRE pipeline can run end-to-end
+against a local LLM (MLX on Apple Silicon) — no cloud spend, no API budget
+pressure, full offline.</p>
+<p><strong>What worked:</strong></p>
+<ul>
+<li>The integration is a <strong>one-env-var swap</strong>. Set <code>OPENAI_API_BASE=http://127.0.0.1:8081/v1</code>,
+  change the role MODEL names to local IDs, restart <code>start.sh</code>. Zero code
+  branches. ChatOpenAI speaks the standard OpenAI Chat Completions protocol
+  that MLX/Ollama/vLLM/LMStudio all implement.</li>
+<li>Full FAIRE pipeline (<code>research → plan → checklist → write → link → review →
+  log</code>) runs against <code>mlx-community/gemma-3-4b-it-qat-4bit</code> in <strong>~4 min per
+  page</strong> on a 24GB M4 base — comparable to cloud wall-clock, at $0 cost.</li>
+<li>The v2 structural template lands cleanly: all 6 sections + 5-persona Build it
+  variants. The page-shape works regardless of which model produces it.</li>
+</ul>
+<p><strong>What didn't work — and the four real causes:</strong></p>
+<p>The 4B model produces structurally-correct but <strong>factually unreliable</strong> pages.
+Concrete failures we observed:</p>
 <table>
 <thead>
 <tr>
-<th>Role</th>
-<th>Model</th>
-<th>Disk</th>
-<th>Speed</th>
+<th>Failure mode</th>
+<th>Concrete example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>writer / mvb</td>
-<td><code>Qwen2.5-Coder-32B-Instruct</code> (4-bit)</td>
-<td>~19GB</td>
-<td>~15–18 tok/s</td>
+<td><strong>Hallucinated arxiv IDs with future-year prefixes</strong></td>
+<td><code>arxiv.org/abs/2604.16324</code>, <code>arxiv.org/abs/2512.22473v4</code> — invented IDs the model can't actually verify</td>
 </tr>
 <tr>
-<td>reviewer / critic / research / fallback</td>
-<td><code>Qwen2.5-7B-Instruct</code> (4-bit)</td>
-<td>~5GB</td>
-<td>~40–60 tok/s</td>
+<td><strong>Context bleed from scratch_pad</strong></td>
+<td>The Bayesian-inference page's "Where the field is now" section cited FLUX.1, DDPM, Latent Diffusion — none of which are Bayesian-inference papers</td>
+</tr>
+<tr>
+<td><strong>Missing equations on math-heavy topics</strong></td>
+<td>The do-calculus page produced <strong>zero</strong> LaTeX equations on a topic literally defined by 3 inference rules</td>
+</tr>
+<tr>
+<td><strong>H1 format drift</strong></td>
+<td>Model consistently emits <code>## Topic Name</code> (H2) where the schema requires <code># Topic Name</code> (H1)</td>
+</tr>
+<tr>
+<td><strong>Lenient self-review</strong></td>
+<td>Reviewer (also 4B) scores its writer-self at 0.90 confidence on pages with the above defects, doesn't catch them</td>
+</tr>
+<tr>
+<td><strong>Build it bleed</strong></td>
+<td>Backpropagation page's Build it section described training Stable Diffusion on CIFAR-10 — wrong topic entirely</td>
 </tr>
 </tbody>
 </table>
-<p>Both fit in unified memory simultaneously (~24GB total) with headroom for KV
-cache. Expect ~8–14 minutes per v2 page locally vs ~2–3 minutes on cloud.</p>
-<p>On M4 base (16GB): swap the writer to <code>Qwen2.5-Coder-14B-Instruct-4bit</code>
-(~9GB). On M4 Max (64GB+): bump the writer to a 5-bit quant or try
-<code>Llama-3.3-70B-Instruct-4bit</code>.</p>
-<h2 id="going-back-to-cloud">Going back to cloud<a class="headerlink" href="#going-back-to-cloud" title="Permanent link">&para;</a></h2>
-<p>Comment out <code>OPENAI_API_BASE</code> and restore the cloud <code>WRITER_MODEL</code> etc.
-in <code>agents/.env</code>. Restart the agent. Everything works again.</p>
-<h2 id="other-local-servers">Other local servers<a class="headerlink" href="#other-local-servers" title="Permanent link">&para;</a></h2>
-<p>The same env-var pattern works for any OpenAI-compatible server:</p>
-<table>
-<thead>
-<tr>
-<th>Server</th>
-<th><code>OPENAI_API_BASE</code></th>
-<th>Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>MLX (Apple Silicon)</td>
-<td><code>http://127.0.0.1:8080/v1</code></td>
-<td>Native, fastest on M-series</td>
-</tr>
-<tr>
-<td>Ollama</td>
-<td><code>http://127.0.0.1:11434/v1</code></td>
-<td>Cross-platform, easiest install</td>
-</tr>
-<tr>
-<td>vLLM</td>
-<td><code>http://127.0.0.1:8000/v1</code></td>
-<td>Best throughput on NVIDIA</td>
-</tr>
-<tr>
-<td>LMStudio</td>
-<td><code>http://127.0.0.1:1234/v1</code></td>
-<td>GUI, good for testing</td>
-</tr>
-</tbody>
-</table>
-<p>For all of these the <code>WRITER_MODEL</code> etc. values must be whatever name the
-server exposes (<code>ollama list</code>, <code>mlx_lm.server --help</code>, etc.).</p>
-<h2 id="when-local-quality-isnt-enough">When local quality isn't enough<a class="headerlink" href="#when-local-quality-isnt-enough" title="Permanent link">&para;</a></h2>
-<p>If a particular page consistently fails review on the local writer, just flip
-back to cloud for that page:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Temporarily unset, generate the hard page, set back</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nb">unset</span><span class="w"> </span>OPENAI_API_BASE
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;http://127.0.0.1:8765/generate?topic=hard-topic&amp;track=04-neural-networks-deep-learning&amp;page_type=core-concept&amp;depth_emphasis=applied&quot;</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_BASE</span><span class="o">=</span>http://127.0.0.1:8080/v1
+<p>The causes, ranked by leverage:</p>
+<ol>
+<li><strong>Parameter count.</strong> A 4B model has dramatically less factual memory than a
+   ~100B+ cloud model. It knows the <em>shape</em> of a topic but can't recall specific
+   papers, equations, or model IDs.</li>
+<li><strong>Training cutoff.</strong> Gemma 3 stops in March 2025. When asked for a recent
+   paper, it invents a future-year arxiv ID instead of admitting ignorance.</li>
+<li><strong>Context confusion under 17K-token prompts.</strong> FAIRE's writer prompt is large
+   (SCHEMA.md slice + WRITE_INSTRUCTIONS + scratch_pad). The 4B model's
+   attention struggles to keep "this fact is about Topic A, that one is about
+   adjacent Topic B" cleanly separated and mashes them.</li>
+<li><strong>Same-model reviewer.</strong> The reviewer is also 4B Gemma. Same-model
+   self-review rarely catches its own writer's mistakes.</li>
+</ol>
+<p><strong>Gemma 4 on MLX is not usable yet (as of mlx-lm 0.31.3, May 2026):</strong></p>
+<p>All three Gemma 4 quants we tested (<code>gemma-4-e2b-it-4bit</code>,
+<code>gemma-4-e4b-it-4bit</code>, <code>gemma-4-e4b-it-8bit</code>) load partially — missing
+<code>v_proj</code>/<code>k_proj</code>/<code>k_norm</code> weights for the upper transformer layers — and
+completions hang silently. The model registers at <code>/v1/models</code> but inference
+never returns. This is a mlx-lm framework gap, not a quant bug. Use <strong>Gemma 3
+QAT variants</strong> (Google's own QAT weights, more reliable than community quants)
+until mlx-lm ships proper Gemma 4 support.</p>
+<p><strong>Memory budgeting on 24GB:</strong></p>
+<p>Gemma 3 27B QAT works for a single request but OOMs once FAIRE's pipeline
+drives multiple LLM calls in a cycle. Gemma 3 12B QAT survives single requests
+but OOMs on the 17K-token writer prompt + parallel critics. <strong>Gemma 3 4B QAT
+is the realistic ceiling on 24GB unified memory</strong> with FAIRE's current prompt
+shape. To go larger requires either an M4 Pro 48GB+ or a meaningful prompt
+trim.</p>
+<p><strong>The trim knobs that made it work:</strong></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nv">CRITIC_PANEL_DISABLE</span><span class="o">=</span><span class="nb">true</span><span class="w">      </span><span class="c1"># skip 8-way critic fan-out (saves ~5GB KV cache duplication)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nv">SPRINT_WORKERS</span><span class="o">=</span><span class="m">1</span><span class="w">               </span><span class="c1"># serial pages; parallel writer calls = Metal OOM</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="nv">SCHEMA_PROMPT_BYTES</span><span class="o">=</span><span class="m">4000</span><span class="w">       </span><span class="c1"># was 12000; trim agents/SCHEMA.md slice</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="nv">SCRATCH_PAD_BYTES</span><span class="o">=</span><span class="m">8000</span><span class="w">         </span><span class="c1"># was effectively unlimited</span>
 </code></pre></div>
-<p>No code changes. No branching. Same agent, same prompts, different inference
-endpoint.</p>
+<p>All four default to current cloud values — zero impact on the cloud loop.</p>
+<p><strong>The honest recommendation that came out of this:</strong></p>
+<p>Local mode is <strong>fit for prototyping and structure validation</strong>, not for
+production wiki content as it stands. The pipeline works; the 4B model output
+isn't publishable because half the citations are fake and adjacent topics
+bleed in. Three usable paths:</p>
+<ul>
+<li><strong>Hybrid mode (recommended)</strong>: keep <code>WRITER_MODEL=openai/gpt-5.1-codex-mini</code>
+  (cloud), route reviewer + critics + research to local. Cuts ~50% of cloud
+  spend without giving up writer accuracy.</li>
+<li><strong>Bigger local hardware</strong>: M4 Pro 48GB lets you run Gemma 3 12B QAT
+  comfortably; M4 Max 64GB+ runs the 27B. Quality recovers significantly.</li>
+<li><strong>Deterministic post-write validator</strong> (TODO): add a no-LLM step in
+  <code>review_node</code> that pings the arxiv API for every citation in the draft and
+  strips/flags ones that don't resolve. Defends against hallucination
+  regardless of model size; benefits cloud-generated pages too.</li>
+</ul>
+<p><strong>What we shipped this session:</strong></p>
+<ul>
+<li><code>agents/src/frontier_agents/llm.py</code> — <code>OPENAI_API_BASE</code> env-overrideable base URL</li>
+<li><code>agents/.env.example</code> — local-mode block, four trim knobs documented</li>
+<li><code>scripts/local-setup.sh</code> — one-time MLX install + model download + server start</li>
+<li><code>docs/system/local-mode.md</code> — runtime guide with model recommendations per M4 tier</li>
+<li><code>agents/tests/test_local_gemma4.py</code> — 7-test harness (unit + integration) for any local MLX server</li>
+<li><code>agents/src/frontier_agents/nodes.py</code> — four trim knobs (<code>CRITIC_PANEL_DISABLE</code>, <code>CRITIC_PANEL_WORKERS</code>, <code>SCHEMA_PROMPT_BYTES</code>, <code>SCRATCH_PAD_BYTES</code>)</li>
+</ul>
+<p>See commits <code>31df99d</code>, <code>7ab29ce</code>, and the README "Local-mode" section for the
+shipped artifacts.</p>
+<hr />
+<p><em>This log is human-written. The auto-generated per-page record lives in the
+<a href="../changelog/">Agent Changelog</a>.</em></p>
 
 
 
