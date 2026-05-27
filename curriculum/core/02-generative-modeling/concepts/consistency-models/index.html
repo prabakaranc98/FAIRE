@@ -1207,13 +1207,148 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">consistency-models</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">diffusion</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">distillation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">mdp</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">score-based-modeling</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">single-step-sampling</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="consistency-models">Consistency Models<a class="headerlink" href="#consistency-models" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">02 · Generative Modeling</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>What if the painful thousand-step descent from white noise to an image were replaced by a single leap back to the art you had in mind? That is the practical headache consistency models were born to solve: teams that ship image generation services cannot afford a hundred sequential denoising steps for every query, and the chains that achieve state-of-the-art quality still make real-time interactivity impossible. This page holds your hand through the math, the engineering, and the knee-deep experiments so you can deliver a one-shot sampler rather than an expensive trajectory. Prerequisites: comfort with probability and Gaussian conditioning, mean-squared-error losses, and basic neural network training with gradient descent.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Sampling speed is the human problem in generative modeling. Early work such as Untitled (2015) <a href="https://arxiv.org/pdf/1503.03585">arxiv:1503.03585</a> explored directly mapping random vectors to structured outputs with a single feed-forward generator, foreshadowing the GAN era that Goodfellow et al. (2014) <a href="https://arxiv.org/pdf/1406.2661">arxiv:1406.2661</a> made famous. Diffusion models reintroduced iteration, showing that a Markovian noising process could be inverted step by step via denoising networks—Ho et al. (2020) <a href="https://arxiv.org/abs/2006.11239">arxiv:2006.11239</a> proved the denoiser could learn the Gaussian noise that had been added at each step and that running the chain backward yields strong likelihoods and crisp samples. The catch is latency: every inference must replay tens to thousands of reverse steps, which is acceptable for batch rendering but not for live applications.</p>
+<p>Consistency models provide a fresh territory. Work such as Rezende et al. (2016) <a href="https://ar5iv.labs.arxiv.org/html/1603.05106">arxiv:1603.05106</a> had already shown that mapping a single noisy observation to a clean sample is powerful, and Song &amp; Dhariwal (2023) <a href="https://arxiv.org/pdf/2303.01469">arxiv:2303.01469</a> turned that idea into a practical framework. They keep the diffusion forward process as a teacher but replace the entire reverse trajectory with a single function <span class="arithmatex">\(f_\theta\)</span> whose repeated application leaves any point on the trajectory unchanged, establishing self-consistency. This page answers: how is such a function trained, why does it work, and what does it take to ship a working one-step sampler? The next section steps through the mechanism.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="the-diffusion-context-and-the-teacher">The diffusion context and the teacher<a class="headerlink" href="#the-diffusion-context-and-the-teacher" title="Permanent link">&para;</a></h3>
+<p>Reuse the DDPM forward noising chain. For a clean datapoint <span class="arithmatex">\(\mathbf{x}_0\)</span> and timestep <span class="arithmatex">\(t \in \{1,\dots,T\}\)</span>, the marginal over noisy samples is
+[
+q(\mathbf{x}_t \mid \mathbf{x}_0) = \mathcal{N}!\left(\mathbf{x}_t;\, \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0,\; (1 - \bar{\alpha}_t) I\right)
+]
+where <span class="arithmatex">\(\bar{\alpha}_t = \prod_{s=1}^{t}(1-\beta_s)\)</span> and each <span class="arithmatex">\(\beta_s\)</span> is the forward variance at step <span class="arithmatex">\(s\)</span>. The forward chain can be seen as continuous-time SDE <span class="arithmatex">\(d\mathbf{x}_t = -\tfrac{1}{2}\beta(t)\mathbf{x}_t\,dt + \sqrt{\beta(t)}\,dW_t\)</span>, where <span class="arithmatex">\(dW_t\)</span> is Brownian noise; the exact schedule <span class="arithmatex">\(\beta(t)\)</span> determines how fast information is washed away.</p>
+<p>DDPM trains a denoiser <span class="arithmatex">\(\epsilon_\theta\)</span> by regressing the added Gaussian noise sample <span class="arithmatex">\(\boldsymbol{\eta} \sim \mathcal{N}(0, I)\)</span> through
+[
+\mathcal{L}<em _mathbf_x="\mathbf{x">{\text{DDPM}}(\theta) = \mathbb{E}</em><em>0, t, \boldsymbol{\eta}} \left[\left|\boldsymbol{\eta} - \epsilon</em>\theta(\mathbf{x}_t, t)\right|^2\right]
+]
+where <span class="arithmatex">\(\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\eta}\)</span>. This loss teaches the reverse Markov chain, but inference requires reconstructing <span class="arithmatex">\(\mathbf{x}_0\)</span> through <span class="arithmatex">\(T\)</span> sequential updates, each invoking the network.</p>
+<p>Consistency models keep this forward teacher but aim to distill a student <span class="arithmatex">\(f_\theta(\mathbf{x}_t, t)\)</span> that is self-consistent: when <span class="arithmatex">\(t\)</span> equals the near-noise-free boundary <span class="arithmatex">\(t_0 \approx 0\)</span>, <span class="arithmatex">\(f_\theta\)</span> should return the input itself,
+[
+f_\theta(\mathbf{x}<em t_0="t_0">{t_0}, t_0) = \mathbf{x}</em>
+]
+This boundary anchors the function to the data manifold. Further, Song &amp; Dhariwal showed that the difference <span class="arithmatex">\(f_\theta(\mathbf{x}_t, t) - \mathbf{x}_t\)</span> should align with the score of the noised distribution,
+[
+\frac{f_\theta(\mathbf{x}<em _mathbf_x="\mathbf{x">t, t) - \mathbf{x}_t}{\gamma_t} \approx -\nabla</em><em>t} \log p_t(\mathbf{x}_t)
+]
+where <span class="arithmatex">\(\gamma_t\)</span> is a schedule-dependent scalar, <span class="arithmatex">\(\mathbf{x}_t\)</span> is drawn from the forward process, and <span class="arithmatex">\(\log p_t\)</span> is the log-density of <span class="arithmatex">\(\mathbf{x}_t\)</span>. This relation comes from differentiating the self-consistency constraint along the diffusion trajectory and mirrors the score-matching identities used in diffusion and flow models. The continuous-time version of this constraint leads to a partial differential equation:
+[
+\frac{\partial}{\partial t} f</em>\theta(\mathbf{x}<em _mathbf_x="\mathbf{x">t, t) + \nabla</em><em>t} f</em>\theta(\mathbf{x}_t, t)^\top \frac{d\mathbf{x}_t}{dt} = 0
+]
+where <span class="arithmatex">\(\frac{d\mathbf{x}_t}{dt}\)</span> is known from the forward SDE. This PDE enforces that <span class="arithmatex">\(f_\theta\)</span> transports noisy samples back to the manifold while respecting the temporal structure of the diffusion chain.</p>
+<p>Consistency models then ask: how do we train <span class="arithmatex">\(f_\theta\)</span> to obey those constraints without executing all <span class="arithmatex">\(T\)</span> steps? Song &amp; Dhariwal answer this through two complementary paradigms.</p>
+<h3 id="consistency-distillation-cd">Consistency Distillation (CD)<a class="headerlink" href="#consistency-distillation-cd" title="Permanent link">&para;</a></h3>
+<p>Consistency Distillation keeps a pretrained diffusion model <span class="arithmatex">\(\epsilon_\theta^{\text{teacher}}\)</span> and lets it simulate intermediate denoising steps to create regression targets. Given a sampled timestep <span class="arithmatex">\(t\)</span> and its noisy sample <span class="arithmatex">\(\mathbf{x}_t\)</span>, the teacher produces a slightly less noisy point <span class="arithmatex">\(\hat{\mathbf{x}}_{t-\delta}\)</span> by taking <span class="arithmatex">\(\delta\)</span> reverse steps (with <span class="arithmatex">\(\delta=1\)</span> being the usual choice). The student <span class="arithmatex">\(f_\theta\)</span> is then trained to map <span class="arithmatex">\(\mathbf{x}_t\)</span> directly to <span class="arithmatex">\(\hat{\mathbf{x}}_{t-\delta}\)</span>. Because <span class="arithmatex">\(\hat{\mathbf{x}}_{t-\delta}\)</span> already lies closer to <span class="arithmatex">\(\mathbf{x}_0\)</span>, the student learns to leap ahead in one evaluation while the teacher still enforces paths that respect the diffusion schedule.</p>
+<p>This training yields the mean-squared error loss
+[
+\mathcal{L}<em _mathbf_x="\mathbf{x">{\text{CD}}(\theta) = \mathbb{E}</em><em t-_delta="t-\delta">t, \hat{\mathbf{x}}</em>}} \left[\left|\hat{\mathbf{x}<em>{t-\delta} - f</em>\theta(\mathbf{x}_t, t)\right|^2\right]
+]
+with <span class="arithmatex">\(\hat{\mathbf{x}}_{t-\delta}\)</span> sampled from the teacher’s rollout. The key tension is that <span class="arithmatex">\(f_\theta\)</span> must approximate a target that the teacher generated via <span class="arithmatex">\( \delta \)</span> steps, so a small <span class="arithmatex">\(\delta\)</span> keeps the target close to the true diffusion path and makes distillation stable. In Song &amp; Dhariwal’s experiments, <span class="arithmatex">\(\delta=1\)</span> already suffices for photo-realistic samples. The distillation pipeline thus shifts the sampling cost into training: once <span class="arithmatex">\(f_\theta\)</span> is trained, inference requires a single evaluation, yet the training loss still reflects the geometry of the diffusion trajectory thanks to the teacher.</p>
+<p>To keep the teacher outputs coherent across timesteps, practitioners reuse a single teacher rollout per batch, sample <span class="arithmatex">\(t\)</span> uniformly, and cache the corresponding <span class="arithmatex">\( (\mathbf{x}_t, \hat{\mathbf{x}}_{t-\delta})\)</span> pairs for the student. This caching converts the teacher’s iterative computation into large-grown regression data that the student sees repeatedly, which is why CD models often inherit the teacher’s compute cost during training but pay it back with a one-shot sampler at inference.</p>
+<h3 id="consistency-training-ct-and-the-bootstrap-view">Consistency Training (CT) and the bootstrap view<a class="headerlink" href="#consistency-training-ct-and-the-bootstrap-view" title="Permanent link">&para;</a></h3>
+<p>Consistency Training removes the teacher entirely and instead relies on the student’s self-consistency across timesteps. Song &amp; Dhariwal framed the constraint as a loss between the outputs at neighboring timesteps, while Geng et al. (2024) <a href="https://arxiv.org/abs/2410.18958">arxiv:2410.18958</a> reinterpreted it as temporal-difference (TD) learning in a Markov Decision Process (MDP). In this view, each noisy sample <span class="arithmatex">\(\mathbf{x}_t\)</span> is a state, the student’s output is a value estimate, and the TD target is the student’s output at the next timestep. The resulting loss is
+[
+\mathcal{L}<em _mathbf_x="\mathbf{x">{\text{CT}}(\theta) = \mathbb{E}</em><em>t} \left[\left|f</em>\theta(\mathbf{x}<em>t, t) - f</em>\theta\left(\mathbf{x}_{t+\delta}, t+\delta\right)\right|^2\right]
+]
+where <span class="arithmatex">\(\mathbf{x}_{t+\delta}\)</span> is obtained by sampling another chunk of Gaussian noise. This bootstrapping update compels the student to agree with its own future predictions, mirroring how Q-learning updates value functions toward future estimates.</p>
+<p>Geng et al. augment this loss with score identities to control the variance from bootstrapping. They approximate the score <span class="arithmatex">\(\nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)\)</span> via auxiliary networks and inject the correction
+[
+f_\theta(\mathbf{x}<em _mathbf_x="\mathbf{x">t, t) \approx \mathbf{x}_t + \gamma_t \nabla</em>_t)
+]
+with }_t} \log p_t(\mathbf{x<span class="arithmatex">\(\gamma_t\)</span> derived from the diffusion schedule. This correction keeps the TD target grounded to the geometry of the data distribution even when <span class="arithmatex">\(\delta\)</span> is large, preventing the bootstrap from drifting toward degenerate minima. In practice CT is noisier than CD because it lacks a teacher, but the MDP view explains why the noise can be tamed with careful scheduling and variance reduction.</p>
+<p>CT therefore unifies consistency learning with reinforcement learning: the student continually reestimates its target, the score identity acts like a critic that regularizes the update, and the boundary constraint at <span class="arithmatex">\(t_0\)</span> serves as the terminal reward that anchors the trajectory. Combined with CD, these paradigms trace a spectrum from teacher-guided regression to bootstrapped self-consistency.</p>
+<h3 id="practical-modeling-choices">Practical modeling choices<a class="headerlink" href="#practical-modeling-choices" title="Permanent link">&para;</a></h3>
+<p>Implementations choose a U-Net backbone with the timestep <span class="arithmatex">\(t\)</span> embedded via sinusoidal features and broadcast into each residual block. Song &amp; Dhariwal found it helpful to have the network predict the denoised sample <span class="arithmatex">\(f_\theta(\mathbf{x}_t, t) \approx \mathbf{x}_0\)</span> instead of noise, which avoids reweighting based on <span class="arithmatex">\(\bar{\alpha}_t\)</span> during inference and aligns better with the CD objective. Temporal embeddings are typically 256-dimensional and concatenated to each block’s input to give the network a sense of the corruption level.</p>
+<p>For CD, the training pipeline runs the diffusion teacher for every <span class="arithmatex">\(\mathbf{x}_t\)</span> in the batch, so efficiency tricks such as reusing rollouts and caching <span class="arithmatex">\(\hat{\mathbf{x}}_{t-\delta}\)</span> pairs are essential. CT implementations sample <span class="arithmatex">\(t\)</span> twice per example, perturb <span class="arithmatex">\(\mathbf{x}_t\)</span> with an extra noise chunk to generate <span class="arithmatex">\(\mathbf{x}_{t+\delta}\)</span>, and evaluate the student for both timesteps within the same forward pass, enabling the TD loss to be computed without additional backpropagations. Failure modes include teacher miscalibration (when CD inherits errors from an imperfect diffusion teacher) and bootstrap divergence (when CT’s TD update overshoots). Score-aware corrections, smaller <span class="arithmatex">\(\delta\)</span>, and periodic reinitialization of TD targets are therefore not optional; they are the stability levers that let consistency models learn the identity mapping across the whole trajectory.</p>
+<p>Consistency models sit between adversarial generators and diffusion samplers. Unlike GAN generators, which can mode-collapse absent a perfect discriminator, CD inherits the diffusion teacher’s likelihood-driven behavior and hence retains diversity. Unlike DDPMs, which march through each timestep, a well-trained consistency model evaluates only once. This hybrid quality explains why teams are eager to put them in production, provided they can master the training noise and score identities that keep the one-shot leap faithful.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier splits between traditional diffusion and the single-step approach of Song &amp; Dhariwal (2023) <a href="https://arxiv.org/pdf/2303.01469">arxiv:2303.01469</a>. Their consistency models demonstrate that a student distilled from a DDPM teacher can match diffusion-level FID scores with just one evaluation, thanks to carefully calibrated self-consistency losses. Geng et al. (2024) <a href="https://arxiv.org/abs/2410.18958">arxiv:2410.18958</a> pushed the frontier further by treating CT as temporal-difference learning, augmenting the objective with score-identity corrections, and showing that the resulting Stable Consistency Tuning (SCT) matches teacher quality on CIFAR-10 while reducing TD variance. These papers establish that CD and CT are not separate islands but rather two ends of a spectrum where the boundary condition and TD regularization keep the student grounded.</p>
+<p>On the engineering frontier, latency remains the battleground. NVIDIA’s Developer Blog (2023) “Serving Stable Diffusion with TensorRT” <a href="https://developer.nvidia.com/blog/serving-stable-diffusion-with-tensorrt/">https://developer.nvidia.com/blog/serving-stable-diffusion-with-tensorrt/</a> documents how optimized kernels still spend ~25 ms per denoising step on an A100, meaning even a 20-step sampler takes half a second. APIs such as Hugging Face’s Diffusers already include a <code>ConsistencyModelPipeline</code> to run distilled samplers <a href="https://huggingface.co/docs/diffusers/main/en/api/pipelines/consistency_models">https://huggingface.co/docs/diffusers/main/en/api/pipelines/consistency_models</a>, showing engineers are baking the one-shot interface into production stacks. These engineering pressures explain why teams that serve browser or mobile clients are following the consistency path: a single evaluation of <span class="arithmatex">\(f_\theta\)</span> reduces latency dramatically and fits within the compute budget of low-power devices.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Is there a systematic way to tune the noise spacing <span class="arithmatex">\(\delta\)</span> so that one-shot inference remains stable across datasets with different intrinsic dimensionalities, or must we resort to dataset-specific curricula? Can CT match CD’s sample quality without a teacher once stronger variance reduction than SCT’s score identities is in place, or does CT forever lag by a small FID gap? How can we mathematically combine the consistency objective with adversarial discriminators so that the student inherits GANs’ mode coverage while remaining single-step? What architectural or regularization knobs (spectral normalization on timestep embeddings, auxiliary consistency heads, or time-aware attention) most effectively prevent TD bootstrap drift in CT-only learners?</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation that justifies those score-identity corrections, → [[score-matching]] lays out the denoiser–score equivalence and the gradients that crop up in the CT loss. The architectural details that make U-Nets fast enough to evaluate hundreds of times during teacher rollouts live in → [[unet-architectures]]. The engineering perspective on how production platforms currently hide multi-step costs is in → [[latent-diffusion-models]], which catalogues the latent-space tricks and API optimizations engineers use to keep response times low. This concept appears in the generative modeling arc right after [[diffusion-models]] and before the specialization into score-based samplers discussed in [[score-matching]].</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>Consistency Distillation for CIFAR-10: distill Google’s DDPM teacher on CIFAR-10 into a one-step student and verify that the distilled sampler retains the teacher’s quality while running in one evaluation.</p>
+<p><strong>What you're building:</strong> a PyTorch consistency model that takes a CIFAR-10 image corrupted at an arbitrary timestep and returns the clean image using a distillation target produced by a pretrained diffusion teacher.</p>
+<p><strong>Why this is valuable:</strong> it makes you implement the teacher rollout, the caching of <code>(x_t, x_{t-\delta})</code> pairs, and the student regression, so you directly feel how the self-consistency objective turns a multi-step sampler into a single greedy evaluation.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>google/ddpm-cifar10-32</code> as the diffusion teacher plus a custom U-Net student with timestep-conditioned residual blocks (outputting denoised pixels).
+- <strong>Dataset:</strong> <code>cifar10</code> from Hugging Face datasets, using its 50,000 training images for both teacher rollouts and student distillation.
+- <strong>Framework:</strong> PyTorch 2.1 with <code>diffusers&gt;=0.30.0</code>, <code>accelerate</code>, and <code>datasets</code> for data loading and noise scheduling helpers.
+- <strong>Compute:</strong> a Colab T4 (16 GB VRAM); teacher rollouts and student training finish in ≈40 minutes with batch size 64.</p>
+<p><strong>The recipe:</strong>
+1. <code>pip install torch==2.1.0 diffusers==0.30.0 datasets accelerate matplotlib seaborn</code> and seed PyTorch, NumPy, and CUDA RNGs; import <code>DiffusionPipeline</code> for the teacher, instantiate the <code>DDPM</code> scheduler, and prepare the <code>cifar10</code> dataset from Hugging Face.
+2. Generate 200,000 <code>(x_t, x_{t-1})</code> pairs by sampling <span class="arithmatex">\(t\sim\text{Uniform}(1,1000)\)</span> per image, creating <span class="arithmatex">\(\mathbf{x}_t = \sqrt{\bar{\alpha}_t}\,\mathbf{x}_0 + \sqrt{1-\bar{\alpha}_t}\,\boldsymbol{\eta}\)</span>, and storing both <span class="arithmatex">\(\mathbf{x}_t\)</span> and the teacher’s denoised output <span class="arithmatex">\(\hat{\mathbf{x}}_{t-1}\)</span> as NumPy arrays on disk (one <code>.pt</code> file per 1,000 examples) so the student can stream them without rerunning the teacher.
+3. Train the DDPM teacher (fine-tune <code>google/ddpm-cifar10-32</code>) for 50 epochs over CIFAR-10, using a cosine-linear <span class="arithmatex">\(\beta_t\)</span> schedule and a linear warmup of <span class="arithmatex">\(1{,}000\)</span> steps before the learning rate plateaus at <span class="arithmatex">\(2 \times 10^{-4}\)</span>; after every epoch, evaluate the teacher on the validation split, save the generated <span class="arithmatex">\(\hat{\mathbf{x}}_{t-1}\)</span> for each cached <span class="arithmatex">\(\mathbf{x}_t\)</span>, and ensure the teacher’s MSE hits a plateau before proceeding to distillation.
+4. Train the consistency student <span class="arithmatex">\(f_\theta\)</span> on the cached tuples with <span class="arithmatex">\(\mathcal{L}_{\text{CD}} = \|\hat{\mathbf{x}}_{t-1} - f_\theta(\mathbf{x}_t, t)\|^2\)</span> using AdamW with <span class="arithmatex">\(2\times 10^{-4}\)</span> learning rate, weight decay <span class="arithmatex">\(1\times 10^{-4}\)</span>, and cosine annealing over 5,000 updates; expect the validation MSE to fall below <span class="arithmatex">\(0.01\)</span> and log the predicted samples after every 500 steps.
+5. Evaluate by sampling 256 random timesteps per image, running the student <span class="arithmatex">\(f_\theta(\mathbf{x}_t, t)\)</span>, and reporting the Euclidean distance to <span class="arithmatex">\(\mathbf{x}_0\)</span> plus FID against real CIFAR-10 samples; plot the reconstructions and confirm that a single pass maps noisy samples back to clean images.</p>
+<p><strong>Expected outcome:</strong> a <code>student.pt</code> checkpoint that reconstructs CIFAR-10 in one evaluation plus plots showing the distillation trajectories and FID numbers that match the teacher within ±2 points.</p>
+<ul>
+<li><strong>Curious generalist:</strong> Visualize the student’s reconstructions at five timesteps and write a short explanation of how the network “jumps” from noise to image in one shot, reinforcing the intuition behind self-consistency.</li>
+<li><strong>CS student:</strong> Halve the teacher’s rollouts to 500 steps and reduce batch size to 32 so the pipeline runs on an RTX 4070 within an hour while still letting you observe convergence in both teacher MSE and student validation loss.</li>
+<li><strong>Applied engineer:</strong> After distillation, export the student to TorchScript, quantize it to FP16 with NVIDIA TensorRT, and serve it on an A10 with a latency target of &lt;5 ms per inference, tracking that reconstruction error stays within 5 % of the unquantized baseline.</li>
+<li><strong>Applied researcher:</strong> Replace the cached teacher targets with the student’s own outputs from two timesteps earlier (a CT-style bootstrap), clamp gradients at 1.0, and report whether the new variant achieves validation MSE within 0.02 of the CD baseline; record the effect on the FID gap.</li>
+<li><strong>Theory student:</strong> Add the score-identity correction to the loss, deriving the term <span class="arithmatex">\(\gamma_t \nabla_{\mathbf{x}_t} \log p_t(\mathbf{x}_t)\)</span> from the cached teacher outputs, and demonstrate that the corrected loss yields a smoother empirical self-consistency gap as a function of <span class="arithmatex">\(t\)</span>.</li>
+<li><strong>Frontier researcher:</strong> Extend the experiment to the CelebA-HQ 64×64 dataset, apply SCT-style correction terms, and show whether CT can remain stable without a teacher by measuring the self-consistency gap drift over 10,000 student updates.</li>
+</ul>
+<p>What can you build next? After nailing this distillation, scale the same pipeline to the FFHQ dataset with a latent diffusion teacher or swap the dataset for ImageNet-128 to test whether the FID gap stays below 3 points—those extensions will reveal whether the consistency objective generalizes to higher-dimensional manifolds while still running in one pass.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
