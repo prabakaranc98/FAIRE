@@ -42,7 +42,7 @@ arc_position:                            # optional — only for pages embedded 
   arc: [arc-slug]
   prev: [prev-slug]
   next: [next-slug]
-mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
+mvb_personas: [applied-researcher, research-engineer, applied-ai-engineer]
 prereqs: [topic-a, topic-b]              # other concept slugs the reader should know first
 tags: []
 updated: YYYY-MM-DD
@@ -158,10 +158,9 @@ Only present when `has_mvb: true`. See MVB Selection Policy below.
 **Expected outcome:** [a model, a demo, a result table — something you can show or deploy]
 
 **Variants per persona (one per active mvb_personas entry):**
-- **CS student:** [one-line tweak to the recipe — what they should do differently]
-- **Applied engineer:** [the production-flavoured variant]
-- **Applied researcher:** [the ablation/hypothesis variant]
-- **Frontier researcher:** [the falsifier-driven extension]
+- **Applied AI/ML engineer (forward-deployed):** [ship-it variant — real model, real latency target, real deploy surface; "Friday afternoon ship"]
+- **Research engineer:** [reproduction variant — pick a specific table/figure from a named paper, hit the number within ±X%, instrumented]
+- **Applied researcher:** [hypothesis variant — one stated hypothesis, one falsification criterion, one plot]
 
 > *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
 ```
@@ -193,33 +192,29 @@ moment where reading turns into doing.
 
 ---
 
-## Multi-audience writing guidelines (for agents)
+## The three personas (canonical, used everywhere)
 
-Pages must serve four reader types simultaneously. Use this checklist:
+Every page — concept, arc, MVB — serves these three readers. Any persona mentioned in a frontmatter must come from this set:
 
-1. **Applied practitioner** (MS Data Science, industry engineer)
-   - Wants: "What can I build with this TODAY?"
-   - Lives in: the Build section + the engineering frontier paragraph in "Where the field is now"
+1. **Applied AI/ML engineer** (a.k.a. forward-deployed engineer)
+   - Wants: "What can I ship into production by Friday?"
+   - Lives in: the Build section's ship-it variant + the engineering frontier paragraph in "Where the field is now"
    - Failure: "Use a diffusion model for image generation" — too vague
-   - Success: "Fine-tune `stabilityai/stable-diffusion-2-1` with LoRA (~4GB VRAM, 1hr)"
+   - Success: "Fine-tune `stabilityai/stable-diffusion-2-1` with LoRA on a single A10 (1 hr), serve at 80 ms p95 with TGI"
 
-2. **Curious generalist** (smart, limited ML background)
-   - Wants: "What IS this and why do people care?"
-   - Lives in: the hook + The territory + the first paragraph of How it works
-   - Failure: Opening with "formally, given a probability distribution..."
-   - Success: Opening with a concrete scenario that explains WHY the problem is hard
+2. **Research engineer**
+   - Wants: "What does it take to reproduce this paper's result on my hardware?"
+   - Lives in: the Build section's reproduction variant + the equations annotated in "How it works"
+   - Failure: "Run their code and get similar numbers"
+   - Success: "Reproduce Table 3 of Llama-3 RLHF paper using HelpSteer2 on 1×H100, hit reward gain within ±5%"
 
-3. **Math/theory student**
-   - Wants: "What are the actual equations? What's the proof sketch?"
-   - Lives in: the deeper paragraphs of How it works (math embedded inline)
-   - Failure: "The ELBO objective is \\[L = ...\\]" with no annotation
-   - Success: Each variable annotated in the same sentence
+3. **Applied researcher**
+   - Wants: "What's the hypothesis I can test this week, and what would falsify it?"
+   - Lives in: the Build section's hypothesis variant + "What's still open"
+   - Failure: "Try diffusion on a new modality"
+   - Success: "Test whether cosine noise schedule outperforms linear on tabular data; metric = held-out NLL; 3 schedules × 2 datasets; plot"
 
-4. **Frontier researcher**
-   - Wants: "What are the open problems? What just changed?"
-   - Lives in: Where the field is now + What's still open
-   - Failure: "Recent work has shown improvements..."
-   - Success: "DAPO (Yu et al. 2025) achieves 50 pts on AIME 2024 using decoupled clipping…"
+The reader who wants pure intuition without a build is still served — the hook + territory + first half of "How it works" carries them. They simply don't need a persona tag.
 
 ---
 
@@ -304,7 +299,7 @@ page_type: concept
 state: stub
 authors_anchored: []
 feeds_de_pillar: []
-mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
+mvb_personas: [applied-researcher, research-engineer, applied-ai-engineer]
 prereqs: []
 tags: []
 updated: YYYY-MM-DD
@@ -323,6 +318,88 @@ walk-through and bumps `state:` to `drafted` or `reviewed`.
 
 ---
 
+## Arc page schema (the tree's middle layer)
+
+An arc is a track-bounded learning path: a small number of ordered steps, each producing an artifact the next step consumes, ending with a named capability. Arcs are the wiki's USP — every reader who finishes an arc has built something real.
+
+**Cardinality (enforced by audit):**
+
+| Level | Min | Default | Hard cap |
+|---|---|---|---|
+| Arcs per track | 1 | 2–3 | **5** |
+| Steps per arc | 3 | 4–5 | **6** |
+| MVBs per arc | 1 | 1 per persona | **4** |
+
+Above the caps the page becomes intimidating; the audit will block.
+
+**Arc-index frontmatter** (`docs/curriculum/core/<track>/arcs/<arc-id>.md`):
+
+```yaml
+---
+layer: arc
+parent_track: 02-generative-modeling
+arc_id: generative-stack
+one_liner: "Build, in 5 ships, every modern image generator"
+capability_at_end: "5 trained generative models with comparable FID, plus a distilled consistency model"
+total_time: "~12 hours over 2 weekends"
+difficulty: applied                          # beginner | applied | researcher
+persona_fit: [applied-ai-engineer, research-engineer]  # who this arc is for
+prerequisite_concepts: [pytorch-basics, convnets]
+steps:                                       # ordered, each loads previous artifact
+  - { slug: ddpm,               artifact_produces: "ddpm_cifar10.pt" }
+  - { slug: score-matching,     artifact_consumes: "ddpm_cifar10.pt", artifact_produces: "score_net.pt" }
+  - { slug: latent-diffusion,   artifact_consumes: "score_net.pt",    artifact_produces: "ld.safetensors" }
+  - { slug: flow-matching,      artifact_produces: "flow_net.pt" }
+  - { slug: consistency-models, artifact_consumes: "ddpm_cifar10.pt", artifact_produces: "consistency.pt" }
+mvbs: [ddpm-cifar10-colab, sd21-finetune-a10, consistency-distill]
+---
+```
+
+The arc-index page itself reads as a syllabus: one paragraph framing the capability, the step ladder with artifact chain visible, and a card per MVB.
+
+---
+
+## MVB page schema + quality bar
+
+An MVB is a runnable recipe. Each MVB serves exactly one persona; the same arc step may carry multiple MVBs (one per persona that needs a different shape). A page that fails the MVB quality bar below is not an MVB — it's tutorial dressing.
+
+**MVB frontmatter** (`docs/curriculum/core/<track>/builds/<mvb-id>.md`):
+
+```yaml
+---
+layer: mvb
+parent_arc: generative-stack
+parent_track: 02-generative-modeling
+mvb_id: ddpm-cifar10-colab
+for_persona: applied-ai-engineer            # exactly one — see the 3 canonical personas above
+time_to_ship: "1 working day"
+hardware: "Single A10 (24 GB) — or Colab Pro+ A100"
+prereqs: [pytorch-basics, training-loops]
+what_you_build: "A fine-tuned DDPM on a custom 5k-image dataset, FID < 60 vs baseline"
+artifact_at_end: "ddpm_finetuned.pt + 32 sampled PNGs + FID log"
+hf_models: ["google/ddpm-cifar10-32"]       # at least one real, loadable ID
+hf_datasets: ["cifar10"]                    # at least one
+runnable_cell_url: "https://colab.research.google.com/..."  # optional but recommended
+verification: "Inspect samples in /samples/ — recognisable class structure; FID < 60"
+---
+```
+
+**MVB quality bar (the standard the writer must clear):**
+
+An MVB is rejected by the reviewer unless it has all five:
+
+| # | Property | What "passes" looks like | What gets rejected |
+|---|---|---|---|
+| 1 | **A real, ship-able artifact** | A finetuned model checkpoint, a deployed endpoint, an instrumented experiment plot, a reproduced benchmark table | "Run the official notebook and observe the output" |
+| 2 | **A concrete time-to-ship** | "1 working day on a single A10" / "an evening on free Colab" | "A few hours" / "depends on your setup" |
+| 3 | **Real HF model + dataset IDs** | IDs that load via `from_pretrained(...)` and exist on the Hub today | A model name with no org prefix; a placeholder ID |
+| 4 | **A specific success metric** | "FID < 60", "reward gain ≥ +0.4 vs SFT baseline", "p95 latency ≤ 80 ms at batch 4" | "It should look reasonable" / "performance improves" |
+| 5 | **Hardness in the middle** | The recipe does at least one of: fine-tunes (not just inference), reproduces a paper's table, runs an ablation with a falsifier, or deploys with a measured latency target | A pip-install + `pipeline()` call with a pretrained model and nothing else |
+
+The middle bar matters most. A recipe that's just "install and run" is underwhelming — a reader can do that from the model card. The MVB earns its name by walking them through the smallest valuable thing that takes effort.
+
+---
+
 ## Reviewer enforcement summary
 
 The reviewer must REJECT a page if any of the following are true:
@@ -337,6 +414,10 @@ The reviewer must REJECT a page if any of the following are true:
 | Bare URL in any link (no anchor text) | Source-policy fail |
 | Any banned domain (medium, towardsdatascience, substack, wikipedia, youtube) | Source-policy fail |
 | `has_mvb: true` but Build it section is generic ("follow the tutorial") | MVB integrity |
+| MVB recipe is just `pip install` + `pipeline()` with a pretrained model (no fine-tune / reproduction / ablation / deploy target) | MVB quality bar #5 — underwhelming |
+| MVB recipe lacks a specific success metric (FID number, reward Δ, p95 latency, hit rate) | MVB quality bar #4 |
+| Arc-index file has >5 arcs in its parent track, or >6 steps in `steps:`, or >4 MVBs in `mvbs:` | Cardinality cap — page becomes intimidating |
+| Any persona tag outside {applied-researcher, research-engineer, applied-ai-engineer} | Persona drift — canonical set is the 3 personas above |
 | Citation in prose without arxiv/edu/huggingface URL | Source-policy fail |
 | Hook reads as a definition rather than a question/scenario/observation | Voice fail |
 

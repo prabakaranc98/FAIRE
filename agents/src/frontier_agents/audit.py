@@ -114,11 +114,111 @@ def audit_wiki(docs_dir: str | Path = "../docs") -> AuditReport:
             rel = str(page.relative_to(docs_path))
             content = page.read_text(encoding="utf-8")
             _check_page(content, rel, report, now)
+        _check_cardinality_caps(curriculum_dir, docs_path, report)
 
     if arcs_dir.exists():
         _check_compounding_chain(arcs_dir, docs_path, report)
 
     return report
+
+
+# v2 cardinality caps (see agents/SCHEMA.md "Arc page schema")
+MAX_ARCS_PER_TRACK = 5
+MAX_STEPS_PER_ARC = 6
+MAX_MVBS_PER_ARC = 4
+CANONICAL_PERSONAS = {"applied-researcher", "research-engineer", "applied-ai-engineer"}
+
+
+def _check_cardinality_caps(curriculum_dir: Path, docs_path: Path, report: AuditReport) -> None:
+    """Enforce the arc/MVB cardinality and persona-set guardrails.
+
+    These caps keep the tree shape "guiding, not intimidating": ≤5 arcs/track,
+    ≤6 steps/arc, ≤4 MVBs/arc, and persona tags must come from the canonical 3.
+    Caps exceeded → warning (page renders but design contract violated).
+    """
+    import re as _re
+    import yaml as _yaml
+
+    # v2 path: docs/curriculum/core/<track>/<page_type>/<slug>.md
+    core_dir = curriculum_dir / "core"
+    if not core_dir.exists():
+        return
+
+    for track_dir in core_dir.iterdir():
+        if not track_dir.is_dir():
+            continue
+        track_id = track_dir.name
+
+        # Arcs per track
+        arcs_dir = track_dir / "arcs"
+        if arcs_dir.exists():
+            arc_files = [p for p in arcs_dir.glob("*.md") if p.name != "index.md"]
+            if len(arc_files) > MAX_ARCS_PER_TRACK:
+                report.issues.append(_issue(
+                    "warning", "arc_cap_exceeded",
+                    str(arcs_dir.relative_to(docs_path)),
+                    f"Track has {len(arc_files)} arcs — cap is {MAX_ARCS_PER_TRACK}. "
+                    f"Reading wall risk. See agents/SCHEMA.md 'Arc page schema'.",
+                ))
+
+            # Steps + MVBs per arc — parse each arc-index frontmatter
+            for arc_file in arc_files:
+                rel = str(arc_file.relative_to(docs_path))
+                text = arc_file.read_text(encoding="utf-8", errors="ignore")
+                m = _re.match(r"^---\n(.+?)\n---", text, _re.DOTALL)
+                if not m:
+                    continue
+                try:
+                    fm = _yaml.safe_load(m.group(1)) or {}
+                except Exception:
+                    continue
+                steps = fm.get("steps") or []
+                mvbs = fm.get("mvbs") or []
+                if len(steps) > MAX_STEPS_PER_ARC:
+                    report.issues.append(_issue(
+                        "warning", "arc_steps_cap_exceeded", rel,
+                        f"Arc has {len(steps)} steps — cap is {MAX_STEPS_PER_ARC}. "
+                        f"Shrink to a weekend-sized commitment.",
+                    ))
+                if len(mvbs) > MAX_MVBS_PER_ARC:
+                    report.issues.append(_issue(
+                        "warning", "arc_mvbs_cap_exceeded", rel,
+                        f"Arc has {len(mvbs)} MVBs — cap is {MAX_MVBS_PER_ARC}. "
+                        f"One per persona is enough.",
+                    ))
+
+        # Persona-drift check on every page in this track
+        for page in track_dir.rglob("*.md"):
+            if page.name == "index.md":
+                continue
+            text = page.read_text(encoding="utf-8", errors="ignore")
+            m = _re.match(r"^---\n(.+?)\n---", text, _re.DOTALL)
+            if not m:
+                continue
+            try:
+                fm = _yaml.safe_load(m.group(1)) or {}
+            except Exception:
+                continue
+            personas: list[str] = []
+            for key in ("mvb_personas", "for_persona", "persona_fit"):
+                v = fm.get(key)
+                if isinstance(v, list):
+                    personas.extend(v)
+                elif isinstance(v, str):
+                    personas.append(v)
+            drift = [p for p in personas if p not in CANONICAL_PERSONAS]
+            if drift:
+                rel = str(page.relative_to(docs_path))
+                report.issues.append(_issue(
+                    "warning", "persona_drift", rel,
+                    f"Persona(s) outside canonical set: {drift}. "
+                    f"Allowed: {sorted(CANONICAL_PERSONAS)}",
+                ))
+
+
+def _issue(severity: str, check: str, page: str, message: str) -> PageIssue:
+    """Tiny helper — keeps the audit-rule definitions readable."""
+    return PageIssue(severity=severity, check=check, page=page, message=message)
 
 
 def _check_compounding_chain(arcs_dir: Path, docs_path: Path, report: AuditReport) -> None:

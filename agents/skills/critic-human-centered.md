@@ -50,11 +50,11 @@ Return JSON:
 {
   "score": 0.0,
   "issues": [
-    "MVB section has only one variant — missing curious-learner, applied-engineer, applied-researcher, theory-student, frontier-researcher",
-    "No opening analogy — curious learner has no on-ramp"
+    "MVB section has only one variant — should serve at least 2 of {applied-ai-engineer, research-engineer, applied-researcher}",
+    "No opening analogy — generalist reader has no on-ramp"
   ],
   "fix_suggestions": [
-    "Add 6-variant MVB block per mvb-recipe.md",
+    "Add at least 2 MVB variants per mvb-recipe.md (one per persona that has something distinct to do)",
     "Lead the 'What it is' section with a one-sentence analogy"
   ]
 }
