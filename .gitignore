@@ -23,6 +23,11 @@ uv.lock
 # MkDocs build output
 site/
 
+# Local agent runtime state — runs.jsonl, metrics, caches, logs, sprint history
+agents/runs/
+agents/logs/
+agents/sprints/history/
+
 # macOS
 .DS_Store
 

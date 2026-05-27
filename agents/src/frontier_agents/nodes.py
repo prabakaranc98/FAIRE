@@ -933,6 +933,88 @@ the exact phrase you saw) and actionable in `fix_suggestions` (name the edit).
     return results
 
 
+_ARXIV_CACHE_PATH = Path(__file__).parent.parent.parent / "runs" / "arxiv_cache.json"
+
+
+def _load_arxiv_cache() -> dict[str, bool]:
+    """Read the persistent arxiv-existence cache. {id: True if exists, False if 404}."""
+    try:
+        if _ARXIV_CACHE_PATH.exists():
+            return _json.loads(_ARXIV_CACHE_PATH.read_text(encoding="utf-8"))
+    except Exception:
+        pass
+    return {}
+
+
+def _save_arxiv_cache(cache: dict[str, bool]) -> None:
+    try:
+        _ARXIV_CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        _ARXIV_CACHE_PATH.write_text(
+            _json.dumps(cache, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
+    except Exception:
+        pass
+
+
+def _verify_arxiv_ids_live(ids: set[str]) -> set[str]:
+    """Probe arxiv.org/abs/<id> for each ID in parallel; return IDs that don't exist.
+
+    arxiv.org returns HTTP 200 even for malformed IDs but renders a sentinel
+    title `[<id>] Article identifier not recognized`. We GET the abs URL,
+    read only the first ~2KB, and look for that marker. A real paper has a
+    title like `[<id>] <Paper Title>`.
+
+    Cached: each ID is hit at most once across all runs (persisted in
+    agents/runs/arxiv_cache.json).
+    Soft-fail: network errors return *no* penalty — never block on flakiness.
+    Bounded: 2s timeout, max 8 concurrent. Total cost: ~100-800ms per page.
+    """
+    if not ids:
+        return set()
+    import urllib.request
+    import urllib.error
+    from concurrent.futures import ThreadPoolExecutor as _TPE_v
+
+    cache = _load_arxiv_cache()
+    to_probe = [aid for aid in ids if aid not in cache]
+    missing: set[str] = {aid for aid in ids if cache.get(aid) is False}
+
+    if not to_probe:
+        return missing
+
+    NOT_FOUND_MARKER = b"Article identifier not recognized"
+
+    def _probe(aid: str) -> tuple[str, bool | None]:
+        url = f"https://arxiv.org/abs/{aid}"
+        try:
+            req = urllib.request.Request(url, headers={
+                "User-Agent": "FAIRE-citation-check/1.0 (https://github.com/prabakaranc98/FAIRE)",
+            })
+            with urllib.request.urlopen(req, timeout=2.0) as resp:
+                # Read enough to span the <title> tag (~2KB is plenty)
+                body = resp.read(4096)
+                return aid, NOT_FOUND_MARKER not in body
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                return aid, False
+            return aid, None  # 5xx etc — don't trust
+        except Exception:
+            return aid, None  # timeout / DNS / connreset — don't penalize
+
+    with _TPE_v(max_workers=min(8, len(to_probe))) as pool:
+        results = list(pool.map(_probe, to_probe))
+
+    for aid, exists in results:
+        if exists is None:
+            continue  # uncertain — leave out of cache, retry next time
+        cache[aid] = exists
+        if exists is False:
+            missing.add(aid)
+
+    _save_arxiv_cache(cache)
+    return missing
+
+
 def _aggregate_review(
     structured: ReviewResult,
     panel: dict[str, CriticScore],
@@ -1158,6 +1240,18 @@ PAGE TO REVIEW:
                 f"suffix {suffix} implausibly high for recent month "
                 f"(arxiv monthly volume tops ~25k)"
             )
+    # HTTP HEAD verification — final defense against well-formed but
+    # nonexistent IDs (e.g. plausible-looking phantoms like "2603.01761"
+    # that the writer invents to support a fabricated citation). Cached
+    # to agents/runs/arxiv_cache.json so each ID is hit at most once.
+    # Returns set of confirmed-missing IDs (404). Network errors are
+    # never penalized — defense must not block on flakiness.
+    survivors = arxiv_ids - set(bad_arxiv)
+    missing_arxiv: set[str] = _verify_arxiv_ids_live(survivors) if survivors else set()
+    for aid in missing_arxiv:
+        bad_arxiv.append(aid)
+        bad_reasons[aid] = "arxiv.org returned 404 — paper does not exist"
+
     if bad_arxiv:
         penalty_a = min(0.20, 0.05 * len(bad_arxiv))
         confidence = max(0.0, confidence - penalty_a)
