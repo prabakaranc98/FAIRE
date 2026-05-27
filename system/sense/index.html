@@ -1040,10 +1040,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#three-layers-one-site" class="md-nav__link">
+  <a href="#three-layers-one-tree" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Three layers, one site
+        Three layers, one tree
       
     </span>
   </a>
@@ -1627,12 +1627,12 @@
 </tr>
 </tbody>
 </table>
-<p><strong>Each pivotal page carries up to 6 MVB variants — one per persona except the PM</strong> — sharing the same concept underneath but diverging in artifact, time, and success metric.</p>
-<h2 id="three-layers-one-site">Three layers, one site<a class="headerlink" href="#three-layers-one-site" title="Permanent link">&para;</a></h2>
+<p><strong>Each pivotal page carries 1–3 MVB variants — one per persona that has something distinct to do</strong> — sharing the same concept underneath but diverging in artifact, time, and success metric. The canonical 3 are: applied-ai-engineer (a.k.a. forward-deployed engineer), research-engineer, applied-researcher. Any other persona tag is a writing error.</p>
+<h2 id="three-layers-one-tree">Three layers, one tree<a class="headerlink" href="#three-layers-one-tree" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Curriculum</strong> (<code>docs/curriculum/</code>) — one page per concept, organized across 15 tracks (10 canonical + 5 extensions). Range. No builds — those live in arcs. Each page backlinks to the arc steps that use it.</li>
-<li><strong>Arc Index</strong> (<code>docs/arcs/{arc}/index.md</code>) — opinionated paths from a starting concept to a frontier capability. Chapters, curated readings, compounding-trajectory table.</li>
-<li><strong>Arc Step</strong> (<code>docs/arcs/{arc}/step-NN-*.md</code>) — one build per page. Each step's artifact is literally what the next step loads. <strong>MVBs (Minimum Valuable Builds) live here as milestones.</strong></li>
+<li><strong>Curriculum</strong> (<code>docs/curriculum/core/&lt;track&gt;/concepts/</code>) — one page per concept, organised across the 10 canonical AI tracks (per <code>pracha.me/curriculum</code>). The supporting reference layer. Concepts back-link to the arc steps that use them; an arc's prerequisites are real concept pages, not air.</li>
+<li><strong>Arc index</strong> (<code>docs/curriculum/core/&lt;track&gt;/arcs/&lt;arc-id&gt;.md</code>) — one syllabus per arc. Step ladder with the compounding artifact chain visible. Cardinality cap: ≤5 arcs per track, ≤6 steps per arc — to keep the tree guiding, not intimidating.</li>
+<li><strong>Arc step</strong> (<code>docs/curriculum/core/&lt;track&gt;/arcs/&lt;arc-id&gt;/step-NN-&lt;slug&gt;.md</code>) — one build per page. Each step's artifact is literally what the next step loads (compounding-chain audit enforces this). <strong>MVBs live here as milestones.</strong></li>
 </ul>
 <h2 id="source-policy-enforced-by-the-reviewer">Source policy (enforced by the reviewer)<a class="headerlink" href="#source-policy-enforced-by-the-reviewer" title="Permanent link">&para;</a></h2>
 <p>Citations come from:</p>

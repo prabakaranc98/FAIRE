@@ -783,10 +783,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#built-for-four-readers" class="md-nav__link">
+  <a href="#built-for-three-personas" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Built for four readers
+        Built for three personas
       
     </span>
   </a>
@@ -1730,40 +1730,39 @@
 <li><strong>Builds</strong> are Minimum Valuable Build recipes — runnable, persona-tagged, real artifact at the end.</li>
 </ul>
 <hr />
-<h2 id="built-for-four-readers">Built for four readers<a class="headerlink" href="#built-for-four-readers" title="Permanent link">&para;</a></h2>
-<p>Every topic page is built for <strong>four reader types</strong> — and always answers the same question: <em>what can I do with this?</em></p>
+<h2 id="built-for-three-personas">Built for three personas<a class="headerlink" href="#built-for-three-personas" title="Permanent link">&para;</a></h2>
+<p>Every page that carries an MVB targets these three. The schema enforces it — any other persona tag is a writing error.</p>
 <table>
 <thead>
 <tr>
-<th>Reader</th>
-<th>Gets</th>
-<th>Outcome</th>
+<th>Persona</th>
+<th>Comes to do</th>
+<th>Time</th>
+<th>Their MVB shape</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Applied practitioner</strong></td>
-<td>Key algorithms + MVB recipe</td>
-<td>Something built today</td>
+<td><strong>Applied AI/ML engineer</strong> (forward-deployed)</td>
+<td>Ship into production by Friday</td>
+<td>Half a day – 1 working day</td>
+<td>Fine-tune a real model and serve it with a measured latency target</td>
 </tr>
 <tr>
-<td><strong>Curious generalist</strong></td>
-<td>Clear intuition, no jargon</td>
-<td>Genuine understanding</td>
+<td><strong>Research engineer</strong></td>
+<td>Reproduce a paper's number on commodity hardware</td>
+<td>1–3 working days</td>
+<td>A reproduced table or figure within ±5% of the published number</td>
 </tr>
 <tr>
-<td><strong>Theory student</strong></td>
-<td>Annotated LaTeX, derivations</td>
-<td>Rigorous mental model</td>
-</tr>
-<tr>
-<td><strong>Frontier researcher</strong></td>
-<td>Named papers, open problems</td>
-<td>Where to push next</td>
+<td><strong>Applied researcher</strong></td>
+<td>Test one hypothesis with one falsifier</td>
+<td>2 days – 1 week</td>
+<td>A 2–3 condition ablation with a plot and a falsification criterion</td>
 </tr>
 </tbody>
 </table>
-<p>Pivotal pages include a <strong>Minimum Valuable Build</strong> — a concrete, runnable recipe with real HuggingFace model and dataset IDs, designed for a consumer GPU or free Colab tier.</p>
+<p>Every MVB clears the <strong>5-gate quality bar</strong>: a real ship-able artifact · a concrete time-to-ship · real HuggingFace model + dataset IDs · a specific success metric · <em>hardness in the middle</em> (fine-tune OR reproduce OR ablate OR deploy — never just <code>pip install</code> + <code>pipeline()</code>).</p>
 <hr />
 <h2 id="source-discipline">Source discipline<a class="headerlink" href="#source-discipline" title="Permanent link">&para;</a></h2>
 <p>Every link traces back to a primary source:</p>
