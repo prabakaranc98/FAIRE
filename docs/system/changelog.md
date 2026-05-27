@@ -8,11 +8,16 @@ description: Every page generated or improved by the editorial agent
 > Every wiki page generated, improved, or reviewed by the agent system is logged here.
 > Entries are prepended (newest first). Source: `agents/runs/runs.jsonl`.
 
-No runs recorded yet. Run the agent to populate this log.
+!!! abstract "Where the system is right now"
+    **71 substantive concept pages · 10 auto-seeded stubs · 106 total pipeline runs · 6 retrospective cycles · ~$70 spent · avg confidence 0.77 across all tracks.** Latest cycle: 88% approval, 71% first-try. Universal weakest critic across every track: `critic-info-architecture` (pages missing "Where this concept appears" / "Connected topics" sections — the next big lever).
+
+    - **What changed today:** closed-loop validated end-to-end (retrospective agent now seeds the next sprint without human input); three-layer hallucination defense shipped (regex → live arxiv HEAD check → LLM-keyword penalty); knockout selector saved 5 pages from improve-pass regressions; Made-to-Stick hero rewrite landed.
+    - **For the human-curated narrative,** see the [Learnings Log](learnings-log.md).
+    - **For the agent's own scrum retrospectives,** see the [Backlog](backlog.md).
 
 ---
 
-*This page is updated automatically by `log_run_node` after every pipeline run.*
+*Per-run entries below are auto-prepended by `log_run_node` after every pipeline run.*
 
 ### 2026-05-25 23:23 UTC — score-matching
 

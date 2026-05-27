@@ -12,6 +12,98 @@ description: Honest write-ups of what the FAIRE system discovered each session �
 
 ---
 
+## 2026-05-27 (late) — Closing the loop: retrospective agent, hallucination defenses, knockout selection
+
+**Goal of the session:** validate the closed-loop is actually a loop — that
+the system can write pages, reflect on them, seed its own next sprint, and
+keep cycling without a human in the queue.
+
+**What worked**
+
+- **The loop closed end-to-end.** Six retrospective cycles ran in one day,
+  cycle #1 (~50 pages) → manual tests → cycle #6 (22 pages from a fresh
+  sprint). Each cycle's scrum retro auto-seeded the next: 7 stubs after
+  cycle #5, 10 stubs after cycle #6 — covering `policy-evaluation`,
+  `representation-learning`, `quantization-aware-training`, `normalization`,
+  `gradient-descent`, `mixed-precision-training`, and others. All of those
+  topics surfaced because the retrospective spotted them being referenced
+  across 2+ existing pages without backing files. The system is now growing
+  its own knowledge graph.
+- **Knockout selector earned its keep.** Of 22 sprint-2 topics, 5 improve
+  passes regressed (`data-parallelism` 0.75 → 0.61, `policy-evaluation`
+  0.81 → 0.60, `representation-learning` 0.81 → 0.74, `backpropagation`
+  0.81 → 0.76, `flash-attention` 0.77 → 0.70). The knockout selector
+  retained the higher-confidence first draft in every case — no shipped
+  page got worse on the improve pass. Without it, the revision spiral
+  would have actively degraded the wiki.
+- **Hallucination defense at three layers works.** (1) Regex catches obvious
+  fakes (future YYMM, implausibly-high suffix). (2) HTTP HEAD against
+  `arxiv.org/abs/<id>` catches well-formed phantom IDs by matching the
+  sentinel title `[<id>] Article identifier not recognized`. (3) The LLM
+  reviewer's own issues list is post-scanned for hallucination keywords
+  and applies a hard −0.10 penalty. The HEAD verifier is cached to
+  `agents/runs/arxiv_cache.json` so every ID is hit at most once — current
+  cost is well under 1s per page for a typical 5-citation draft.
+- **Cost held at $0.18/page.** Sprint 2 was 22 topics + 22 improve passes
+  + 8 critics × 30 invocations + 6 retrospective runs for **~$7**. Per-page
+  economy is genuinely linear at this scale; nothing about the closed loop
+  added overhead.
+
+**What we got wrong — and corrected**
+
+- We initially flagged `arxiv:2603.01761` as a "phantom citation" because
+  the retrospective reported it appeared 6× across 4 different pages. The
+  HEAD verifier confirmed it's real — "Modular Memory is the Key to
+  Continual Learning Agents" (Dorovatas et al. 2026). **Citation
+  concentration is not the same as fabrication.** A real seminal paper
+  legitimately cited by multiple pages will cluster the same way. The
+  retrospective should keep flagging concentration (it's a hint), but
+  the conclusion has to come from the HEAD check, not from the count.
+- The first version of the regex validator only blocked future-dated YYMM.
+  That missed `2605.21058` (current month, implausible counter 21058 for
+  May 27 2026), which the LLM reviewer caught as suspicious but didn't
+  hard-fail. The fix: add a `suffix > 25000` check for the current and
+  previous YYMM, plus the LLM-keyword post-scan. Layered defense — the
+  regex is cheap, the HEAD verifier is authoritative, the LLM is the
+  third opinion.
+
+**Universal weakest signal across all 10 tracks**
+
+`critic-info-architecture` is the lowest-scoring critic on **every** track
+in cycle 6 (range 0.38 in 05-stat-prob / 08-causal up to 0.65 in 09-systems).
+The recurring complaint: pages are missing a "Where this concept appears"
+section linking back to arcs, and a "Connected topics" section linking
+sideways to peer concepts. This is the next big lever — fixing the writer
+prompt to mandate both sections should lift every track's avg confidence
+by ~0.05–0.08.
+
+**What we changed today**
+
+- `agents/src/frontier_agents/retrospective.py` — new scrum retro agent
+  (aggregator + LLM proposer + safe auto-applier), 720 LOC, wired into
+  the scheduler.
+- `agents/src/frontier_agents/nodes.py` — H1 fixer in `write_file_node`,
+  layered arxiv validator + HEAD verifier + LLM-keyword post-scan in
+  `review_node`.
+- `docs/system/architecture.md` — rewritten as a closed-loop blueprint;
+  the retrospective is now part of the per-cycle diagram, not a "planned"
+  item in the gap list.
+- `docs/overrides/home.html` — hero rewritten with Made-to-Stick framing
+  around the MVB promise, plus a four-node closed-loop showcase strip.
+
+**What's next**
+
+- Persona/prompt update so the writer always emits "Where this concept
+  appears" and "Connected topics" — closes the universal weakest-critic
+  gap.
+- Author pages for the most-cited researchers (`2604.15469` topped this
+  cycle at 8 citations; an anchor page would let every concept page
+  link back to one canonical author write-up).
+- A `MAX_CYCLES` or `STOP_WHEN_COVERAGE_PCT` env var so the server has a
+  declarative stop rule instead of relying on the budget envelope alone.
+
+---
+
 ## 2026-05-27 — Local-mode reality check on M4 24GB unified RAM
 
 **Goal of the session:** validate that the FAIRE pipeline can run end-to-end

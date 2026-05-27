@@ -29,9 +29,9 @@ FAIRE is organized around the 10 parallel learning tracks from [pracha.me/curric
 
 ---
 
-## What every page gives you
+## Every page is one of four artifact types
 
-Every subject is built around four artifact types — **concepts**, **authors**, **arcs**, and **builds** — designed to converge into a coherent reading you can act on.
+Each subject converges on the same shape — **concepts**, **authors**, **arcs**, and **builds** — designed to feed into each other rather than sit as a bookmark pile.
 
 - **Concepts** are encyclopedic, self-contained walk-throughs (Olah/Distill grade), not bullet-point summaries.
 - **Authors** anchor the field to the people whose work shaped it.
@@ -40,7 +40,7 @@ Every subject is built around four artifact types — **concepts**, **authors**,
 
 ---
 
-## What every page gives you
+## Built for four readers
 
 Every topic page is built for **four reader types** — and always answers the same question: *what can I do with this?*
 

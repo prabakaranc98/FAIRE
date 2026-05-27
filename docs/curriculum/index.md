@@ -2,12 +2,15 @@
 title: Curriculum
 description: The 10 canonical tracks per pracha.me/curriculum. Each subject has concepts, authors, arcs, builds.
 state: active
-updated: 2026-05-26
+updated: 2026-05-27
 ---
 
 # Curriculum
 
 The 10 canonical tracks from [pracha.me/curriculum](https://pracha.me/curriculum). Every subject has the same shape: `concepts/`, `authors/`, `arcs/`, `builds/`. See the [structure spec](../system/structure-v2.md) for the v2 design contract.
+
+!!! info "Current state — autonomously maintained"
+    **71 substantive concept pages** across all 10 tracks · 10 newly auto-seeded stubs awaiting the next cycle · 6 retrospective entries on the [backlog](../system/backlog.md). The system writes, reviews, and expands itself — every cycle a [retrospective agent](../system/architecture.md#agent-roster) reflects on what regressed and seeds the next sprint with the gaps it found. See the [latest retro](../system/backlog.md) for what the agents themselves identified as weak this round.
 
 ## The 10 tracks
 
