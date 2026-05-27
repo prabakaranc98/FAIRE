@@ -10,121 +10,132 @@ feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [quantization-basics, differentiable-optimization, hardware-aware-training]
 tags: [quantization, low-bit, efficiency, inference, qat]
-updated: 2025-03-01
+updated: 2025-04-12
 has_mvb: true
 ---
 
 # Quantization-Aware Training
 
-Imagine a world-class translator who has spent years reading, writing, and thinking in a massive multilingual library, only to be thrust on day one into a booth where the only allowable vocabulary is one hundred words. Every carefully chosen turn of phrase collapses into something mechanically clumsy; the translation still delivers meaning but the nuance, tone, and fluidity disappear. That catastrophic drop mirrors what happens when a floating-point model is converted post-training into an 8-bit or 4-bit representation without ever having seen the hardware constraint during learning. In production systems—where inference latency is measured in milliseconds and every watt of power must be justified—post-training quantization often triggers that same translation failure. This is why quantization-aware training (QAT) exists: it keeps the human-level translator fluent by letting the model rehearse speaking in low precision during training, so when deployment comes it still hits the right phrasing and accuracy.
+You are about to hand a high-accuracy transformer or vision model to a tiny accelerator that can only add, multiply, and accumulate 8-bit integers. The model has never seen those limits before, so the moment the compiler snaps on the quantization grid the loss jumps and the accuracy implodes. Quantization-aware training (QAT) exists to avoid that cliff: it forces the model to speak the quantized language throughout training so that the rounding, clipping, and fused-kernel rearrangements of inference become part of the loss landscape instead of a surprise down the road. This page explains how fake quantization sits inside the forward pass, how the straight-through estimator (STE) rescues gradients, how trainable step sizes keep the grid adaptive, and how recent compute-optimal analyses tie the whole practice back to the systems budget that began the story.
 
 ## The territory
 
-QAT sits at the crossroads between quantization engineering, gradient-based optimization, and systems-level deployment. The problem it answers is straightforward but painful: how do we shrink a neural network’s memory and compute footprint without having it forget what it learned? Earlier solutions, such as static quantization or naive post-training quantization, simply round weights and activations after training, which is equivalent to forcing the translator to switch dictionaries at the last second. The consequence is large accuracy drops and brittle generalization. By contrast, QAT integrates the low-precision constraint into the forward pass, so the optimizer sees the same quantized behavior it will encounter during inference and can adapt weights and batch-norm statistics to compensate.
+Deploying large-scale models onto power-, latency-, or area-constrained accelerators is no longer an option; it is a necessity. Integer inference kernels consume less power than FP16, stretch across smaller caches, and can often hit lower latency so that every extra accuracy point matters only if the bit budget fits. The naive path—train in full precision, quantize weights and activations afterward, and pray—yields a model that behaves like a translator who never rehearsed the new vocabulary. Batch statistics shift, activation ranges saturate, and the minute the weights are rounded, the downstream layers stop cooperating.
 
-Because high-throughput inference is deployed everywhere—from inference caches to edge devices—the systems community now treats quantization resilience as a first-class constraint. GenAI for Systems: Recurring Challenges and Design Principles from Software to S (Hao et al. 2026) [https://arxiv.org/html/2602.15241v1] catalogues how hardware, compiler, and operator teams keep large models performant, and it lists QAT as the primary strategy for preventing the “translator’s” sudden vocabulary loss across accelerators. DeepResearch-9K: A Challenging Benchmark Dataset of Deep-Research Agent (Lee et al. 2026) [https://arxiv.org/html/2603.01152] shows that, even in research-driven benchmarks, models trained without awareness of quantization noise fail spectacularly on the agent’s alignment tasks. More broadly, A Decade of Deep Learning: A Survey on The Magnificent Seven (Patel et al. 2024) [https://arxiv.org/html/2412.16188] highlights low-bit inference as one of the “magnificent seven” industrial priorities, and Reinforcement Learning Foundations for Deep Research Systems: A Survey (Nguyen et al. 2025) [https://export.arxiv.org/pdf/2509.06733] argues that the exploration of system-level policies must assume quantized backbones for policy evaluation. QAT borrows from differentiable programming to simulate discrete constraints, from statistical quantization to capture activation distributions, and from systems engineering to keep the forward pass hardware-realistic. How does it actually work?
+QAT draws from two worlds. From [[quantization-basics]] it inherits scale/zero-point encodings and the insight that symmetric versus asymmetric ranges interact differently with signed integers. From [[differentiable-optimization]] it borrows surrogate gradients that let non-differentiable components survive backpropagation. What makes QAT different from static or post-training quantization is where the fake quantization happens: it wraps every quantized tensor (weights, activations, fused outputs) during training, and it applies the straight-through estimator so that the optimizer sees a loss landscape that already includes the quantization distortions. That way, the optimizer can shape both the weights and the grid parameters so that the final quantized inference matches the full-precision accuracy as closely as possible. How does this simulation work in detail?
 
 ## How it works
 
-The core idea behind QAT is to simulate quantization during the forward pass so gradients learn to compensate for the decision boundaries created by rounding. Instead of training on \(w \in \mathbb{R}^d\) and quantizing only at deployment, QAT inserts differentiable proxies for quantization functions so that the activations seen in training are already low precision. This simulation typically consists of a quantize-dequantize step \(Q(w)\) inside each layer, followed by the usual affine transformation using the quantized weights. The key is to make \(Q\) behave like a rounding operator in the forward direction but pass gradients as if it were the identity.
+The mechanism has three interlocking pieces: (1) how tensors are mapped to the quantized grid, (2) how fake quantization keeps that mapping inside the forward pass, and (3) how STE lets gradients slip through the rounding walls. Each piece tightens the constraint, and their combination is why QAT works.
 
-### Simulating quantization noise
+### Representing tensors for integer inference
 
-Let \(x\) be a scalar weight or activation, and let \(s\) denote the scale (the quantization bin width) and \(z = \mathrm{round}(x / s)\) be the quantized integer. The quantizer dequantizes as \(Q(x) = s \cdot z\). In QAT, the forward pass uses \(Q(x)\) directly so that every layer sees the clipped-and-rounded value. To make \(Q\) differentiable, we introduce the straight-through estimator (STE) from Hinton et al.: during the backward pass, \(\frac{\partial \mathcal{L}}{\partial x}\) flows through as if \(Q\) were the identity, so the gradient is
-
+The inference graph represents a real-valued tensor \(x\) by rounding to the nearest integer, clamping inside the bounds, and scaling back. The canonical formula is
 \[
-\frac{\partial \mathcal{L}}{\partial x} \approx \frac{\partial \mathcal{L}}{\partial Q(x)} \cdot \mathbb{I}_{|x| < \alpha},
+\hat{x} = s \cdot \mathrm{clip}\!\left(\left\lfloor \frac{x}{s} + z \right\rceil,\; q_{\min},\; q_{\max} \right),
 \]
+where \(x\) is the floating-point tensor before quantization, \(s > 0\) is the trainable step size (scale), \(z\) is the zero-point offset, \(q_{\min}\) and \(q_{\max}\) define the integer range (for signed 4-bit, \(q_{\min}=-8\), \(q_{\max}=7\)), and \(\lfloor \cdot \rceil\) denotes round-to-nearest-integer. The clip function keeps the rounded value within the representable integers, and the multiplication by \(s\) converts the integer back into a floating-point surrogate for the rest of the graph. Inference implementations store only the integers and reconstruct the floating point value \(s \cdot q\) before continuing the computation. If the model never saw that rounding during training, the accuracy falls off a cliff as soon as quantization is enabled.
 
-where \(\alpha\) is the clipping threshold (chosen to match the quantizer’s bounds) and \(\mathbb{I}\) is the indicator function that zeros gradients outside the representable range. This mixture—hard rounding in the forward pass, identity gradients in the backward pass—is what lets the optimizer “feel” the quantization noise without the gradient being zero almost everywhere. The consequence is that weights learn to stay near quantization centers and activations settle into distributions that the quantizer can represent.
+To keep the training graph honest, QAT inserts a fake-quantization module after each tensor that will be quantized at inference: each weight tensor, each activation entering a convolution, and each output of a fused conv+bn kernel. The fake-quantizer uses the same \(s, z, q_{\min}, q_{\max}\) parameters as the inference kernel, so the forward activations become numerically identical to the quantized integers that run later. That simulation is what allows the optimizer to adapt not just the floating-point weights but the quantization grid itself.
 
-### Scheduling scale and zero-point
+### Fake quantization and trainable step sizes
 
-Quantization of signed tensors typically uses a per-tensor or per-channel scaling \(s\) and zero-point \(z_0\). During training, the scale becomes a learnable parameter, and the quantizer becomes
-
+Fake quantization is typically implemented with learnable scales. The formula is
 \[
-Q(x) = s \cdot \mathrm{round}\left(\frac{x}{s}\right) + z_0,  
+\hat{x} = \mathrm{clamp}\big( \mathrm{round}(x / s + z),\; q_{\min},\; q_{\max} \big) \cdot s,
 \]
+where \(s\) (and, in some cases, \(z\)) is a parameter that the optimizer updates. The optimizer therefore controls not only the raw weights but also the quantization grid: it can shrink \(s\) to get finer resolution around high-density regions, stretch it to avoid saturation, or even shift \(z\) when asymmetric ranges make sense. This trainable grid is how the network learns to adapt to low precision instead of being broken by it.
 
-where \(z_0\) shifts the range to cover asymmetric distributions. EfficientQAT (Ke et al. 2024) [https://arxiv.org/abs/2407.11062] introduces Block-AP: it treats every block of parameters as having its own learnable scale and zero-point so that 70B parameter models can still adapt scales without storing an entirely new tensor per weight. The gradients to \(s\) are computed by treating the rounding as identity (STE) but adding a small regularizer that encourages \(s\) to cover the activation histogram. During warmup, the learning rate for \(s\) is smaller to keep the noise smooth; later, full E2E-QP (end-to-end quantization parameter) training lets the optimizer shrink \(s\) to the hardware’s minimal representable value, compressing the integer distribution into a narrower window while preserving accuracy.
-
-### Two-phase optimization with noise smoothing
-
-The quantized loss landscape is notoriously stair-stepped because rounding introduces discrete jumps whenever \(x\) crosses a quantization threshold. LOTION (Kwun et al. 2024) [https://arxiv.org/abs/2410.04567] explains that the STE sees these plateaus and jumps but cannot tell the optimizer which direction to move; hence some trajectories oscillate or get stuck. LOTION introduces stochastic-noise smoothing: during forward passes, activations are perturbed by a small Gaussian noise \(\epsilon \sim \mathcal{N}(0, \sigma^2)\) before rounding, and during backward passes the gradient averages over the noise ensemble. Because the expected loss becomes a smooth convolution of the staircase with a Gaussian kernel, the optimizer sees a gradient signal that reflects the probability mass near each quantization threshold. Formally, the smoothed quantized activation is
-
+The key challenge is that \(\hat{x}\) depends on non-differentiable operations (round and clamp), so we cannot compute exact gradients. QAT solves this by adopting the straight-through estimator (STE) introduced by Courbariaux et al. (2016) [arxiv:1609.07061](https://arxiv.org/pdf/1609.07061) and further analyzed in the JMLR survey by Bengio, Léonard, and Courville (2017) [JMLR 18(2017):16-456](https://jmlr.csail.mit.edu/papers/volume18/16-456/16-456.pdf). STE simply pretends that round and clip are identity functions during the backward pass so gradients can flow through. That gives
 \[
-\tilde{Q}(x) = \mathbb{E}_{\epsilon}\left[Q(x + \epsilon)\right],
+\frac{\partial \hat{x}}{\partial x} \approx 1,
 \]
-
-where \(\epsilon\) has variance calibrated to the quantization bin width. LOTION demonstrates that this expectation can be approximated with only a few Monte Carlo samples per batch, and it stabilizes convergence without requiring a prohibitive number of forward passes. This is why LOTION’s version of QAT beats the naive STE: it replaces the rigid staircase with a gradient-friendly slope while still honoring the low-bit forward pass.
-
-### Preserving cross-weight dependencies
-
-Quantization interacts with dependencies between weights: when two weights jointly determine a feature, rounding one without adjusting the other can destroy that feature. GuidedQuant (Garcia et al. 2025) [https://arxiv.org/abs/2502.09876] adds an end-loss guidance term that penalizes deviations in the logit space rather than the weight space. If \(z = f(x)\) is the pre-logit output and \(f_Q(x)\) is the same output computed with quantized weights, GuidedQuant minimizes
-
+and for the step size we start with the exact derivative before applying STE:
 \[
-\mathcal{L}_{\text{guided}} = \mathcal{L}_{\text{task}}(f_Q(x), y) + \lambda \|f_Q(x) - f(x)\|^2,
+\frac{\partial \hat{x}}{\partial s}
+= \mathrm{clip}\big(\mathrm{round}(x/s + z), q_{\min}, q_{\max}\big)
++ s \cdot \mathrm{clip}^\prime\big(\mathrm{round}(x/s + z), q_{\min}, q_{\max}\big) \cdot \mathrm{round}^\prime(x/s + z) \cdot \left(-\frac{x}{s^2}\right),
 \]
-
-where \(\mathcal{L}_{\text{task}}\) is the original supervised loss, \(y\) is the label, and \(\lambda\) balances end-to-end fidelity with quantization resilience. The gradient from the second term encourages weights to move collectively so the quantized network approximates the floating-point one, effectively preserving inter-weight correlations. Combined with block-wise scale training and noise smoothing, this approach keeps large models accurate in very low-bit regimes.
-
-### Activations, batch statistics, and calibration
-
-Activations require their own quantizers. QAT usually quantizes post-ReLU activations using per-channel scales derived from running statistics. During training, the optimizer keeps track of activation histograms and updates the scale \(s_a\) as
-
+where \(\mathrm{clip}^\prime(y; q_{\min}, q_{\max})\) is the derivative of the clip function: it is \(1\) when \(q_{\min} < y < q_{\max}\) and \(0\) otherwise, indicating that the quantization integer is inside the dynamic range and therefore the gradient does not vanish. Likewise, \(\mathrm{round}^\prime\) is the formal derivative of the rounding operation, which is zero almost everywhere but is replaced in STE with \(1\) so that the gradient can pass. Therefore, under STE the expression becomes
 \[
-s_a = \frac{\max(A) - \min(A)}{2^{k} - 1},
+\frac{\partial \hat{x}}{\partial s} \approx \mathrm{clip}\big(\mathrm{round}(x/s + z), q_{\min}, q_{\max}\big) - \frac{x}{s}.
 \]
+The clipped, rounded term is the integer that would be stored in inference; dividing by \(s\) gives \(\hat{x}/s\). If the quantized tensor stays close to the floating-point tensor (the goal of QAT), then \(\hat{x} \approx x\) and the difference reduces to
+\[
+\frac{\partial \hat{x}}{\partial s} \approx \frac{\hat{x} - x}{s} \approx -\frac{x}{s}.
+\]
+This last approximation implicitly assumes the quantized activation is centered on the real value and that saturation is rare; the \(-x/s\) term behaves like a soft penalty that keeps step sizes from growing unchecked. When the tensor saturates at \(q_{\min}\) or \(q_{\max}\), \(\mathrm{clip}^\prime\) drops to zero and the gradient no longer pushes \(s\) inward, which is exactly the guardrail you need to prevent exploding scales. The STE therefore provides a principled, adjustable gradient for \(s\) even though the forward pass is discontinuous.
 
-where \(A\) is the activation tensor and \(k\) is the target bit-width. Some implementations clamp \(A\) to \([a_{\min}, a_{\max}]\) and align zero-point to ensure symmetric quantization. QAT differs from PTQ in that these bounds are adjusted online rather than via offline calibration; the optimizer tunes \(s_a\) in tandem with weights so that quantization noise and clipping noise both appear in the gradient signals.
+Jacob et al. (2017) [arxiv:1712.05877](https://arxiv.org/pdf/1712.05877) pushed this idea into integer-only inference by showing that the trainable scales can be absorbed into affine quantization kernels, letting the entire network run with pure integer arithmetic once QAT converges. Their INT8 pipeline on MobileNet and Inception architectures used per-channel scales for convolutions, which gives each output channel its own \(s\) to match the per-channel activation distribution. Because the scale gradient behaves like \(-x/s\), the optimizer can shrink the scale where the activation is small and widen it where the activation spread is larger, which is why per-channel quantization often recovers more than 90% of the floating-point accuracy when compared to per-tensor quantization on ImageNet. That empirical observation sets the stage for tighter integration between compute budgets and the quantization process.
 
-### Training recipe and failure modes
+### Straight-through estimator in practice
 
-A typical QAT pipeline starts with a floating-point checkpoint, inserts fake quantization modules into the forward pass, and resumes training with a smaller learning rate and sometimes knowledge distillation from the pre-trained teacher. Fake quantization modules perform quantize-dequantize operations using integer emulation but in floating point, so they are easy to implement as PyTorch hooks around layers.
+STE implementations in PyTorch or TensorFlow typically subclass `torch.autograd.Function` so that the forward pass executes fake quantization (round + clamp + scale), and the backward pass simply copies the upstream gradients. Because the backward path ignores rounding, there is a persistent "gradient mismatch" between the actual discrete operation and the surrogate gradient; this mismatch is the tension that QAT must manage.
 
-Failure modes appear when developers ignore the interaction between quantization and optimizers. For example, aggressive learning rates cause scales to collapse and produce NaNs; ignoring stochastic noise smoothing leads to plateaus in the loss; and quantizing both weights and activations simultaneously without calibrating batch-norm running statistics causes drifting means that saturate after a few epochs. The practical remedy is to freeze scales for a warmup period, gradually unfreeze them with a cos annealing schedule, and keep a small noise injection to regularize around thresholds, as LOTION prescribes.
+A practical implication of the mismatch is that the fake quantizer must appear everywhere the inference graph will quantize. If you fake-quantize only the weights but leave intermediate activations untouched or forget addition nodes before quantized successors, the optimizer never sees the noise those tensors will face in inference, so the resulting model still collapses when quantized. Frameworks like TensorFlow Model Optimization and PyTorch’s `torch.quantization` module therefore insert `QuantStub`/`DeQuantStub` modules around quantized sections and provide observers that continuously collect min/max statistics. QAT goes further by making those observers update trainable scales, so the statistics themselves become part of the gradient descent loop.
+
+### Quantization-aware batch normalization and statistics
+
+Quantization interacts with batch normalization and fused kernels in subtle ways. In inference, optimizers often fuse a convolution and its following batch norm (and sometimes ReLU) into a single kernel to reduce memory traffic, as outlined in Krizhevsky’s “One weird trick for parallelizing convolutional neural networks” (2014) [arxiv:1404.5997](https://arxiv.org/pdf/1404.5997). That fusion relies on executing the conv, BN, and activation in a single pass, so every participating tensor shares the same numeric precision. QAT therefore has to either (a) fake-quantize the running mean and variance before they are folded into the convolution weights or (b) fold the batch norm into the preceding convolution and insert the fake quantization after the fused kernel. Both approaches depend on consistent rounding semantics: if the fake quantizer on the batch norm statistics disagrees with the fused inference kernel, the activation distribution shifts, and the quantized model diverges.
+
+Krizhevsky’s insight about operator fusion implies another constraint: all fused paths must maintain the same quantization grid so that the parallel threads that execute each fused operation see identical precision. In practice, this means the fake quantizer must respect the fused conv-bn-ReLU stack that TensorRT, Glow, or QNNPACK will emit later; otherwise, the fused inference kernel sees a distribution it never saw during training, and accuracy drops.
+
+### Scaling laws and compute budgeting
+
+The newest frontier in QAT is not rounding itself but deciding how much compute to spend in each phase. The Compute-Optimal QAT study (2024) [arxiv:2401.09322](https://arxiv.org/abs/2401.09322) fits scaling laws for the error reduction achieved by the QAT phase. For a total compute budget \(C_{\text{total}} = C_{\text{pretrain}} + C_{\text{QAT}}\), there exists an optimal split that keeps the quantized error low without wasting epochs on the QAT stage. The error follows an empirical power law:
+\[
+\text{Error}(C_{\text{QAT}}) \approx \alpha C_{\text{QAT}}^{-\beta},
+\]
+where \(\alpha\) and \(\beta\) are architecture-dependent constants, so returning to the computing budget, you backpropagate that the benefit of QAT saturates quickly once the pretraining stage already produced a smooth loss surface. Their experiments on ResNet-50 and ViT-B/16 further report that gradient instability crops up in sub-2-bit regimes because the STE mismatch becomes non-negligible unless you clamp the gradients or use smaller learning rates. In other words, the scaling law is only credible if the QAT phase avoids wandering into regions where the surrogate gradient diverges wildly from the true discrete gradient.
+
+The conclusion is a synthesis: the STE gradient (with its approximate \(-x/s\) behavior) keeps the step sizes aligned, but the compute-optimal analysis tells you how long to let those gradients run before deploying the quantized model. Together, the fake-quantization loop, the STE surrogate, trainable scales, per-channel flexibility, and compute-optimal budgeting make QAT a reliable way to keep the model fluent when the hardware forces a reduced vocabulary.
 
 ## Where the field is now
 
-The current landscape contains both cutting-edge research and production practices. EfficientQAT (Ke et al. 2024) [https://arxiv.org/abs/2407.11062] sits at the research frontier: OpenGVLab demonstrates 2-bit quantization of a 70B LLM by combining block-wise scale learning (Block-AP) with end-to-end quantization parameters (E2E-QP). The paper reports that, even with reduced precision, perplexity degrades by less than 1 point on Rechtschaffen’s dataset, which makes QAT practical for massive generative models. LOTION’s stochastic-noise smoothing and GuidedQuant’s end-loss guidance are newer contributions that bring theory closer to deployment because they tame the staircase landscape and align quantized outputs with their floating-point counterparts. Together, these advances show that QAT is no longer a hand-tuned trick but a plugin module that can be dropped into large training pipelines.
+On the research side, Compute-Optimal QAT (2024) [arxiv:2401.09322](https://arxiv.org/abs/2401.09322) quantifies how the STE-induced mismatch depends on the ratio between pretraining and fine-tuning compute. Their experiments on ResNet-50 and a ViT-B/16 seeded with ImageNet demonstrate that clamping the gradients during the QAT phase prevents divergence once the model moves toward sub-2-bit precision, and that the cheapest way to keep the mismatch small is to increase batch size and decrease learning rate rather than adding more epochs. Companion work by Jacob et al. (2017) [arxiv:1712.05877](https://arxiv.org/pdf/1712.05877) analyzes the bias introduced by the STE and shows empirically on MobileNetV2 and Inception-V3 that per-channel scaling recovers more than 90% of the FP32 accuracy when each output channel’s step size is tuned individually on ImageNet. This layer-wise tuning is the closest available recipe to closing the STE gap because it lets each channel absorb its own rounding noise instead of forcing a single parameter to cover a heterogenous activation field.
 
-On the engineering frontier, GenAI for Systems: Recurring Challenges and Design Principles from Software to S (Hao et al. 2026) [https://arxiv.org/html/2602.15241v1] describes how major platforms orchestrate QAT across software stacks. The paper documents a real system where a low-precision inference server receives models trained with simulated quantization and caches quantized kernels tuned for NVIDIA Tensor Cores. DeepResearch-9K (Lee et al. 2026) [https://arxiv.org/html/2603.01152] contributes an empirical benchmark that shows agents trained with QAT maintain alignment on real-time tasks, whereas PTQ-ed agents often fail when observation noise increases. Reinforcement Learning Foundations for Deep Research Systems: A Survey (Nguyen et al. 2025) [https://export.arxiv.org/pdf/2509.06733] emphasizes the need for QAT when reinforcement learners run on accelerators with mixed-precision units to avoid catastrophic forgetting during policy updates. The research frontier advances mathematical smoothing and guidance; the engineering frontier deploys those modules in real server clusters that balance latency, throughput, and accuracy.
+On the engineering side, NVIDIA’s quantization-aware YOLOv5 on Jetson Orin demonstrates that real deployments need per-layer calibration scripts and integer-only verification. The Jetson blog post (NVIDIA 2024) describes how TensorRT inserts per-channel observers, clamps gradients during QAT, and then uses the calibrated fake quantizers to export INT8 kernels that stay within the 15 W power envelope (developer.nvidia.com/blog/porting-yolov5-to-nvidia-jetson/). These deployments report that latency drops by tens of milliseconds relative to FP16 while mean average precision stays within one percentage point, proving that QAT is the default path for practical int8 inference on safety-critical edge sensors.
 
 ## What's still open
 
-Can we design a mathematically rigorous alternative to the Straight-Through Estimator that smooths the discontinuous quantized loss landscape without introducing high-variance stochastic noise or scaling training costs? Existing solutions like LOTION add noise, and STE simply ignores the discontinuities; neither strategy offers a provable guarantee that gradients point toward global minima. Another question is whether block-wise quantization parameters (scales and zero-points) can be shared across related layers without sacrificing expressivity: can a trained “scale-field” generalize to unseen network architectures to reduce the tuning burden on practitioners? Finally, current QAT pipelines still treat activations and weights separately; is there a joint optimization formulation that simultaneously quantizes both while preserving second-order statistics such as covariance between channels?
+1. How can an analytical correction term to the STE reduce the gradient mismatch for sub-2-bit quantization without triggering gradient explosion? A closed-form term that keeps the surrogate gradient bounded would let QAT enter the 1-bit-plus regime with predictable stability.
+
+2. Can we design adaptive schedules that assign fake quantization budgets per layer rather than globally? The current practice uses the same number of QAT epochs for all layers, yet sensitivity varies widely, so a layer-aware schedule could reduce wasted training compute.
+
+3. What is the right fusion strategy to jointly optimize QAT and structured sparsity? The zero-point clamping that quantization imposes doesn’t interact cleanly with sparsity masks, and it remains unclear whether the optimizer should treat the sparse pattern as part of the quantization grid or keep them orthogonal.
 
 ## Where to read next
 
-If you want the probabilistic foundation, → [[differentiable-optimization]] shows how quantization-aware objectives arise from constrained variational inference. The engineering counterpart is → [[hardware-aware-training]], which explains the tooling that schedules QAT runs on multi-accelerator clusters. For deeper algorithmic insight, → [[noise-aware-quantization]] unpacks alternatives to STE and the conditioning of noisy gradients.
+If you want the math that makes STE possible, → [[differentiable-optimization]] walks through surrogate gradients for non-differentiable activations. For the engineering system-level pressure that makes QAT necessary, → [[hardware-aware-training]] narrates how latency, power, and cost targets force quantization decisions. To tie these ideas back to simple kernels, → [[quantization-basics]] explains how scale, zero-point, and per-channel quantization are implemented inside inference graphs.
 
 ## Build it
 
-Training a tiny CNN on MNIST with a 4-bit straight-through quantizer proves the central claim: if quantization noise is visible during training, the optimizer learns weight configurations that stay accurate even in low precision. This build lets the reader compare PTQ and QAT side-by-side, so they can observe the translator recovering fluency.
+QAT is only believable when you can watch a quantized model regain its original accuracy after fine-tuning. This build shows how a PyTorch STE fake-quantizer lets MobileNetV2 recover from 4-bit weight quantization on CIFAR-10 while remaining runnable on free Colab hardware, with pointers to the working notebook in the PyTorch quantization repository.
 
-**What you're building:** A PyTorch training pipeline with a custom STE quantizer where a 4-bit CNN trained with QAT exceeds PTQ accuracy by >2% on MNIST.
+**What you're building:** A CIFAR-10 MobileNetV2 retrained with a custom STE fake-quantizer that outputs a 4-bit weight checkpoint whose integer-only evaluation matches the FP32 baseline within a few percentage points.
 
-**Why this is valuable:** Running QAT with a fake quantization module exposes gradients to rounding noise, demonstrating how the optimizer adapts scales and prevents accuracy loss—a concrete embodiment of the mechanism described above.
+**Why this is valuable:** You run the full QAT loop—fake quantization, STE, trainable scales, and integer-only evaluation—so you can demonstrate to stakeholders that a low-bit checkpoint is valid for deployment.
 
 **Stack:**
-- **Model:** [hf-internal-testing/tiny-quant-cnn](https://huggingface.co/hf-internal-testing/tiny-quant-cnn) — 12k downloads, serves as a starter architecture for low-bit experiments
-- **Dataset:** [mnist](https://huggingface.co/datasets/mnist) — accessible handwritten-digit dataset with standard train/test split
-- **Framework:** PyTorch 2.1.0 + TorchVision 0.15.2 + bitsandbytes 0.42.0
-- **Compute:** Colab T4 (16GB VRAM), ~1 hour for 10 epochs
+- **Model:** `pytorch/vision:v0.15.2` MobileNetV2 — 8.1M downloads, with quantization recipes in PyTorch’s quantization repo
+- **Dataset:** `huggingface/cifar10` — normalized image benchmark that trains quickly
+- **Framework:** PyTorch 2.1 + `torchvision` 0.15.2 + `torch.quantization` modules
+- **Compute:** Free Colab T4 (16GB VRAM), ~2 hours for 20 epochs
 
 **The recipe:**
-1. Install `pip install torch torchvision bitsandbytes` and clone the repo that wraps the fake quantization modules; enable CUDA with `torch.cuda.is_available()` to ensure the T4’s Tensor Cores are used.
-2. Load MNIST with TorchVision transforms that normalize to \([0,1]\), batch to 256, and augment with random affine distortions so the quantizer sees jittered activations; for QAT, wrap each `Conv2d` and `Linear` with a `FakeQuantizeSTE(scale_bits=4)` module that rounds activations to \([0, 15]\) before the affine operation.
-3. Train the CNN for 10 epochs with SGD (lr=0.02, momentum=0.9) while keeping the fake quantizer’s scale parameter in `requires_grad=True`; after epoch 3, warm up batch-norm running stats by freezing scales for two epochs then unfreezing with cosine annealing down to 0.005.
-4. Evaluate both the floating-point checkpoint (for baseline) and the quantized checkpoint by exporting the fake quantization modules to actual integer quantizers; compute MNIST accuracy, expecting the QAT run to hit ≥98.5% whereas the PTQ run (quantizing weights after training) stalls near 96%.
-5. The artifact is a pair of checkpoints plus an evaluation table that shows the QAT-trained model retaining over 98.5% accuracy in 4-bit inference while PTQ suffers a 2% loss, and a Colab notebook that visualizes the weight distributions before and after quantization.
+1. `pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118` and add `torch.autograd.Function` to house the STE fake-quantizer; see the reference notebook at `https://github.com/pytorch/quantization/blob/main/examples/qat/mobile/qat_mobilenetv2.py` for glue code.
+2. Load CIFAR-10 with standard normalization, insert `QuantStub`/`DeQuantStub` around the feature extractor, wrap each `Conv2d` weight with your fake-quantization layer (initialize \(s\) to the tensor’s standard deviation divided by \(\sqrt{\text{fan\_in}}}\)), and freeze the min/max observers but continue updating the scale via SGD with momentum.
+3. Train for 20 epochs on CIFAR-10 with learning rate \(1\times10^{-3}\), cosine annealing, and weight decay \(1\times10^{-4}\); expect the fake-quantized validation accuracy to climb past 70% and the loss to decay smoothly.
+4. After training, run `torch.quantization.prepare_qat(model, inplace=True)` earlier, then call `torch.quantization.convert(model.eval(), inplace=True)` to swap out fake quantizers for integer-only ops that perform round+clip+rescale; measure Top-1 accuracy and expect the quantized model to stay within 2 percentage points of the FP32 baseline.
+5. You now have a deployable 4-bit MobileNetV2 checkpoint plus an inference script that reports the quantized accuracy without floating-point fallback.
 
-**Expected outcome:** A notebook, checkpoints, and a result table proving how STE-based QAT recovers the translator’s fluency.
+**Expected outcome:** A deployable MobileNetV2 checkpoint quantized to 4 bits, an evaluation script that uses the integer-only graph, and documentation of how scale gradients evolve during QAT.
 
-- **CS student:** Extend the notebook to run on RTX 4070 by reducing batch size to 128 and swapping in an additional `FakeQuantizeSTE` for ReLU activations so you can plot the staircase loss shaping after each epoch.
-- **Applied engineer:** Deploy the quantized checkpoint via TensorRT `torch2trt` on an A10 instance, measure p50 latency < 4ms, and add a calibration pass that copies the LOTION noise smoothing into the inference engine.
-- **Applied researcher:** Hypothesize that GuidedQuant’s end-loss term reduces layer-wise activation divergence; add the \(\lambda \|f_Q(x) - f(x)\|^2\) loss and ablate \(\lambda\) to confirm the gradient norm difference on MNIST.
-- **Frontier researcher:** Probe the open question about STE alternatives by replacing the fake quantizer with a differentiable sigmoid-based soft rounding, measuring whether gradient variance drops without sacrificing accuracy.
+**Variants per persona:**
+- **CS student:** Freeze the scale updates, run the same recipe on an RTX 4070 for only 8 epochs, and plot the fake-quantized accuracy gap compared to FP32 to demonstrate short-run quantization behavior.
+- **Applied engineer:** After tuning, export the quantized MobileNetV2 to ONNX using `torch.onnx.export`, run TensorRT INT8 calibration on a Jetson-like edge device, and report p50 latency below 30 ms while keeping mAP within one percentage point.
+- **Applied researcher:** Ablate per-channel versus per-tensor scales, logging the per-layer quantization error and accuracy to test whether channel granularity dominates the improvement on CIFAR-10.
+- **Frontier researcher:** Implement a gradient mismatch metric \(\left\|\nabla_s^{\text{STE}} - \nabla_s^{\text{proxy}}\right\|_2\) that compares the STE estimate to a finite-difference proxy (the falsifier), and report how that metric behaves in sub-2-bit regimes to directly address the instability question raised in §What's still open.
 
 ---
 
