@@ -738,21 +738,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#where-to-start" class="md-nav__link">
+  <a href="#concepts" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to start
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#key-thinkers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Key thinkers
+        Concepts
       
     </span>
   </a>
@@ -771,10 +760,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#builds-tied-to-this-subject" class="md-nav__link">
+  <a href="#key-thinkers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Builds tied to this subject
+        Key thinkers
       
     </span>
   </a>
@@ -782,10 +771,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#connected-subjects" class="md-nav__link">
+  <a href="#builds-tied-to-this-subject" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Connected subjects
+        Builds tied to this subject
       
     </span>
   </a>
@@ -1388,52 +1377,6 @@
                 
                   
 
-  <nav class="md-tags" >
-    
-      
-      
-      
-      
-        <span class="md-tag">distributed-training</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">gpu</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">inference</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">kv-cache</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">mlops</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">quantization</span>
-      
-    
-  </nav>
-
 
   
   
@@ -1441,20 +1384,39 @@
 
 <h1 id="algorithms-systems-for-ai">Algorithms &amp; Systems for AI<a class="headerlink" href="#algorithms-systems-for-ai" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>What this subject is for:</strong> Making models fast, cheap, and deployable — algorithms &amp; complexity, data structures, DP &amp; search, graph algorithms, vector DBs, GPU programming, distributed training, mixed precision, quantization, pruning, distillation, inference serving, ML compilers, MLOps.</p>
+<p><strong>What this subject is for:</strong> Making models fast, cheap, and deployable — distributed training, parallelism, kv-cache, FlashAttention, quantization, inference optimization.</p>
 </blockquote>
-<h2 id="where-to-start">Where to start<a class="headerlink" href="#where-to-start" title="Permanent link">&para;</a></h2>
-<p>🚧 Reading order pending — will list 3–5 entry concepts.</p>
-<h2 id="key-thinkers">Key thinkers<a class="headerlink" href="#key-thinkers" title="Permanent link">&para;</a></h2>
-<p>🚧 Author pages pending in <code>./authors/</code>.</p>
+<p><strong>Track status:</strong> 18 substantive concept pages · 6 stubs awaiting next cycle. See the live <a href="../../../system/status/">generation status</a> and the <a href="../../../system/backlog/">latest retrospective</a>.</p>
+<h2 id="concepts">Concepts<a class="headerlink" href="#concepts" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="concepts/attention-mechanisms/">Attention Mechanisms</a></li>
+<li><a href="concepts/data-parallelism/">Data Parallelism</a></li>
+<li><a href="concepts/distributed-training-arc/">Distributed Training Arc</a></li>
+<li><a href="concepts/distributed-training/">Distributed Training</a></li>
+<li><a href="concepts/flash-attention/">Flash Attention</a></li>
+<li><a href="concepts/inference-optimization/">Inference optimization</a></li>
+<li><a href="concepts/kv-cache/">KV cache</a></li>
+<li><a href="concepts/llm-architecture-optimizations/">LLM Architecture Optimizations</a></li>
+<li><a href="concepts/llm-inference/">LLM Inference</a></li>
+<li><a href="concepts/mixed-precision-training/">Mixed-precision training</a></li>
+<li><a href="concepts/model-deployment/">Model Deployment</a></li>
+<li><a href="concepts/model-parallelism/">Model Parallelism</a></li>
+<li><a href="concepts/pipeline-parallelism/">Pipeline Parallelism</a></li>
+<li><a href="concepts/post-training-quantization/">Post-Training Quantization</a></li>
+<li><a href="concepts/precision-scaling/">Precision scaling</a></li>
+<li><a href="concepts/quantization-aware-training/">Quantization-Aware Training</a></li>
+<li><a href="concepts/quantization/">Quantization</a></li>
+<li><a href="concepts/tensor-parallelism/">Tensor parallelism</a></li>
+</ul>
+<p><em>Auto-seeded stubs awaiting next cycle: <code>communication-collectives</code>, <code>compiler-optimizations-for-ml</code>, <code>differentiable-optimization</code>, <code>kv-cache-management</code>, <code>quantization-basics</code>, <code>reinforcement-learning-schedulers</code></em></p>
 <h2 id="arcs-through-this-subject">Arcs through this subject<a class="headerlink" href="#arcs-through-this-subject" title="Permanent link">&para;</a></h2>
-<p>🚧 Learning paths pending in <code>./arcs/</code>.</p>
+<p><em>No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.</em></p>
+<h2 id="key-thinkers">Key thinkers<a class="headerlink" href="#key-thinkers" title="Permanent link">&para;</a></h2>
+<p><em>Author pages pending.</em></p>
 <h2 id="builds-tied-to-this-subject">Builds tied to this subject<a class="headerlink" href="#builds-tied-to-this-subject" title="Permanent link">&para;</a></h2>
-<p>🚧 MVB recipes pending in <code>./builds/</code>.</p>
-<h2 id="connected-subjects">Connected subjects<a class="headerlink" href="#connected-subjects" title="Permanent link">&para;</a></h2>
-<p>🚧 Cross-subject links pending.</p>
+<p><em>MVB recipes pending — currently they live inside concept pages' Build it sections.</em></p>
 <hr />
-<p><em>Subject overview stub — created 2026-05-26 as part of the <a href="../../../system/structure-v2/">structure-v2 skeleton</a>.</em></p>
+<p><em>Auto-rebuilt from filesystem state by <code>scripts/rebuild_track_indexes.py</code> — see <a href="../../../system/architecture/">system architecture</a>.</em></p>
 
 
 
