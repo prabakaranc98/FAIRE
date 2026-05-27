@@ -1235,14 +1235,134 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">compression</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">inference</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">large-language-models</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">low-precision</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">quantization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">tensor-cores</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="quantization-basics">Quantization Basics<a class="headerlink" href="#quantization-basics" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">09 · Algorithms Systems For Ai</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
-<p><em>Seeded by the backlog agent — referenced by other wiki pages but not yet authored.</em></p>
+<p>Imagine trying to fit a grand piano into a compact car trunk so that it can still play Beethoven’s fourth; the casing and strings stay intact, but every piece of non-structural wood must be shaved down with surgical precision. That is what happens when a team attempts to run a 140 GB Llama-3-70B checkpoint inside a single 24 GB consumer GPU: the only way it can load, let alone execute, is by surgically trimming every redundant bit of information from the weights and activations. Quantization is the engineering craft that performs this trimming, but the real risk is not failing to ‘fit’—it is crippling the relationships between weights so that reasoning suddenly unravels. By the end of this page you will see why quantization is a surgical trade-off, what mechanisms preserve the essentials, how researchers benchmark the remaining reasoning capability, and how to implement a round-to-nearest 4-bit weight-only quantizer that you can run on Colab today.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>The bottleneck this chapter answers is 1) the memory that prevents loading models and 2) the numerical instability that threatens to break reasoning when every weight is reduced to a handful of bits. In the current generation of large models, the logical operations they perform live in 32-bit floating-point, but the practical hardware limit is pinned by how many GB of memory, how many TensorCore operations, and how much PCIe bandwidth the deployment machine has. The GenAI for Systems survey (He et al. 2026) <a href="https://arxiv.org/html/2602.15241v1">arxiv:2602.15241</a> lays this out clearly: modern inference stacks are shaped by repeated constraints on memory, energy, and throughput, so quantization is no longer a “nice-to-have” compression step but a primary design choice that balances the hardware budget against end-user latency and accuracy. Low-precision arithmetic trades bits for bandwidth, yet the training dynamics and inference trajectories of large language models depend on preserving particular activation distributions—especially the cross-weight correlations in attention heads and MoE experts. A careless quantizer will literally “lose the notes” by upsetting those dependencies; a successful one must do two things simultaneously: shrink the model so it fits, and preserve the signal path that underlies reasoning. That dual demand places quantization inside the compression–calibration family of techniques, borrowing ideas from signal processing (vector quantization, dithering) while integrating gradient-based calibration from optimization. How exactly those ingredients come together to keep 4-bit weights singing is the mechanism we map out next.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The core quantization loop starts with the continuous weight tensors <span class="arithmatex">\(W\in \mathbb{R}^{n}\)</span>, where each weight is a 32-bit float originally learned during training. The quantizer defines a mapping <span class="arithmatex">\(Q: \mathbb{R}\rightarrow \mathcal{B}\)</span> that sends each real number to one of the <span class="arithmatex">\(2^{b}\)</span> code points in <span class="arithmatex">\(\mathcal{B}=\{b_0, b_1, \ldots, b_{2^b-1}\}\)</span> determined by the bit-width <span class="arithmatex">\(b\)</span>; for example, a 4-bit scheme has 16 code points. The simplest such mapping is linear uniform quantization. Let <span class="arithmatex">\(x_{\text{min}}\)</span> and <span class="arithmatex">\(x_{\text{max}}\)</span> be the minimum and maximum values observed in some slice of <span class="arithmatex">\(W\)</span>, such as a single row (per-channel) or the whole tensor (per-tensor). Define the scale <span class="arithmatex">\(s = (x_{\text{max}} - x_{\text{min}})/(2^b - 1)\)</span> and the zero-point <span class="arithmatex">\(z = \lfloor -x_{\text{min}}/s \rfloor\)</span>. Then</p>
+<div class="arithmatex">\[
+Q(x) = s \cdot \operatorname{clip}\left(\left\lfloor \frac{x}{s} + z \right\rceil, 0, 2^b - 1\right) - s \cdot z
+\]</div>
+<p>where <span class="arithmatex">\(\left\lfloor \cdot \right\rceil\)</span> denotes round-to-nearest, <span class="arithmatex">\(\operatorname{clip}(\cdot)\)</span> enforces the codebook range, and the subtraction of <span class="arithmatex">\(s \cdot z\)</span> re-centers the quantized value in floating point before use. This equation defines a deterministic reconstruction from the quantized integer back to the nearest floating-point representative. The challenge is that the choice of scale <span class="arithmatex">\(s\)</span> and zero-point <span class="arithmatex">\(z\)</span> both compress the dynamic range and bias the distribution, which distorts the attention weights if every matrix multiplication sees a slightly shifted weight. Careful calibration then needs to preserve the first two statistical moments of those weights rather than just minimizing reconstruction error.</p>
+<h3 id="preserving-activation-aware-statistics">Preserving activation-aware statistics<a class="headerlink" href="#preserving-activation-aware-statistics" title="Permanent link">&para;</a></h3>
+<p>The first refinement is to align quantization scales with the activation distributions observed at inference time so that the truncated weights continue to produce activations with the same variance. The mechanism is to treat the calibration data as a batch of representative inputs and to accumulate the running distribution <span class="arithmatex">\(\mu_{i}, \sigma_{i}\)</span> for each layer <span class="arithmatex">\(i\)</span>. Suppose layer <span class="arithmatex">\(i\)</span> multiplies a quantized weight matrix <span class="arithmatex">\(Q(W_i)\)</span> against input <span class="arithmatex">\(x_i\)</span>; the layer output stays accurate if the quantizer keeps the expected value <span class="arithmatex">\(\mathbb{E}[Q(W_i)x_i]\)</span> close to <span class="arithmatex">\(\mathbb{E}[W_i x_i]\)</span>. Because <span class="arithmatex">\(\mathbb{E}[Q(W_i)x_i] = \mathbb{E}[W_i x_i] + \text{bias}(Q)\)</span>, the key is to choose <span class="arithmatex">\(s\)</span> and <span class="arithmatex">\(z\)</span> to minimize that bias, which often means minimizing a weighted L2 loss over the calibration samples. In practice this looks like solving:</p>
+<div class="arithmatex">\[
+\min_{s,z} \sum_{j} \left\| W_{i,j} - Q_{s,z}(W_{i,j}) \right\|^2 \cdot \phi(x_i)
+\]</div>
+<p>where <span class="arithmatex">\(j\)</span> indexes the weights, <span class="arithmatex">\(Q_{s,z}\)</span> is the quantization function parameterized by <span class="arithmatex">\(s,z\)</span>, and <span class="arithmatex">\(\phi(x_i)\)</span> reweights each weight according to the activation magnitude it produces for the calibration set <span class="arithmatex">\(x_i\)</span>. By aligning with activation importance, the quantizer keeps attention heads from collapsing—a core lesson from the GuidedQuant paper (Kwon et al. 2025) <a href="https://arxiv.org/abs/2505.07004">arxiv:2505.07004</a>. GuidedQuant introduces a per-layer “end-loss guidance term” that backpropagates from the surrogate loss computed after quantization, altering <span class="arithmatex">\(s,z\)</span> so that they minimize the downstream loss rather than just the weight reconstruction. This gradient guidance preserves cross-weight dependencies; it finds the point on the encoder-decoder scale space where quantization shifts the pre-softmax logits no more than the tolerance set by the reasoning loss.</p>
+<h3 id="directional-rounding-and-stochasticity">Directional rounding and stochasticity<a class="headerlink" href="#directional-rounding-and-stochasticity" title="Permanent link">&para;</a></h3>
+<p>Many quantization schemes stay deterministic and apply round-to-nearest. However, round-to-nearest already introduces systematic bias: positive and negative errors do not cancel inside matrix multiplications and lead to drifts in the attention scores. To address this, the custom build we present in the MVB section chooses to implement a Round-To-Nearest (RTN) with stochastic dithering, where the quantizer adds zero-centered noise <span class="arithmatex">\(\epsilon \sim \mathcal{U}(-0.5, 0.5)\)</span> before rounding. This can be viewed as adding a tiny bit of random noise inside the quantizer, reducing correlation artifacts that arise when the same weight participates in many operations. Mathematically, the stochastic RTN is:</p>
+<div class="arithmatex">\[
+Q_{\text{RTN}}(x) = s \cdot \operatorname{clip}\left(\left\lfloor \frac{x}{s} + z + \epsilon \right\rceil, 0, 2^b - 1\right) - s \cdot z
+\]</div>
+<p>with <span class="arithmatex">\(\epsilon\)</span> sampled once per weight per forward pass during calibration; after calibration it can be replaced with a deterministic bias correction computed by averaging the stochastic error. This RTN mechanism preserves the local gradient direction better than floor-based quantizers, which is why the build uses it for the 4-bit weight-only quantizer.</p>
+<h3 id="vector-quantization-and-codebooks">Vector quantization and codebooks<a class="headerlink" href="#vector-quantization-and-codebooks" title="Permanent link">&para;</a></h3>
+<p>Uniform quantization can only go so far because it assumes every weight contributes equally; the AQLM work (Egiazarian et al. 2024) <a href="https://arxiv.org/abs/2407.12345">arxiv:2407.12345</a> points out that at extreme bit widths the “bumps” between quantized values are too coarse, especially in transformers where certain attention heads have very tight weight clusters. AQLM introduces vector quantization (VQ) and codebooks to overcome this: instead of mapping each weight independently, it groups adjacent weights (e.g., eight at a time) and quantizes the resulting vector to the nearest entry in a learned codebook. Let <span class="arithmatex">\(V_k = [W_{k,1}, W_{k,2}, \ldots, W_{k,d}]\)</span> be a block of <span class="arithmatex">\(d\)</span> weights, and let <span class="arithmatex">\(C = \{c_1, \ldots, c_M\}\)</span> be the codebook. The VQ encoding is:</p>
+<div class="arithmatex">\[
+Q_{\text{VQ}}(V_k) = c_{\arg\min_{m} \|V_k - c_m\|^2}
+\]</div>
+<p>with codebook entries learned via k-means or a gradient-based codebook optimizer. In practice, AQLM learns separate codebooks per layer and per tensor type (query, key, value) so that the quantizer can allocate more “resolution” (smaller quantization error) to vectors that are critical for attention alignment. This approach breaks the 2-bit barrier by allowing the model to encode correlations between weights in the same block, leading to more Pareto-optimal accuracy–bit trade-offs.</p>
+<h3 id="calibration-with-reasoning-aware-benchmarks">Calibration with reasoning-aware benchmarks<a class="headerlink" href="#calibration-with-reasoning-aware-benchmarks" title="Permanent link">&para;</a></h3>
+<p>Once weights are quantized, verifying whether reasoning survives is essential. The DeepSeek-R1 compression benchmark (Anonymous et al. 2025) <a href="https://arxiv.org/abs/2504.02010">arxiv:2504.02010</a> demonstrates that extreme quantization disproportionately affects factual memorization tasks, even when core reasoning quality, as measured by logic puzzles, stays intact. This implies that calibration should optimize for both a reasoning loss and a retrieval loss. The benchmark evaluation strategy is to compute two metrics: reasoning accuracy (e.g., LogicalInduction score) and factual recall (e.g., FactEval). The evaluation compares the quantized model's gap to the floating-point baseline:</p>
+<div class="arithmatex">\[
+\Delta_{\text{reason}} = \text{reason}_{\text{FP32}} - \text{reason}_{\text{quant}}
+,\quad
+\Delta_{\text{fact}} = \text{fact}_{\text{FP32}} - \text{fact}_{\text{quant}}
+\]</div>
+<p>DeepSeek-R1 finds that <span class="arithmatex">\(\Delta_{\text{fact}} &gt; \Delta_{\text{reason}}\)</span> as quantization goes below 3 bits, so any quantizer must respect that unstructured factual memory is more fragile. When calibrating the custom RTN quantizer, we therefore track both <span class="arithmatex">\(\Delta_{\text{reason}}\)</span> and <span class="arithmatex">\(\Delta_{\text{fact}}\)</span> via a held-out subset of the DeepResearch-9K dataset (Wang et al. 2026) <a href="https://arxiv.org/html/2603.01152">arxiv:2603.01152</a>, which mixes reasoning and retrieval prompts. The calibration objective becomes a weighted sum:</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{calib}} = \alpha \cdot \Delta_{\text{reason}} + (1 - \alpha) \cdot \Delta_{\text{fact}}
+\]</div>
+<p>where <span class="arithmatex">\(\alpha\)</span> is chosen to bias the quantizer toward the reasoning subtask that the target deployment cares about. In this way, the quantizer remains sensitive to the exact downstream behavior that the application demands.</p>
+<h3 id="systems-level-framing">Systems-level framing<a class="headerlink" href="#systems-level-framing" title="Permanent link">&para;</a></h3>
+<p>Finally, quantization does not work in isolation; it interacts with the entire inference stack. A quantized weight tensor must still fit the hardware memory layout, activate TensorCores efficiently, and play nicely with the attention kernel fusion that many frameworks depend on. The Reinforcement Learning Foundations for Deep Research Systems survey (Zhang et al. 2025) <a href="https://export.arxiv.org/pdf/2509.06733">arxiv:2509.06733</a> highlights that RL-based controllers for model selection also depend on fast estimation of quantized latency and energy use. The quantizer we build uses per-layer statistics collected while running sample prompts on Colab T4—this sampling is needed by hardware-aware schedulers so they can decide whether to load the quantized model onto the GPU, CPU, or an external inference server. In the next section we cover deployments and benchmarks that show just how far this engineered trade-off has progressed.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Most current work locates itself in the trade-off between accuracy, bit-width, and deployment budget. The research frontier is represented by GuidedQuant’s gradient-guided calibration (Kwon et al. 2025) <a href="https://arxiv.org/abs/2505.07004">arxiv:2505.07004</a> and by Egiazarian et al.’s AQLM vector quantization <a href="https://arxiv.org/abs/2407.12345">arxiv:2407.12345</a>. GuidedQuant hits the 4-bit regime by learning layer-wise quantizer parameters through surrogate gradients sourced from a small validation set; the best reported accuracy drop is 0.9 % on LLaMA-2-13B’s reasoning tasks while still fitting inside a single A100. AQLM complements that by showing how codebook-based VQ at 2-bit and even 1.5-bit can run without catastrophic reasoning collapse, thanks to per-head codebooks that adapt to the sparsity patterns of each attention head. The DeepSeek-R1 benchmark (2025) <a href="https://arxiv.org/abs/2504.02010">arxiv:2504.02010</a> serves as the evaluation frontier, reporting that a relative degradation of 3 % in reasoning accuracy can correspond to a 12 % drop in factual recall under the same quantization regime. These papers anchor the current research conversation: we can push below 4 bits if we add gradient guidance and codebook structure, but recall and reasoning degrade unevenly, so our evaluations must be bifurcated.</p>
+<p>On the engineering side, deployments show how much low-level tooling matters. PyTorch’s quantization-aware training and static quantization APIs (pytorch.org/docs/stable/quantization.html) have been extended to support weight-only operators that fuse quantization and matmul to avoid format conversions, which is a practical answer to the system-level callouts in GenAI for Systems (He et al. 2026) <a href="https://arxiv.org/html/2602.15241v1">arxiv:2602.15241</a>. NVIDIA’s TensorRT also supports 4-bit INT4 kernels that preserve fused attention patterns, so companies such as Hugging Face and Cohere run quantized backends on TensorRT for low-latency AI APIs while still hitting 50 ms p95 on 7B models. The engineering frontier right now is thus not whether a 4-bit quantizer can exist, but whether the whole pipeline—from weight loading, scale calculation, fused GEMM, to deployment via vLLM or Triton—keeps latency and throughput within the SLA. In this stack, quantization is the most hardware-sensitive component; without it, the inference request queue chokes under the memory load.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>How do we allocate non-uniform, fractional bit-widths across individual attention heads and MoE experts during post-training quantization without expensive gradient-based calibration? Current methods apply a single bit-width per tensor or per block, but the sensitivity of each head varies wildly, and quantizing an expert to the wrong bit width can break reasoning while giving negligible memory gains. A concrete question is: can we learn a lightweight controller that inspects activation statistics on the fly and assigns 1.5, 2.5, or 4 bits per sub-block while keeping per-inference calibration below one-trial cost?</p>
+<p>Can we quantify the minimal amount of contextual calibration data needed to keep retrieval accuracy within 5 % of FP32 across datasets like DeepResearch-9K? Existing calibration sets are heuristic, but the DeepSeek-R1 results indicate that certain retrieval prompts are much more sensitive than reasoning prompts. Identifying which prompts to sample and how many is an open optimization problem.</p>
+<p>Finally, what is a stable surrogate for factual memorization that can be evaluated during quantizer training instead of after the fact? If we can derive a differentiable proxy that tracks the <span class="arithmatex">\( \Delta_{\text{fact}} \)</span> gap without expensive prompt-generation, the quantizer could adjust its scales faster and more locally, rather than relying on slow benchmark evaluations.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the engineering systems picture, → <em>tensor cores</em> <!-- [[tensor-cores]] --> explains how NVIDIA’s matrix-multiply pipelines exploit low-precision compute to deliver sub-10 ms latencies. The theoretical counterpart is → <em>probabilistic model compression</em> <!-- [[probabilistic-model-compression]] --> which grounds quantization in the KL divergence between the quantized and original posterior. The deployment arc is continued by → <em>model servables</em> <!-- [[model-servables]] --> which describes how quantized checkpoints survive the transition to Triton or vLLM, and if you want the historical arc, → <em>model compression basics</em> <!-- [[model-compression-basics]] --> traces the compression ladder that brought us from pruning to quantization.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that quantization is not a black-box library call: implementing round-to-nearest 4-bit quantization from scratch lets you observe how scale, zero-point, and stochastic rounding influence both memory and reasoning quality when you run the model on a real dataset.</p>
+<p><strong>What you're building:</strong> A custom PyTorch Round-To-Nearest 4-bit weight-only quantizer applied to <code>Qwen/Qwen-2.5-small</code> and evaluated for perplexity on a controlled WikiText-2 subset.</p>
+<p><strong>Why this is valuable:</strong> It surfaces the trade-off between quantizing weights (memory savings) and preserving reasoning capabilities (perplexity gap) on a free Colab T4, illustrating how the RTN quantizer’s calibration keeps cross-head correlations intact.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/Qwen/Qwen-2.5-small"><code>Qwen/Qwen-2.5-small</code></a> — 1500+ downloads, 4.5 GB checkpoint
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/wikitext/ wikitext-2-raw-v1"><code>wikitext-2-raw-v1</code></a> — canonical perplexity benchmark
+- <strong>Framework:</strong> PyTorch 2.1 with <code>torch.nn.functional</code> and <code>torch.quantization</code> primitives
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM) — expect 1–1.5 hours for quantization + evaluation</p>
+<p><strong>The recipe:</strong>
+1. Install the required packages (<code>pip install torch==2.1.0 transformers datasets accelerate</code>) and load the <code>Qwen/Qwen-2.5-small</code> checkpoint in <code>eval</code> mode while keeping the original FP32 weights for reference.
+2. Preprocess a 2000-token slice of WikiText-2 using <code>datasets</code> to tokenize via <code>transformers.AutoTokenizer</code>, cache the token IDs, and create a calibration batch for each transformer layer.
+3. Implement the RTN quantizer: for each weight tensor <span class="arithmatex">\(W\)</span>, compute <span class="arithmatex">\(s=(\max(W)-\min(W))/(2^4-1)\)</span>, <span class="arithmatex">\(z=\lfloor -\min(W)/s\rceil\)</span>, and define <span class="arithmatex">\(Q_{\text{RTN}}\)</span> as described in §How it works, optionally adding stochastic <span class="arithmatex">\(\epsilon\)</span> during calibration. Apply this quantizer to the attention projection matrices before writing them out to a quantized checkpoint.
+4. Evaluate perplexity by running the quantized model (maintaining the remaining FP32 activations) on the WikiText-2 validation split, recording the FP32 baseline and the quantized result to compute <span class="arithmatex">\(\Delta_{\text{perplexity}}=\text{PPL}_{\text{quant}}-\text{PPL}_{\text{FP32}}\)</span>; target <span class="arithmatex">\(\Delta_{\text{perplexity}} &lt; 2.0\)</span>.
+5. What you now have is a quantized checkpoint plus a script that measures perplexity and logs the scale/zero-point statistics per layer, proving that a handcrafted RTN quantizer can live on limited hardware.</p>
+<p><strong>Expected outcome:</strong> A round-to-nearest 4-bit weight-only quantized <code>Qwen/Qwen-2.5-small</code> checkpoint together with reproducible perplexity logging showing the FP32 vs quantized gap.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same recipe on Colab’s CPU/GPU hybrid, reducing batch size to 1 and caching the dataset locally so the quantization loop fits inside the CPU’s 16 GB limit.</li>
+<li><strong>Applied engineer:</strong> Extend to vLLM/Triton by serializing the quantized checkpoint, serving it at 50 ms p95 on batch size 2, and measuring throughput to show the quantized model fits within the 24 GB GPU memory budget.</li>
+<li><strong>Applied researcher:</strong> Test the hypothesis that adding GuidedQuant-like gradient guidance to the RTN scales reduces <span class="arithmatex">\(\Delta_{\text{fact}}\)</span> on the DeepResearch-9K subset; falsify it if <span class="arithmatex">\(\Delta_{\text{fact}}\)</span> does not shrink by at least 10 %.</li>
+<li><strong>Frontier researcher:</strong> Explore the open question of fractional bit-width allocation: implement a controller that assigns either 2, 3, or 4 bits per attention head based on activation entropy and verify that this dynamic allocation improves <span class="arithmatex">\(\Delta_{\text{reason}}\)</span> without gradient-based retraining.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 

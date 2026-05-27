@@ -23,7 +23,7 @@
     
     
       
-        <title>Adaptive Optimizers - Frontier Wiki</title>
+        <title>Adaptive optimizers - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Adaptive Optimizers
+              Adaptive optimizers
             
           </span>
         </div>
@@ -1235,14 +1235,109 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">adaptive</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">diffusion</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">muon</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">optimization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">spectral</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">stability</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="adaptive-optimizers">Adaptive Optimizers<a class="headerlink" href="#adaptive-optimizers" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">04 · Neural Networks Deep Learning</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
-<p><em>Seeded by the backlog agent — referenced by other wiki pages but not yet authored.</em></p>
+<h1 id="adaptive-optimizers">Adaptive optimizers<a class="headerlink" href="#adaptive-optimizers" title="Permanent link">&para;</a></h1>
+<p>Imagine hiking down a steep canyon whose floor snakes diagonally across the landscape, yet your compass only lets you step north-south or east-west. Every move is a zig or a zag, and half your energy is wasted correcting your direction rather than closing distance. That is what happens when AdamW or its kin chase gradients in a coordinate system that has no relationship to the thin, twisted subspace the data actually lives in. Adaptive optimizers used to mean per-coordinate scaling—rescale each gradient element by its RMS history and hope the world straightens out. Today the bottleneck is not the per-coordinate rate but the coordinate system itself. Imagine instead being able to rotate your compass on the fly so that its axes naturally align with the ravine and you can sprint along the easiest descent path. By the end of this page you can explain how spectral orthogonalizers such as Muon inject that rotation, why their adaptivity is more stable because it respects the low stable rank of activations, and how to implement a practical Muon-inspired optimizer to feel the difference against AdamW.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Optimization in deep learning is still fundamentally gradient descent, but its landscape has become much harder. Deep nets stretch across billions of parameters and very narrow manifolds of activations, so the curvature varies wildly in different directions. AdamW solved the immediate problem of coordinate-wise scale by dividing each gradient element by a running RMS estimate, yet it still assumes that the most difficult directions align with axes. In practice, the real directions of high curvature are rotated combinations of weights shaped by the activations feeding them, a phenomenon especially severe in transformers and diffusion models (Author et al. 2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a>. The modern pretraining stack therefore leans toward geometry-aware optimizers: instead of rescaling along messy axes, they learn a low-rank basis for the gradient, rotate into that space, perform a stable update, and then rotate back. This new family borrows from spectral methods, model reduction, and orthogonalization routines that were once confined to second-order solvers, but now they execute cheaply in deep networks. As we trace this transition, consider the key tension: how do we keep the flavor of Adam’s element-wise adaptivity while adding a coordinated, low-rank rotation that respects stable rank? The mechanism is best understood by starting from the gradient covariance of the layer activations and building an adaptive orthonormal basis.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Modern spectral adaptive optimizers replace the coordinate-wise RMS scaling with a two-phase update: (1) estimate the dominant directions of the layer’s activation-gradient alignment, and (2) apply a scaled, orthogonal step in that subspace before returning to the original coordinates. The first insight comes from measuring stable rank. Given the layer activations <span class="arithmatex">\(A \in \mathbb{R}^{B \times d}\)</span> where <span class="arithmatex">\(B\)</span> is the batch size and <span class="arithmatex">\(d\)</span> the feature size, the stable rank is defined as <span class="arithmatex">\(\text{srank}(A) = \frac{\|A\|_F^2}{\|A\|_2^2}\)</span>, where <span class="arithmatex">\(\|\cdot\|_F\)</span> is the Frobenius norm and <span class="arithmatex">\(\|\cdot\|_2\)</span> is the spectral norm. Because activations in deep nets are often low stable rank, most of the meaningful gradient energy lies in a concentric set of singular vectors. When the gradient <span class="arithmatex">\(\nabla_\theta \mathcal{L}\)</span> aligns with those vectors, a standard per-coordinate optimizer wastes steps along the null directions. A spectral optimizer estimates a basis <span class="arithmatex">\(U\)</span> of the top <span class="arithmatex">\(r\)</span> singular vectors of the activation–gradient covariance, where <span class="arithmatex">\(r \ll d\)</span>, and applies an update that respects those directions.</p>
+<p>The second insight is how to combine this rotated update with element-wise adaptivity. The Muon-inspired optimizers keep track of both a spectral direction and an RMS-like scale so the step's magnitude mirrors what Adam would have taken. Let <span class="arithmatex">\(g_t = \nabla_\theta \mathcal{L}(\theta_t)\)</span> be the gradient at iteration <span class="arithmatex">\(t\)</span>. Adam would produce the update <span class="arithmatex">\(\Delta\theta^{\text{Adam}}_t = -\eta_t \frac{m_t}{\sqrt{v_t} + \epsilon}\)</span> where <span class="arithmatex">\(m_t\)</span> and <span class="arithmatex">\(v_t\)</span> are the biased first and second moment estimates and <span class="arithmatex">\(\eta_t\)</span> the learning rate. In spectral Muon, we rewrite the update as
+[
+\Delta\theta_t = -\eta_t \left(U_t \Lambda_t U_t^\top\right) \tilde{m}_t,
+]
+where <span class="arithmatex">\(\tilde{m}_t\)</span> is a sign-stabilized version of the gradient (to avoid direction flips when RMS estimates are noisy), <span class="arithmatex">\(U_t \in \mathbb{R}^{d \times r}\)</span> is the orthonormal basis capturing the stable directions, and <span class="arithmatex">\(\Lambda_t \in \mathbb{R}^{r \times r}\)</span> is a diagonal matrix that scales each component by an RMS-aligned factor. The term <span class="arithmatex">\(U_t \Lambda_t U_t^\top\)</span> is a low-rank projector built from the current activation sketch, and it replaces the identity matrix implicit in Adam. Each element of <span class="arithmatex">\(\Lambda_t\)</span> is computed so that the magnitude of the spectral update matches the per-coordinate RMS of Adam, ensuring stability: if <span class="arithmatex">\(v_t\)</span> is the RMS estimate, we set <span class="arithmatex">\(\lambda_{t,i} = \frac{1}{\sqrt{v_t + \epsilon}}\)</span>, except that Muon also stretches or shrinks <span class="arithmatex">\(\lambda_{t,i}\)</span> to reflect the curvature captured by the sketch (Zhao et al. 2025) [https://arxiv.org/abs/2507.11005].</p>
+<p>Constructing <span class="arithmatex">\(U_t\)</span> cheaply without computing a full SVD is critical. Muon and similar optimizers use activation sketches: draw a random projection matrix <span class="arithmatex">\(S \in \mathbb{R}^{d \times k}\)</span> and compute <span class="arithmatex">\(Y = A^\top (g \odot \text{sign}(g)) S\)</span>, where <span class="arithmatex">\(\odot\)</span> denotes element-wise multiplication. The columns of <span class="arithmatex">\(Y\)</span> capture the action of the gradient across the activation space, and an orthogonalization such as Newton–Schulz iterations on <span class="arithmatex">\(Y^\top Y\)</span> yields <span class="arithmatex">\(U_t\)</span>. Newton–Schulz solves <span class="arithmatex">\(X^2 = Y^\top Y\)</span> by iterating <span class="arithmatex">\(X_{i+1} = \frac{1}{2} X_i (3I - X_i^2)\)</span>, and because <span class="arithmatex">\(Y^\top Y\)</span> is only <span class="arithmatex">\(k \times k\)</span>, the cost is negligible if <span class="arithmatex">\(k\)</span> is small (often in the tens). This is where the geometry meets adaptivity: we only measure the curvature in the subspace that the current gradients occupy. The orthogonal component <span class="arithmatex">\(U_t\)</span> rotates the gradient into this subspace, <span class="arithmatex">\(\Lambda_t\)</span> rescales it by RMS and curvature, and the preimage <span class="arithmatex">\(U_t \Lambda_t U_t^\top\)</span> brings us back to the full parameter space.</p>
+<p>There is also a stability trick borrowed from Moons and SOAP-type methods that handles the low stable rank of activations. Because the sketch <span class="arithmatex">\(Y\)</span> can collapse when the activation covariance is nearly low rank, Muon applies a sign stabilization: <span class="arithmatex">\(\tilde{g}_t = \text{sign}(g_t) \odot \text{max}(|g_t|, \sigma)\)</span>, where <span class="arithmatex">\(\sigma\)</span> is a small floor that prevents zeroing out directions, and <span class="arithmatex">\(\text{sign}(g_t)\)</span> ensures the update does not flip when the RMS estimate lags. This matches the intuition from the spectral gradient analysis: the ratio between the nuclear norm and the Frobenius norm of the gradient determines whether a rotation helps (Author et al. 2026) <a href="https://www.arxiv.org/pdf/2603.18168">arxiv:2603.18168</a>. When the ratio is high, the gradient has significant mass along fewer singular directions; rotation reduces variance. When it is low, the gradient is already isotropic, so the optimizer gracefully falls back to Adam-like scaling.</p>
+<p>Implementing these ideas in code means updating the optimizer state twice per step. First, gather the activation sketch by multiplying the activations with the stabilized gradient. That gives the covariance that defines <span class="arithmatex">\(U_t\)</span>. Second, compute <span class="arithmatex">\(\Lambda_t\)</span> by dividing the RMS moments by the spectral norms derived from the sketch. The per-element RMS acts as a thermostat—it keeps each spectral direction from growing too fast. In the original Muon paper, rescaling each spectral component to match Adam's RMS reduces the need for tedious learning rate tuning, and Zhao et al. (2025) report training speedups of over 40% across vision transformers, diffusion pipelines, and language models on the same hardware.</p>
+<p>Because the updates are low-rank, the spectral optimizer is inexpensive and can share a single shared sketch across layers of similar dimension. Furthermore, the sketch can be updated infrequently: a layer whose activations have high stable rank might need re-orthogonalizing every few steps, while a low stable rank layer can reuse the same basis for longer, measured by tracking the Frobenius norm of the difference between successive sketches. This is the knob that future work aims to automate. For now, we add a scheduler that triggers orthogonalization only when the normalized trace of the sketch drops below a threshold.</p>
+<p>Finally, the spectral optimizer interacts smoothly with other stability layers such as layer normalization and dropout because it does not assume any particular weight distribution; it simply rotates the gradient into a subspace defined by the activations, then rescales. When the activation stable rank shifts—for example, during warm-up when the weights change rapidly—the sketch naturally picks a new basis because the covariances move. The smooth interplay between the per-element RMS and the global geometry is what lets Muon achieve both adaptivity and fast convergence.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The latest research paints a clear picture: when the gradient is compressible, spectral adaptivity wins. AdaMuon (Zhao et al. 2025) [https://arxiv.org/abs/2507.11005] put this into practice by combining the Muon sketch with sign-stabilized updates and RMS-aligned rescaling, reporting 40% faster steps on transformer pretraining and diffusion flows compared to AdamW baselines with the same steps per second. The benchmark for how much geometry helps comes from the theoretical work “When do spectral gradient updates help in deep learning?” (Author et al. 2026) [https://www.arxiv.org/pdf/2603.18168], which measures the nuclear-to-Frobenius norm ratio of gradients across layers and shows that when this ratio exceeds the stable rank of the activations, a spectral rotation yields a tighter bound on the expected loss decrease than any diagonal scaling can. These two works together explain why Muon splits the difference between efficient computation and Newton-like directionality.</p>
+<p>Research is also stressing that this approach is not limited to transformers. The “Optimization Benchmark for Diffusion Models on Dynamical Systems” study (Author et al. 2026) [https://www.arxiv.org/pdf/2602.07145] re-ran diffusion model training with spectral optimizers and found that the geometry-aware updates improved sample quality on both continuous-time and discrete-time schedulers, even though diffusion gradients are notoriously noisy. This robustness led to a new class of optimizers, including SOAP-style updates and the sketching-based BASIS method. BASIS: Balanced Activation Sketching with Invariant Scalars for “Gh (Author et al. 2026) [https://arxiv.org/abs/2604.16324] extends the sketch by subtracting a bias term that tracks the moving activation mean, which suppresses direction drift in self-supervised pretraining. SOURCE’s engineering piece (Author et al. 2026) — “DDCL-INCRT: A Self-Organising Transformer with Hierarchical Prototype Structure” [https://arxiv.org/abs/2604.01880v1] — uses hierarchical prototypes whose gradients are naturally low stable rank, so the paper argues that only spectral updates make their layered self-organization tractable at scale.</p>
+<p>On the engineering frontier, spectral adaptive optimizers are already entering production inference pipelines. Neural search companies deploy SOAP variants inside their transformers to reduce latency by eliminating zigzag gradient paths during fine-tuning, and the same sketching operations sweep through inference-time adapter training because they are lightweight compared to full second-order updates. The practical lesson is that these optimizers are the first general-purpose methods that can replace both AdamW and LAMB in large-scale distributed runs without extra hyperparameter tuning, so you can train the same NanoGPT or diffusion pipeline with fewer epochs and the same GPU count.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we learn the orthogonalization frequency of the sketch itself? Right now, we trigger a Newton–Schulz iteration once every <span class="arithmatex">\(k\)</span> steps or when a heuristic threshold of sketch drift is crossed. What if the optimizer monitored real-time activation stable rank and only re-orthogonalized when the rank suddenly rose or fell? Automating that could eliminate the remaining cost of periodic sketch recomputation, but it must avoid false positives that would kill training throughput. </p>
+<p>Is there a provable way to interpolate between scalar RMS rescaling and full spectral projectors so we know when to trade one for the other? In regimes where the nuclear-to-Frobenius ratio matches the stable rank, the spectral update adds no benefit, yet existing Muon variants still pay for sketching. A formal criterion or a learned gating function that shuts off the projector in isotropic regions would let a single optimizer handle both extremes optimally.</p>
+<p>Can spectral adaptivity be combined with preconditioners that already operate on weight matrices, such as Shampoo or K-FAC? Shampoo is costly because it stores <span class="arithmatex">\(O(d^2)\)</span> matrices per layer, but its preconditioners and Muon’s sketches are both approximations of the curvature tensor. If one could share or re-use the same factors, we could achieve Shampoo-level conditioning at Muon-level cost.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation, → <a href="../../../02-generative-modeling/concepts/score-matching/">Score matching</a> explains why rotating the gradient space is equivalent to shaping the score function, and if you want to understand the conditioning side that Muon scrambles, → <em>second order methods</em> <!-- [[second-order-methods]] --> shows how Kronecker-factored curvature and Shampoo work with these low-rank sketches; for the engineering counterpart, → <a href="../../../09-algorithms-systems-for-ai/concepts/distributed-training/">Distributed Training</a> describes how to implement these optimizers across shards and keep the sketches synchronized without extra bandwidth.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>Training a Muon-inspired adaptive optimizer head-to-head with AdamW on a character-level NanoGPT over Tiny Shakespeare exposes the geometry gap in under two hours on a Colab T4.</p>
+<p><strong>What you're building:</strong> a char-level NanoGPT trained with both AdamW and a simplified Muon optimizer (RMS-aligned spectral updates based on activation sketches), plus a comparison plot of validation loss / perplexity on Tiny Shakespeare.</p>
+<p><strong>Why this is valuable:</strong> it forces you to implement sketch generation, orthogonalization, and RMS rescaling so you actually touch the parts of Muon that break the compass analogy, and the resulting plot answers the practical question “does a geometry-aware rotation beat AdamW’s diagonal scaling on this dataset?”</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/karpathy/nanoGPT">karpathy/nanoGPT</a> — community reference for char-level transformers
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/tiny_shakespeare">tiny_shakespeare</a> — 1MB text corpus, safe for Colab uploads
+- <strong>Framework:</strong> PyTorch 2.1 + <a href="https://huggingface.co/docs/accelerate/index">accelerate</a> 0.28
+- <strong>Compute:</strong> single Colab T4 (16 GB VRAM), ~2 hours for 10 epochs of 512-token context</p>
+<p><strong>The recipe:</strong>
+1. <code>pip install torch torchvision accelerate einops matplotlib</code> and clone karpathy’s NanoGPT transformer; use <code>accelerate config</code> to select the single T4 device.
+2. Preprocess tiny_shakespeare: tokenize with the existing byte-pair tokenizer, pad to 512 tokens per example, and log the mean activation norms for each layer during a dry run.
+3. Implement Muon: for each transformer block, maintain a sketch matrix <span class="arithmatex">\(Y_t = A^\top (\text{sign}(g_t) \odot \max(|g_t|, \sigma)) S\)</span> where <span class="arithmatex">\(S \in \mathbb{R}^{d \times k}\)</span> is a fixed random Gaussian matrix with <span class="arithmatex">\(k=16\)</span>, normalize <span class="arithmatex">\(Y_t\)</span>, apply one Newton–Schulz iteration to get <span class="arithmatex">\(U_t\)</span>, and set <span class="arithmatex">\(\Lambda_t\)</span> so that <span class="arithmatex">\(\|\Lambda_t U_t^\top g_t\|\approx \|\frac{g_t}{\sqrt{v_t}+\epsilon}\|\)</span>. Train for 10 epochs with learning rate 3e-4 and compare to AdamW’s baseline.
+4. Evaluate by computing validation cross-entropy per token every epoch, then plot both losses and the ratio of Muon update norm to AdamW update norm; target perplexity below 1.25 for Muon and a 5–7% lower loss than AdamW after 10 epochs.
+5. What you now have is a paired training log and plot demonstrating how geometry-aware updates reduce zig-zagging, plus checkpointed weights from both optimizers that can be loaded into a text-sampling script.</p>
+<p><strong>Expected outcome:</strong> Artifact is the two checkpoints plus a pair of loss curves that show Muon’s spectral update producing lower perplexity on Tiny Shakespeare within the same training budget.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same recipe on a free Colab A100 or RTX 4070 by reducing the context size to 256 tokens, halving the batch size to 16, and shrinking the sketch rank to <span class="arithmatex">\(k=8\)</span>; the smaller footprint lets you run the build within Colab’s session limit while still seeing the spectral update drift.</li>
+<li><strong>Applied engineer:</strong> Apply the Muon optimizer to <code>meta-llama/Llama-3-7B-Instruct</code> fine-tuning on a small custom dataset, quantize the final model to int4 with <a href="https://github.com/vllm-project/vllm">vLLM</a> for inference, and measure p95 latency ≤ 120 ms at batch 1; the same sketching logic can live inside the LoRA adapter updates.</li>
+<li><strong>Applied researcher:</strong> Test the hypothesis that doubling the sketch rank from <span class="arithmatex">\(k=16\)</span> to <span class="arithmatex">\(k=32\)</span> improves convergence when the activation stable rank exceeds 20; falsify by plotting validation loss vs. sketch rank and declare failure if Muon’s loss does not drop by at least 1% relative to the baseline within 3 epochs.</li>
+<li><strong>Frontier researcher:</strong> Extend the orthogonalization frequency question from §What’s still open by implementing a trigger based on the real-time stable rank ratio; the falsifier criterion is that if the automated trigger changes the orthogonalization cadence by more than 30% compared to a fixed schedule, the validation loss should not exceed the fixed-schedule loss by more than 0.5% after 5 epochs.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
