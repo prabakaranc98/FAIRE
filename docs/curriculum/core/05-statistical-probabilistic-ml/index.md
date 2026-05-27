@@ -4,32 +4,45 @@ slug: 05-statistical-probabilistic-ml
 layer: core
 subject: 05-statistical-probabilistic-ml
 page_type: subject-overview
-state: stub
-authors_anchored: [murphy, bishop, ghahramani]
+state: drafted
+authors_anchored: []
 feeds_de_pillar: []
-tags: [bayesian, mcmc, vi, gps, graphical-models, uncertainty]
-updated: 2026-05-26
+tags: []
+updated: 2026-05-27
 ---
 
 # Statistical & Probabilistic ML
 
-> **What this subject is for:** Reasoning under uncertainty with structure — probability foundations, MLE, Bayesian inference, MCMC, variational inference, graphical models, Gaussian processes, EM, uncertainty quantification, probabilistic programming.
+> **What this subject is for:** Reasoning under uncertainty — Bayesian inference, variational methods, MCMC, Gaussian processes, EM, uncertainty quantification.
 
-## Where to start
-🚧 Reading order pending — will list 3–5 entry concepts.
+**Track status:** 9 substantive concept pages · 1 stub awaiting next cycle. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
-## Key thinkers
-🚧 Author pages pending in `./authors/`.
+## Concepts
+
+- [Bayesian inference](concepts/bayesian-inference/)
+- [Bayesian neural networks](concepts/bayesian-neural-networks/)
+- [Bayesian optimization](concepts/bayesian-optimization/)
+- [Expectation-Maximization Algorithm](concepts/em-algorithm/)
+- [Expectation-Maximization](concepts/expectation-maximization/)
+- [Gaussian processes](concepts/gaussian-processes/)
+- [Markov Chain Monte Carlo](concepts/mcmc/)
+- [Uncertainty Quantification](concepts/uncertainty-quantification/)
+- [Variational Inference](concepts/variational-inference/)
+
+*Auto-seeded stubs awaiting next cycle: `probabilistic-programming`*
 
 ## Arcs through this subject
-🚧 Learning paths pending in `./arcs/`.
+
+*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+
+## Key thinkers
+
+*Author pages pending.*
 
 ## Builds tied to this subject
-🚧 MVB recipes pending in `./builds/`.
 
-## Connected subjects
-🚧 Cross-subject links pending.
+*MVB recipes pending — currently they live inside concept pages' Build it sections.*
 
 ---
 
-*Subject overview stub — created 2026-05-26 as part of the [structure-v2 skeleton](../../../system/structure-v2.md).*
+*Auto-rebuilt from filesystem state by `scripts/rebuild_track_indexes.py` — see [system architecture](../../../system/architecture.md).*

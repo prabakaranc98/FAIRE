@@ -4,32 +4,42 @@ slug: 06-reinforcement-learning
 layer: core
 subject: 06-reinforcement-learning
 page_type: subject-overview
-state: stub
-authors_anchored: [sutton, silver]
+state: drafted
+authors_anchored: []
 feeds_de_pillar: []
-tags: [mdp, q-learning, policy-gradient, ppo, world-models, rlhf, offline-rl]
-updated: 2026-05-26
+tags: []
+updated: 2026-05-27
 ---
 
 # Reinforcement Learning
 
-> **What this subject is for:** Learning to act under feedback you don't fully control — MDPs, DP & Bellman, Q-learning/DQN, policy gradients, actor-critic, PPO, model-based RL, world models, exploration, offline RL, RLHF, multi-agent.
+> **What this subject is for:** Learning from delayed reward — MDPs, policy gradients, actor-critic, model-based RL, world models, RLHF.
 
-## Where to start
-🚧 Reading order pending — will list 3–5 entry concepts.
+**Track status:** 8 substantive concept pages. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
-## Key thinkers
-🚧 Author pages pending in `./authors/`.
+## Concepts
+
+- [Actor-Critic](concepts/actor-critic/)
+- [Markov Decision Processes](concepts/mdp/)
+- [Model-Based Reinforcement Learning](concepts/model-based-reinforcement-learning/)
+- [Policy gradient](concepts/policy-gradient/)
+- [Policy Gradients](concepts/policy-gradients/)
+- [Proximal Policy Optimization](concepts/ppo/)
+- [Q-learning](concepts/q-learning/)
+- [World models](concepts/world-models/)
 
 ## Arcs through this subject
-🚧 Learning paths pending in `./arcs/`.
+
+*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+
+## Key thinkers
+
+*Author pages pending.*
 
 ## Builds tied to this subject
-🚧 MVB recipes pending in `./builds/`.
 
-## Connected subjects
-🚧 Cross-subject links pending.
+*MVB recipes pending — currently they live inside concept pages' Build it sections.*
 
 ---
 
-*Subject overview stub — created 2026-05-26 as part of the [structure-v2 skeleton](../../../system/structure-v2.md).*
+*Auto-rebuilt from filesystem state by `scripts/rebuild_track_indexes.py` — see [system architecture](../../../system/architecture.md).*

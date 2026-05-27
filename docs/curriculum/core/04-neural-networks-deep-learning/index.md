@@ -4,32 +4,45 @@ slug: 04-neural-networks-deep-learning
 layer: core
 subject: 04-neural-networks-deep-learning
 page_type: subject-overview
-state: stub
-authors_anchored: [hinton, karpathy, bengio]
+state: drafted
+authors_anchored: []
 feeds_de_pillar: []
-tags: [cnn, rnn, transformer, optimization, scaling-laws, normalization]
-updated: 2026-05-26
+tags: []
+updated: 2026-05-27
 ---
 
 # Neural Networks & Deep Learning
 
-> **What this subject is for:** Why deep networks work and how to make them work better — feedforward, CNNs, RNNs/LSTMs, attention, transformers, GNNs, optimization, regularization, training dynamics, scaling laws.
+> **What this subject is for:** The architectural primitives every modern model is built from — MLPs, CNNs, RNNs, residuals, normalization, optimization, scaling laws.
 
-## Where to start
-🚧 Reading order pending — will list 3–5 entry concepts.
+**Track status:** 9 substantive concept pages · 3 stubs awaiting next cycle. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
-## Key thinkers
-🚧 Author pages pending in `./authors/`.
+## Concepts
+
+- [Backpropagation](concepts/backpropagation/)
+- [Batch normalization](concepts/batch-normalization/)
+- [Gradient Descent](concepts/gradient-descent/)
+- [Normalization](concepts/normalization/)
+- [Optimization](concepts/optimization/)
+- [Regularization in Large Model Fine-Tuning](concepts/regularization/)
+- [Residual connections](concepts/residual-connections/)
+- [Scaling laws in neural networks](concepts/scaling-laws/)
+- [Transformer Architecture](concepts/transformer-architecture/)
+
+*Auto-seeded stubs awaiting next cycle: `adaptive-optimizers`, `layer-normalization`, `residual-networks`*
 
 ## Arcs through this subject
-🚧 Learning paths pending in `./arcs/`.
+
+*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+
+## Key thinkers
+
+*Author pages pending.*
 
 ## Builds tied to this subject
-🚧 MVB recipes pending in `./builds/`.
 
-## Connected subjects
-🚧 Cross-subject links pending.
+*MVB recipes pending — currently they live inside concept pages' Build it sections.*
 
 ---
 
-*Subject overview stub — created 2026-05-26 as part of the [structure-v2 skeleton](../../../system/structure-v2.md).*
+*Auto-rebuilt from filesystem state by `scripts/rebuild_track_indexes.py` — see [system architecture](../../../system/architecture.md).*

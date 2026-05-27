@@ -4,32 +4,41 @@ slug: 01-ai
 layer: core
 subject: 01-ai
 page_type: subject-overview
-state: stub
-authors_anchored: [karpathy, olah]
+state: drafted
+authors_anchored: []
 feeds_de_pillar: []
-tags: [llm, vlm, agents, alignment, mech-interp]
-updated: 2026-05-26
+tags: []
+updated: 2026-05-27
 ---
 
 # AI
 
-> **What this subject is for:** Frontier model engineering — LLMs, VLMs, agents, evaluation, mechanistic interpretability, alignment. The applied/systems frontier of "AI" as it's practiced now.
+> **What this subject is for:** What AI is, what it isn't, what it can do — agentic systems, RLHF, mechanistic interpretability, alignment.
 
-## Where to start
-🚧 Reading order pending — will list 3–5 entry concepts.
+**Track status:** 7 substantive concept pages. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
-## Key thinkers
-🚧 Author pages pending in `./authors/` (Karpathy, Olah to anchor).
+## Concepts
+
+- [Alignment safety](concepts/alignment-safety/)
+- [Chain-of-thought](concepts/chain-of-thought/)
+- [Mechanistic Interpretability](concepts/mechanistic-interpretability/)
+- [Mixture of experts](concepts/mixture-of-experts/)
+- [Reward Modeling](concepts/reward-modeling/)
+- [Reinforcement Learning from Human Feedback](concepts/rlhf/)
+- [Transformer](concepts/transformer/)
 
 ## Arcs through this subject
-🚧 Learning paths pending in `./arcs/`.
+
+*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+
+## Key thinkers
+
+*Author pages pending.*
 
 ## Builds tied to this subject
-🚧 MVB recipes pending in `./builds/`.
 
-## Connected subjects
-🚧 Cross-subject links pending.
+*MVB recipes pending — currently they live inside concept pages' Build it sections.*
 
 ---
 
-*Subject overview stub — created 2026-05-26 as part of the [structure-v2 skeleton](../../../system/structure-v2.md).*
+*Auto-rebuilt from filesystem state by `scripts/rebuild_track_indexes.py` — see [system architecture](../../../system/architecture.md).*

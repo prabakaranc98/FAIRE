@@ -4,32 +4,41 @@ slug: 02-generative-modeling
 layer: core
 subject: 02-generative-modeling
 page_type: subject-overview
-state: stub
-authors_anchored: [ho, song, kingma]
+state: drafted
+authors_anchored: []
 feeds_de_pillar: []
-tags: [diffusion, vae, gan, flow-matching, score-matching]
-updated: 2026-05-26
+tags: []
+updated: 2026-05-27
 ---
 
 # Generative Modeling
 
 > **What this subject is for:** How to draw a sample from a distribution you don't know — autoregressive, VAEs, GANs, diffusion, score matching, flow matching, optimal transport, energy-based models.
 
-## Where to start
-🚧 Reading order pending — will list 3–5 entry concepts.
+**Track status:** 7 substantive concept pages. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
-## Key thinkers
-🚧 Author pages pending in `./authors/`.
+## Concepts
+
+- [Consistency Models](concepts/consistency-models/)
+- [Diffusion Models](concepts/diffusion-models/)
+- [Flow matching](concepts/flow-matching/)
+- [Generative Adversarial Networks](concepts/generative-adversarial-networks/)
+- [Latent Diffusion Models](concepts/latent-diffusion-models/)
+- [Score matching](concepts/score-matching/)
+- [Variational Autoencoders](concepts/variational-autoencoders/)
 
 ## Arcs through this subject
-🚧 Learning paths pending in `./arcs/`.
+
+*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+
+## Key thinkers
+
+*Author pages pending.*
 
 ## Builds tied to this subject
-🚧 MVB recipes pending in `./builds/`.
 
-## Connected subjects
-🚧 Cross-subject links pending.
+*MVB recipes pending — currently they live inside concept pages' Build it sections.*
 
 ---
 
-*Subject overview stub — created 2026-05-26 as part of the [structure-v2 skeleton](../../../system/structure-v2.md).*
+*Auto-rebuilt from filesystem state by `scripts/rebuild_track_indexes.py` — see [system architecture](../../../system/architecture.md).*

@@ -4,32 +4,41 @@ slug: 03-representation-learning
 layer: core
 subject: 03-representation-learning
 page_type: subject-overview
-state: stub
-authors_anchored: [lecun, chen-simclr, he-mae]
+state: drafted
+authors_anchored: []
 feeds_de_pillar: []
-tags: [ssl, contrastive, jepa, mae, multimodal]
-updated: 2026-05-26
+tags: []
+updated: 2026-05-27
 ---
 
 # Representation Learning
 
-> **What this subject is for:** Learning what to represent before what to predict — self-supervised pretraining, contrastive (SimCLR/MoCo/CLIP), masked autoencoding, JEPA, latent geometry, multimodal alignment.
+> **What this subject is for:** How to learn embeddings that carry useful structure — contrastive, self-supervised, masked, JEPA, multimodal.
 
-## Where to start
-🚧 Reading order pending — will list 3–5 entry concepts.
+**Track status:** 7 substantive concept pages. See the live [generation status](../../../system/status.md) and the [latest retrospective](../../../system/backlog.md).
 
-## Key thinkers
-🚧 Author pages pending in `./authors/`.
+## Concepts
+
+- [Contrastive Learning](concepts/contrastive-learning/)
+- [Data Augmentation](concepts/data-augmentation/)
+- [Joint Embedding Predictive Architectures](concepts/jepa/)
+- [Masked Autoencoders](concepts/masked-autoencoders/)
+- [Representation Learning](concepts/representation-learning/)
+- [Self-Supervised Learning](concepts/self-supervised-learning/)
+- [SimCLR](concepts/simclr/)
 
 ## Arcs through this subject
-🚧 Learning paths pending in `./arcs/`.
+
+*No arcs yet — the retrospective proposes these once concept coverage hits ≥4 pages per track.*
+
+## Key thinkers
+
+*Author pages pending.*
 
 ## Builds tied to this subject
-🚧 MVB recipes pending in `./builds/`.
 
-## Connected subjects
-🚧 Cross-subject links pending.
+*MVB recipes pending — currently they live inside concept pages' Build it sections.*
 
 ---
 
-*Subject overview stub — created 2026-05-26 as part of the [structure-v2 skeleton](../../../system/structure-v2.md).*
+*Auto-rebuilt from filesystem state by `scripts/rebuild_track_indexes.py` — see [system architecture](../../../system/architecture.md).*

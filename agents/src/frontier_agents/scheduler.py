@@ -422,6 +422,20 @@ def full_cycle_job(dry_run: bool = False) -> dict:
     run_results = sprint_job(dry_run=dry_run)
     write_changelog_entry(sprint_tasks, confidence_before, run_results)
 
+    # Step 4.5: Rebuild track index pages from filesystem state. Pages get
+    # auto-listed under their track's index.md so visitors actually see them.
+    # Without this, track indexes stay as stubs and 71+ generated pages look
+    # invisible to anyone navigating /curriculum/core/<track>/.
+    if not dry_run:
+        try:
+            import subprocess as _sp
+            from pathlib import Path as _P
+            repo_root = _P(__file__).resolve().parent.parent.parent.parent
+            _sp.run(["python3", "scripts/rebuild_track_indexes.py"],
+                    cwd=repo_root, capture_output=True, text=True, timeout=30)
+        except Exception:
+            pass  # never break the cycle on cosmetic regeneration
+
     # Step 5: Retrospective — backlog agent closes the loop. Aggregates patterns
     # from this cycle's runs, runs an LLM scrum-style retrospective, auto-applies
     # safe proposals (stub seeds), writes everything to docs/system/backlog.md
