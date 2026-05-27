@@ -102,7 +102,7 @@ class WikiObservation:
     approved_pct: float = 0.0  # approved / generated
     pages_with_mvb: int = 0
     tracks_covered: int = 0
-    tracks_total: int = 15
+    tracks_total: int = 10
 
     # ── Per-track breakdown ───────────────────────────────────────
     track_metrics: dict[str, TrackMetrics] = field(default_factory=dict)
@@ -140,7 +140,14 @@ def observe(
         for page in curriculum.rglob("*.md"):
             if page.name == "index.md":
                 continue
-            track = page.parent.name
+            # v2 layout: docs/curriculum/core/<track>/<page_type>/<slug>.md
+            # legacy:    docs/curriculum/<track>/<slug>.md
+            parts = page.parent.parts
+            if "core" in parts:
+                ci = parts.index("core")
+                track = parts[ci + 1] if ci + 1 < len(parts) else page.parent.name
+            else:
+                track = page.parent.name
             if track not in track_page_counts:
                 track_page_counts[track] = {"total": 0, "stubs": 0, "stale": 0}
 

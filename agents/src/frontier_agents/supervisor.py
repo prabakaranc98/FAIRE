@@ -46,7 +46,7 @@ class WikiHealth:
     flagged_pages: int = 0
     avg_confidence: float = 0.0
     tracks_covered: int = 0
-    tracks_total: int = 15
+    tracks_total: int = 10
     pages_with_mvb: int = 0
     critical_issues: int = 0
     warnings: int = 0
