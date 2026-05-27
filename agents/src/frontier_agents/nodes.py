@@ -567,7 +567,7 @@ def write_draft_node(state: WikiPageState) -> WikiPageState:
     system = (
         WRITER_SYSTEM
         .replace("{domain}", persona.get("domain", "AI/ML"))
-        .replace("{schema}", schema[:12000])
+        .replace("{schema}", schema[:int(os.getenv("SCHEMA_PROMPT_BYTES", "12000"))])
     ) + skills_block
 
     depth_note = (
@@ -600,7 +600,7 @@ WRITING PLAN
 ════════════════════════════════════
 WORKING MEMORY (verified facts — use ONLY these citations, equations, examples)
 ════════════════════════════════════
-{scratch_pad}
+{scratch_pad[:int(os.getenv("SCRATCH_PAD_BYTES", "20000"))]}
 {improve_note}
 
 {WRITE_INSTRUCTIONS}
@@ -875,9 +875,17 @@ def _run_critic_panel(draft: str, state: WikiPageState) -> dict[str, CriticScore
     Each critic gets the full draft + its own skill prompt and returns a
     structured CriticScore. Results aggregate into a per-critic dict the
     reviewer's confidence is then derived from.
+
+    Local-mode trim: set CRITIC_PANEL_DISABLE=true to skip entirely (saves
+    8× the KV cache that would otherwise duplicate the draft across critics
+    — the root cause of Metal OOM on 24GB Macs running 12B+ models). Set
+    CRITIC_PANEL_WORKERS=N (default 8) to limit parallelism without disabling.
     """
     from .skills import load_skills
     from concurrent.futures import ThreadPoolExecutor as _TPE, as_completed as _asc
+
+    if os.getenv("CRITIC_PANEL_DISABLE", "").lower() in ("true", "1", "yes"):
+        return {}
 
     skills = [s for s in load_skills() if "review" in s.applies_to and s.name.startswith("critic-")]
     if not skills:
@@ -913,8 +921,11 @@ the exact phrase you saw) and actionable in `fix_suggestions` (name the edit).
             )
 
     results: dict[str, CriticScore] = {}
-    # 8 critics; OpenRouter handles concurrency fine. Cap workers at 8.
-    with _TPE(max_workers=min(8, max(1, len(skills))), thread_name_prefix="critic") as pool:
+    # Cap workers — OpenRouter handles 8 concurrent fine, but local MLX servers
+    # share unified memory and KV cache blows up at high parallelism. Default 8;
+    # set CRITIC_PANEL_WORKERS=1 (or 2) when running local to serialize.
+    worker_cap = int(os.getenv("CRITIC_PANEL_WORKERS", "8"))
+    with _TPE(max_workers=min(worker_cap, max(1, len(skills))), thread_name_prefix="critic") as pool:
         futures = {pool.submit(_run_one, s): s for s in skills}
         for fut in _asc(futures):
             name, score = fut.result()
@@ -1143,7 +1154,7 @@ def revise_draft_node(state: WikiPageState) -> WikiPageState:
     system = (
         WRITER_SYSTEM
         .replace("{domain}", persona.get("domain", "AI/ML"))
-        .replace("{schema}", schema[:12000])
+        .replace("{schema}", schema[:int(os.getenv("SCHEMA_PROMPT_BYTES", "12000"))])
     )
 
     draft = state.get("draft", "")
