@@ -80,7 +80,7 @@ The remaining questions boil down to adaptivity under heterogeneity. First, how 
 
 ## Where to read next
 
-If you want hands-on arc material, → [[systems-for-scale/step-03-tensor-parallelism]] implements Megatron-style column and row splits on two GPUs and explains how they combine with optimizer sharding. If latency reduction is your goal, → [[inference-optimization/step-05-async-tp]] walks the Async-TP pipeline that hides `AllReduce` latency during decoding. If you want the theoretical context for the communication lower bounds that make \(R(m)\) the decision metric, → [[parallel-algorithmics]] frames tensor parallelism inside the broader class of distributed linear algebra lower bounds. These links keep tensor parallelism connected to the rest of this arc so that the next build you read about deepens the same operational picture.
+If you want hands-on arc material, → *step 03 tensor parallelism* <!-- [[step-03-tensor-parallelism]] --> implements Megatron-style column and row splits on two GPUs and explains how they combine with optimizer sharding. If latency reduction is your goal, → *step 05 async tp* <!-- [[step-05-async-tp]] --> walks the Async-TP pipeline that hides `AllReduce` latency during decoding. If you want the theoretical context for the communication lower bounds that make \(R(m)\) the decision metric, → [[parallel-algorithmics]] frames tensor parallelism inside the broader class of distributed linear algebra lower bounds. These links keep tensor parallelism connected to the rest of this arc so that the next build you read about deepens the same operational picture.
 
 ## Build it
 

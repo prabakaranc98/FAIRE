@@ -72,7 +72,7 @@ Finally, we still lack a principled answer to “What can we build next?” once
 
 ## Where to read next
 
-If you want the engineering story of how solvers connect to training workloads, → [[curriculum/core/02-generative-modeling/flow-matching]] explains the ordinary differential equation perspective that produced the teacher checkpoint. If you want the probabilistic backbone of consistency functions and objectives, → [[curriculum/core/02-generative-modeling/consistency-models]] traces the derivation of \(\mathcal{L}_{CD}\) and the uniform \(t\) sampler we inked here for the double-moons dataset. For a different take on noise prediction and how it aligns with both flow matching and consistency, → [[curriculum/core/02-generative-modeling/score-matching]] shows how predicting \(\epsilon\) yields equivalent gradients and why many papers switch notations between representations.
+If you want the engineering story of how solvers connect to training workloads, → [Flow Matching](../../concepts/flow-matching.md) explains the ordinary differential equation perspective that produced the teacher checkpoint. If you want the probabilistic backbone of consistency functions and objectives, → [Consistency Models](../../concepts/consistency-models.md) traces the derivation of \(\mathcal{L}_{CD}\) and the uniform \(t\) sampler we inked here for the double-moons dataset. For a different take on noise prediction and how it aligns with both flow matching and consistency, → [Score Matching](../../concepts/score-matching.md) shows how predicting \(\epsilon\) yields equivalent gradients and why many papers switch notations between representations.
 
 ## Build it
 

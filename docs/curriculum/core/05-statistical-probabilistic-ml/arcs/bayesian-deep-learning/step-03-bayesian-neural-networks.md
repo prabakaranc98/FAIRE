@@ -64,7 +64,7 @@ The third question is how to integrate ScalaBL with multi-modal prompts. The cur
 
 ## Where to read next
 
-If you want to revisit the optimizer you are reusing, → [[step-02-variational-inference]] lays out the ELBO and SGVI machinery in full. If you want to learn how to interpret the variance traces once they are logged, → [[step-04-uncertainty-quantification]] shows how to turn them into calibrated abstention policies and dashboards. For the broader probabilistic context, → [[curriculum/05-statistical-probabilistic-ml/bayesian-inference.md]] explains the prior design and KL penalties that keep a ScalaBL posterior from collapsing.
+If you want to revisit the optimizer you are reusing, → [[step-02-variational-inference]] lays out the ELBO and SGVI machinery in full. If you want to learn how to interpret the variance traces once they are logged, → [[step-04-uncertainty-quantification]] shows how to turn them into calibrated abstention policies and dashboards. For the broader probabilistic context, → [Bayesian Inference](../../concepts/bayesian-inference.md) explains the prior design and KL penalties that keep a ScalaBL posterior from collapsing.
 
 ## Build it
 

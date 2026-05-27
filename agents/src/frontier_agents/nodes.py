@@ -1649,12 +1649,19 @@ def _inject_links(
     # Current file location (v2 layout): docs/curriculum/core/<track>/concepts/<topic>.md
     current_path = Path(DOCS_DIR) / "curriculum" / "core" / current_track / "concepts" / f"{current_topic}.md"
 
-    pattern = re.compile(r"\[\[([a-z0-9][a-z0-9\-]*)\]\]")
+    # Accept both simple `[[slug]]` and path-style `[[curriculum/...track.../slug]]`
+    # wikilinks. The path-style form is what the arc-step writer tends to emit;
+    # we resolve them by taking the last path segment (after any `/` and
+    # stripping `.md`) and looking THAT up in existing_pages.
+    pattern = re.compile(r"\[\[([a-zA-Z0-9][a-zA-Z0-9\-/.]*)\]\]")
 
     resolved_targets: list[str] = []  # for backlinks.json
 
     def _replace(match: re.Match) -> str:
-        slug = match.group(1)
+        raw = match.group(1)
+        # Normalise to a bare slug: last path component, strip .md / .html, lowercase
+        slug = raw.rsplit("/", 1)[-1]
+        slug = slug.removesuffix(".md").removesuffix(".html").lower()
         if slug == current_topic:
             # Self-reference — drop the brackets, keep the word
             return slug.replace("-", " ")

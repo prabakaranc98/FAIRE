@@ -78,7 +78,7 @@ Can prompt templates that alternate reasoning tokens with lightweight verificati
 
 ## Where to read next
 
-If you want the historical foundation, → [[chain-of-thought]] traces how Chain-of-Thought prompting emerged from zero-shot heuristics to structured reasoning. For production-minded readers, → [[reasoning-as-a-service]] describes how latency budgets and prompt templates are enforced at scale. The engineering counterpart is → [[agents/tool-use-memory]] which explains how written chains are treated like external tools, mirroring the writable medium metaphor in this pipeline.
+If you want the historical foundation, → [[chain-of-thought]] traces how Chain-of-Thought prompting emerged from zero-shot heuristics to structured reasoning. For production-minded readers, → [[reasoning-as-a-service]] describes how latency budgets and prompt templates are enforced at scale. The engineering counterpart is → *tool use memory* <!-- [[tool-use-memory]] --> which explains how written chains are treated like external tools, mirroring the writable medium metaphor in this pipeline.
 
 ## Build it
 
