@@ -1297,13 +1297,41 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#audit-2026-05-26-1856-utc" class="md-nav__link">
+  <a href="#audit-2026-05-27-0749-utc" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Audit — 2026-05-26 18:56 UTC
+        Audit — 2026-05-27 07:49 UTC
       
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Audit — 2026-05-27 07:49 UTC">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#warning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Warning
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#info" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Info
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1393,7 +1421,7 @@
 
 <h1 id="supervisor-report">Supervisor Report<a class="headerlink" href="#supervisor-report" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p>Generated: <strong>2026-05-26 18:56 UTC</strong> by the Frontier Wiki supervising agent</p>
+<p>Generated: <strong>2026-05-27 07:49 UTC</strong> by the Frontier Wiki supervising agent</p>
 </blockquote>
 <h2 id="wiki-health">Wiki Health<a class="headerlink" href="#wiki-health" title="Permanent link">&para;</a></h2>
 <table>
@@ -1406,19 +1434,19 @@
 <tbody>
 <tr>
 <td>Total pages (stubs + generated)</td>
-<td><strong>0</strong></td>
+<td><strong>71</strong></td>
 </tr>
 <tr>
 <td>Stub pages (not yet generated)</td>
-<td><strong>0</strong></td>
+<td><strong>14</strong></td>
 </tr>
 <tr>
 <td>Generated pages</td>
-<td><strong>0</strong></td>
+<td><strong>57</strong></td>
 </tr>
 <tr>
 <td>Approved (conf ≥ 0.8)</td>
-<td><strong>0</strong> (0%)</td>
+<td><strong>50</strong> (87%)</td>
 </tr>
 <tr>
 <td>Flagged (conf &lt; 0.8)</td>
@@ -1426,11 +1454,11 @@
 </tr>
 <tr>
 <td>Avg reviewer confidence</td>
-<td><strong>0.00</strong></td>
+<td><strong>0.77</strong></td>
 </tr>
 <tr>
 <td>Tracks with content</td>
-<td><strong>0</strong> / 15</td>
+<td><strong>1</strong> / 15</td>
 </tr>
 <tr>
 <td>Pages with MVB</td>
@@ -1442,12 +1470,12 @@
 </tr>
 <tr>
 <td>Warnings</td>
-<td><strong>0</strong></td>
+<td><strong>9</strong></td>
 </tr>
 </tbody>
 </table>
 <h2 id="editorial-analysis">Editorial Analysis<a class="headerlink" href="#editorial-analysis" title="Permanent link">&para;</a></h2>
-<p>Wiki has 0 pages (0 stubs). 0 pages need revision. Focus: generate stubs and improve flagged pages.</p>
+<p>We are in a strong structural position with over eighty percent of our target pages generated and a steady upward quality trend, but we must now address a persistent quality deficit of 0.08 to push our average reviewer confidence past the threshold. Our immediate bottleneck lies not in coverage, but in execution: a cluster of technically demanding pages—including actor-critic, do-calculus, and optimization—recently errored out during generation, while our self-supervised learning entry remains flagged due to low reviewer confidence. In the upcoming sprint, the team must prioritize targeted retries and revisions for these high-impact topics to stabilize our core content. Once these quality gaps are resolved, we should leverage our healthy twenty-one dollar budget to begin systematically converting foundational stubs like backpropagation and Bayesian inference. Fortunately, we face no critical audit issues or severe budget constraints, giving us the perfect operational runway to focus purely on mathematical rigor and prose refinement as we polish these complex algorithmic pages.</p>
 <h2 id="prioritised-work-queue">Prioritised Work Queue<a class="headerlink" href="#prioritised-work-queue" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1462,21 +1490,254 @@
 </thead>
 <tbody>
 <tr>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td>1</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>actor-critic</td>
+<td>06-reinforcement-learning</td>
+<td>Previous attempt errored (conf=0.76) — retry with current prompts</td>
+</tr>
+<tr>
+<td>2</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>counterfactuals</td>
+<td>08-causal-statistical-inference</td>
+<td>Previous attempt errored (conf=0.80) — retry with current prompts</td>
+</tr>
+<tr>
+<td>3</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>do-calculus</td>
+<td>08-causal-statistical-inference</td>
+<td>Previous attempt errored (conf=0.78) — retry with current prompts</td>
+</tr>
+<tr>
+<td>4</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>optimization</td>
+<td>04-neural-networks-deep-learning</td>
+<td>Previous attempt errored (conf=0.72) — retry with current prompts</td>
+</tr>
+<tr>
+<td>5</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>quantization</td>
+<td>09-algorithms-systems-for-ai</td>
+<td>Previous attempt errored (conf=0.71) — retry with current prompts</td>
+</tr>
+<tr>
+<td>6</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>self-supervised-learning</td>
+<td>03-representation-learning</td>
+<td>Reviewer flagged (conf=0.61) — needs targeted revision</td>
+</tr>
+<tr>
+<td>7</td>
+<td>🔴 critical</td>
+<td>improve</td>
+<td>variational-inference</td>
+<td>05-statistical-probabilistic-ml</td>
+<td>Previous attempt errored (conf=0.72) — retry with current prompts</td>
+</tr>
+<tr>
+<td>8</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>backpropagation</td>
+<td>04-neural-networks-deep-learning</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>9</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>bayesian-inference</td>
+<td>05-statistical-probabilistic-ml</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>10</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>bayesian-neural-networks</td>
+<td>05-statistical-probabilistic-ml</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>11</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>contrastive-learning</td>
+<td>03-representation-learning</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>12</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>data-parallelism</td>
+<td>09-algorithms-systems-for-ai</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>13</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>flash-attention</td>
+<td>09-algorithms-systems-for-ai</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>14</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>model-based-reinforcement-learning</td>
+<td>06-reinforcement-learning</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>15</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>pipeline-parallelism</td>
+<td>09-algorithms-systems-for-ai</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>16</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>policy-evaluation</td>
+<td>08-causal-statistical-inference</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>17</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>policy-gradients</td>
+<td>06-reinforcement-learning</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>18</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>quantization-aware-training</td>
+<td>09-algorithms-systems-for-ai</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>19</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>representation-learning</td>
+<td>03-representation-learning</td>
+<td>Stub page — not yet generated</td>
+</tr>
+<tr>
+<td>20</td>
+<td>🟡 medium</td>
+<td>generate</td>
+<td>reward-modeling</td>
+<td>01-ai</td>
+<td>Stub page — not yet generated</td>
 </tr>
 </tbody>
 </table>
 <h2 id="audit-issues">Audit Issues<a class="headerlink" href="#audit-issues" title="Permanent link">&para;</a></h2>
-<h2 id="audit-2026-05-26-1856-utc">Audit — 2026-05-26 18:56 UTC<a class="headerlink" href="#audit-2026-05-26-1856-utc" title="Permanent link">&para;</a></h2>
+<h2 id="audit-2026-05-27-0749-utc">Audit — 2026-05-27 07:49 UTC<a class="headerlink" href="#audit-2026-05-27-0749-utc" title="Permanent link">&para;</a></h2>
 <blockquote>
-<p>0 pages scanned · 0 critical · 0 warnings</p>
+<p>71 pages scanned · 0 critical · 9 warnings</p>
 </blockquote>
-<p>No issues found.</p>
+<h3 id="warning">Warning<a class="headerlink" href="#warning" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/ppo.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/actor-critic.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/mcmc.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/attention.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/flow-matching.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/latent-diffusion-models.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/self-supervised-learning.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/04-neural-networks-deep-learning/concepts/scaling-laws.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/kv-cache.md</strong> [no_arxiv]: No arXiv sources found — page needs academic citations</li>
+</ul>
+<h3 id="info">Info<a class="headerlink" href="#info" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/model-based-reinforcement-learning.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/mdp.md</strong> [stale_sota]: Page updated 508 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/policy-gradients.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/world-models.md</strong> [stale_sota]: Page updated 232 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/ppo.md</strong> [stale_sota]: Page updated 351 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/q-learning.md</strong> [stale_sota]: Page updated 543 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/actor-critic.md</strong> [stale_sota]: Page updated 568 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/06-reinforcement-learning/concepts/policy-gradient.md</strong> [stale_sota]: Page updated 497 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/mcmc.md</strong> [stale_sota]: Page updated 301 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/gaussian-processes.md</strong> [stale_sota]: Page updated 497 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/bayesian-inference.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/uncertainty-quantification.md</strong> [stale_sota]: Page updated 542 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/expectation-maximization.md</strong> [stale_sota]: Page updated 561 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/bayesian-neural-networks.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/05-statistical-probabilistic-ml/concepts/em-algorithm.md</strong> [stale_sota]: Page updated 602 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/multi-head-attention.md</strong> [stale_sota]: Page updated 360 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/in-context-learning.md</strong> [stale_sota]: Page updated 471 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/positional-encoding.md</strong> [stale_sota]: Page updated 238 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/attention.md</strong> [stale_sota]: Page updated 549 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/long-context.md</strong> [stale_sota]: Page updated 203 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/07-attention-memory-reasoning-continual/concepts/retrieval-augmented-generation.md</strong> [stale_sota]: Page updated 599 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/diffusion-models.md</strong> [stale_sota]: Page updated 599 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/consistency-models.md</strong> [stale_sota]: Page updated 542 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/score-matching.md</strong> [stale_sota]: Page updated 542 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/flow-matching.md</strong> [stale_sota]: Page updated 558 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/generative-adversarial-networks.md</strong> [stale_sota]: Page updated 234 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/latent-diffusion-models.md</strong> [stale_sota]: Page updated 330 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/02-generative-modeling/concepts/variational-autoencoders.md</strong> [stale_sota]: Page updated 542 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/10-complexity-cognition-natural-intelligence/concepts/generalization.md</strong> [stale_sota]: Page updated 188 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/10-complexity-cognition-natural-intelligence/concepts/compositionality.md</strong> [stale_sota]: Page updated 574 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/10-complexity-cognition-natural-intelligence/concepts/emergence.md</strong> [stale_sota]: Page updated 391 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/10-complexity-cognition-natural-intelligence/concepts/scaling-collapse.md</strong> [stale_sota]: Page updated 497 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/causal-representation-learning.md</strong> [stale_sota]: Page updated 600 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/causal-discovery.md</strong> [stale_sota]: Page updated 321 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/instrumental-variables.md</strong> [stale_sota]: Page updated 207 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/mediation-analysis.md</strong> [stale_sota]: Page updated 483 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/do-calculus.md</strong> [stale_sota]: Page updated 563 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/counterfactuals.md</strong> [stale_sota]: Page updated 412 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/policy-evaluation.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/08-causal-statistical-inference/concepts/structural-causal-models.md</strong> [stale_sota]: Page updated 559 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/jepa.md</strong> [stale_sota]: Page updated 497 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/simclr.md</strong> [stale_sota]: Page updated 497 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/self-supervised-learning.md</strong> [stale_sota]: Page updated 597 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/contrastive-learning.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/masked-autoencoders.md</strong> [stale_sota]: Page updated 421 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/03-representation-learning/concepts/representation-learning.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/04-neural-networks-deep-learning/concepts/scaling-laws.md</strong> [stale_sota]: Page updated 374 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/04-neural-networks-deep-learning/concepts/backpropagation.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/04-neural-networks-deep-learning/concepts/residual-connections.md</strong> [stale_sota]: Page updated 181 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/04-neural-networks-deep-learning/concepts/optimization.md</strong> [stale_sota]: Page updated 545 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/04-neural-networks-deep-learning/concepts/batch-normalization.md</strong> [stale_sota]: Page updated 592 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/distributed-training.md</strong> [stale_sota]: Page updated 396 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/quantization-aware-training.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/model-parallelism.md</strong> [stale_sota]: Page updated 238 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/tensor-parallelism.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/kv-cache.md</strong> [stale_sota]: Page updated 394 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/pipeline-parallelism.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/inference-optimization.md</strong> [stale_sota]: Page updated 228 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/flash-attention.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/09-algorithms-systems-for-ai/concepts/data-parallelism.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/01-ai/concepts/transformer.md</strong> [stale_sota]: Page updated 511 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/01-ai/concepts/reward-modeling.md</strong> [stub]: Page is still a stub — not yet agent-generated</li>
+<li><strong>curriculum/core/01-ai/concepts/alignment-safety.md</strong> [stale_sota]: Page updated 497 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/01-ai/concepts/mechanistic-interpretability.md</strong> [stale_sota]: Page updated 421 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/01-ai/concepts/mixture-of-experts.md</strong> [stale_sota]: Page updated 572 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/01-ai/concepts/rlhf.md</strong> [stale_sota]: Page updated 417 days ago — SotA may be outdated</li>
+<li><strong>curriculum/core/01-ai/concepts/chain-of-thought.md</strong> [stale_sota]: Page updated 227 days ago — SotA may be outdated</li>
+</ul>
 <hr />
 <p><em>This report is regenerated automatically. The supervisor updates <code>agents/sprints/current.md</code> with the top work items.</em></p>
 

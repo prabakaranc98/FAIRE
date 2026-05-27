@@ -85,6 +85,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/concepts/data-augmentation/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/concepts/jepa/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -117,6 +121,14 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/gradient-descent/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/normalization/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/optimization/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -130,6 +142,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/scaling-laws/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/transformer-architecture/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -265,6 +281,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/08-causal-statistical-inference/concepts/potential-outcomes/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/08-causal-statistical-inference/concepts/structural-causal-models/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -273,7 +293,15 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/attention-mechanisms/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/data-parallelism/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/distributed-training-arc/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -293,11 +321,23 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/llm-architecture-optimizations/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/mixed-precision-training/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/model-parallelism/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/pipeline-parallelism/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/post-training-quantization/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>

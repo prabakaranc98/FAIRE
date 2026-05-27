@@ -52,7 +52,7 @@
       "07-attention-memory-reasoning/single-head-attention"
     ],
     "08-causal-statistical-inference/causal-discovery": [
-      "07-attention-memory-reasoning/single-head-attention"
+      "structural-causal-models"
     ],
     "01-ai/agent-architectures": [
       "07-attention-memory-reasoning/single-head-attention"
@@ -82,7 +82,7 @@
       "07-attention-memory-reasoning/single-head-attention"
     ],
     "05-statistical-probabilistic-ml/bayesian-inference": [
-      "07-attention-memory-reasoning/single-head-attention"
+      "variational-inference"
     ],
     "05-statistical-probabilistic-ml/bayesian-nn": [
       "07-attention-memory-reasoning/single-head-attention"
@@ -187,11 +187,7 @@
       "05-statistical-probabilistic-ml/bayesian-inference"
     ],
     "02-generative-modeling/consistency-models": [
-      "04-neural-networks-dl/backpropagation",
-      "05-statistical-probabilistic-ml/bayesian-inference",
-      "05-statistical-probabilistic-ml/bayesian-nn",
-      "15-ml-theory-foundations/bias-variance",
-      "03-representation-learning/bootstrapping-methods"
+      "score-matching"
     ],
     "01-ai/constraint-satisfaction": [
       "10-complexity-cognition/cognitive-architectures",
@@ -202,12 +198,7 @@
       "15-ml-theory-foundations/bias-variance"
     ],
     "03-representation-learning/contrastive-learning": [
-      "03-representation-learning/bootstrapping-methods",
-      "04-neural-networks-dl/backpropagation",
-      "04-neural-networks-dl/cnn",
-      "15-ml-theory-foundations/bias-variance",
-      "05-statistical-probabilistic-ml/bayesian-inference",
-      "07-attention-memory-reasoning/single-head-attention"
+      "self-supervised-learning"
     ],
     "11-robotics-embodied-ai/control-theory": [
       "10-complexity-cognition/cognitive-architectures",
@@ -224,12 +215,8 @@
       "15-ml-theory-foundations/entropy"
     ],
     "08-causal-statistical-inference/counterfactuals": [
-      "08-causal-statistical-inference/disentanglement",
-      "05-statistical-probabilistic-ml/bayesian-inference",
-      "05-statistical-probabilistic-ml/bayesian-nn",
-      "15-ml-theory-foundations/bias-variance",
-      "05-statistical-probabilistic-ml/em",
-      "03-representation-learning/bootstrapping-methods"
+      "structural-causal-models",
+      "do-calculus"
     ],
     "09-algorithms-systems-ai/custom-kernels": [
       "04-neural-networks-dl/cnn",
@@ -255,12 +242,7 @@
       "09-algorithms-systems-ai/ai-hardware"
     ],
     "02-generative-modeling/diffusion-models": [
-      "04-neural-networks-dl/backpropagation",
-      "04-neural-networks-dl/cnn",
-      "05-statistical-probabilistic-ml/bayesian-inference",
-      "05-statistical-probabilistic-ml/bayesian-nn",
-      "03-representation-learning/contrastive-learning",
-      "15-ml-theory-foundations/bias-variance"
+      "transformer"
     ],
     "05-statistical-probabilistic-ml/directed-graphical-models": [
       "05-statistical-probabilistic-ml/bayesian-inference",
@@ -301,12 +283,8 @@
       "07-attention-memory-reasoning/single-head-attention"
     ],
     "08-causal-statistical-inference/do-calculus": [
-      "08-causal-statistical-inference/counterfactuals",
-      "08-causal-statistical-inference/disentanglement",
-      "05-statistical-probabilistic-ml/bayesian-inference",
-      "15-ml-theory-foundations/entropy",
-      "15-ml-theory-foundations/bias-variance",
-      "05-statistical-probabilistic-ml/em"
+      "structural-causal-models",
+      "causal-representation-learning"
     ],
     "15-ml-theory-foundations/double-descent": [
       "15-ml-theory-foundations/bias-variance",
@@ -411,12 +389,10 @@
       "15-ml-theory-foundations/concentration"
     ],
     "02-generative-modeling/flow-matching": [
-      "02-generative-modeling/energy-based-models",
-      "02-generative-modeling/generative-adversarial-networks",
-      "15-ml-theory-foundations/entropy",
-      "05-statistical-probabilistic-ml/bayesian-inference",
-      "12-physics-scientific-ai/equivariant-networks",
-      "08-causal-statistical-inference/estimation"
+      "concepts/diffusion-models",
+      "concepts/generative-adversarial-networks",
+      "concepts/variational-autoencoders",
+      "concepts/transformer"
     ],
     "12-physics-scientific-ai/fno": [
       "12-physics-scientific-ai/equivariant-networks",
@@ -458,12 +434,8 @@
       "08-causal-statistical-inference/disentanglement"
     ],
     "02-generative-modeling/generative-adversarial-networks": [
-      "04-neural-networks-dl/backpropagation",
-      "04-neural-networks-dl/cnn",
-      "08-causal-statistical-inference/disentanglement",
-      "15-ml-theory-foundations/entropy",
-      "15-ml-theory-foundations/bias-variance",
-      "03-representation-learning/contrastive-learning"
+      "concepts/diffusion-models",
+      "concepts/variational-autoencoders"
     ],
     "12-physics-scientific-ai/geometric-dl": [
       "12-physics-scientific-ai/equivariant-networks",
@@ -518,6 +490,156 @@
       "07-attention-memory-reasoning/single-head-attention",
       "03-representation-learning/contrastive-learning",
       "04-neural-networks-dl/backpropagation"
+    ],
+    "01-ai/mechanistic-interpretability": [
+      "concepts/diffusion-models",
+      "concepts/variational-autoencoders"
+    ],
+    "02-generative-modeling/score-matching": [
+      "concepts/diffusion-models",
+      "concepts/generative-adversarial-networks",
+      "concepts/variational-autoencoders"
+    ],
+    "01-ai/transformer": [
+      "concepts/mechanistic-interpretability",
+      "concepts/diffusion-models",
+      "concepts/generative-adversarial-networks",
+      "concepts/variational-autoencoders"
+    ],
+    "08-causal-statistical-inference/structural-causal-models": [
+      "concepts/mechanistic-interpretability",
+      "concepts/variational-autoencoders",
+      "concepts/generative-adversarial-networks",
+      "concepts/diffusion-models",
+      "concepts/transformer"
+    ],
+    "07-attention-memory-reasoning-continual/attention": [
+      "score-matching",
+      "flow-matching"
+    ],
+    "01-ai/chain-of-thought": [
+      "score-matching",
+      "flow-matching"
+    ],
+    "10-complexity-cognition-natural-intelligence/double-descent": [
+      "score-matching"
+    ],
+    "10-complexity-cognition-natural-intelligence/generalization": [
+      "score-matching"
+    ],
+    "07-attention-memory-reasoning-continual/in-context-learning": [
+      "score-matching"
+    ],
+    "03-representation-learning/jepa": [
+      "score-matching"
+    ],
+    "09-algorithms-systems-for-ai/kv-cache": [
+      "attention"
+    ],
+    "02-generative-modeling/latent-diffusion-models": [
+      "score-matching",
+      "variational-autoencoders"
+    ],
+    "07-attention-memory-reasoning-continual/long-context": [
+      "attention",
+      "kv-cache"
+    ],
+    "03-representation-learning/masked-autoencoders": [
+      "score-matching"
+    ],
+    "05-statistical-probabilistic-ml/mcmc": [
+      "score-matching"
+    ],
+    "08-causal-statistical-inference/mediation-analysis": [
+      "structural-causal-models",
+      "counterfactuals"
+    ],
+    "01-ai/mixture-of-experts": [
+      "score-matching",
+      "flow-matching"
+    ],
+    "07-attention-memory-reasoning-continual/multi-head-attention": [
+      "score-matching"
+    ],
+    "06-reinforcement-learning/policy-gradient": [
+      "actor-critic"
+    ],
+    "09-algorithms-systems-for-ai/quantization": [
+      "score-matching"
+    ],
+    "04-neural-networks-deep-learning/regularization": [
+      "policy-gradient"
+    ],
+    "01-ai/rlhf": [
+      "chain-of-thought"
+    ],
+    "10-complexity-cognition-natural-intelligence/scaling-collapse": [
+      "score-matching"
+    ],
+    "03-representation-learning/self-supervised-learning": [
+      "score-matching",
+      "simclr"
+    ],
+    "04-neural-networks-deep-learning/scaling-laws": [
+      "score-matching"
+    ],
+    "03-representation-learning/simclr": [
+      "score-matching"
+    ],
+    "05-statistical-probabilistic-ml/uncertainty-quantification": [
+      "gaussian-processes"
+    ],
+    "05-statistical-probabilistic-ml/variational-inference": [
+      "variational-autoencoders"
+    ],
+    "06-reinforcement-learning/world-models": [
+      "variational-autoencoders"
+    ],
+    "08-causal-statistical-inference/causal-representation-learning": [
+      "structural-causal-models"
+    ],
+    "05-statistical-probabilistic-ml/expectation-maximization": [
+      "variational-inference",
+      "mixture-of-experts"
+    ],
+    "06-reinforcement-learning/actor-critic": [
+      "policy-gradient",
+      "ppo"
+    ],
+    "04-neural-networks-deep-learning/optimization": [
+      "regularization"
+    ],
+    "05-statistical-probabilistic-ml/bayesian-neural-networks": [
+      "variational-inference"
+    ],
+    "04-neural-networks-deep-learning/backpropagation": [
+      "score-matching",
+      "flow-matching"
+    ],
+    "09-algorithms-systems-for-ai/data-parallelism": [
+      "score-matching"
+    ],
+    "09-algorithms-systems-for-ai/pipeline-parallelism": [
+      "data-parallelism"
+    ],
+    "08-causal-statistical-inference/policy-evaluation": [
+      "structural-causal-models"
+    ],
+    "06-reinforcement-learning/model-based-reinforcement-learning": [
+      "score-matching"
+    ],
+    "06-reinforcement-learning/policy-gradients": [
+      "actor-critic",
+      "ppo",
+      "score-matching"
+    ],
+    "03-representation-learning/representation-learning": [
+      "score-matching",
+      "contrastive-learning",
+      "self-supervised-learning"
+    ],
+    "09-algorithms-systems-for-ai/tensor-parallelism": [
+      "distributed-training"
     ]
   },
   "reverse": {
@@ -944,6 +1066,158 @@
     ],
     "13-graph-relational-ai/equivariant-gnn": [
       "13-graph-relational-ai/graph-transformers"
+    ],
+    "concepts/diffusion-models": [
+      "01-ai/mechanistic-interpretability",
+      "02-generative-modeling/flow-matching",
+      "02-generative-modeling/generative-adversarial-networks",
+      "02-generative-modeling/score-matching",
+      "01-ai/transformer",
+      "08-causal-statistical-inference/structural-causal-models"
+    ],
+    "concepts/variational-autoencoders": [
+      "01-ai/mechanistic-interpretability",
+      "08-causal-statistical-inference/do-calculus",
+      "02-generative-modeling/flow-matching",
+      "02-generative-modeling/generative-adversarial-networks",
+      "02-generative-modeling/score-matching",
+      "01-ai/transformer",
+      "08-causal-statistical-inference/structural-causal-models"
+    ],
+    "concepts/mechanistic-interpretability": [
+      "01-ai/transformer",
+      "08-causal-statistical-inference/structural-causal-models",
+      "08-causal-statistical-inference/do-calculus"
+    ],
+    "concepts/generative-adversarial-networks": [
+      "01-ai/transformer",
+      "02-generative-modeling/score-matching",
+      "02-generative-modeling/flow-matching",
+      "08-causal-statistical-inference/structural-causal-models"
+    ],
+    "concepts/transformer": [
+      "02-generative-modeling/flow-matching",
+      "08-causal-statistical-inference/structural-causal-models"
+    ],
+    "variational-autoencoders": [
+      "02-generative-modeling/diffusion-models",
+      "02-generative-modeling/latent-diffusion-models",
+      "06-reinforcement-learning/world-models",
+      "05-statistical-probabilistic-ml/variational-inference"
+    ],
+    "transformer": [
+      "02-generative-modeling/diffusion-models"
+    ],
+    "score-matching": [
+      "07-attention-memory-reasoning-continual/attention",
+      "01-ai/chain-of-thought",
+      "02-generative-modeling/consistency-models",
+      "08-causal-statistical-inference/counterfactuals",
+      "10-complexity-cognition-natural-intelligence/double-descent",
+      "10-complexity-cognition-natural-intelligence/generalization",
+      "07-attention-memory-reasoning-continual/in-context-learning",
+      "03-representation-learning/jepa",
+      "02-generative-modeling/latent-diffusion-models",
+      "03-representation-learning/masked-autoencoders",
+      "05-statistical-probabilistic-ml/mcmc",
+      "01-ai/mixture-of-experts",
+      "07-attention-memory-reasoning-continual/multi-head-attention",
+      "09-algorithms-systems-for-ai/quantization",
+      "10-complexity-cognition-natural-intelligence/scaling-collapse",
+      "03-representation-learning/self-supervised-learning",
+      "04-neural-networks-deep-learning/scaling-laws",
+      "03-representation-learning/simclr",
+      "05-statistical-probabilistic-ml/variational-inference",
+      "04-neural-networks-deep-learning/backpropagation",
+      "03-representation-learning/contrastive-learning",
+      "09-algorithms-systems-for-ai/data-parallelism",
+      "06-reinforcement-learning/model-based-reinforcement-learning",
+      "06-reinforcement-learning/policy-gradients",
+      "03-representation-learning/representation-learning"
+    ],
+    "flow-matching": [
+      "07-attention-memory-reasoning-continual/attention",
+      "01-ai/chain-of-thought",
+      "01-ai/mixture-of-experts",
+      "05-statistical-probabilistic-ml/variational-inference",
+      "03-representation-learning/self-supervised-learning",
+      "05-statistical-probabilistic-ml/bayesian-neural-networks",
+      "04-neural-networks-deep-learning/backpropagation"
+    ],
+    "structural-causal-models": [
+      "08-causal-statistical-inference/causal-discovery",
+      "08-causal-statistical-inference/mediation-analysis",
+      "08-causal-statistical-inference/causal-representation-learning",
+      "08-causal-statistical-inference/do-calculus",
+      "08-causal-statistical-inference/counterfactuals",
+      "08-causal-statistical-inference/policy-evaluation"
+    ],
+    "do-calculus": [
+      "08-causal-statistical-inference/counterfactuals"
+    ],
+    "attention": [
+      "09-algorithms-systems-for-ai/kv-cache",
+      "07-attention-memory-reasoning-continual/long-context"
+    ],
+    "kv-cache": [
+      "07-attention-memory-reasoning-continual/long-context"
+    ],
+    "counterfactuals": [
+      "08-causal-statistical-inference/mediation-analysis"
+    ],
+    "actor-critic": [
+      "06-reinforcement-learning/policy-gradient",
+      "06-reinforcement-learning/policy-gradients"
+    ],
+    "policy-gradient": [
+      "04-neural-networks-deep-learning/regularization",
+      "06-reinforcement-learning/actor-critic"
+    ],
+    "chain-of-thought": [
+      "01-ai/rlhf"
+    ],
+    "gaussian-processes": [
+      "05-statistical-probabilistic-ml/uncertainty-quantification"
+    ],
+    "variational-inference": [
+      "05-statistical-probabilistic-ml/expectation-maximization",
+      "05-statistical-probabilistic-ml/bayesian-inference",
+      "05-statistical-probabilistic-ml/bayesian-neural-networks"
+    ],
+    "mixture-of-experts": [
+      "05-statistical-probabilistic-ml/expectation-maximization"
+    ],
+    "causal-representation-learning": [
+      "08-causal-statistical-inference/do-calculus"
+    ],
+    "ppo": [
+      "06-reinforcement-learning/actor-critic",
+      "06-reinforcement-learning/policy-gradients"
+    ],
+    "regularization": [
+      "04-neural-networks-deep-learning/optimization"
+    ],
+    "simclr": [
+      "03-representation-learning/self-supervised-learning"
+    ],
+    "self-supervised-learning": [
+      "03-representation-learning/contrastive-learning",
+      "03-representation-learning/representation-learning"
+    ],
+    "data-parallelism": [
+      "09-algorithms-systems-for-ai/pipeline-parallelism"
+    ],
+    "rlhf": [
+      "06-reinforcement-learning/policy-gradients"
+    ],
+    "contrastive-learning": [
+      "03-representation-learning/representation-learning"
+    ],
+    "pipeline-parallelism": [
+      "09-algorithms-systems-for-ai/tensor-parallelism"
+    ],
+    "distributed-training": [
+      "09-algorithms-systems-for-ai/tensor-parallelism"
     ]
   }
 }
