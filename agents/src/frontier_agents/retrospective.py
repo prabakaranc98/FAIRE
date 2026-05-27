@@ -327,7 +327,14 @@ Each item in NEW_TO_ADD is an ACTION with this shape:
   "risk_class": "safe" | "moderate" | "risky",
   "auto_apply": true|false,
   "action_type": "stub-seed" | "author-page-seed" | "arc-proposal" | "queue-priority-bump" | "trim-knob-adjust" | "other",
-  "action_params": {{...}}  // for stub-seed: {{slug, track}}; for queue: {{topic, priority}}
+  "action_params": {{...}}
+    // for stub-seed:        {{slug, track}}
+    // for queue:             {{topic, priority}}
+    // for arc-proposal:      {{arc_id, track, dest, steps: [slug1, slug2, ...]}}
+    //   - arc_id: kebab-case (e.g. "generative-stack")
+    //   - track: NN-track-slug (e.g. "02-generative-modeling")
+    //   - dest: one-line capability_at_end (e.g. "5 trained generative models with comparable FID")
+    //   - steps: 4-5 concept slugs in narrative order; each MUST already exist on disk
 }}
 
 Items in WENT_WELL / WENT_WRONG / NEEDS_DEPTH / PROCESS_IMPROVEMENTS are just strings
@@ -335,8 +342,12 @@ Items in WENT_WELL / WENT_WRONG / NEEDS_DEPTH / PROCESS_IMPROVEMENTS are just st
 
 auto_apply=true ONLY when:
   - risk_class == "safe"
-  - action_type ∈ {{stub-seed, queue-priority-bump}}
+  - action_type ∈ {{stub-seed, queue-priority-bump, arc-proposal}}
   - action_params are concrete and complete
+  - for arc-proposal: track has >=3 substantive concept pages AND >=4 of the 5
+    named step slugs already exist on disk AND track has <2 active arcs
+    (these guardrails are also enforced at apply-time; mark safe only when
+    you have evidence all three hold from the per-track signals above)
 
 OUTPUT JSON ONLY (no preamble, no markdown fences):
 {{
@@ -485,10 +496,141 @@ def apply_safe_proposals(
             )
             log.append({"action": p.get("action", "?"), "status": f"applied → {file_path.relative_to(docs_path)}"})
 
+        elif action == "arc-proposal":
+            result = _apply_arc_proposal(p, params, docs_path)
+            log.append({"action": p.get("action", "?"), "status": result})
+
         else:
             log.append({"action": p.get("action", "?"), "status": f"skipped (unsupported action_type={action!r})"})
 
     return log
+
+
+# ── Move 1: arc autonomy ────────────────────────────────────────────────────
+# Apply a safe arc-proposal by appending arc-index + arc-step lines to the
+# next sprint queue. Guardrails ensure the arc has real material to anchor to.
+
+_MIN_CONCEPTS_FOR_ARC = 3
+_MIN_NAMED_STEPS_ON_DISK = 4
+_MAX_ACTIVE_ARCS_PER_TRACK = 2
+
+
+def _is_substantive_concept(path: Path) -> bool:
+    try:
+        body = path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return False
+    if len(body) < 1500:
+        return False
+    return "🚧" not in body and "Agent-generated content pending" not in body
+
+
+def _resolve_track_dir(docs_path: Path, track: str) -> Path | None:
+    """Resolve a track key (NN or NN-full-name) to the actual track directory."""
+    core_dir = docs_path / "curriculum" / "core"
+    if not core_dir.exists():
+        return None
+    direct = core_dir / track
+    if direct.is_dir():
+        return direct
+    matches = [d for d in core_dir.iterdir() if d.is_dir() and d.name.startswith(track)]
+    return matches[0] if matches else None
+
+
+def _apply_arc_proposal(proposal: dict, params: dict, docs_path: Path) -> str:
+    """Append arc-index + arc-step lines to current.md after guardrails pass.
+
+    Returns a status string for the apply_log.
+    """
+    arc_id = (params.get("arc_id") or "").strip()
+    track = (params.get("track") or "").strip()
+    dest = (params.get("dest") or "").strip()
+    steps = params.get("steps") or []
+    if not (arc_id and track and steps and isinstance(steps, list)):
+        return "skipped (arc-proposal missing arc_id/track/steps)"
+
+    track_dir = _resolve_track_dir(docs_path, track)
+    if not track_dir:
+        return f"skipped (track {track!r} not found)"
+    track_name = track_dir.name  # canonical NN-full form
+
+    # Guardrail 1: track has >= MIN_CONCEPTS_FOR_ARC substantive concepts
+    concepts_dir = track_dir / "concepts"
+    if not concepts_dir.exists():
+        return "skipped (no concepts/ in track)"
+    substantive = [p for p in concepts_dir.glob("*.md")
+                   if p.name != "index.md" and _is_substantive_concept(p)]
+    if len(substantive) < _MIN_CONCEPTS_FOR_ARC:
+        return f"skipped (track has only {len(substantive)} substantive concepts; need {_MIN_CONCEPTS_FOR_ARC})"
+
+    # Guardrail 2: >= MIN_NAMED_STEPS_ON_DISK of the named steps exist as substantive pages
+    existing_step_slugs = {p.stem for p in substantive}
+    landed_steps = [s for s in steps if s in existing_step_slugs]
+    if len(landed_steps) < _MIN_NAMED_STEPS_ON_DISK:
+        return (f"skipped (only {len(landed_steps)}/{len(steps)} named steps exist as substantive "
+                f"concepts; need >={_MIN_NAMED_STEPS_ON_DISK})")
+
+    # Guardrail 3: track has < MAX_ACTIVE_ARCS_PER_TRACK active arcs
+    arcs_dir = track_dir / "arcs"
+    existing_arcs = [p for p in arcs_dir.glob("*.md")] if arcs_dir.exists() else []
+    existing_arc_files = [p for p in existing_arcs if p.name != "index.md"]
+    if len(existing_arc_files) >= _MAX_ACTIVE_ARCS_PER_TRACK:
+        return (f"skipped (track already has {len(existing_arc_files)} active arcs; "
+                f"cap is {_MAX_ACTIVE_ARCS_PER_TRACK})")
+
+    # Already spun? Either as an on-disk arc-index file, or already queued in
+    # current.md as `arc:<arc_id>` (prevents the retro re-firing the same arc
+    # before the cycle has had a chance to consume the queued items).
+    if arcs_dir.exists() and (arcs_dir / f"{arc_id}.md").exists():
+        return f"skipped (arc {arc_id} already exists)"
+    sprints_dir = Path(__file__).resolve().parent.parent.parent / "sprints"
+    sprint_path = sprints_dir / "current.md"
+    if sprint_path.exists():
+        try:
+            queued = sprint_path.read_text(encoding="utf-8", errors="ignore")
+            if f"arc:{arc_id}" in queued:
+                return f"skipped (arc {arc_id} already queued in current.md)"
+        except Exception:
+            pass
+
+    # Build the sprint queue lines.
+    # Format documented in scheduler.py::_parse_sprint_item
+    # arc-index:
+    #   topic | track | arc-index | frontier | arc:id dest:"..." total:N
+    # arc-step:
+    #   topic | track | arc-step | applied | arc:id pos:N ch:K ch_title:"..."
+    #     prev:slug next:slug prev_artifact:"..." artifact:"..." total:M
+    total = len(landed_steps)
+    lines: list[str] = []
+    lines.append("\n## Arc Index")
+    lines.append(
+        f'- [ ] {arc_id}-index | {track_name} | arc-index | frontier | '
+        f'arc:{arc_id} dest:"{dest or arc_id.replace("-", " ")}" total:{total}'
+    )
+    lines.append("\n## Arc Steps")
+    for i, slug in enumerate(landed_steps, 1):
+        prev_slug = landed_steps[i - 2] if i > 1 else ""
+        next_slug = landed_steps[i] if i < total else ""
+        prev_art = "(prior step artifact)" if prev_slug else ""
+        artifact = f"{slug} build at step {i}"
+        chapter = (i + 1) // 2  # group steps into 2-3 chapters
+        lines.append(
+            f'- [ ] {slug} | {track_name} | arc-step | applied | '
+            f'arc:{arc_id} pos:{i} ch:{chapter} ch_title:"step {i}" '
+            f'prev:{prev_slug} next:{next_slug} '
+            f'prev_artifact:"{prev_art}" artifact:"{artifact}" total:{total}'
+        )
+
+    # Append to current.md
+    sprints_dir = Path(__file__).resolve().parent.parent.parent / "sprints"
+    sprint_path = sprints_dir / "current.md"
+    if not sprint_path.exists():
+        return f"skipped (sprint queue {sprint_path} not found)"
+
+    with sprint_path.open("a", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+
+    return f"applied → queued arc-index + {total} arc-step items for {arc_id} in {track_name}"
 
 
 def write_backlog_md(
