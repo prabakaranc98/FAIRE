@@ -40,10 +40,13 @@ Every page the system writes must honor four contracts simultaneously. A critic 
                               ▲
                               │ writes / reads
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 4 — Editorial pipeline (LangGraph)                        │
+│  Layer 4 — Editorial pipeline (LangGraph, per-page)              │
 │     load_persona → read_stub → research → plan_and_scratch       │
-│        → write_{draft|arc_step|arc_index} → link → review_PANEL  │
-│        → write_file → commit → log_run                           │
+│        → build_writing_checklist → write_{draft|arc_step|         │
+│           arc_index} → link → review (rubric + 8-critic panel)   │
+│        → revise → review' → keep_best_draft (knockout) →         │
+│           route_after_review → write_file (H1-fixed, arc-       │
+│           breadcrumbed) → commit (if conf ≥ 0.7) → log_run        │
 └─────────────────────────────────────────────────────────────────┘
                               ▲
                               │ uses
@@ -74,9 +77,11 @@ Every page the system writes must honor four contracts simultaneously. A critic 
                               ▲
                               │ measured by
 ┌─────────────────────────────────────────────────────────────────┐
-│  Layer 0 — Control loop                                          │
+│  Layer 0 — Closed control loop (per-cycle)                       │
 │     observer (sensor) → supervisor (controller) →                │
-│     pipeline (actuator) → runs.jsonl (feedback)                  │
+│     sprint (actuator, N pages parallel) → runs.jsonl (feedback)  │
+│     → retrospective (reflector: scrum-style retro + safe         │
+│         auto-applies stub-seeds) → next cycle's supervisor       │
 │     Set points: quality 0.85 · coverage 0.80 · staleness 180d    │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -93,16 +98,18 @@ Every page the system writes must honor four contracts simultaneously. A critic 
 | **Research agent** | 3-channel Exa search (papers/SotA/production) + HF model+dataset lookup | topic + persona search_seeds | `research_results`, `sota_results`, `production_results`, `hf_models`, `hf_datasets` | `nodes.py::research_node` |
 | **Planner** | 5-question planning prompt → 200-word writing plan | research results | `writing_plan` | `nodes.py::plan_and_scratch_node` |
 | **Scratch compiler** | Verified fact-sheet (citations, equations, prod examples, MVB stack, opening scenario, open problem) | writing_plan + raw research | `scratch_pad` (writer never sees raw results) | same node |
-| **Writer** | Produces a full schema-compliant page draft | persona + plan + scratch_pad | `draft` | `nodes.py::write_{draft,arc_step,arc_index}_node` |
-| **Sanitizer** | Strips fenced YAML, preambles; ensures file starts with `---` | draft | sanitized final | `nodes.py::_sanitize_draft` |
+| **Checklist builder** | Promotes scratch_pad facts to mandatory: must-cite papers (arxiv-id resolved), must-use HF model IDs (pre-verified by `verify_mvb_stack`), must-include equations, must-link concept slugs | scratch_pad | `writing_checklist` dict | `nodes.py::build_writing_checklist_node` |
+| **Writer** | Produces a full schema-compliant page draft constrained by the checklist | persona + plan + scratch_pad + checklist | `draft` | `nodes.py::write_{draft,arc_step,arc_index}_node` |
+| **Sanitizer + H1 fixer** | Strips fenced YAML and preambles; promotes the first heading after frontmatter to `# Topic` if writer drifted to `## Topic` | draft | sanitized final | `nodes.py::_sanitize_draft`, `_ensure_h1` |
 | **Linker** | Finds related curriculum pages, injects real backlinks; updates `backlinks.json` | draft + filesystem | draft with injected links | `nodes.py::link_node` |
-| **Critic panel (planned)** | 5 specialized critics, run in parallel; each scores one dimension | draft + scratch_pad | per-critic {score, issues, fixes} | `nodes.py::review_node` (refactor target) |
-| **Aggregator (planned)** | Combines critic outputs into single confidence + issue list | critic outputs | `review_confidence`, `review_feedback` | same as review |
-| **Reviser** | One revision pass on flagged drafts | draft + critic feedback | revised draft | `nodes.py::revise_draft_node` |
-| **Committer** | git add + commit if confidence ≥ `GIT_COMMIT_THRESHOLD` | output_path + confidence | git side-effect | `nodes.py::commit_node` |
+| **Critic panel (8 critics, parallel)** | Each `critic-*` skill spawns one parallel API call scoring its dimension (info-architecture · beginner-onramp · human-centered · wiki-voice · build-nudge · cohesion · coverage · prerequisites). Combined with structured rubric reviewer + deterministic checklist enforcement + future-arxiv-ID validator | draft + scratch_pad + checklist | per-critic {score, issues, fixes}, aggregated `review_confidence` | `nodes.py::review_node`, `_run_critic_panel`, `_aggregate_review` |
+| **Reviser** | Up to 2 revision passes on flagged drafts | draft + critic feedback | revised draft | `nodes.py::revise_draft_node` |
+| **Knockout selector** | After revise + re-review, keeps the higher-confidence of {previous, revised}; restores prior draft if revision regressed by ≥0.02 (PerFine pattern, arxiv 2510.24469) | review_confidence vs prev_review_confidence | `draft`, `review_confidence` | `nodes.py::keep_best_draft_node` |
+| **Committer** | git add + commit if confidence ≥ `GIT_COMMIT_THRESHOLD`; never-throw-away routing lands ≥0.6 drafts on disk | output_path + confidence | git side-effect | `nodes.py::commit_node` |
 | **Logger** | Appends run record; recomputes metrics + observer page | full state | runs.jsonl + metrics.json + observer.md | `nodes.py::log_run_node` |
 | **Observer** | Builds `WikiObservation` snapshot (sensor) | filesystem + runs.jsonl + OpenRouter | metrics.json + observer.md + budget state | `observer.py::observe` |
 | **Audit** | Structural scan (banned URLs, missing sections, nested lists, frontmatter) | docs/ | `last_audit.json` | `audit.py::audit_wiki` |
+| **Retrospective (backlog agent)** | After every cycle: aggregates deterministic signals (per-track health, recurring critic issues, unresolved wikilinks, heading drift, citation health), runs scrum-style retro through gpt-5-mini with structured output, auto-applies safe items (stub-seeds for high-reference unresolved slugs) | runs.jsonl + supervisor.json + backlinks.json + sprint queue | `docs/system/backlog.md`, auto-seeded stub files | `retrospective.py::retrospective_job` |
 
 ---
 
@@ -140,7 +147,9 @@ Every file in the repo has one of these jobs. Anything else is cruft.
 | `docs/system/architecture.md` | This page | human + Claude |
 | `docs/system/observer.md` | Live control dashboard | observer agent, auto-overwritten |
 | `docs/system/supervisor.md` | Latest supervisor report | supervisor agent |
-| `docs/system/changelog.md` | Quality delta per sprint | scheduler |
+| `docs/system/changelog.md` | Per-page generation log | logger agent |
+| `docs/system/backlog.md` | Sprint retrospectives (scrum-style: went-well, went-wrong, needs-depth, new-to-add, process-improvements) | **retrospective agent** |
+| `docs/system/learnings-log.md` | Human-curated cross-cycle learnings | human |
 | `docs/system/backlinks.json` | Forward/reverse link index | linker agent |
 | `agents/sprints/current.md` | Work queue | supervisor agent |
 | `agents/sprints/history/*` | Archived sprints | scheduler |
@@ -181,36 +190,36 @@ Per observation:
 
 | Loop | Where it closes |
 |---|---|
-| Per-run quality | review fails → revise → re-review (max 2 revisions) |
+| Per-run quality (within page) | review fails → revise → re-review → **knockout selector** keeps higher-confidence draft (max 2 revisions) |
+| Per-run hallucination guards | deterministic future-arxiv-ID validator + checklist enforcement inside `review_node` — pure regex/arithmetic, zero LLM cost |
 | Per-cycle quality | runs.jsonl → quality_trend → supervisor adjusts sprint priorities |
-| Per-cycle coverage | filesystem stub count → supervisor queues generate actions |
+| Per-cycle coverage | filesystem stub count + unresolved wikilinks → supervisor queues generate actions |
+| **Per-cycle retrospective** (new) | runs.jsonl + critic_panel + backlinks.json → `retrospective_job` → `backlog.md` + auto-seeded stubs → supervisor reads on next cycle |
 | Long-horizon voice | (planned) failed-critic patterns → persona YAML diff proposal |
 | Budget | OpenRouter `/auth/key` → check_budget → mode change → sprint_job behavior |
 
-The system has feedback for everything *except* the writer's own voice over time. That last loop is the next upgrade — see `critic-attribution + persona-update` under "what's missing" below.
+The retrospective loop is the centerpiece — it makes the system *learn from itself*. Each cycle's scrum retro names what went well, what regressed, what needs depth, and what to add. Safe items (stub-seed for unresolved wikilinks referenced 2+ times) auto-apply; risky items (queue-priority changes, arc proposals, author pages) are queued for human review. The next cycle's supervisor sees the new stubs and the retro context, and the wiki grows in the direction the agents themselves identified as weak.
 
 ---
 
-## 8. The long-running cycle (what actually happens for $10)
+## 8. What a real cycle actually cost ($30 top-up, May 2026)
 
-Concrete numbers under current model config (writer = gemini-3.1-flash-lite, reviewer = gpt-5-mini, research = gemini-2.0-flash-lite, panel of 5 critics in parallel):
+These are measured numbers from the production run that shipped 60 v2 pages across the 10 canonical tracks. Model stack: writer/MVB = `openai/gpt-5.1-codex-mini`, reviewer = `openai/gpt-5-mini`, critics = `google/gemini-3.1-flash-lite`, research = `google/gemini-3.5-flash`.
 
-| Step | Cost | Time | Cumulative |
-|---|---|---|---|
-| Per page: research (3 Exa calls + 2 HF) | $0.02 | 10s | |
-| Per page: plan + scratch | $0.02 | 8s | |
-| Per page: write draft | $0.06 | 25s | |
-| Per page: link injection | $0.01 | 5s | |
-| Per page: review panel (5× parallel critics) | $0.05 | 12s (longest critic) | |
-| Per page: revise (if needed, avg 0.7×) | $0.04 | 15s | |
-| Per page: commit + log | $0 | 2s | |
-| **One full page** | **~$0.20** | **~70s** | $0.20 |
-| ~25 curriculum pages | $5.00 | ~30 min @ 4 parallel workers | $5.00 |
-| ~10 arc steps + 2 arc indexes | $2.40 | ~12 min | $7.40 |
-| ~12 improvement passes on flagged | $1.80 | ~10 min | $9.20 |
-| Audit + supervisor LLM call | $0.20 | 2 min | **~$9.40** |
+| Metric | Value |
+|---|---|
+| Pages shipped (approved) | 53 / 60 (88%) |
+| First-try approval rate | 73% |
+| Average confidence | 0.76 |
+| Tracks with ≥4 concept pages | 10 / 10 |
+| Total spent | **$7.41** |
+| Per-page cost (incl. revisions) | **$0.18** |
+| Budget remaining (of $30 top-up) | $22.77 |
+| Wall-clock for full sprint | ~3.5 hours @ 4 parallel workers |
+| Retrospective cycle (gpt-5-mini, structured output) | $0.04, 25s |
+| Auto-seeded stubs from first retro | 7 |
 
-That brings us to ~50 pages on a $10 cap, then `paused` mode. Maintenance after that is audit + supervisor only until the next budget anchor.
+Per-page breakdown holds at roughly: research $0.02 · plan+scratch $0.02 · checklist $0.005 · write $0.05 · link $0.005 · review (rubric + 8 critics in parallel) $0.05 · revise (~0.27× of pages) $0.03. The closed loop is significantly cheaper than the v1 budget table above because the checklist + knockout selector reduce revision count and the critic panel runs in parallel.
 
 ---
 
@@ -218,12 +227,11 @@ That brings us to ~50 pages on a $10 cap, then `paused` mode. Maintenance after 
 
 | # | Gap | Effort | Why it matters |
 |---|---|---|---|
-| 1 | **Critic panel.** Current `review_node` is one model, one call. | Medium | One model can't be expert in IA + voice + sources + nudge + reader-fit at once. |
-| 2 | **Critic-attribution feedback.** Failed-critic patterns don't feed back into the writer's persona. | Medium | Without this, the system doesn't actually improve its voice over time. |
-| 3 | **Arc proposal phase.** After curriculum coverage > 60%, supervisor should propose a slate of arcs to materialize. | Small | The user picks which arcs become real; matches the "2 active arcs at a time" constraint. |
-| 4 | **Backlinks bidirectional.** Curriculum links forward to arcs that may not exist yet; arc steps need to add backlinks to curriculum on creation. | Small | The "Where this concept appears" section currently can be wrong. |
-| 5 | **Visual sanity for math.** No automated check that LaTeX renders. | Small | Some pages have unrendered `\(...\)` because of escaping. |
-| 6 | **MVB executability check.** No verification that the named model ID + dataset ID exist on HuggingFace at write time. | Small | An MVB pointing to a renamed/deleted model is a dead end. |
+| 1 | **Critic-attribution → persona update.** Failed-critic patterns surface in `backlog.md`, but the writer's persona YAML isn't yet auto-amended by the retrospective. | Medium | Without this, the same critic flags can recur cycle after cycle even when the retro identified them. |
+| 2 | **Arc proposal phase.** Supervisor should propose arc slates once curriculum coverage stabilises; retrospective already flags candidates but doesn't promote them. | Small | The user picks which arcs become real; matches the "2 active arcs at a time" canon. |
+| 3 | **Author pages.** High-frequency cited researchers (Bengio, He, Vaswani, Pearl…) deserve author pages with their seminal works; retrospective flags this but it's marked moderate-risk and stays human-review. | Small | Compounds citation density and gives every concept page a place to deep-link to. |
+| 4 | **Visual sanity for math.** No automated check that LaTeX renders. | Small | Some pages have unrendered `\(...\)` because of escaping. |
+| 5 | **Hybrid local/cloud mode.** Critics could run locally (Gemma 3 4B) while writer/reviewer stay cloud — cuts cost ~30%. Local-mode has working scaffold but Gemma 4 MLX is broken upstream. | Medium | Cheap parallel critic fanout without burning OpenRouter budget on every dimension. |
 
 ---
 
