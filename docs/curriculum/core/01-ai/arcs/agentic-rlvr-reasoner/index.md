@@ -15,7 +15,7 @@ tags: [agentic, rlvr, reasoning]
 updated: 2025-07-01
 has_mvb: true
 ---
-> **Arc:** [Agentic Rlvr Reasoner](../../arcs/agentic-rlvr-reasoner.md) — Step 0 of 4
+> **Arc syllabus** — this page is the entry point to the **Agentic Rlvr Reasoner** arc.
 
 
 A research assistant is only a few clicks away from a hallucination when each search result is partial, every verification step costs time, and the prompt needs a verifiable reason why the final answer should be trusted. The traditional pipeline—retrieve, then reason—is a sequence of stops with no feedback loop; once a search action is taken, the agent has no memory of whether that action helped or hurt the downstream reasoning. Agentic RLVR (Reinforcement Learning with Verifiable Rewards) reasoners rewrite that narrative by letting the policy treat queries, tool calls, and verification tests as atomic actions whose consequences can be observed, rewarded, and corrected on the fly. This arc teaches you how to design that loop: how to represent search inside the observation, how to shape rewards with verifiable evidence, and how to train a policy that learns *when* to pause and verify before issuing the next action. When you finish, you will understand the RLVR decisional architecture, have a working policy that replicates R1-Zero-style verification gains, and know where the open research trade-offs still lie.

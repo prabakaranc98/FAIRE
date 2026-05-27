@@ -13,7 +13,7 @@ tags: []
 updated: 2024-11-29
 has_mvb: true
 ---
-> **Arc:** [Training Fundamentals](../../arcs/training-fundamentals.md) — Step 0 of 5
+> **Arc syllabus** — this page is the entry point to the **Training Fundamentals** arc.
 
 
 # Training Fundamentals

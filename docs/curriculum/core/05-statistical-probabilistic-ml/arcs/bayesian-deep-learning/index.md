@@ -13,7 +13,7 @@ tags: []
 updated: 2025-10-10
 has_mvb: true
 ---
-> **Arc:** [Bayesian Deep Learning](../../arcs/bayesian-deep-learning.md) — Step 0 of 5
+> **Arc syllabus** — this page is the entry point to the **Bayesian Deep Learning** arc.
 
 
 # Bayesian Deep Learning

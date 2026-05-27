@@ -13,7 +13,7 @@ tags: [self-supervised, vision, representation-learning, contrastive-learning]
 updated: 2025-01-15
 has_mvb: true
 ---
-> **Arc:** [Self Supervised Vision Foundations](../../arcs/self-supervised-vision-foundations.md) — Step 0 of 5
+> **Arc syllabus** — this page is the entry point to the **Self Supervised Vision Foundations** arc.
 
 
 # Self-Supervised Vision Foundations

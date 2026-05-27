@@ -17,7 +17,7 @@ tags: [generative, stacks, evaluation]
 updated: 2024-11-10
 has_mvb: true
 ---
-> **Arc:** [Generative Stack](../../arcs/generative-stack.md) — Step 0 of 5
+> **Arc syllabus** — this page is the entry point to the **Generative Stack** arc.
 
 
 Imagine a control room where dozens of generative models flicker across dashboards: each one sourced from a different modality, each one trained with a different objective, and all of them expected to behave predictably when a new prompt, new context, or new regulator walks in. Operations leaders stop asking whether individual models can produce interesting output; they start asking how to characterize the health of the entire pipeline—how representation, generation, and evaluation coexist so that a swap in the front-end encoder does not crash the late-stage scoring system.

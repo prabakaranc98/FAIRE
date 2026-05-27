@@ -1477,12 +1477,25 @@ def write_file_node(state: WikiPageState) -> WikiPageState:
     # Inject arc breadcrumb immediately after frontmatter closing ---
     arc_context = state.get("arc_context", {})
     if arc_context and arc_context.get("arc_id"):
+        mode = state.get("mode", "")
         arc_id = arc_context["arc_id"]
-        position = arc_context.get("position", "?")
+        try:
+            position = int(arc_context.get("position") or 0)
+        except (TypeError, ValueError):
+            position = 0
         arc_title = arc_context.get("arc_title", arc_id.replace("-", " ").title())
         arc_path = f"../../arcs/{arc_id}.md"
-        total_str = f" of {arc_context['total']}" if arc_context.get("total") else ""
-        breadcrumb = f"\n> **Arc:** [{arc_title}]({arc_path}) — Step {position}{total_str}\n"
+        total = arc_context.get("total") or 0
+        # For arc-index pages (the syllabus): no "Step N of M" — they ARE the
+        # arc, not a step in it. Show a different breadcrumb.
+        # For arc-step pages with a real position (1+): show "Step N of M".
+        # For anything else (arc-context attached to a concept page): omit the
+        # numeric step suffix.
+        if mode == "arc-index" or position == 0:
+            breadcrumb = f"\n> **Arc syllabus** — this page is the entry point to the **{arc_title}** arc.\n"
+        else:
+            total_str = f" of {total}" if total else ""
+            breadcrumb = f"\n> **Arc:** [{arc_title}]({arc_path}) — Step {position}{total_str}\n"
         fm_start = final.find("---\n")
         fm_end = final.find("\n---\n", fm_start + 1)
         if fm_start != -1 and fm_end != -1:
