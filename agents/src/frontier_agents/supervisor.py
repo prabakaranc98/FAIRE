@@ -583,8 +583,83 @@ def _write_report(report: SupervisorReport, docs_path: Path) -> None:
 ARC_PROPOSE_COVERAGE_THRESHOLD = float(os.environ.get("ARC_PROPOSE_COVERAGE_THRESHOLD", "0.60"))
 
 
+def _parse_arc_roadmap(docs_path: Path) -> list[dict]:
+    """Parse docs/system/arc-roadmap.md and return only `ready` arcs.
+
+    The roadmap is the human-curated, frontier-grounded design doc that
+    replaces hardcoded canonical arcs. Each arc has a named frontier
+    destination and a diagonal 5-step spine. Only `ready` arcs are returned
+    (status `needs-seeds` arcs wait for their missing concepts to land).
+    """
+    import re as _re
+    roadmap = docs_path / "system" / "arc-roadmap.md"
+    if not roadmap.exists():
+        return []
+    text = roadmap.read_text(encoding="utf-8")
+    out: list[dict] = []
+    # Split by track sections (## NN-track-...)
+    track_pattern = _re.compile(r"^## (\d{2}-[a-z\-]+)", _re.MULTILINE)
+    matches = list(track_pattern.finditer(text))
+    for i, m in enumerate(matches):
+        track = m.group(1).split(" ")[0]
+        start = m.end()
+        end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+        body = text[start:end]
+        arc_pattern = _re.compile(
+            r"^### \d+\.\s+`([a-z0-9\-]+)`\s+—\s+(ready|needs-seeds)\b(.*?)(?=^### |\Z)",
+            _re.MULTILINE | _re.DOTALL,
+        )
+        for am in arc_pattern.finditer(body):
+            if am.group(2) != "ready":
+                continue
+            arc_id = am.group(1)
+            arc_body = am.group(3)
+            dest_match = _re.search(
+                r"\*\*Destination:\*\*\s*\*?(.+?)\*?\s*$", arc_body, _re.MULTILINE
+            )
+            destination = dest_match.group(1).strip().rstrip(".") if dest_match else ""
+            spine_match = _re.search(
+                r"\*\*Diagonal spine:\*\*\s*(.+?)$", arc_body, _re.MULTILINE
+            )
+            spine_raw = spine_match.group(1).strip() if spine_match else ""
+            steps_raw = _re.findall(r"`([a-z0-9\-]+)`", spine_raw)
+            if len(steps_raw) < 4:
+                continue
+            out.append({
+                "arc_id": arc_id,
+                "track": track,
+                "dest": destination,
+                "steps": steps_raw[:5],
+            })
+    return out
+
+
 def _suggest_track_arcs(core_dir: Path) -> list[dict]:
-    """For each track, build at most one arc-proposal candidate from existing concepts.
+    """Read `ready` arcs from the roadmap. Falls back to a tiny hardcoded set
+    if the roadmap is missing.
+
+    Replaces the earlier `<track>-foundations` placeholder approach (which
+    produced vertical reading lists, not arcs). See docs/system/arc-roadmap.md
+    for the design and frontier evidence behind each ready arc.
+    """
+    docs_path = core_dir.parent.parent
+    roadmap_arcs = _parse_arc_roadmap(docs_path)
+    if roadmap_arcs:
+        return roadmap_arcs
+    # Fallback if roadmap missing — minimal safe set
+    return [
+        {"arc_id": "generative-stack",
+         "track": "02-generative-modeling",
+         "dest": "Five trained generative models compared head-to-head",
+         "steps": ["diffusion-models", "score-matching", "latent-diffusion-models",
+                   "flow-matching", "consistency-models"]},
+    ]
+
+
+def _suggest_track_arcs_LEGACY(core_dir: Path) -> list[dict]:
+    """LEGACY — replaced by roadmap parser above. Kept for reference.
+
+    For each track, build at most one arc-proposal candidate from existing concepts.
 
     Returns the action_params payloads expected by `retrospective._apply_arc_proposal`.
     The helper there enforces guardrails (>=3 substantive concepts, >=4 of the named

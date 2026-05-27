@@ -63,6 +63,7 @@ nav:
   - Home: index.md
   - Curriculum:
     - Overview: curriculum/index.md
+    - Arcs (frontier paths): curriculum/arcs.md
     - "01 · AI": curriculum/core/01-ai/index.md
     - "02 · Generative Modeling": curriculum/core/02-generative-modeling/index.md
     - "03 · Representation Learning": curriculum/core/03-representation-learning/index.md
