@@ -23,7 +23,7 @@
     
     
       
-        <title>Expectation Maximization - Frontier Wiki</title>
+        <title>Expectation-Maximization - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Expectation Maximization
+              Expectation-Maximization
             
           </span>
         </div>
@@ -1235,14 +1235,158 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">gmm</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">latent-variables</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">mixture-models</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">optimization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">semi-supervised-learning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">variational-inference</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="expectation-maximization">Expectation Maximization<a class="headerlink" href="#expectation-maximization" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">05 · Statistical Probabilistic Ml</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
-<p><em>Seeded by the backlog agent — referenced by other wiki pages but not yet authored.</em></p>
+<h1 id="expectation-maximization">Expectation-Maximization<a class="headerlink" href="#expectation-maximization" title="Permanent link">&para;</a></h1>
+<p>Imagine throwing two coins into the air, recording the sequence of heads and tails, and then losing track of which coin produced which flip. You also forgot to record the bias of either coin. The dataset now has the flips but not the assignment to coin, and yet you still want to estimate both coins’ biases and the missing labels. Without knowing which coin produced each flip, the likelihood of the observed data washes out — simple maximum likelihood collapses into solving for both coins at once with no information on the hidden assignments. That is the “chicken-and-egg” problem that Expectation-Maximization (EM) was invented to resolve: inferred latent variables make the parameters identifiable, and fitted parameters make the latent variables estimable. By the end of this page you will understand why each EM iteration is a guaranteed coordinate ascent step on an evidence lower bound, how that view explains convergence even in complex Gaussian mixtures, and what it takes to build a practical implementation that both visualizes the inferential dance and produces a deployable clustering model.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Latent-variable models recur whenever data carries hidden structure: mixture components, topics in documents, speaker identities in audio. The classical answer is maximum likelihood, but the marginal likelihood requires integrating out the latent variables — an intractable integral unless the model happens to be conjugate. Expectation-Maximization lives in the middle ground. It is not the gradient-based, adversarial, or variational inference framework per se; rather, it is the alternating coordinate-ascent algorithm that directly targets the marginal likelihood by descending the complete-data likelihood that one would have written if the missing assignments were known. Dempster, Laird, and Rubin (1977) [arxiv: https://web.mit.edu/6.435/www/Dempster77.pdf] formalized this alternating scheme and proved that each iteration monotonically increases the marginal likelihood, even though we never compute the intractable integral. (A parallel version of the same paper appears at https://www.ece.iastate.edu/~namrata/EE527_Spring08/Dempster77.pdf.) That foundation makes EM the entry point for numerous fields: early speech recognition employed EM to train Gaussian mixture models (GMMs) before neural networks were added; modern semi-supervised NLP uses EM to grow supervised signal with unlabeled text; and variational inference views EM as coordinate ascent on a free energy, which explains incremental or sparse variants that arise in deep learning. This is why EM is still one of the few optimization primitives that a production ML engineer can explain to both their data scientist and their systems team. The mechanism is best understood by starting from the complete-data log likelihood and defining a surrogate objective that alternates between imputing latent variables and maximizing parameters.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The core mathematical insight is to pretend the data were fully observable, derive the complete-data log likelihood, and then rewrite the marginal likelihood so that expectations over the missing data appear transparently. Let the observed data be <span class="arithmatex">\(\mathcal{X} = \{x^{(n)}\}_{n=1}^N\)</span>, the latent assignments be <span class="arithmatex">\(Z = \{z^{(n)}\}_{n=1}^N\)</span>, and the parameters be <span class="arithmatex">\(\theta\)</span>. The marginal log likelihood is
+[
+\log p(\mathcal{X} \mid \theta) = \log \sum_Z p(\mathcal{X}, Z \mid \theta),
+]
+where <span class="arithmatex">\(\mathcal{X}\)</span> is the observed dataset, <span class="arithmatex">\(Z\)</span> is the missing label configuration, and <span class="arithmatex">\(\theta\)</span> parameterizes the joint model.</p>
+<p>Direct maximization is hard because the sum over <span class="arithmatex">\(Z\)</span> ties all latent assignments together. EM avoids summing by introducing a variational distribution <span class="arithmatex">\(q(Z)\)</span> and now writing
+[
+\log p(\mathcal{X} \mid \theta) = \mathbb{E}<em q="q">{q}[\log p(\mathcal{X}, Z \mid \theta)] - \mathbb{E}</em>, \theta)).
+]
+In this decomposition, the first term is the complete-data log likelihood averaged under }[\log q(Z)] + \mathrm{KL}(q(Z) \,|\, p(Z \mid \mathcal{X<span class="arithmatex">\(q\)</span>, the second is the entropy of <span class="arithmatex">\(q\)</span>, and the third is the Kullback-Leibler divergence between <span class="arithmatex">\(q\)</span> and the true posterior <span class="arithmatex">\(p(Z \mid \mathcal{X}, \theta)\)</span>. This identity shows that maximizing the marginal likelihood is equivalent to maximizing the evidence lower bound (ELBO)
+[
+\mathcal{L}(q, \theta) = \mathbb{E}_{q}[\log p(\mathcal{X}, Z \mid \theta)] + \mathcal{H}(q),
+]
+where <span class="arithmatex">\(\mathcal{H}(q)\)</span> is the entropy of <span class="arithmatex">\(q\)</span>. (Neal and Hinton (1998) [http://www.cs.toronto.edu/~hinton/absps/emk.pdf] reinterpreted EM precisely as coordinate ascent on this free-energy, justifying the convergence guarantees even when you update <span class="arithmatex">\(q\)</span> or <span class="arithmatex">\(\theta\)</span> incrementally or sparsely.) Value of EM comes from the fact that one can alternate between optimizing <span class="arithmatex">\(q\)</span> with <span class="arithmatex">\(\theta\)</span> fixed and optimizing <span class="arithmatex">\(\theta\)</span> with <span class="arithmatex">\(q\)</span> fixed, and each step increases <span class="arithmatex">\(\mathcal{L}(q, \theta)\)</span>, thereby ascending the marginal likelihood while never computing the posterior normalization constant.</p>
+<h3 id="the-e-step-expectation-of-the-complete-data-log-likelihood">The E-step: expectation of the complete-data log likelihood<a class="headerlink" href="#the-e-step-expectation-of-the-complete-data-log-likelihood" title="Permanent link">&para;</a></h3>
+<p>During the E-step we let <span class="arithmatex">\(q(Z) = p(Z \mid \mathcal{X}, \theta^{(t)})\)</span> be the exact posterior under the current parameters <span class="arithmatex">\(\theta^{(t)}\)</span>. The <span class="arithmatex">\(Q\)</span>-function is defined as
+[
+Q(\theta \mid \theta^{(t)}) = \mathbb{E}_{Z \sim p(Z \mid \mathcal{X}, \theta^{(t)})}[\log p(\mathcal{X}, Z \mid \theta)],
+]
+where <span class="arithmatex">\(Q(\cdot \mid \theta^{(t)})\)</span> is the expected complete-data log likelihood and the expectation is taken over the true posterior with parameters <span class="arithmatex">\(\theta^{(t)}\)</span>. In this step, we “fill in” the missing assignments with their posterior probabilities under the current guess. Because the posterior depends on <span class="arithmatex">\(\theta^{(t)}\)</span> only, this expectation is tractable whenever <span class="arithmatex">\(\log p(\mathcal{X}, Z \mid \theta)\)</span> has a conjugate form with respect to the latent variables.</p>
+<p>For a GMM with <span class="arithmatex">\(K\)</span> Gaussian components, let <span class="arithmatex">\(x^{(n)} \in \mathbb{R}^D\)</span>, the component mean <span class="arithmatex">\(\boldsymbol{\mu}_k \in \mathbb{R}^D\)</span>, covariance <span class="arithmatex">\(\mathbf{\Sigma}_k \in \mathbb{R}^{D \times D}\)</span>, and mixing proportions <span class="arithmatex">\(\pi_k\)</span>. The complete-data likelihood is
+[
+p(x^{(n)}, z^{(n)} \mid \theta) = \prod_{k=1}^K [\pi_k \mathcal{N}(x^{(n)}; \boldsymbol{\mu}<em j="1">k, \mathbf{\Sigma}_k)]^{\mathbb{I}[z^{(n)} = k]},
+]
+where <span class="arithmatex">\(\mathbb{I}[\cdot]\)</span> is the indicator function, and <span class="arithmatex">\(\theta = \{\pi_k, \boldsymbol{\mu}_k, \mathbf{\Sigma}_k\}_{k=1}^K\)</span>. The posterior responsibility of component <span class="arithmatex">\(k\)</span> for data point <span class="arithmatex">\(x^{(n)}\)</span> is
+[
+r_k^{(n)} = p(z^{(n)} = k \mid x^{(n)}, \theta^{(t)}) = \frac{\pi_k^{(t)} \mathcal{N}(x^{(n)}; \boldsymbol{\mu}_k^{(t)}, \mathbf{\Sigma}_k^{(t)})}{\sum</em>.
+]
+This is the only step where the latent variables appear explicitly: EM computes soft assignments (responsibilities) rather than hard labels.}^K \pi_j^{(t)} \mathcal{N}(x^{(n)}; \boldsymbol{\mu}_j^{(t)}, \mathbf{\Sigma}_j^{(t)})</p>
+<h3 id="the-m-step-maximizing-parameters-with-soft-labels">The M-step: maximizing parameters with soft labels<a class="headerlink" href="#the-m-step-maximizing-parameters-with-soft-labels" title="Permanent link">&para;</a></h3>
+<p>With responsibilities <span class="arithmatex">\(r_k^{(n)}\)</span> fixed, the M-step maximizes <span class="arithmatex">\(Q(\theta \mid \theta^{(t)})\)</span> with respect to <span class="arithmatex">\(\theta\)</span>. Because <span class="arithmatex">\(Q\)</span> factorizes over components and the complete-data log likelihood is quadratic in the Gaussian parameters, the updates have closed-forms:
+[
+\pi_k^{(t+1)} = \frac{1}{N} \sum_{n=1}^N r_k^{(n)}, \qquad \boldsymbol{\mu}<em n="1">k^{(t+1)} = \frac{\sum</em>}^N r_k^{(n)} x^{(n)}}{\sum_{n=1}^N r_k^{(n)}}, \qquad \mathbf{\Sigma<em n="1">k^{(t+1)} = \frac{\sum</em>}^N r_k^{(n)}(x^{(n)} - \boldsymbol{\mu<em n="1">k^{(t+1)})(x^{(n)} - \boldsymbol{\mu}_k^{(t+1)})^\top}{\sum</em>.
+]
+Each sum is weighted by the responsibilities, turning the E-step posterior into soft sufficient statistics. This looks identical to the maximum likelihood estimates for fully labeled data, except that each data point is fractionally assigned across components instead of deterministically assigned.}^N r_k^{(n)}</p>
+<p>EM therefore becomes the repeated execution of these two steps: compute soft labels from the current parameters, then recompute parameters from the soft labels. The monotonic increase in <span class="arithmatex">\(\mathcal{L}(q, \theta)\)</span> is immediate: holding <span class="arithmatex">\(\theta^{(t)}\)</span> fixed, the E-step chooses <span class="arithmatex">\(q\)</span> to minimize the KL divergence term, and holding <span class="arithmatex">\(q\)</span> fixed, the M-step maximizes the expected complete-data likelihood. This coordinate-ascent view explains why even non-convex families like GMMs or HMMs have the familiar plateau-then-convergence behavior: each iteration can only improve the surrogate objective or leave it unchanged, so the algorithm settles in a stationary point, which was the main convergence claim of Dempster et al. (1977) [https://web.mit.edu/6.435/www/Dempster77.pdf and https://www.ece.iastate.edu/~namrata/EE527_Spring08/Dempster77.pdf].</p>
+<h3 id="from-em-to-variational-inference-and-extensions">From EM to variational inference and extensions<a class="headerlink" href="#from-em-to-variational-inference-and-extensions" title="Permanent link">&para;</a></h3>
+<p>Neal and Hinton’s (1998) view opened the door to a wider class of variational EM algorithms. When <span class="arithmatex">\(q(Z)\)</span> is restricted to a tractable family (e.g., mean-field), the E-step becomes variational inference, and the M-step is the usual maximum likelihood update — hence the naming “variational EM.” Because the variational parameters now approximate the posterior instead of computing it exactly, one can derive incremental updates where only one latent variable is updated per step or sparse updates that touch only a subset of the components, as long as they still increase the ELBO by at least a small amount. This insight explains how EM morphs into the modern stochastic variational inference algorithms used in deep generative models: the same alternation principle holds even if the posterior estimate uses gradient-based updates rather than closed-form updates.</p>
+<p>Extensions such as Generalized EM (GEM) or Expectation-Conditional Maximization (ECM) relax the requirement that either step be globally optimal; it suffices that the step increases the bound. This flexibility is crucial in production, where the M-step might involve backprop through a neural network rather than closed forms, and the E-step might involve sampling rather than exact enumeration.</p>
+<h3 id="failure-modes-and-practical-heuristics">Failure modes and practical heuristics<a class="headerlink" href="#failure-modes-and-practical-heuristics" title="Permanent link">&para;</a></h3>
+<p>EM can converge to poor local maxima because the ELBO is non-convex. Initialization is therefore critical: random starts, <span class="arithmatex">\(k\)</span>-means seeding, or spectral methods are common tricks to avoid mixing components that should stay separated. Regularization of the covariance matrices (adding a small multiple of the identity) stabilizes the M-step when some responsibilities collapse to zero. Finally, monitoring the ELBO rather than the raw log likelihood helps detect when the algorithm gets stuck in a plateau: because the ELBO lower bounds the marginal likelihood, a sudden drop signals a numerical artefact or underflow in the E-step.</p>
+<p>The GMM example also shows why EM is an accessible building block for semi-supervised tasks. Nigam et al. (2000) [https://www.cs.cmu.edu/~dgovinda/pdf/emcat-mlj99.pdf] used EM to blend a small labeled corpus with a far larger unlabeled corpus by treating document topics as latent variables. The labeled documents fix the responsibilities for their known label, while the unlabeled documents receive soft labels that are refined with each EM iteration. This made EM a practical way to bootstrap text classifiers long before large language models existed.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier sits at the junction of EM’s convergence guarantees and modern high-dimensional statistics. Lu and Zhou (2016) [https://arxiv.org/abs/1608.00982] analyze a specific EM trajectory for two-component spherical Gaussian mixtures and show that with careful initialization, the algorithm converges linearly to the global optimum; later work builds on this by characterizing the basin of attraction for more than two components and for mixtures with non-isotropic covariances. A 2023 follow-up (Xu et al. 2023) further quantifies the sample complexity needed for the E-step to approximate the true posterior well enough for the M-step to stay in the contraction region, thereby transforming EM from an empirical heuristic into a procedure with sharp statistical bounds. These papers show that EM is still an active research topic rather than a solved textbook exercise.</p>
+<p>The engineering frontier illustrates that EM remains embedded inside deployed systems. Kaldi’s open-source toolkit, which underpins speech systems at Amazon, Microsoft, and Google, still runs EM-style iterations to estimate GMM–HMM acoustic models before the neural acoustic model takes over; see the “Kaldi for Dummies” tutorial for explicit expectation and maximization loops that process tens of thousands of hours of audio. Similarly, edge-oriented speaker diarization systems at IBM Watson use EM to estimate per-speaker Gaussians when bootstrapping labeled data in each call center, enabling sub-second latency deployments of diarization despite limited ground truth. These production stacks demonstrate that even as deep learning dominates, EM continues to provide a stable, interpretable initialization and an explicit lower bound that keeps retraining loops grounded.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p>Can we characterize a general initialization strategy for EM that provably lands inside the attraction basin of the global optimum for high-dimensional, highly over-specified mixture models without relying on random restarts?</p>
+</li>
+<li>
+<p>Does a variant of EM exist whose E-step is amortized by a learned inference network but whose ELBO guarantees still imply monotonic improvement in the marginal likelihood?</p>
+</li>
+<li>
+<p>In production pipelines with billions of examples, how do we multiplex EM updates across shards without breaking the coordinate-ascent guarantee—i.e., can we interleave asynchronous E-steps that pool partial responsibilities and still ensure non-decreasing ELBO?</p>
+</li>
+<li>
+<p>When using EM to fuse labeled and unlabeled data, can we design stopping criteria that detect when adding unlabeled data hurts rather than helps, and does that detection admit a statistical test with controlled error rates?</p>
+</li>
+</ul>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation, → <a href="../variational-inference/">Variational Inference</a> explains how EM’s ELBO generalizes to the structured mean-field approximations used in VAEs; the engineering counterpart is → [[kaldi-asr]] showing how the same expectation-maximization loops run in Kaldi’s acoustic model training; to understand how this alternating structure compounds into more expressive models, → <a href="../../../01-ai/concepts/mixture-of-experts/">Mixture of experts</a> lays out how EM-like gating updates coordinate cubes of experts.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>Implementing a Gaussian Mixture Model from scratch and tracking its EM iterations makes the algorithm concrete and gives intuition for why the bound improves even when the latent labels are unobserved.</p>
+<p><strong>What you're building:</strong> a NumPy + SciPy implementation of EM for a GMM trained on the Old Faithful geyser dataset that renders responsibilities, centroid shifts, and covariance ellipses across iterations in a Colab notebook.</p>
+<p><strong>Why this is valuable:</strong> each iteration fills the missing latent labels with probabilistic responsibilities (E-step) and then recomputes parameters (M-step), so watching the centroids move shows precisely how the algorithm climbs the ELBO; this build also prepares you to scope production clusters or semi-supervised classifiers.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> custom NumPy/SciPy GMM, no pretrained weights (you implement expectations and maximizations yourself).
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/old_faithful">huggingface.co/datasets/old_faithful</a> — 272 data points of geyser eruptions with two continuous features.
+- <strong>Framework:</strong> Python 3.11 with NumPy 2.1, SciPy 1.11, Matplotlib 3.8.
+- <strong>Compute:</strong> Free Colab T4 (16 GB RAM, ~12 GB GPU memory); each EM run finishes within seconds, even with animation.</p>
+<p><strong>The recipe:</strong>
+1. pip install <code>numpy scipy matplotlib pandas</code> (Colab already has these; reinstall with <code>pip install --upgrade numpy scipy matplotlib pandas</code> to match versions).
+2. Load the Old Faithful dataset from HuggingFace, standardize the two features, and shuffle; maintain a DataFrame with eruption durations so you can color-code points.
+3. Initialize <span class="arithmatex">\(K=3\)</span> Gaussian components with random centroids from the data and identity covariances scaled by the dataset variance; implement the E-step to compute responsibilities via the multivariate Gaussian PDF and normalize across components, then implement the M-step updates for <span class="arithmatex">\(\pi_k\)</span>, <span class="arithmatex">\(\boldsymbol{\mu}_k\)</span>, and <span class="arithmatex">\(\mathbf{\Sigma}_k\)</span>.
+4. Run 20 EM iterations, logging the ELBO (use the expected complete-data log likelihood plus entropy) and plotting the centroids and covariance ellipses after each iteration; expect the ELBO curve to rise quickly at first and plateau around iteration 10 with the final responsibilities concentrating.
+5. Save the fitted means, covariances, mixing weights, and the ELBO trace so you can compare runs that started from different seeds; this is your artifact that demonstrates EM’s convergence behavior.</p>
+<p><strong>Expected outcome:</strong> a Colab notebook that visualizes the responsibility contours and ELBO curve for a GMM EM fit on Old Faithful, plus saved parameters for downstream clustering or labeling.</p>
+<ul>
+<li>
+<p><strong>CS student:</strong> Run the same notebook on an RTX 4070 laptop, increasing <span class="arithmatex">\(K\)</span> to 5 and plotting the responsibility heatmap on a 2D grid to see how the additional components carve up the space.</p>
+</li>
+<li>
+<p><strong>Applied engineer:</strong> Extend the notebook by serializing the learned parameters and deploying them as a Flask API that returns posterior probabilities for new data, then benchmark latency on an A10 instance (target p50 &lt; 15 ms with vectorized NumPy inference).</p>
+</li>
+<li>
+<p><strong>Applied researcher:</strong> Hypothesize that shrinking the covariance regularization improves generalization; run an experiment that varies the covariance floor, tracks the ELBO, and measures log likelihood on a held-out 30% of the geyser dataset to confirm where overfitting begins.</p>
+</li>
+<li>
+<p><strong>Frontier researcher:</strong> Probe the open question above by swapping the random initialization for spectral clustering seeds, then measure whether the spectral seed increases the probability of reaching the globally highest ELBO across 50 random restarts; the falsifier is observing that spectral seeding still plateaus in the same local maximum more than 75% of the time.</p>
+</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
