@@ -1336,15 +1336,30 @@ def _update_backlinks(
 
 
 def flag_human_review_node(state: WikiPageState) -> WikiPageState:
+    """Land the page on disk as a 'drafted' artifact when review maxes out
+    without approval. Never throw away the work — the draft is real content
+    the user can polish manually, and a future cycle can re-attempt it."""
     try:
         from rich.console import Console
         Console().print(
-            f"[yellow]⚠ Human review required:[/yellow] {state['output_path']}\n"
+            f"[yellow]⚠ Max revisions reached — landing as 'drafted':[/yellow] "
+            f"{state['output_path']}\n"
             f"Confidence: {state.get('review_confidence', 0):.2f}\n"
-            f"{state.get('review_feedback', '')}"
         )
     except ImportError:
-        print(f"Human review required: {state['output_path']}")
+        print(f"Landing as drafted (max revs): {state['output_path']}")
+
+    # Write the draft to disk even though it didn't pass full review.
+    # The auto-commit downstream will skip git commit if confidence is low,
+    # but the file lands so we don't lose work.
+    from .tools import write_file as _write_file
+    draft = state.get("draft", "")
+    if draft:
+        try:
+            _write_file(state["output_path"], draft)
+        except Exception:
+            pass
+
     return {**state, "approved": False, "committed": False}
 
 
@@ -1353,8 +1368,19 @@ def flag_human_review_node(state: WikiPageState) -> WikiPageState:
 # ---------------------------------------------------------------------------
 
 def route_after_review(state: WikiPageState) -> str:
+    """v2 routing — never discard a reasonable draft.
+
+    - approved → write_file (full commit path)
+    - revisions maxed BUT confidence >= 0.6 → write_file anyway as 'drafted'
+      (auto-commit decides separately based on GIT_COMMIT_THRESHOLD)
+    - revisions maxed AND confidence < 0.6 → flag_human_review (page still
+      lands on disk via the new flag_human_review_node)
+    - otherwise → revise_draft
+    """
     if state.get("approved"):
         return "write_file"
     if state.get("revision_count", 0) >= 2:
+        if state.get("review_confidence", 0) >= 0.6:
+            return "write_file"
         return "flag_human_review"
     return "revise_draft"

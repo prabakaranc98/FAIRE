@@ -340,10 +340,18 @@ def _build_action_list(
                     except json.JSONDecodeError:
                         pass
 
-    # Priority 1: Flagged pages (generated but below confidence threshold)
+    # Priority 1: Flagged AND errored pages (generated but didn't land cleanly).
+    # Errored pages were previously orphaned — they now get retried with the
+    # latest prompts and code.
     for topic, r in latest_runs.items():
-        if r.get("status") == "flagged":
+        s = r.get("status")
+        if s in ("flagged", "error"):
             conf = r.get("confidence", 0)
+            reason = (
+                f"Reviewer flagged (conf={conf:.2f}) — needs targeted revision"
+                if s == "flagged"
+                else f"Previous attempt errored (conf={conf:.2f}) — retry with current prompts"
+            )
             actions.append(SupervisorAction(
                 priority=1,
                 action="improve",
@@ -351,7 +359,7 @@ def _build_action_list(
                 track=r.get("track", ""),
                 page_type=r.get("page_type", "core-concept"),
                 depth_emphasis=r.get("depth_emphasis", ["applied"]),
-                reason=f"Reviewer flagged (conf={conf:.2f}) — needs targeted revision",
+                reason=reason,
             ))
 
     # Priority 2: Pages with critical audit issues
