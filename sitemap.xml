@@ -21,6 +21,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/01-ai/arcs/agentic-rlvr-reasoner/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/01-ai/arcs/agentic-rlvr-reasoner/step-01-chain-of-thought/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -73,11 +77,19 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/step-01-diffusion-models/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/step-02-score-matching/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/step-03-latent-diffusion-models/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/step-04-flow-matching/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -122,6 +134,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/arcs/self-supervised-vision-foundations/step-01-simclr/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/arcs/self-supervised-vision-foundations/step-02-contrastive-learning/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -177,11 +193,19 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/arcs/training-fundamentals/step-02-gradient-descent/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/arcs/training-fundamentals/step-03-adaptive-optimizers/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/arcs/training-fundamentals/step-04-regularization/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/arcs/training-fundamentals/step-05-batch-normalization/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -237,6 +261,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/04-neural-networks-deep-learning/concepts/what-can-you-build-next-template-04-neural-networks-deep-learning/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -245,11 +273,23 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-01-bayesian-inference/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-02-variational-inference/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-03-bayesian-neural-networks/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-04-uncertainty-quantification/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-05-gaussian-processes/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -409,6 +449,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/collective-communication/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/communication-collectives/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -418,6 +462,10 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/connected-topics-template-09-algorithms-systems-for-ai/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/constrained-learning/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
@@ -477,6 +525,10 @@
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/long-context-models/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/mixed-precision-training/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
@@ -518,6 +570,14 @@
     </url>
     <url>
          <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/reinforcement-learning-schedulers/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/reinforcement-learning/</loc>
+         <lastmod>2026-05-27</lastmod>
+    </url>
+    <url>
+         <loc>https://prabakaranc98.github.io/FAIRE/curriculum/core/09-algorithms-systems-for-ai/concepts/rlhf-infrastructure-overview/</loc>
          <lastmod>2026-05-27</lastmod>
     </url>
     <url>

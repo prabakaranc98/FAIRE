@@ -1317,7 +1317,7 @@
 <blockquote>
 <p><strong>Arc:</strong> <a href="../../arcs/training-fundamentals.md">Training Fundamentals</a> — Step 3 of 5</p>
 <p><strong>Arc:</strong> <a href="../index.md">Training Fundamentals</a> — Step 3 of 5<br />
-← <a href="./step-02-gradient-descent.md">Previous Step</a> &nbsp;&nbsp; <a href="../step-04-regularization/">Next Step →</a></p>
+← <a href="../step-02-gradient-descent/">Previous Step</a> &nbsp;&nbsp; <a href="../step-04-regularization/">Next Step →</a></p>
 </blockquote>
 <h1 id="step-3-implement-ademamix-on-tinyshakespeare">Step 3 — Implement AdEMAMix on TinyShakespeare<a class="headerlink" href="#step-3-implement-ademamix-on-tinyshakespeare" title="Permanent link">&para;</a></h1>
 <p>Imagine arriving at the lab after Step 2 and seeing the single-LR TinyShakespeare checkpoint: the training log shows sharp spikes in the validation loss whenever a high-curvature direction is nudged, yet the bulk of the parameters barely budge because the shared step size is throttled. In production, those spikes mean a longer training run and wasted compute while your batches wait for the optimizer to “catch up.” The question this step answers is simple: what if the optimizer itself kept three memories—per-coordinate scale, momentum, and the global norm—so that you can train the same TinyShakespeare GPT in one run and still keep the update geometry stable enough to finish within a scheduled 6‑hour slot? By the end of this page you will understand why AdEMAMix’s multi-scale history is a strategic leap for training stability and also have a runnable artifact that proves it works for the character-level GPT on TinyShakespeare.</p>

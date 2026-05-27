@@ -1324,7 +1324,7 @@
 <blockquote>
 <p><strong>Arc:</strong> <a href="../../arcs/generative-stack.md">Generative Stack</a> — Step 2 of 5</p>
 <p><strong>Arc:</strong> <a href="../index.md">Generative Stack</a> — Step 2 of 5<br />
-← <a href="./step-01-diffusion-models.md">Previous Step</a> &nbsp;&nbsp; <a href="../step-03-latent-diffusion-models/">Next Step →</a></p>
+← <a href="../step-01-diffusion-models/">Previous Step</a> &nbsp;&nbsp; <a href="../step-03-latent-diffusion-models/">Next Step →</a></p>
 </blockquote>
 <h1 id="step-2-train-dsm-langevin-sampler-on-a-swiss-roll">Step 2 — Train DSM &amp; Langevin Sampler on a Swiss Roll<a class="headerlink" href="#step-2-train-dsm-langevin-sampler-on-a-swiss-roll" title="Permanent link">&para;</a></h1>
 <p>Imagine you could judge whether a model really <em>knows</em> the Swiss Roll without letting it see that shape twice. Instead of watching it reverse a long diffusion chain step-by-step, you ask it: “Where on the hill would you move if you wanted to stay on the ridge?” If the model answers with consistent directional cues, you can follow those gradients with a handful of Langevin updates to stay on the roll. This step teaches you how to train that directional compass— the score of the data distribution—so that sampling reduces to following learned gradients rather than replaying a schedule. By the end, you will have validated that your score estimator, trained via denoising score matching, drives a sampler toward the manifold with only a few gradient steps, closing the gap between proof-of-concept diffusion reverse chains and genuinely reusable score-based generators.</p>

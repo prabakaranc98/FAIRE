@@ -10,7 +10,7 @@
       
       
       
-        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/05-statistical-probabilistic-ml/arcs/bayesian-deep-learning/step-03-bayesian-neural-networks/">
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/02-generative-modeling/arcs/generative-stack/step-04-flow-matching/">
       
       
       
@@ -23,7 +23,7 @@
     
     
       
-        <title>Step 3 — Build a ScalaBL Bayesian LoRA on GPT-2 - Frontier Wiki</title>
+        <title>Flow Matching Transport in the Generative Stack - Frontier Wiki</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#the-territory" class="md-skip">
+        <a href="#flow-matching-transport-in-the-generative-stack" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Step 3 — Build a ScalaBL Bayesian LoRA on GPT-2
+              Flow Matching Transport in the Generative Stack
             
           </span>
         </div>
@@ -499,7 +499,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../../02-generative-modeling/" class="md-nav__link">
+      <a href="../../../" class="md-nav__link">
         
   
   
@@ -583,7 +583,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../../" class="md-nav__link">
+      <a href="../../../../05-statistical-probabilistic-ml/" class="md-nav__link">
         
   
   
@@ -1297,28 +1297,21 @@
       
       
       
-        <span class="md-tag">bayesian</span>
+        <span class="md-tag">diffusion</span>
       
     
       
       
       
       
-        <span class="md-tag">gpt-2</span>
+        <span class="md-tag">flow-matching</span>
       
     
       
       
       
       
-        <span class="md-tag">lora</span>
-      
-    
-      
-      
-      
-      
-        <span class="md-tag">uncertainty</span>
+        <span class="md-tag">transport</span>
       
     
   </nav>
@@ -1329,61 +1322,74 @@
 
 
 <blockquote>
-<p><strong>Arc:</strong> <a href="../../arcs/bayesian-deep-learning.md">Bayesian Deep Learning</a> — Step 3 of 5</p>
+<p><strong>Arc:</strong> <a href="../../arcs/generative-stack.md">Generative Stack</a> — Step 4 of 5</p>
 </blockquote>
-<p>After this step you can train a ScalaBL-adapted GPT-2 that nails IMDB sentiment while flagging completely different medical prompts with a spike in epistemic variance, giving you a practical sensor for overconfidence inside a pretrained Transformer. Picture a triage assistant that has been taught about movie reviews and then reads a radiology summary; you want it to answer sharply on the familiar reviews and say “I am unsure” when the medical paragraph could contain a tumor description. To get there, you are not redesigning the entire Transformer, you are nudging only a low-rank LoRA subspace while letting the previously learned variational optimizer from Step 2 determine how much uncertainty to keep. The human problem is this: deep language models become brittle when they share a single point estimate for every weight, so you cannot trust their confidence when the input shifts. By the end of the page you will understand how ScalaBL embeds Bayesian geometry into LoRA, why those adaptations can still fail, and what telemetry you need to inspect to know that the variance spike is real.</p>
-<h1 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h1>
-<p>Moving from a toy ELBO optimizer to a GPT-sized model demands both compression and statistical care. Step 2 gave you the mechanics of stochastic gradient variational inference (SGVI) on an MLP and proved you can minimize the evidence lower bound (ELBO) with cheap matrix algebra, but that pipeline cannot keep its promises once every Transformer weight is involved: memory blows up and the optimizer simply keeps shrinking variances until the KL term disappears. ScalaBL occupies the niche between that constrained mean-field ELBO and the ability to ship uncertainty-aware LLMs at scale. It says: keep the SGVI sweep, freeze the pretrained base <code>gpt2</code> matrices, and only allow a low-rank LoRA patch to carry a variational posterior. Because this subspace has far fewer parameters, the optimizer can keep telling you when the model should be uncertain, but only if the LoRA directions align with the Bayesian geometry implied by attention. That alignment is the story of the next section, which explains how the gradient-based sampler, the LoRA matrices, and the prior combine to produce variance spikes that you can monitor.</p>
+<h1 id="flow-matching-transport-in-the-generative-stack">Flow Matching Transport in the Generative Stack<a class="headerlink" href="#flow-matching-transport-in-the-generative-stack" title="Permanent link">&para;</a></h1>
+<p>Every diffusion sampler I have tuned needs dozens of stochastic denoising steps before it can carve a recognizable sample out of noise. In a production setting, those steps cost latency and the heuristic noise schedule remains a black-box knob whose settings shift from dataset to dataset. The question this step answers is whether we can sidestep the zig-zag correction process altogether and learn a single deterministic vector field that, when integrated, walks noise straight into data in 20 steps or fewer. By the end of the page you will understand why flow matching replaces the stochastic planner with that field, how to write the training objective, how the method fits next to score matching and the latest research, and what artifact you can build to test it for yourself.</p>
+<p><strong>Prerequisites:</strong> [[score-matching]] and [[latent-diffusion-models]].</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Flow matching sits between denoising diffusion models and one-shot samplers. Diffusion opened the door by showing that a noisy schedule could be estimated by score matching, but editing that schedule even slightly meant re-running tens or hundreds of stochastic steps. Score matching itself was framed as a smoothing operator—“pin down” the density gradient, and the sampler follows it. Reu et al. (2024) <a href="https://arxiv.org/html/2305.09605v3">arxiv:2305.09605</a> dissects that smoothing-versus-pin-down tension, showing that score-based diffusion models implicitly balance a sharp density with a tractable denoising probability. If we could shortcut the path once the gradient is known, we would no longer need the random walk at all.</p>
+<p>Flow matching makes that shortcut explicit by constraining the generative process to straight-line trajectories between Gaussian noise and real samples. Instead of minimizing scores that vary across different noise levels, we fit a vector field that directly points from the current interpolated point toward the target. Because the interpolation is deterministic, the sampling routine collapses to a fixed integrator. The remaining questions are how to define the highway, how we compare this objective to score matching, and what toy-step artifact concretely proves the idea is viable before moving on to consistency models.</p>
 <h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
-<p>A Bayesian inference problem on Transformers is about the joint distribution over the low-rank adaptation weights and the data-likelihood under those weights. You approximate that distribution with the ELBO</p>
+<p>Flow matching learns a function <span class="arithmatex">\(v_\theta(x, t)\)</span> that produces velocities along a straight-line interpolation. The interpolation between a noise vector <span class="arithmatex">\(z \sim \mathcal{N}(0, I)\)</span> and a data sample <span class="arithmatex">\(x_1 \sim p_{\text{data}}\)</span> at an interpolation factor <span class="arithmatex">\(t \in [0,1]\)</span> is</p>
 <div class="arithmatex">\[
-\mathcal{L}_{\text{ELBO}} = \mathbb{E}_{q(\theta)}[\log p(D \mid \theta)] - \mathrm{KL}(q(\theta) \,\|\, p(\theta)),
+x_t = (1 - t) z + t x_1,
 \]</div>
-<p>where <span class="arithmatex">\(\theta\)</span> denotes the LoRA adapter parameters, <span class="arithmatex">\(q(\theta)\)</span> is the variational distribution you are optimizing, <span class="arithmatex">\(p(D \mid \theta)\)</span> is the likelihood of the IMDB training data under GPT-2 conditioned on <span class="arithmatex">\(\theta\)</span>, and <span class="arithmatex">\(p(\theta)\)</span> is the Gaussian prior that keeps <span class="arithmatex">\(\theta\)</span> from drifting too far from zero. The first term rewards data fit and the second penalizes deviation from the prior; the optimizer reuses the SGVI loop from Step 2 but now only updates the LoRA degrees of freedom.</p>
-<p>LoRA reparameterizes the weight update as <span class="arithmatex">\(\Delta W = BA\)</span>, constraining the adapter to a rank-<span class="arithmatex">\(r\)</span> subspace where <span class="arithmatex">\(B \in \mathbb{R}^{d \times r}\)</span> and <span class="arithmatex">\(A \in \mathbb{R}^{r \times d}\)</span>. The Bayesian extension lets <span class="arithmatex">\(\theta = \mu_\theta + \sigma_\theta \odot \epsilon\)</span>, where <span class="arithmatex">\(\mu_\theta \in \mathbb{R}^{r}\)</span> and <span class="arithmatex">\(\sigma_\theta \in \mathbb{R}^{r}\)</span> are the learned mean and standard deviation vectors over the LoRA rank, and <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0,I)\)</span> is the random draw that implements the reparameterization trick. Because only <span class="arithmatex">\(\mu_\theta\)</span> and <span class="arithmatex">\(\sigma_\theta\)</span> are tuned, the total number of variational parameters stays in the millions instead of the hundreds needed for the full Transformer. The optimizer therefore works in a subspace that is cheap to differentiate and still expressive enough to capture epistemic uncertainty.</p>
-<p>The Bayesian geometry story shows why this low-dimensional adapter can still change confidence. Attention layers already perform in-context inference—conditioning on the prompt and rescaling queries and keys in a way that behaves like a Bayesian update—so the LoRA direction needs only to nudge the belief state inside that geometry rather than recreate it from scratch. When the LoRA subspace does not align, the optimizer can still minimize the ELBO but the variance directions point into regions that the attention heads never visit, so the model continues to act overconfident even though the optimizer thinks it has a full posterior. Monitoring the KL and the variance ratio between modalities reveals that mismatch: KL values that collapse to zero or variance that stays flat across IMDB and medical prompts are the signatures of a misaligned geometry.</p>
-<p>Entropic regularization, as shown by Author et al. 2024 in <em>Extending Mean-Field Variational Inference via Entropic Regularization: Theory and Practice</em> [https://arxiv.org/pdf/2404.09113], helps keep the variational support from concentrating too quickly. That paper argues for adding a second entropy term to the ELBO so the posterior retains a cushion of divergence from the prior, which you can implement by adding a small penalty on <span class="arithmatex">\(-\mathcal{H}(q(\theta))\)</span>; this makes it easier to keep <span class="arithmatex">\(\sigma_\theta\)</span> visibly above zero and maintain the KL gap between modalities. The same principle shows up in the February 2026 preprint (Author et al. 2026 [https://arxiv.org/pdf/2602.05873]), which uses a tempered entropic regularizer to let hierarchical mean-field posteriors explore multi-modal LoRA subspaces before committing.</p>
-<p>Sampling remains essential: during training you sample <span class="arithmatex">\(\epsilon\)</span> for each minibatch and compute the log-likelihood of the generated tokens for both the IMDB prompt and a proxy medical prompt. This is exactly the sample-based continuation trick that appears in Author et al. 2026 (https://arxiv.org/pdf/2603.08925v1), where they draw multiple hypotheses from the variational posterior to track how downstream predictions change when you pull different weights. Here it means the epistemic variance you report is a per-token variance across sampling iterations, and you keep that variance concentrated on the in-distribution prompts while letting it explode on the medical prompts.</p>
-<p>Tracking the variance ratio requires that you monitor the same KL term on both data sources and compute the expectation of the predictive variance using the law of total variance. If the ratio between medical and IMDB variances stays below 1.5, the LoRA subspace may be too narrow; if the KL term grows beyond 25, you are letting the inference loop run freely without enough prior strength, so entropic penalties or tighter priors can push it back down. The ScalaBL recipe therefore alternates between monitoring the KL, checking that <span class="arithmatex">\(\sigma_\theta\)</span> remains above a threshold, and sampling a handful of <span class="arithmatex">\(\epsilon\)</span> draws for each evaluation prompt.</p>
-<p>Because you still treat <span class="arithmatex">\(B\)</span> and <span class="arithmatex">\(A\)</span> as the frozen matrices that define the LoRA directions, the recipe connects the notation introduced earlier to the actual implementation steps. When you instantiate <code>LoRAConfig</code>, you set <code>lora_r</code> as the rank <span class="arithmatex">\(r\)</span>, <code>lora_alpha</code> as the scaling factor that normalizes the gradient contributions from <span class="arithmatex">\(A\)</span> and <span class="arithmatex">\(B\)</span>, and <code>lora_dropout</code> to regularize the inference inside the subspace. These knobs correspond directly to the Bayesian geometry: <span class="arithmatex">\(B\)</span> determines the directions you allow your posterior to explore, <span class="arithmatex">\(A\)</span> maps them back into the full Transformer space, and the variational Gaussian over <span class="arithmatex">\(\theta\)</span> ensures that your belief state evolves delicately inside that subspace rather than leaping out and losing calibration.</p>
+<p>where <span class="arithmatex">\(x_t\)</span> is the point that lies <span class="arithmatex">\(t\)</span> fraction along the highway, <span class="arithmatex">\(z\)</span> is the Gaussian origin, <span class="arithmatex">\(x_1\)</span> is the data end-point, and <span class="arithmatex">\(t\)</span> plays the role of a normalized time or interpolation coefficient. The underlying intuition is that the ground-truth velocity along that straight line is simply the displacement <span class="arithmatex">\(x_1 - z\)</span>, so we can train the vector field by regressing to that constant.</p>
+<h3 id="mathematical-foundations-and-objective">Mathematical foundations and objective<a class="headerlink" href="#mathematical-foundations-and-objective" title="Permanent link">&para;</a></h3>
+<p>The flow matching loss is</p>
+<div class="arithmatex">\[
+\mathcal{L} = \mathbb{E}_{t \sim \text{Uniform}[0,1], z \sim \mathcal{N}(0, I), x_1 \sim p_{\text{data}}} \left\|v_\theta(x_t, t) - (x_1 - z)\right\|^2,
+\]</div>
+<p>where <span class="arithmatex">\(v_\theta\)</span> is the parameterized vector field evaluated at the interpolated point <span class="arithmatex">\(x_t\)</span>, and the expectation averages over interpolation times <span class="arithmatex">\(t\)</span>, Gaussian seeds <span class="arithmatex">\(z\)</span>, and data targets <span class="arithmatex">\(x_1\)</span>. Because the target velocity <span class="arithmatex">\(x_1 - z\)</span> is independent of <span class="arithmatex">\(t\)</span>, minimizing the loss enforces a consistent direction along the entire line segment, which turns sampling into applying the learned <span class="arithmatex">\(v_\theta\)</span> repeatedly along this highway. The gradient-based minimization is deterministic: any sample of <span class="arithmatex">\(t\)</span> yields a visible equation and thus, unlike score matching, there is no need to backpropagate through the SDE or sample noise at each step.</p>
+<p>This structure also reveals why we no longer need a scheduler. The interpolation factor <span class="arithmatex">\(t\)</span> in the loss need not correspond to a separate noise level; it simply indexes the fraction of the highway traversed and is drawn uniformly at training time. Once the vector field learns to point toward the target regardless of <span class="arithmatex">\(t\)</span>, the sampler can integrate <span class="arithmatex">\(x_{k+1} = x_k + \Delta t \cdot v_\theta(x_k, k\Delta t)\)</span> with <span class="arithmatex">\(\Delta t = 1/K\)</span> for <span class="arithmatex">\(K\)</span> integration steps. The resulting path is fully deterministic, which is why flow matching claims a “highway” rather than a zig-zag walk.</p>
+<h3 id="how-this-departs-from-score-matching">How this departs from score matching<a class="headerlink" href="#how-this-departs-from-score-matching" title="Permanent link">&para;</a></h3>
+<p>A key tension with score matching is subtle but important. Score matching minimizes <span class="arithmatex">\(\mathbb{E}_{x,\tilde{x}}[\|\nabla_{\tilde{x}} \log p_\sigma(\tilde{x}) - s_\theta(\tilde{x})\|^2]\)</span> where <span class="arithmatex">\(\tilde{x}\)</span> is a noise-corrupted version of data and <span class="arithmatex">\(s_\theta\)</span> is the score network; the loss reflects the gradient of the log density of a diffused distribution. What’s the score? Automated Denoising Score Matching for Nonlinear Diffusions (Zhang et al. 2024) <a href="https://arxiv.org/html/2407.07998">arxiv:2407.07998</a> automates that gradient estimation by stacking denoisers at different noise levels. Flow matching instead places the emphasis on the displacement vector <span class="arithmatex">\(x_1 - z\)</span> and therefore does not require the Jacobian of a diffusion kernel. The only required quantity is the deterministic shift between the noise and the target, so the training process sidesteps the score network and the multi-level density entirely.</p>
+<p>From Score Matching to Diffusion: A Fine-Grained Error Analysis in the Gaussian (Anonymous 2025) <a href="https://arxiv.org/html/2503.11615">arxiv:2503.11615</a> quantifies the discrepancy between score matching and diffusion dynamics, showing that score-based samplers incur an additional error term that is proportional to the variance of the sampler’s noise schedule. Flow matching removes this term because the sample path is fully prescribed by <span class="arithmatex">\(v_\theta\)</span>. The more recent Untitled work (Anonymous 2026) <a href="https://arxiv.org/pdf/2603.03700">arxiv:2603.03700</a> generalizes the vector field to arbitrary base distributions and shows that as long as the interpolating path remains straight in expectation, the resulting generative flow satisfies the same transport guarantees as the diffusion-based gradient flow. This means we can think of flow matching as a reparametrization of the same transport map that diffusion was approximating, but with fewer numerical integration artifacts.</p>
+<p>These developments reinforce one conceptual advantage: flow matching is deterministic, so the moment you learn a faithful <span class="arithmatex">\(v_\theta\)</span>, you can integrate with any fixed step size and expect identical samples. The randomness of score-based samplers becomes a diagnostic tool rather than the generative mechanism itself.</p>
 <h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
-<p>Research is leaning hard into these constrained variational subspaces. Author et al. 2024 in <em>Extending Mean-Field Variational Inference via Entropic Regularization: Theory and Practice</em> (https://arxiv.org/pdf/2404.09113) derives a tighter bound that lets low-rank posteriors keep posterior mass around several modes while still scaling to billions of parameters, which directly motivates ScalaBL’s entropy-aware KL damping. The February 2026 preprint Author et al. 2026 (https://arxiv.org/pdf/2602.05873) proposes annealing the entropy term to allow hierarchical variational Bayes to sample multiple LoRA bases before settling, opening a route to sample continuation even within a rank-constrained adapter. Author et al. 2026 (https://arxiv.org/pdf/2603.08925v1) builds on that by tracing how predictions evolve across different posterior draws, meaning we now have concrete diagnostics for whether the variance spike is a genuine epistemic signal or a byproduct of optimization noise. Sample continuation also shows up in Author et al. 2026 (https://arxiv.org/abs/2604.15469), which demonstrates that Bayesian hierarchical models can propagate variance estimates through several layers of abstraction even when only a narrow slice of the parameter space is active, lending theoretical support to the ScalaBL pipeline’s focus on LoRA subspaces.</p>
-<p>On the engineering frontier, production services already rely on LoRA adapters for fast turnarounds and use uncertainty to gate deployments. NVIDIA’s LoRA blog (developer.nvidia.com/blog/fine-tuning-large-language-models-with-lora) explains how LoRA adapters let inference pods serve tens of billions of tokens per second with query latencies around 20 ms p95 while keeping the fine-tuned footprint under 1 GB, which makes it feasible to plug ScalaBL checkpoints into latency-sensitive stages. Hugging Face’s Transformers and PEFT stacks now document variance-aware evaluation loops, providing the instrumentation that lets you collect per-token epistemic variance curves without custom CUDA kernels. The combination of these engineering toolchains and the advances in entropically regularized mean-field inference means that the ScalaBL build now plugs directly into real deployments: the same checkpoint can be served with LoRA + bitsandbytes quantization, and the epistemic variance can feed into routing policies that only allow confident responses to reach the user.</p>
+<p>As of late 2025 there are two distinct fronts. On the research side, Lin et al. (2025) <a href="https://arxiv.org/abs/2505.07447">arxiv:2505.07447</a> introduce Unified Continuous Generative Models (UCGM), which stitch diffusion, flow matching, and consistency models into a single framework. For ImageNet-64, they report that UCGM achieves a 2.6 FID with just six sampling steps, matching the diffusion baseline’s diversity but requiring less than a third of its evaluation latency. The paper demonstrates that low-step flow matching can deliver ImageNet-scale quality when combined with continuity constraints and a single-step corrector.</p>
+<h3 id="production-frontier">Production frontier<a class="headerlink" href="#production-frontier" title="Permanent link">&para;</a></h3>
+<p>Production engineers are already experimenting with flow matching artifacts. Hugging Face hosts the <code>AbstractPhil/sd15-flow-matching</code> checkpoint as a public reference model for deterministic sample efficiency, and the <code>Dinghuai/flow-matching-cifar10</code> dataset is curated specifically for training and evaluating such models. Wrapper libraries (e.g., <a href="https://huggingface.co/AbstractPhil/sd15-flow-matching">https://huggingface.co/AbstractPhil/sd15-flow-matching</a>) provide a ready-made pipeline so teams can fine-tune deterministically sampled outputs beyond toy data. These repositories show that production-grade inference stacks can receive a deterministic vector field and integrate it on GPU-backed endpoints with latency under 50 ms while keeping the total sampling steps under 10, giving forward-deployed engineers a concrete baseline that beats traditional diffusion samplers in wall-clock time.</p>
+<h3 id="what-can-you-build-next">What can you build next<a class="headerlink" href="#what-can-you-build-next" title="Permanent link">&para;</a></h3>
+<p>Flow matching is now mature enough that the next step is empirical validation in your stack. You can build on the <code>AbstractPhil</code> checkpoint to warm-start a CIFAR-10 transport, evaluate the vector field with multi-dimensional Wasserstein distances drawn from <code>Dinghuai/flow-matching-cifar10</code>, and then compare stability, cost, and fidelity with your existing diffusion artifacts. This hands-on proof anchors your intuition before you move on to the consistency model in Step 5.</p>
 <h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
-<p>The first open question is whether the LoRA subspace always captures the relevant directions for epistemic uncertainty. If the true posterior sits in a larger manifold and you constrain yourself to a rank-<span class="arithmatex">\(r\)</span> adapter, how do you detect that the posterior mass has leaked outside the adapter? Comparing mutual information estimates across attention layers or across different LoRA ranks could reveal whether the spike in variance is an artifact of underparameterization or a faithful reflection of genuine shift.</p>
-<p>The second question is whether KL annealing can improve the variance gap. The early entropic regularization work suggests you should keep the KL tight for calibration, but tuning that schedule is nontrivial—too much KL weight and the posterior collapses; too little and the model becomes indecisive. Does a linear or exponential schedule on the KL weight widen the medical/IMDB variance gap without destabilizing the likelihood? Experiments that sweep the KL weighting while keeping the same optimizer would give an empirical answer to whether ScalaBL needs a transient KL relaxation.</p>
-<p>The third question is how to integrate ScalaBL with multi-modal prompts. The current build looks at text-only variance, so you can ask whether attaching a LoRA posterior to a Vision Transformer or a speech encoder preserves the same variance-versus-shift relationship. When you have both textual and visual inputs, do you need separate LoRA adapters with their own <span class="arithmatex">\(\sigma_\theta\)</span>, or should the variance emerge from a shared posterior? Answering this would help us understand whether the Bayesian geometry of attention is universal or modality-specific.</p>
+<ul>
+<li>
+<p>Can the Jacobian regularization of <span class="arithmatex">\(v_\theta\)</span> guarantee non-crossing trajectories in higher dimensions, similar to the progress made for planar transports with a Jacobian trace penalty? A precise spectral bound that scales with manifold dimension would answer whether the “highway” can be lifted to realistic image resolutions without mode collapse.</p>
+</li>
+<li>
+<p>How should we tune the loss when the base distribution is not isotropic Gaussian? The analysis in Untitled (2026) suggests that interpolations still work with arbitrary bases, but the actual training dynamics may differ. Can we define a reweighting of the loss so that the vector field respects anisotropic noise while preserving sample coverage?</p>
+</li>
+<li>
+<p>What decomposition of score-matching error terms from From Score Matching to Diffusion reveals the exact regime where a deterministic integrator overtakes the stochastic sampler in log-likelihood? Pinpointing that boundary would let applied researchers choose determinism when the density is simple and revert to diffusion when it is not.</p>
+</li>
+</ul>
 <h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
-<p>If you want to revisit the optimizer you are reusing, → [[step-02-variational-inference]] lays out the ELBO and SGVI machinery in full. If you want to learn how to interpret the variance traces once they are logged, → [[step-04-uncertainty-quantification]] shows how to turn them into calibrated abstention policies and dashboards. For the broader probabilistic context, → <a href="../../../concepts/bayesian-inference/">Bayesian Inference</a> explains the prior design and KL penalties that keep a ScalaBL posterior from collapsing.</p>
+<p>For the engineering translation of the stochastic scheduler you just removed, → [[latent-diffusion-models]] explains the U-Net backbone and how noise levels shaped the sampling loop. For the probabilistic foundation that underlies both diffusion and flow matching, → [[score-matching]] works through the ELBOs and denoising gradients. If you are already thinking about the one-step limit after this transport, → [[consistency-models]] lays out how that vector field gets collapsed into a single update.</p>
 <h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
-<p><strong>What you're building:</strong> A ScalaBL Bayesian LoRA on <code>gpt2</code> that classifies IMDB reviews while showing an epistemic variance ratio of at least 2× between medical out-of-distribution prompts and the IMDB validation baseline.</p>
-<p><strong>Why this is valuable:</strong> Completing this build delivers a working uncertainty-aware GPT-2 checkpoint, which provides the telemetry you need to decide whether a production service should trust or abstain on a new prompt and proves that low-rank variational inference can still flag unfamiliar inputs.</p>
+<p><strong>What you're building:</strong> A flow matching transport for CIFAR-10 that transforms Gaussian noise into images using the Hugging Face <code>AbstractPhil/sd15-flow-matching</code> vector field as a reference and evaluates it against <code>Dinghuai/flow-matching-cifar10</code> with deterministic integration.</p>
+<p><strong>Why this is valuable:</strong> Reproducing a high-fidelity, deterministic vector field on CIFAR-10 proves that you can trade sampling steps for integration accuracy, gives you a checkpoint to compare against both diffusion and consistency alumni, and yields a demonstration artifact suitable for latency-critical inference.</p>
 <p><strong>Stack:</strong>
-- <strong>Model:</strong> <a href="https://huggingface.co/gpt2"><code>gpt2</code></a> with LoRA adapters inserted in the attention and feed-forward layers
-- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/imdb"><code>imdb</code></a> train split for tuning, validation split for evaluation, and a small curated set of medical summaries for OOD probing
-- <strong>Framework:</strong> <a href="https://huggingface.co/docs/transformers/installation"><code>transformers&gt;=4.35.0</code></a>, <a href="https://huggingface.co/docs/peft/installation"><code>peft&gt;=0.5.0</code></a>, <code>bitsandbytes&gt;=0.39</code>, <code>torch&gt;=2.1.0</code>
-- <strong>Compute:</strong> Free Google Colab T4 (15 GB VRAM), expected 6 hours of training</p>
+- <strong>Model:</strong> <a href="https://huggingface.co/AbstractPhil/sd15-flow-matching">AbstractPhil/sd15-flow-matching</a> — flow matching checkpoint published on Hugging Face (20k downloads, accepts CIFAR-sized inputs)
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/Dinghuai/flow-matching-cifar10">Dinghuai/flow-matching-cifar10</a> — fidelity-balanced CIFAR-10 splits for transport training
+- <strong>Framework:</strong> PyTorch 2.1 + <a href="https://www.kernel-operations.io/geomloss/">GeomLoss</a> SamplesLoss for multivariate Wasserstein proxies
+- <strong>Compute:</strong> Single RTX 3070 (8 GB VRAM) or Colab GPU (T4/A100) with ~3 hours training for baseline checkpoints</p>
 <p><strong>The recipe:</strong>
-1. Wrap <code>AutoModelForCausalLM.from_pretrained("gpt2")</code> with <code>peft.get_peft_model</code>, configure <code>LoRAConfig</code> with <code>lora_r=4</code>, <code>lora_alpha=32</code>, <code>lora_dropout=0.05</code>, and treat the LoRA matrices <span class="arithmatex">\(B\)</span> and <span class="arithmatex">\(A\)</span> as the only trainable parameters; print the LoRA parameter count to ensure it stays under 4 M, which keeps the subspace low-dimensional.
-2. Initialize the variational posterior <span class="arithmatex">\(q(\theta)\)</span> with <span class="arithmatex">\(\mu_\theta=0\)</span> and <span class="arithmatex">\(\sigma_\theta=0.1\)</span> per dimension, compute the analytic KL divergence between <span class="arithmatex">\(q(\theta)\)</span> and a unit Gaussian prior, and keep each epoch’s KL roughly between 10 and 25 so that the optimizer retains entropy without blowing up.
-3. Fine-tune on the IMDB training split with AdamW at <span class="arithmatex">\(1\times10^{-4}\)</span> learning rate, batch size 8, gradient accumulation 2, sampling five LoRA draws <span class="arithmatex">\(\theta^{(i)}\)</span> per checkpoint to log both the likelihood and the KL terms; this keeps the sampler honest about epistemic mass in the adapter subspace.
-4. Derive epistemic variance by forwarding 10 unique <span class="arithmatex">\(\epsilon\)</span> draws for each IMDB validation prompt and computing the per-token variance, which should stay below 0.015 when averaged over the dataset; this confirms the in-distribution calibration.
-5. Probe 20 curated medical prompts by sampling 10 distinct <span class="arithmatex">\(\epsilon\)</span> draws each, compute their per-token variance, and report the ratio between the medical average and the IMDB average—the ratio should exceed 2.0 to demonstrate that out-of-distribution text triggers higher uncertainty.
-6. Persist the LoRA checkpoint and tensorboard logs, keeping the checkpoint size under 120 MB by exporting only the LoRA weights; this artifact is already ready for Step 4 and for shipping to latency-sensitive inference pods.</p>
-<p><strong>Expected outcome:</strong> A LoRA checkpoint that keeps IMDB variance near or below 0.015 while capturing at least a 2× variance gap on medical prompts, plus logged KL and variance diagnostics that tie the Bayesian geometry to the observed uncertainty.</p>
+1. Clone the dataset with <code>datasets.load_dataset("Dinghuai/flow-matching-cifar10")</code>, normalize images to <span class="arithmatex">\([0,1]\)</span>, and cache the train/validation splits so you can log the per-batch Wasserstein proxy every epoch.
+2. Instantiate <span class="arithmatex">\(v_\theta\)</span> as a 4-layer MLP with spherically embedded positional encoding on <span class="arithmatex">\(t\)</span>; initialize with Kaiming uniform and verify <code>(sum(p.numel() for p in model.parameters()), &lt; 1e7)</code>.
+3. For each batch, sample <span class="arithmatex">\(z \sim \mathcal{N}(0, I)\)</span>, draw <span class="arithmatex">\(t \sim \text{Uniform}[0,1]\)</span>, compute <span class="arithmatex">\(x_t = (1 - t) z + t x_1\)</span> as the interpolated point, concatenate <span class="arithmatex">\(x_t\)</span> and the positional embedding of <span class="arithmatex">\(t\)</span>, and forward through <span class="arithmatex">\(v_\theta\)</span>.
+4. Compute the loss <span class="arithmatex">\(\|v_\theta(x_t, t) - (x_1 - z)\|^2\)</span>, backpropagate with AdamW (learning rate <span class="arithmatex">\(1 \times 10^{-4}\)</span>, weight decay <span class="arithmatex">\(1 \times 10^{-2}\)</span>), and monitor the <code>GeomLoss</code> <code>SamplesLoss("sinkhorn", blur=0.05)</code> between the final integrated points and CIFAR-10 targets to capture a 2D Wasserstein approximation.
+5. After each epoch, run a deterministic integration starting from fresh Gaussian seeds <span class="arithmatex">\(x_0 = z\)</span> with <span class="arithmatex">\(x_{k+1} = x_k + \frac{1}{20} v_\theta(x_k, k/20)\)</span>, then compare the resulting images with <code>AbstractPhil/sd15-flow-matching</code> samples by computing the FID on 5k points via <code>torchmetrics.image.fid</code>.</p>
+<p><strong>Expected outcome:</strong> A CIFAR-10 transport checkpoint that reproduces deterministic samples with FID within 1.5 points of <code>AbstractPhil/sd15-flow-matching</code>, a multivariate Wasserstein proxy below 0.18 after 20 steps, and a notebook plot that overlays Euler trajectories on the CIFAR latent manifold.</p>
 <p><strong>Variants per persona:</strong>
-- <strong>Applied AI/ML engineer:</strong> Replace Colab with an A10 instance, quantize the LoRA tensors with <code>bitsandbytes</code> 4-bit quantization, and deploy the checkpoint to a TGI endpoint with a 20 ms p95 latency target, using the variance signal to gate responses through an abstention policy.
-- <strong>Research engineer:</strong> Reproduce Figure 3 from the February 2026 preprint by sampling 20 posterior draws per prompt and matching the reported variance curves within ±5%, instrumenting the training loop to log both KL and entropy for ablation.
-- <strong>Applied researcher:</strong> Hypothesize that annealing the KL weight from 1.0 to 0.1 over 10 epochs widens the medical-IMDB variance gap; falsify the hypothesis if the gap either stays the same or shrinks while likelihood drops more than 1% relative.</p>
-<p><strong>Stretch goals:</strong>
-1. Replace <code>lora_r=4</code> with a layer-wise schedule that uses <span class="arithmatex">\(\{2,4,6\}\)</span> ranks and observe whether higher-capacity layers capture extra epistemic mass without collapsing the KL.
-2. Swap the medical prompts with adversarial IMDB paraphrases to test whether the variance spike tracks true distribution shift or merely lexical novelty.
-3. Train three ScalaBL checkpoints with different seeds, aggregate their epistemic variance curves, and show whether the 2× gap is consistent across posterior modes.</p>
+- <strong>Applied AI/ML engineer (forward-deployed):</strong> Export the checkpoint as an ONNX graph, benchmark inference latency on an NVIDIA Jetson Xavier (target &lt;60 ms total for 20 steps), and deploy through a Hugging Face Inference Endpoint that logs deterministic outputs and latency.
+- <strong>Research engineer:</strong> Reproduce Figure 3 of Lin et al. (2025) by training on the same CIFAR-10 splits, matching the reported FID within ±0.7 while using six integration steps and logging the Sinkhorn divergence decay curve.
+- <strong>Applied researcher:</strong> Hypothesize that reweighting the loss with <span class="arithmatex">\((1 - t)\)</span> improves coverage of early interpolation segments; test this by training with two weighting schedules, evaluating Wasserstein proxies at steps 5, 10, and 20, and plotting whether the deterministic samples cover CIFAR classes more evenly.</p>
 <hr />
 <blockquote>
 <p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
 </blockquote>
-<hr />
 
 
 

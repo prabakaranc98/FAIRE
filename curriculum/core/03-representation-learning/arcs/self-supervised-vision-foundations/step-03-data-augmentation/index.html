@@ -1324,7 +1324,7 @@
 <blockquote>
 <p><strong>Arc:</strong> <a href="../../arcs/self-supervised-vision-foundations.md">Self Supervised Vision Foundations</a> — Step 3 of 5</p>
 <p><strong>Arc:</strong> <a href="../index.md">Self Supervised Vision Foundations</a> — Step 3 of 5<br />
-← <a href="./step-02-contrastive-learning.md">Previous Step</a> &nbsp;&nbsp; <a href="../step-04-masked-autoencoders/">Next Step →</a></p>
+← <a href="../step-02-contrastive-learning/">Previous Step</a> &nbsp;&nbsp; <a href="../step-04-masked-autoencoders/">Next Step →</a></p>
 </blockquote>
 <h1 id="step-3-compare-spatial-and-frequency-augmentations">Step 3 — Compare Spatial and Frequency Augmentations<a class="headerlink" href="#step-3-compare-spatial-and-frequency-augmentations" title="Permanent link">&para;</a></h1>
 <p>You are about to build a contrastive training experiment whose only difference from the previous step lives inside the augmentation pipe. Why does that matter? Because when two views become “positive” in InfoNCE, the augmentation policy is implicitly declaring which attributes the encoder should treat as noise. If the augmentation banks only include spatial crops and color jitter, every training batch teaches the encoder that color histograms are invariant and thus the similarity score becomes a proxy for color distance. The result is high linear-probe accuracy driven by color shortcuts, not by shape or composition, and this causes downstream models to fail on cases where color changes but semantics stay fixed.</p>
