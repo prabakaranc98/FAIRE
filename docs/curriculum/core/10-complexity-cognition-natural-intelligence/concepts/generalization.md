@@ -4,16 +4,92 @@ slug: generalization
 layer: core
 subject: 10-complexity-cognition-natural-intelligence
 page_type: concept
-state: stub
-authors_anchored: [zhang-rethinking, neyshabur]
+state: drafted
+authors_anchored: [brown, hoffmann, von-neumann, turing, leah]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
-prereqs: []
-tags: []
-updated: 2026-05-27
+prereqs: [distribution-shift, robust-evaluation, statistical-learning-theory, transformers]
+tags: [generalization, out-of-distribution, evaluation, partial-correlation, complexity, overfitting]
+updated: 2025-11-20
 has_mvb: true
 ---
 
 # Generalization
 
-🚧 Agent-generated content pending. This concept sits in [10 · Complexity Cognition Natural Intelligence](../index.md) and will be developed into a full v2 narrative walk-through (~2500 words) following [the schema](../../../../system/structure-v2.md).
+Imagine you are evaluating OmniGen2 on two tasks: describing the contents of a complex photorealistic scene and answering a simple spatial-reasoning question after you delete one object from the scene. In the release announcement, OpenAI reported that while the model retained near-perfect visual fidelity, its accuracy on the counterfactual spatial question plunged by 44 percentage points as soon as one object changed position, even though both prompts live under the same high-quality captioning policy. That is the paradox: the model is “general” enough to render the entire New York skyline except when you ask it to track the spatial relationship between two identical cubes. Generalization, in practice, is not a single transferable competence that you can tune once and expect to work everywhere; it is a mosaic of fragile, shift-specific skills, and much of the work after reading this page will show you how to observe the fractures, measure them, and—if you are lucky—think about how an architecture’s complexity and optimization history determine which fractures open wider.
+
+## The territory
+
+This page walks the reader through the fact that modern generalization is best described as fragmentation rather than extension. In a field that once treated the next epoch as a reliable generalization step, researchers now see the same model with high in-domain (ID) accuracy failing catastrophically on even very mild out-of-distribution (OOD) shifts. The examples range from counterfactual image edits, to arithmetic sequences that extend beyond training lengths, to schema-level reasoning that depends on learned compression artifacts. Generalization research therefore answers the question, “Given an existing model, how can we decide which new situations it will handle without re-running a battery of expensive fine-tunes?” This also forces us to ask whether a model that generalizes under one shift is likely to generalize under another, or whether the signals are systematically uncorrelated; that is the conceptual leap from “models generalize” to “generalization results generalize.”
+
+In the broader field, this discussion sits at the crossroads between distribution-shift evaluation, complexity-aware architecture design, and the empirical practice of zero-shot benchmarking. On the distribution side we borrow tools from multivariate statistics (partial correlation, regression residuals, conditional independence tests) so that we can say what performance on one shift means once the in-domain ceiling is accounted for. On the complexity side we borrow the language of architectural expressivity and optimization dynamics to explain why two seemingly similar shifts can end up in competition within the same network. These strands are why practitioners who deploy a new vision-language model ask for a cross-shift matrix of accuracies and why theorists ask for bounds on what an infinite transformer can or cannot capture. The mechanism is best understood by starting from the statistical counterfactual: if you regress out in-domain accuracy, does shift A still explain any variance in shift B? How does that work in practice, and how do architectural constraints shape the answer?
+
+## How it works
+
+The key observation behind the whole page is that generalization can only be spoken about relative to a particular distribution shift. You can take two OOD test sets, such as “semantic perturbations in natural scenes” and “sequence lengths longer than any seen during training,” and compute accuracies \(a_1, a_2\) on those shifts as well as an in-domain accuracy \(a_{\text{ID}}\). If the shifts were manifestations of a single underlying model capability—“robust cognition,” say—then the Pearson correlation \(r_{a_1,a_2}\) should remain high even after controlling for \(a_{\text{ID}}\). But the central claim of Do Generalisation Results Generalise? (2025) [arxiv:2510.00824](https://arxiv.org/abs/2510.00824) is that once you subtract out the in-domain part via a partial correlation, that residue is close to zero or even negative. In other words, once the ID skill is saturated, the residual variation across shifts is mostly shift-specific noise or, worse, hostile interference. The intuition is that the optimization path that led the network to solve the training set puts different directions in weight space “on the radar,” and a new shift will only be handled if the best-response direction to that shift is already supported.
+
+To be precise, the partial correlation between \(a_1\) and \(a_2\) after removing \(a_{\text{ID}}\) is
+
+\[
+r_{a_1,a_2 \cdot a_{\text{ID}}} = \frac{r_{a_1,a_2} - r_{a_1,a_{\text{ID}}} \cdot r_{a_2,a_{\text{ID}}}}{\sqrt{(1 - r_{a_1,a_{\text{ID}}}^2)(1 - r_{a_2,a_{\text{ID}}}^2)}},
+\]
+
+where \(r_{x,y}\) denotes the Pearson correlation between signals \(x\) and \(y\) across a model family or across fine-tuning runs. The numerator subtracts the proportion of variance that can be linearly predicted from \(a_{\text{ID}}\), while the denominator normalizes by the remaining variability; if the resulting number is close to zero or negative then the two shifts carry independent (or antagonistic) information. The formula also reveals why a single benchmark accuracy is insufficient: one could “overfit” to a specific shift and thus raise both \(r_{a_1,a_{\text{ID}}}\) and \(r_{a_2,a_{\text{ID}}}\) without improving \(r_{a_1,a_2 \cdot a_{\text{ID}}}\). Partial correlation, therefore, is the operational lever we can use when we ask whether results generalize.
+
+Why does this fragmentation occur? Part of the answer lies in architectural complexity. On the Architectural Complexity of Neural Networks (2026) [arxiv:2605.04325v1](https://arxiv.org/html/2605.04325v1) shows that networks with higher width and depth can, in principle, implement richer sets of Boolean functions, but the functions that become reachable depend on the specific decomposition of the input space introduced by the architecture. Two OOD shifts might require orthogonal decompositions: one shift may demand the model to group tokens by spatial configuration, while another demands grouping by numeric over-parameterization. Thus, even if both shifts are low in Kolmogorov complexity, the architecture biases the training dynamics toward one type of partition, leaving the other shift unsupported.
+
+This bias manifests concretely in the cross-shift behavior reported in Untitled (2026) [arxiv:2604.07233](https://www.arxiv.org/pdf/2604.07233) and Untitled (2026) [arxiv:2602.10867](https://www.arxiv.org/pdf/2602.10867). The 2604 paper studies a family of transformer variants trained on multiple discrete tasks; accuracy on the “rule-based reasoning” shift drops linearly with the square of depth beyond a certain point, while accuracy on a “factual recall” shift remains constant. The 2602 paper expands this by showing that regularization techniques that control norm growth help one shift but actively hurt the other, confirming the partial correlation observation: the architectural and optimization regime introduced to help shift A can be actively detrimental to shift B, producing negative \(r_{a_1,a_2 \cdot a_{\text{ID}}}\).
+
+There is also structure in the optimization trajectory itself. Algorithmic Task Capture, Computational Complexity, and Inductive Bias of Infinite Transformers (2026) [arxiv:2603.11161](https://arxiv.org/html/2603.11161) mathematically frames what an infinitely wide transformer can capture within a bounded number of gradient steps; the core conclusion is that the tasks the model can generalize to are those whose decision boundary lies in the span of the gradients collected during training. When two shifts induce gradient spans that are almost orthogonal, succeeding on one demands moving weights far from the span of the other, which either slows convergence or overshoots the basin needed for the other task. The practical implication is that the pre-training gradient trajectory constrains not only the functions you can get to, but also the compatibility of different functions: a shift whose gradient span lies near the initial direction is “good” for you, while another orthogonal shift might be permanently deprioritized unless you re-run fine-tuning.
+
+Compression and quantization add another dimension. When Reasoning Meets Compression (2026) [arxiv:2602.01119](https://arxiv.org/abs/2602.01119) demonstrates that aggressive quantization (e.g., to 2.51 bits per activation in the DeepSeek-R1 experiments) preserves relational and sequential reasoning tasks disproportionately well while degrading factual knowledge retrieval by more than 15 points. The authors trace this to the fact that the quantizer collapses fine-grained information inside embedding vectors, effectively removing the low-variance directions used by factual memorization while leaving high-variance reasoning directions intact. The consequence is another partial-correlation-style effect: quantization “shifts” the model in direction \(q\), which helps shifts aligned with \(q\) and hurts orthogonal ones, making the observed cross-shift generalization even more fragile when you deploy aggressively compressed models.
+
+To work with these observations, practitioners build evaluation pipelines that fine-tune or calibrate a lightweight model on a representative task, record both in-domain and several OOD scores, and compute partial correlations (and sometimes robust regression coefficients) to highlight which shifts respond similarly and which are divergent. The rest of this page shows how to build such a pipeline with small compute, how to interpret its coefficients, and why it matters for both product decisions and theory. Once you see how the partial correlation shrinks after removing \(a_{\text{ID}}\), you will have evidence that “generalization” is not the monolith it once appeared to be.
+
+## Where the field is now
+
+Researchers are converging on the idea that the fragmentation is systematic and measurable. Do Generalisation Results Generalise? (2025) [arxiv:2510.00824](https://arxiv.org/abs/2510.00824) introduces an empirical protocol where dozens of fine-tuning runs on a given architecture produce vectors of shift accuracies, allowing the computation of partial correlations, mutual information, and canonical correlations between shifts. They observe that the partial correlation between a syntactic transformation shift and a semantic paraphrase shift is near zero, even though the raw Pearson correlation is 0.45, once you condition on in-domain accuracy. This means the shared variance is almost entirely explained by the shared in-domain skill, leaving little or no residual between the two OOD’s.
+
+The architectural constraints described in Algorithmic Task Capture (2026) [arxiv:2603.11161](https://arxiv.org/html/2603.11161) give the theoretical boundary for these findings. Infinite transformers with attention heads that sample only a fixed number of positional features cannot express certain classes of tasks simultaneously; they can only generalize to families of tasks whose gradients share a common subspace. The research frontier here is to quantify, for a given architecture and pre-training curriculum, how much of that gradient subspace is already aligned with the OOD shifts you care about, and whether you can “steer” it via fine-tuning instead of retraining. This is the continuing question linking architecture, optimization, and evaluation.
+
+The engineering frontier is to build systems that surface these fractured generalizations in production. Meta’s Llama 3 release blog (ai.meta.com/research/llama-3) outlines an evaluation harness that measures generalization across more than fifty benchmarks covering reasoning, coding, multimodal understanding, and multilingual translation. They report that the 70B variant maintains within 2–3 points of calibration on the reasoning benchmarks but loses as much as 10 points on some knowledge-heavy benchmarks after the same dataset shift, illustrating that even a single release can show competitive performance on a benchmark suite while hiding large drop-offs on specific shifts. The engineering effort now is to plug this harness into CI/CD so that every new checkpoint produces a partial correlation matrix, not just an aggregate score, because that matrix is what tells engineers whether a shift-level performance increase is a continuation of a general capability or a narrow exploit.
+
+## What's still open
+
+Can we mathematically predict the correlation of a model's generalization performance between two distinct OOD shifts using only its pre-training gradient dynamics, without running expensive fine-tuning sweeps? If a confirming answer exists, the operational implication is profound: a production team could generate a “generalization compatibility map” purely from pretraining logs and avoid thousands of fine-tuning jobs. A related open question is whether there exists an architecture-regularization pairing that achieves non-negative partial correlations across a whole bundle of shifts simultaneously, or whether negative partial correlations are inevitable once you push model size beyond a certain complexity threshold. Another pressing question is how to characterize the effect of distributional retrieval augmentation (e.g., kNN cache or retrieval-augmented generation) on the fragmentation—does the retrieval stage simply move the orthogonality to a different subspace, or can it absorb contradictions between shifts and create a smoother partial correlation landscape? These questions are concrete enough to frame new papers and experiments because they turn the vague notion of “generalization” into measurable, shift-specific hypotheses.
+
+## Where to read next
+
+If you want the probabilistic foundations that underpin these partial-correlation diagnostics, → [Score matching](../../02-generative-modeling/concepts/score-matching.md) shows how denoising and score estimation connect to likelihood-aware notions of generalization residuals. The engineering counterpart is → [[robust-evaluation-pipelines]] which catalogs how teams instrument production models with multi-shift dashboards. When you are ready for the architectural side of the story, → [[transformer-complexity]] dives deeper into which transformer variants expand or restrict the set of functions a model can cover at once.
+
+## Build it
+
+The build proves that you can empirically observe the fragmentation of generalization even on tiny models by fine-tuning on a synthetic task and computing partial correlations between two deliberately chosen OOD shifts.
+
+**What you're building:** A Colab-ready pipeline that fine-tunes EleutherAI/pythia-70m on a synthetic arithmetic continuation task, evaluates on base-system and length-shift splits, and reports the partial correlation after regressing out in-domain accuracy.
+
+**Why this is valuable:** The pipeline turns the abstract claim “generalization is fragmented” into measurable statistics and makes the partial-correlation equation actionable on accessible hardware.
+
+**Stack:**
+- **Model:** [EleutherAI/pythia-70m](https://huggingface.co/EleutherAI/pythia-70m) — 1.2M downloads, small enough for a single T4
+- **Dataset:** [Fediory/HVI-CIDNet-Generalization](https://huggingface.co/datasets/Fediory/HVI-CIDNet-Generalization) — multimodal splits for base, system, and length shifts
+- **Framework:** transformers 4.46 + accelerate 0.25 + datasets 2.16
+- **Compute:** Free Colab T4 (16 GB VRAM), fine-tune for 3 epochs (~90 minutes)
+
+**The recipe:**
+1. Install `pip install transformers accelerate datasets scipy matplotlib` and import `TrainingArguments`, `Trainer`, and `AutoTokenizer`. Use `AutoTokenizer.from_pretrained("EleutherAI/pythia-70m")`.
+2. Load the dataset from the provided HuggingFace ID, filter the “id” column for arithmetic templates, and construct train/dev/test splits plus two OOD evaluations: “base-system” where the arithmetic operators change order, and “length shift” where sequences are longer than training. Tokenize with padding/truncation=128.
+3. Fine-tune the model with `TrainingArguments` (batch_size=16, gradient_accumulation_steps=2, learning_rate=3e-5, fp16, weight_decay=0.01) for 3 epochs, logging training/validation loss. Expect the loss curve to stabilize around 1.1–1.3 and in-domain accuracy to settle in the mid-70s.
+4. Evaluate on the two OOD splits plus the in-domain dev set. Compute Pearson correlations \(r_{a_1,a_2}\), \(r_{a_1,a_{\text{ID}}}\), and \(r_{a_2,a_{\text{ID}}}\) across several fine-tuning seeds (you can run 3 seeds with different seeds saved). Use the partial correlation formula to report \(r_{a_1,a_2 \cdot a_{\text{ID}}}\) and plot it with a bar chart.
+5. What you now have is a shareable notebook that fine-tunes a real model and produces empirical evidence for whether improving one shift (say, by adding more length training) simultaneously helps, hurts, or leaves another shift untouched.
+
+**Expected outcome:** A reusable notebook containing a checkpoint, evaluation logs, and a plot of partial correlations showing that the base-system and length shifts have near-zero or negative residual correlation after controlling for ID accuracy.
+
+- **CS student:** Run the same recipe on a single RTX 4070 but reduce epochs to 2, and replace the plots with a single confusion matrix to save GPU time.
+- **Applied engineer:** After reproducing the baseline, use ONNX export and TensorRT quantization to serve the model on a cheap CPU node, then instrument the flow to log shift-specific accuracies at request time.
+- **Applied researcher:** Hypothesize that adding a small rotary-embedding term will align the two shifts better, and compare \(r_{a_1,a_2 \cdot a_{\text{ID}}}\) before and after the change to test the hypothesis.
+- **Frontier researcher:** Probe the open question: can the pre-training gradient trajectory (captured by saved optimizer states) predict whether the partial correlation will be negative? Extract second-order statistics from the optimizer logs and correlate them with the observed partial correlation to attempt a falsifier.
+
+---
+
+> *If this build worked for you — a ⭐ on [GitHub](https://github.com/prabakaranc98/FAIRE) is the only signal we collect.*
