@@ -1639,9 +1639,12 @@ def _inject_links(
             return slug.replace("-", " ")
         meta = existing_pages.get(slug)
         if not meta:
-            # Page doesn't exist yet — leave the wikilink as-is so a later
-            # generation can resolve it. Better than a broken markdown link.
-            return f"[[{slug}]]"
+            # Page doesn't exist yet. Render as an italic placeholder so it
+            # looks intentional (not a broken `[[slug]]` literal). The retro
+            # agent reads from the HTML comment marker below — keeps the
+            # cross-page reference signal alive for the next auto-seed cycle.
+            human = slug.replace("-", " ")
+            return f"*{human}* <!-- [[{slug}]] -->"
         target_path: Path = meta["abs_path"]
         try:
             rel = os.path.relpath(target_path, start=current_path.parent)
