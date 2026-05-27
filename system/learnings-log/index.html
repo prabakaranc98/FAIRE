@@ -1115,6 +1115,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#2026-05-27-late-closing-the-loop-retrospective-agent-hallucination-defenses-knockout-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2026-05-27 (late) — Closing the loop: retrospective agent, hallucination defenses, knockout selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#2026-05-27-local-mode-reality-check-on-m4-24gb-unified-ram" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1356,6 +1367,93 @@ and the pedagogy as the wiki was built. <strong>Distinct from the auto-generated
 Agent Changelog</strong> (per-page runs) — this is a human-curated record of
 sessions where something non-obvious surfaced and is worth carrying forward.</p>
 </blockquote>
+<hr />
+<h2 id="2026-05-27-late-closing-the-loop-retrospective-agent-hallucination-defenses-knockout-selection">2026-05-27 (late) — Closing the loop: retrospective agent, hallucination defenses, knockout selection<a class="headerlink" href="#2026-05-27-late-closing-the-loop-retrospective-agent-hallucination-defenses-knockout-selection" title="Permanent link">&para;</a></h2>
+<p><strong>Goal of the session:</strong> validate the closed-loop is actually a loop — that
+the system can write pages, reflect on them, seed its own next sprint, and
+keep cycling without a human in the queue.</p>
+<p><strong>What worked</strong></p>
+<ul>
+<li><strong>The loop closed end-to-end.</strong> Six retrospective cycles ran in one day,
+  cycle #1 (~50 pages) → manual tests → cycle #6 (22 pages from a fresh
+  sprint). Each cycle's scrum retro auto-seeded the next: 7 stubs after
+  cycle #5, 10 stubs after cycle #6 — covering <code>policy-evaluation</code>,
+  <code>representation-learning</code>, <code>quantization-aware-training</code>, <code>normalization</code>,
+  <code>gradient-descent</code>, <code>mixed-precision-training</code>, and others. All of those
+  topics surfaced because the retrospective spotted them being referenced
+  across 2+ existing pages without backing files. The system is now growing
+  its own knowledge graph.</li>
+<li><strong>Knockout selector earned its keep.</strong> Of 22 sprint-2 topics, 5 improve
+  passes regressed (<code>data-parallelism</code> 0.75 → 0.61, <code>policy-evaluation</code>
+  0.81 → 0.60, <code>representation-learning</code> 0.81 → 0.74, <code>backpropagation</code>
+  0.81 → 0.76, <code>flash-attention</code> 0.77 → 0.70). The knockout selector
+  retained the higher-confidence first draft in every case — no shipped
+  page got worse on the improve pass. Without it, the revision spiral
+  would have actively degraded the wiki.</li>
+<li><strong>Hallucination defense at three layers works.</strong> (1) Regex catches obvious
+  fakes (future YYMM, implausibly-high suffix). (2) HTTP HEAD against
+  <code>arxiv.org/abs/&lt;id&gt;</code> catches well-formed phantom IDs by matching the
+  sentinel title <code>[&lt;id&gt;] Article identifier not recognized</code>. (3) The LLM
+  reviewer's own issues list is post-scanned for hallucination keywords
+  and applies a hard −0.10 penalty. The HEAD verifier is cached to
+  <code>agents/runs/arxiv_cache.json</code> so every ID is hit at most once — current
+  cost is well under 1s per page for a typical 5-citation draft.</li>
+<li><strong>Cost held at $0.18/page.</strong> Sprint 2 was 22 topics + 22 improve passes</li>
+<li>8 critics × 30 invocations + 6 retrospective runs for <strong>~$7</strong>. Per-page
+  economy is genuinely linear at this scale; nothing about the closed loop
+  added overhead.</li>
+</ul>
+<p><strong>What we got wrong — and corrected</strong></p>
+<ul>
+<li>We initially flagged <code>arxiv:2603.01761</code> as a "phantom citation" because
+  the retrospective reported it appeared 6× across 4 different pages. The
+  HEAD verifier confirmed it's real — "Modular Memory is the Key to
+  Continual Learning Agents" (Dorovatas et al. 2026). <strong>Citation
+  concentration is not the same as fabrication.</strong> A real seminal paper
+  legitimately cited by multiple pages will cluster the same way. The
+  retrospective should keep flagging concentration (it's a hint), but
+  the conclusion has to come from the HEAD check, not from the count.</li>
+<li>The first version of the regex validator only blocked future-dated YYMM.
+  That missed <code>2605.21058</code> (current month, implausible counter 21058 for
+  May 27 2026), which the LLM reviewer caught as suspicious but didn't
+  hard-fail. The fix: add a <code>suffix &gt; 25000</code> check for the current and
+  previous YYMM, plus the LLM-keyword post-scan. Layered defense — the
+  regex is cheap, the HEAD verifier is authoritative, the LLM is the
+  third opinion.</li>
+</ul>
+<p><strong>Universal weakest signal across all 10 tracks</strong></p>
+<p><code>critic-info-architecture</code> is the lowest-scoring critic on <strong>every</strong> track
+in cycle 6 (range 0.38 in 05-stat-prob / 08-causal up to 0.65 in 09-systems).
+The recurring complaint: pages are missing a "Where this concept appears"
+section linking back to arcs, and a "Connected topics" section linking
+sideways to peer concepts. This is the next big lever — fixing the writer
+prompt to mandate both sections should lift every track's avg confidence
+by ~0.05–0.08.</p>
+<p><strong>What we changed today</strong></p>
+<ul>
+<li><code>agents/src/frontier_agents/retrospective.py</code> — new scrum retro agent
+  (aggregator + LLM proposer + safe auto-applier), 720 LOC, wired into
+  the scheduler.</li>
+<li><code>agents/src/frontier_agents/nodes.py</code> — H1 fixer in <code>write_file_node</code>,
+  layered arxiv validator + HEAD verifier + LLM-keyword post-scan in
+  <code>review_node</code>.</li>
+<li><code>docs/system/architecture.md</code> — rewritten as a closed-loop blueprint;
+  the retrospective is now part of the per-cycle diagram, not a "planned"
+  item in the gap list.</li>
+<li><code>docs/overrides/home.html</code> — hero rewritten with Made-to-Stick framing
+  around the MVB promise, plus a four-node closed-loop showcase strip.</li>
+</ul>
+<p><strong>What's next</strong></p>
+<ul>
+<li>Persona/prompt update so the writer always emits "Where this concept
+  appears" and "Connected topics" — closes the universal weakest-critic
+  gap.</li>
+<li>Author pages for the most-cited researchers (<code>2604.15469</code> topped this
+  cycle at 8 citations; an anchor page would let every concept page
+  link back to one canonical author write-up).</li>
+<li>A <code>MAX_CYCLES</code> or <code>STOP_WHEN_COVERAGE_PCT</code> env var so the server has a
+  declarative stop rule instead of relying on the budget envelope alone.</li>
+</ul>
 <hr />
 <h2 id="2026-05-27-local-mode-reality-check-on-m4-24gb-unified-ram">2026-05-27 — Local-mode reality check on M4 24GB unified RAM<a class="headerlink" href="#2026-05-27-local-mode-reality-check-on-m4-24gb-unified-ram" title="Permanent link">&para;</a></h2>
 <p><strong>Goal of the session:</strong> validate that the FAIRE pipeline can run end-to-end

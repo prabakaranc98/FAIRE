@@ -4841,9 +4841,17 @@
 <p>Every wiki page generated, improved, or reviewed by the agent system is logged here.
 Entries are prepended (newest first). Source: <code>agents/runs/runs.jsonl</code>.</p>
 </blockquote>
-<p>No runs recorded yet. Run the agent to populate this log.</p>
+<div class="admonition abstract">
+<p class="admonition-title">Where the system is right now</p>
+<p><strong>71 substantive concept pages · 10 auto-seeded stubs · 106 total pipeline runs · 6 retrospective cycles · ~$70 spent · avg confidence 0.77 across all tracks.</strong> Latest cycle: 88% approval, 71% first-try. Universal weakest critic across every track: <code>critic-info-architecture</code> (pages missing "Where this concept appears" / "Connected topics" sections — the next big lever).</p>
+<ul>
+<li><strong>What changed today:</strong> closed-loop validated end-to-end (retrospective agent now seeds the next sprint without human input); three-layer hallucination defense shipped (regex → live arxiv HEAD check → LLM-keyword penalty); knockout selector saved 5 pages from improve-pass regressions; Made-to-Stick hero rewrite landed.</li>
+<li><strong>For the human-curated narrative,</strong> see the <a href="../learnings-log/">Learnings Log</a>.</li>
+<li><strong>For the agent's own scrum retrospectives,</strong> see the <a href="../backlog/">Backlog</a>.</li>
+</ul>
+</div>
 <hr />
-<p><em>This page is updated automatically by <code>log_run_node</code> after every pipeline run.</em></p>
+<p><em>Per-run entries below are auto-prepended by <code>log_run_node</code> after every pipeline run.</em></p>
 <h3 id="2026-05-25-2323-utc-score-matching">2026-05-25 23:23 UTC — score-matching<a class="headerlink" href="#2026-05-25-2323-utc-score-matching" title="Permanent link">&para;</a></h3>
 <p>⚠️ <strong>flagged</strong> · conf=0.20</p>
 <ul>
