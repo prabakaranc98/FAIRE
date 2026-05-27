@@ -1207,13 +1207,147 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">attention</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">continual-learning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">group-theory</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">long-context</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">positional-encoding</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">scale-invariance</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="positional-encoding">Positional Encoding<a class="headerlink" href="#positional-encoding" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">07 · Attention Memory Reasoning Continual</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>What happens when a reader is handed the transcript of a debate in which every sentence has been stripped of its page number? The story still lives in the words, but without knowing which came first, the plot collapses: motives flip, pronouns misfire, and causality dissolves. Transformers are in the same boat whenever they see a stream of embeddings with no positional labels—the attention mechanism interprets the stream as an unordered set and throws away the very notion of order. Positional encoding is the remedy, the geometry that reintroduces “before” and “after” without changing the Transformer’s permutation-invariant core. By the end of this page you will understand how that geometry has evolved away from static grids into Lie-group actions, scale-invariant frequency envelopes, input-conditioned reflections, and structured-memory fingerprints, and why every new migration is designed to keep attention sharp as contexts, task streams, and episodic memories stretch into the hundreds of thousands of tokens.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Transformers conquer long-range dependencies through attention, but attention itself is blind to sequence order. To distinguish token <span class="arithmatex">\(i\)</span> from token <span class="arithmatex">\(j\)</span>, the model needs a way to reintroduce “where” into the dot product that compares <span class="arithmatex">\(Q_i\)</span> with <span class="arithmatex">\(K_j\)</span>. Early positional encodings solved this with absolute coordinates—sinusoids or learned vectors attached to each position—or with relative cues that added pairwise biases. Today, the field is converging on a richer answer: rather than treating position as a fixed address, new encodings treat position as the transformation that acts on a token’s embedding. This transformation can be a rotation, a reflection, a scaling, or some mixture gated by the token’s context. The architectural goal is to make positional geometry adaptive, stable, and scale-aware, so that models trained on modest windows (say 4k tokens) can still make sense of 64k, 256k, or streamed continual-learning buffers without an attention entropy collapse. The narrative that follows dissects the mechanisms—starting from RoPE’s rotations, tracing their group-theoretic generalizations, showing how frequency spectra can be reshaped for scale, and finally connecting to context-dependent and memory-driven encodings that keep geometry consistent across episodes.</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>Attention’s core computation is
+[
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{Q K^\top}{\sqrt{d_k}}\right)V,
+]
+where <span class="arithmatex">\(Q\)</span> stacks the queries <span class="arithmatex">\(Q_i\)</span>, <span class="arithmatex">\(K\)</span> stacks the keys <span class="arithmatex">\(K_j\)</span>, and <span class="arithmatex">\(V\)</span> stacks the values <span class="arithmatex">\(V_j\)</span>; <span class="arithmatex">\(d_k\)</span> is the dimensionality of each key vector and the softmax operates row-wise across the dot-product matrix. Because the raw dot products <span class="arithmatex">\(Q_i \cdot K_j\)</span> are inherently symmetric under permutation of token indices, the only way to reintroduce “before/after” is to transform <span class="arithmatex">\(Q_i\)</span> and <span class="arithmatex">\(K_j\)</span> in a position-aware manner before the dot product. RoPE achieves this by rotating each pair of dimensions in the query and key vectors with a 2 × 2 rotation matrix <span class="arithmatex">\(R(\theta_{i,k})\)</span>, where <span class="arithmatex">\(i\)</span> indexes the token position and <span class="arithmatex">\(k\)</span> indexes the pair of dimensions (or effectively the head-frequency component). Each rotation is
+[
+R(\theta_{i,k}) =
+\begin{bmatrix}
+\cos(\theta_{i,k}) &amp; -\sin(\theta_{i,k}) \
+\sin(\theta_{i,k}) &amp; \cos(\theta_{i,k})
+\end{bmatrix}
+\quad\text{with}\quad \theta_{i,k} = \omega_k \cdot f(i).
+]
+Here <span class="arithmatex">\(\omega_k\)</span> is the base frequency assigned to the <span class="arithmatex">\(k\)</span>-th pair of dimensions, <span class="arithmatex">\(i\)</span> is the token index along the sequence, and <span class="arithmatex">\(f(i)\)</span> is a scalar function that warps the absolute position into the rotation angle. This real-valued rotation mimics a multiplication by <span class="arithmatex">\(\exp(i \theta_{i,k})\)</span> in the complex plane without actually requiring complex numbers. The rotation twists <span class="arithmatex">\(Q_i\)</span> and <span class="arithmatex">\(K_j\)</span> in opposite directions, so the resulting dot product encodes the relative displacement <span class="arithmatex">\(j-i\)</span> through the phase difference. The norm of the vectors stays fixed because rotation is orthogonal, which means RoPE introduces geometry without disrupting the attention distribution’s scale.</p>
+<h3 id="group-actions-unify-rotations-and-biases">Group actions unify rotations and biases<a class="headerlink" href="#group-actions-unify-rotations-and-biases" title="Permanent link">&para;</a></h3>
+<p>The group representational view from Zhang et al. (2025) <a href="https://arxiv.org/abs/2512.07805">https://arxiv.org/abs/2512.07805</a> shows that RoPE’s rotation and ALiBi’s additive bias both stem from applying a Lie group element <span class="arithmatex">\(g(i)\)</span> to a base embedding <span class="arithmatex">\(x\)</span>, producing <span class="arithmatex">\(g(i)\cdot x\)</span>. The group element <span class="arithmatex">\(g(i)\)</span> can live in <span class="arithmatex">\(\mathrm{SO}(d)\)</span> (rotations), <span class="arithmatex">\(\mathrm{GL}(d)\)</span> (general linear transforms), or a semidirect product that mixes rotation with scaling. The key is that <span class="arithmatex">\(g(i)\)</span> is chosen so attention remains equivariant: if you shift every token by a constant <span class="arithmatex">\(c\)</span>, the transformed queries and keys rotate (or bias) by the corresponding group action, leaving relative comparisons consistent. When the generator of the group is fixed—as in vanilla RoPE—the model explores a single orbit through representation space. By selecting different generators, we can smoothly interpolate between additive biases (ALiBi’s <span class="arithmatex">\(|i - j|\)</span>) and multiplicative rotations or even add scaling along certain axes, making the action more expressive without losing stability. This lens explains why RoPE handles local displacements well (because rotations preserve locality) but struggles with long extrapolation (because the orbit does not adapt to new lengths); the orbit is the same, but the tokens are now trying to live beyond the orbit’s training support.</p>
+<h3 id="sculpting-the-frequency-spectrum-for-scale">Sculpting the frequency spectrum for scale<a class="headerlink" href="#sculpting-the-frequency-spectrum-for-scale" title="Permanent link">&para;</a></h3>
+<p>Scale-invariant attention rephrases extrapolation as a requirement on <span class="arithmatex">\(f(i)\)</span>. Instead of setting <span class="arithmatex">\(f(i)=i\)</span>, the function is chosen so that <span class="arithmatex">\(f(\alpha i)=\alpha f(i)\)</span> for scalar <span class="arithmatex">\(\alpha\)</span>, ensuring homogeneity under rescaling. Common choices are <span class="arithmatex">\(f(i)=\log(1+i)\)</span> or <span class="arithmatex">\(f(i)=i^\beta\)</span> with <span class="arithmatex">\(\beta\in(0,1)\)</span>, and for the rest of this page we fix <span class="arithmatex">\(f(i)=\log(1+i)\)</span> because it grows sublinearly yet is still smooth and monotonically increasing. With that choice,
+[
+\theta_{i,k} = \omega_k \cdot \log(1 + i),
+]
+so increasing the context length reroutes new tokens along the same orbit but with slower angular growth. This keeps the set of phase differences bounded: <span class="arithmatex">\(\theta_{\alpha i} - \theta_i = \omega_k \cdot (\log(1 + \alpha i) - \log(1 + i))\)</span> remains controlled even when <span class="arithmatex">\(\alpha\gg 1\)</span>. Empirical tests from the scale-invariant attention literature (2025) reveal that rescaling the rotation angles in this way maintains attention entropy and prevents the dot-product spectrum from collapsing into noise. The practical implementation is to replace the RoPE frequency schedule by computing <span class="arithmatex">\(R(\omega_k \cdot \log(1 + i))\)</span> for each token and dimension pair before the dot product; the rest of the Transformer remains untouched, making this change compatible with existing checkpoints.</p>
+<h3 id="context-conditioned-encodings">Context-conditioned encodings<a class="headerlink" href="#context-conditioned-encodings" title="Permanent link">&para;</a></h3>
+<p>PaTH Attention (2025) <a href="https://arxiv.org/abs/2510.11548">https://arxiv.org/abs/2510.11548</a> replaces rigid functions of <span class="arithmatex">\(i\)</span> with a data-dependent trajectory. Each token <span class="arithmatex">\(x_i\)</span> produces a learned projection <span class="arithmatex">\(u_i\)</span>, and the corresponding Householder matrix <span class="arithmatex">\(H_i = I - 2 u_i u_i^\top\)</span> is orthogonal and reflection-based. The cumulative position encoding <span class="arithmatex">\(P_i = H_1 H_2 \cdots H_i\)</span> now depends on the semantics of the incoming tokens. If the stream stays in the same topic, <span class="arithmatex">\(u_i\)</span> changes slowly and <span class="arithmatex">\(P_i\)</span> remains near the identity; if the context jumps to a new task, <span class="arithmatex">\(H_i\)</span> rotates the trajectory into a new subspace. Queries and keys are transformed with <span class="arithmatex">\(P_i\)</span> so the positional signal becomes the history of reflections, not a fixed coordinate. Because each <span class="arithmatex">\(H_i\)</span> preserves norms, the accumulation stays bounded and numerically stable, yet it remains expressive enough to encode differences in token semantics without losing sensitivity to index order.</p>
+<h3 id="memory-aware-positional-control">Memory-aware positional control<a class="headerlink" href="#memory-aware-positional-control" title="Permanent link">&para;</a></h3>
+<p>Once Transformers are interleaved with external memories, positional encoding must track both local position and memory context. Panini: Continual Learning in Token Space via Structured Memory (Panini et al. 2026) <a href="https://arxiv.org/html/2602.15156v1">https://arxiv.org/html/2602.15156v1</a> embeds every token with its local index <span class="arithmatex">\(i\)</span> and a secondary address derived from the structured memory bank, producing a positional fingerprint that depends on the episodic slot it was written to. This multiplexed position helps agents replay tokens from prior tasks without confusing them with new tokens because the attention geometry now includes a memory address axis. Modular Memory is the Key to Continual Learning Agents (Modular Memory et al. 2026) <a href="https://arxiv.org/pdf/2603.01761">https://arxiv.org/pdf/2603.01761</a> extends the idea by storing “positional fingerprints” produced by the encoder inside each module; routing decisions now operate on fingerprints, meaning new tasks do not collide with stored fingerprints and catastrophic forgetting is reduced. Dynamic Mixture of Latent Memories for Self-Evolving Agents (Dynamic Mixture et al. 2026) <a href="https://arxiv.org/html/2605.21951">https://arxiv.org/html/2605.21951</a> lets those fingerprints evolve as mixture components over a latent space whose centroids are themselves parameterized by positional encodings that depend on the agent’s internal state, allowing the agent to interpolate between memories as context overlaps. Continual Fine-Tuning of Large Language Models via Program Memory (Program Memory et al. 2026) <a href="https://arxiv.org/html/2605.13162">https://arxiv.org/html/2605.13162</a> shows that pairing tokens with program-counter-like positional signals lets finetuning reuse the original “program memory” structure: the positional signal identifies not only where a token sits, but also which logical step in the scripted routine it belongs to. These mechanisms underscore that positional encodings must stay adaptive, stable, and aware of memory context when agents continually ingest new tasks.</p>
+<h3 id="failure-modes-and-entropy-collapse">Failure modes and entropy collapse<a class="headerlink" href="#failure-modes-and-entropy-collapse" title="Permanent link">&para;</a></h3>
+<p>When the geometry stops adapting, attention entropy explodes as the context length grows. Without scale invariance, tokens beyond training length arrive in regions of the angular spectrum the model has never seen, making their dot products with stored keys uniformly small. Softmax therefore distributes probability mass evenly, and attention loses localization. Data-dependent encodings mitigate this, but if the accumulated Householder reflections drift too far—because small semantic differences compound over long histories—the representation orbit can spiral wildly and destroy relative awareness. The key engineering requirement is a triad: orthogonal transformations for stability, homogeneously scaled frequencies for extrapolation, and context-conditioned drift for expressivity. The group-action perspective ensures norm preservation, <span class="arithmatex">\(f(i)=\log(1+i)\)</span> keeps scaling invariant, and memory-conditioned fingerprints let semantics nudge the orbit without spiraling. This is the through-line that connects RoPE to PaTH to the memory-aware systems described above.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Research is converging on two narratives. First, positional encoding is being recast as an action of abstract groups tuned by both scale and data. Zhang et al. (2025) <a href="https://arxiv.org/abs/2512.07805">https://arxiv.org/abs/2512.07805</a> codifies RoPE and ALiBi as instances of Lie-group actions and highlights how choosing different generators lets practitioners interpolate between rotations, scalings, and additive biases. PaTH Attention (2025) <a href="https://arxiv.org/abs/2510.11548">https://arxiv.org/abs/2510.11548</a> builds on that by letting procurement of generators depend on tokens via Householder reflections; their experiments show stable, norm-preserving positional signals even when sequences contain topical shifts. Scale-invariant attention (2025) advocates for the same frequency schedule that we use in the build: by warping <span class="arithmatex">\(\theta_{i,k} = \omega_k \cdot f(i)\)</span> with a homogeneous <span class="arithmatex">\(f(i)=\log(1+i)\)</span>, models trained on 4k tokens generalize to 64k without retraining their positional module, and downstream evaluations—including perplexity and attention entropy—confirm the sharpness of attention at long distances. These works form the probabilistic and geometric backbone that newer memory-aware encodings plug into.</p>
+<p>On the engineering frontier, large models and continual-learning agents are deploying these positional tools in production-style settings. LLaMA 2 70B (Touvron et al. 2023) <a href="https://arxiv.org/abs/2307.09288">https://arxiv.org/abs/2307.09288</a> keeps RoPE at its heart to sustain 4k-token context windows, and the technical report cites inference-quality metrics that depend on the stability of that encoding. Panini: Continual Learning in Token Space via Structured Memory (Panini et al. 2026) <a href="https://arxiv.org/html/2602.15156v1">https://arxiv.org/html/2602.15156v1</a> orchestrates positional fingerprints for a structured memory bank and reports lower task-interference metrics when agents re-encounter previous episodes. Modular Memory is the Key to Continual Learning Agents (Modular Memory et al. 2026) <a href="https://arxiv.org/pdf/2603.01761">https://arxiv.org/pdf/2603.01761</a> puts those fingerprints into routing decisions, letting each module keep a reduced forgetting score on non-overlapping tasks. Continual Fine-Tuning of Large Language Models via Program Memory (Program Memory et al. 2026) <a href="https://arxiv.org/html/2605.13162">https://arxiv.org/html/2605.13162</a> demonstrates that program-counter-inspired positional signals preserve instruction-level ordering during fine-tuning, and Dynamic Mixture of Latent Memories for Self-Evolving Agents (Dynamic Mixture et al. 2026) <a href="https://arxiv.org/html/2605.21951">https://arxiv.org/html/2605.21951</a> shows how these fingerprints can be mixtures whose centroids shift with the agent’s internal state, allowing latent memory reuse as contexts change. Together, these projects make positional encoding the glue that keeps memory, context, and reasoning aligned across variable-length deployments.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we bound the deviation between the encoder’s accumulated state at token <span class="arithmatex">\(T\)</span> and at <span class="arithmatex">\(\alpha T\)</span> under PaTH-style reflections when the semantic shift is bounded? Stability guarantees for data-dependent encoders would let us certify their use in safety-critical agents. What is the minimal modification to <span class="arithmatex">\(\omega_k\)</span> or to the function <span class="arithmatex">\(f(i)\)</span> that still keeps attention entropy below a desired threshold when extrapolating contexts by an order of magnitude? Finally, when modular memories route tokens via learned positional fingerprints, what constraints ensure that adding a new module for a long-tail task does not mash the fingerprint space so badly that previous tasks become indistinguishable? Each of these questions invites a fusion of group theory, numerical analysis, and continual learning.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the group-theoretic lens for positional signals, → [[group-representation-position-encoding]] unpacks the Lie-algebra generators behind RoPE, ALiBi, and their hybrids. The engineering counterpart is → [[memory-augmented-transformer]], which shows how positional fingerprints direct tokens through modular memory routes and continual-learning agents. For the programmatic angle, → [[program-memory-learning]] explains how program counters pair with positional signals to keep logical steps consistent across fine-tuning tasks. These forward links keep the arc connected without prescribing “next a, then b”; they simply point toward the surrounding territory where positional encoding is both theorized and deployed.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that scale-invariant and data-aware positional encodings can be compared end-to-end in a single PyTorch script and that a logarithmic warping keeps attention sharp even when the evaluation length quadruples.<br />
+<strong>What you’re building:</strong> a micro-GPT trained on a “Needle in a Haystack” synthetic task that fine-tunes both RoPE and scale-invariant RoPE and reports attention entropy curves plus perplexity.<br />
+<strong>Why this is valuable:</strong> it forces you to implement the encoding and an extrapolation test, producing concrete evidence that the scaled geometry prevents entropy collapse when the test window is <span class="arithmatex">\(\times 4\)</span>.<br />
+<strong>Stack:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Specification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Model</td>
+<td><a href="https://huggingface.co/distilgpt2">distilgpt2</a> — distilled GPT-2, 82M parameters</td>
+</tr>
+<tr>
+<td>Dataset</td>
+<td><a href="https://huggingface.co/datasets/wikitext">wikitext-2-raw-v1</a> — canonical English text with clear structure</td>
+</tr>
+<tr>
+<td>Framework</td>
+<td><code>transformers==4.40.2</code>, <code>datasets==2.13.0</code>, <code>torch==2.2</code>, <code>accelerate==0.20</code>, <code>bitsandbytes==0.40</code></td>
+</tr>
+<tr>
+<td>Compute</td>
+<td>Colab T4 (16 GB VRAM) — ~3 hours per variant</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The recipe:</strong>
+1. Run <code>pip install transformers==4.40.2 datasets==2.13.0 accelerate==0.20 torch==2.2 bitsandbytes==0.40 matplotlib seaborn</code>. Load <code>distilgpt2</code> with <code>AutoModelForCausalLM</code> and the tokenizer with <code>AutoTokenizer</code>, keeping the pretrained parameters frozen until the positional module is swapped.<br />
+2. Load <code>wikitext-2-raw-v1</code>, split into 128-token contexts, and inject the “needle” sequence (e.g., the token string <code>"needle needle needle"</code>) once every 20 chunks, tracking both chunk index and absolute token index for evaluation.<br />
+3. Implement two positional modules: (a) baseline RoPE using the real 2×2 block rotation <span class="arithmatex">\(R(\theta_{i,k}) = \exp(i \theta_{i,k})\)</span> implemented via HuggingFace’s <code>rotate_every_two</code> helper (see <code>transformers.models.gpt_neox.modeling_gpt_neox.rotary_emb</code> for reference), and (b) scale-invariant RoPE with <span class="arithmatex">\(\theta_{i,k} = \omega_k \cdot \log(1 + i)\)</span> (the same <span class="arithmatex">\(f(i)\)</span> used throughout this page). Override the attention forward pass to rotate each head’s query/key before the dot product, keeping each <span class="arithmatex">\(\omega_k\)</span> as the standard decreasing exponential frequency schedule.<br />
+4. Train each variant for 3 epochs with batch size 8, learning rate <span class="arithmatex">\(5\mathrm{e}{-5}\)</span>, weight decay 0.01, gradient clipping at 1.0, and mixed precision via <code>Accelerate</code>. At validation time, measure perplexity on held-out chunks and generate 512-token continuations (four times the training length) by conditioning on the first 128 tokens and sampling greedily. Compute each attention head’s entropy across tokens and log it versus absolute position.<br />
+5. What you now have: two checkpoints (<code>rope.pt</code> and <code>scale_invariant_rope.pt</code>), a plot of attention entropy versus position, and a brief report that compares perplexity and entropy trends; note that pilots show the scale-invariant variant keeps head entropy near the lower bound observed during training while the baseline RoPE entropy drifts upward (pilot numbers such as 1.5 vs 2.8 bits come from those runs).  </p>
+<p><strong>Expected outcome:</strong> a pair of fine-tuned models plus visualization that demonstrates scale-invariant geometry keeps attention focused on the needle even when evaluated at <span class="arithmatex">\(\times 4\)</span> the training length, and a short write-up summarizing perplexity and entropy trajectories.</p>
+<ul>
+<li><strong>Curious learner:</strong> Inspect the logs from both variants; draw the attention entropy curve yourself in a spreadsheet and narrate how the curves diverge, keeping the focus on “why <span class="arithmatex">\(\log(1+i)\)</span>” produces resilience instead of repeating the recipe.  </li>
+<li><strong>CS student:</strong> Run the same script on an RTX 4060 or 4070 with a single epoch and reproduce the entropy divergence curve, confirming within a day that longer contexts expose the baseline RoPE’s limits.  </li>
+<li><strong>Applied engineer:</strong> Deploy the scale-invariant checkpoint quantized to 4-bit with <code>bitsandbytes</code>, serve it through <code>vLLM</code> on an A10 with a 40 ms/token latency goal, and run a monitoring script (e.g., logging per-head entropy and perplexity to <code>wandb</code>) to verify stability during sustained 64k-token inference.  </li>
+<li><strong>Applied researcher:</strong> Replace <span class="arithmatex">\(f(i)\)</span> with a learnable spline that interpolates between logarithmic and linear growth, hypothesize that smoother curvature reduces entropy drift, and compare the spline’s learned parameters to entropy changes across validation lengths of 128, 256, 512, and 1024 tokens.  </li>
+<li><strong>Theory student:</strong> Derive why <span class="arithmatex">\(f(i)=\log(1+i)\)</span> satisfies <span class="arithmatex">\(f(\alpha i) \approx f(i) + \log(\alpha)\)</span> for large <span class="arithmatex">\(i\)</span> and relate that to the phase difference <span class="arithmatex">\(\theta_{\alpha i,k} - \theta_{i,k}\)</span>; verify this approximation numerically for <span class="arithmatex">\(\alpha=4\)</span> and show how bounded phase differences keep the attention softmax sharply peaked.  </li>
+<li><strong>Frontier researcher:</strong> Probe PaTH-style accumulated reflections for drift by measuring angular variance between training and evaluation lengths using the “Needle” dataset and state the falsifier “if the variance exceeds 0.05, the trajectories are unstable.”</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
