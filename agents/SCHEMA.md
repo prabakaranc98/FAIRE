@@ -386,7 +386,7 @@ verification: "Inspect samples in /samples/ — recognisable class structure; FI
 
 **MVB quality bar (the standard the writer must clear):**
 
-An MVB is rejected by the reviewer unless it has all five:
+An MVB is rejected by the reviewer unless it has all six:
 
 | # | Property | What "passes" looks like | What gets rejected |
 |---|---|---|---|
@@ -395,8 +395,9 @@ An MVB is rejected by the reviewer unless it has all five:
 | 3 | **Real HF model + dataset IDs** | IDs that load via `from_pretrained(...)` and exist on the Hub today | A model name with no org prefix; a placeholder ID |
 | 4 | **A specific success metric** | "FID < 60", "reward gain ≥ +0.4 vs SFT baseline", "p95 latency ≤ 80 ms at batch 4" | "It should look reasonable" / "performance improves" |
 | 5 | **Hardness in the middle** | The recipe does at least one of: fine-tunes (not just inference), reproduces a paper's table, runs an ablation with a falsifier, or deploys with a measured latency target | A pip-install + `pipeline()` call with a pretrained model and nothing else |
+| 6 | **Direction, not copy-paste tutorial** | Names the ingredients (HF IDs, dataset, success metric) AND gives structural hints ("you'll need to: pre-tokenise with X, batch with Y, monitor Z during training, watch for the collapse mode at step ~N"). Leaves the actual implementation to the reader — the building is where the concept becomes theirs. | A pasted training loop, a full `def train():` block, a 20-line code dump. If the reader can copy-paste their way through, the MVB has failed its purpose. |
 
-The middle bar matters most. A recipe that's just "install and run" is underwhelming — a reader can do that from the model card. The MVB earns its name by walking them through the smallest valuable thing that takes effort.
+The middle bar (gate 5) matters most for whether the MVB is *worth* doing. The last bar (gate 6) matters most for whether the MVB *teaches* — a recipe a reader can copy-paste isn't pedagogy, it's a model card. The wiki nudges reader to implement from a directed sketch; understanding lands in the implementation gap.
 
 ---
 
@@ -416,6 +417,7 @@ The reviewer must REJECT a page if any of the following are true:
 | `has_mvb: true` but Build it section is generic ("follow the tutorial") | MVB integrity |
 | MVB recipe is just `pip install` + `pipeline()` with a pretrained model (no fine-tune / reproduction / ablation / deploy target) | MVB quality bar #5 — underwhelming |
 | MVB recipe lacks a specific success metric (FID number, reward Δ, p95 latency, hit rate) | MVB quality bar #4 |
+| MVB pastes a full training loop / `def train():` block / 20+ lines of code | MVB quality bar #6 — recipe should DIRECT not DUMP. Leave the implementation to the reader; the building is the learning. |
 | Arc-index file has >5 arcs in its parent track, or >6 steps in `steps:`, or >4 MVBs in `mvbs:` | Cardinality cap — page becomes intimidating |
 | Any persona tag outside {applied-researcher, research-engineer, applied-ai-engineer} | Persona drift — canonical set is the 3 personas above |
 | Citation in prose without arxiv/edu/huggingface URL | Source-policy fail |

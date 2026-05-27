@@ -25,7 +25,7 @@ Every MVB targets exactly **one** of these. Same arc step can carry multiple MVB
 
 A page typically carries 1–3 MVBs (one per persona that has something distinct to do). Pure-theory pages may carry only one. Above 3 MVBs the section becomes a wall — don't pad just to hit a count.
 
-## The MVB quality bar (writer must clear all five)
+## The MVB quality bar (writer must clear all six)
 
 A page fails the reviewer if its MVB is missing any of these:
 
@@ -34,8 +34,9 @@ A page fails the reviewer if its MVB is missing any of these:
 3. **Real HF model + dataset IDs** that load via `from_pretrained()` today. No placeholder names; no org-less IDs.
 4. **A specific success metric** — "FID < 60", "reward gain ≥ +0.4 vs SFT", "p95 latency ≤ 80 ms at batch 4". Never "results should improve."
 5. **Hardness in the middle** — the recipe MUST do at least one of: fine-tune (not just inference), reproduce a paper's number, run an ablation with a falsifier, or deploy with a measured latency target. A `pip install` + `pipeline()` call is not an MVB — it's the model card.
+6. **Direction, not a copy-paste tutorial** — name the ingredients (HF IDs, dataset, success metric) AND give the structural hints ("you'll need to pre-tokenise with X · batch with Y · monitor Z during training · watch for the collapse mode at step ~N"), but DO NOT paste a full training loop or `def train():` block. The reader implements it from the recipe — the building is where the concept becomes theirs. If they can copy-paste their way through, the MVB has failed: that's a tutorial, not a nudge to build.
 
-The fifth bar is what makes MVBs FAIRE's USP. A reader can copy from any blog. They come to FAIRE because the MVB is the smallest valuable thing that *takes effort*, with the success metric named upfront so they know when they're done.
+Gates 5 and 6 together are FAIRE's USP. Gate 5 makes the MVB *worth* doing. Gate 6 makes it *teach*. The reader should leave with both an artifact AND understanding — neither lands if the page hands them a runnable cell.
 
 ## Required structure (one block per persona served)
 
