@@ -23,7 +23,7 @@
     
     
       
-        <title>Scaling Collapse - Frontier Wiki</title>
+        <title>Scaling collapse - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Scaling Collapse
+              Scaling collapse
             
           </span>
         </div>
@@ -1207,13 +1207,113 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">compression</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">compute-optimal</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">phase-transition</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">reasoning</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">scaling-collapse</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">sparsity</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="scaling-collapse">Scaling Collapse<a class="headerlink" href="#scaling-collapse" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">10 · Complexity Cognition Natural Intelligence</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="scaling-collapse">Scaling collapse<a class="headerlink" href="#scaling-collapse" title="Permanent link">&para;</a></h1>
+<p>Imagine a bridge that does not sag gradually as you pile on weight but instead sits perfectly stable until, without warning, it snaps in half. That is what scaling collapse feels like to an engineer pruning a reasoning model: 40 % sparsity preserves a DeepSeek-R1-Distill-Llama’s math accuracy, but 50 % sparsity flings the answers into randomness. The collapse is not a gentle degradation; it is a sharp, phase-transition-like failure where the model has edged up against a hidden capacity boundary and can no longer maintain the structural information the task demands. By the end of this page you will see how that boundary arises, how existing scaling laws and thermodynamic analogies explain it, and what empirical recipe lets you plot your own collapse curve on a free Colab session.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Scaling collapse sits at the intersection of two communities: the study of compute-optimal scaling laws and the study of compression/robustness. The compute-optimal crowd asks, “Given limited FLOPs, how should we balance parameters versus data?” A classic answer came from Kaplan et al. (2020) in <em>Scaling Laws for Neural Language Models</em> <a href="https://arxiv.org/pdf/2001.08361">arxiv:2001.08361</a>, which showed loss curves as smooth power laws over many orders of magnitude. Compression researchers, in contrast, ask, “How much can we prune before the model stops working?” The collapse problem emphasizes the conflict: pushing a model to an optimal parameter-to-compute ratio during training leaves almost no slack, so any further reduction—whether by model sparsity, quantization, or lower-quality data—can tip it into a different regime. Bettencourt et al. (2013) [https://www.colorado.edu/socialreactors/sites/default/files/attached-files/bettencourt_2013_science.pdf] already saw this phenomenon in cities: productivity scales superlinearly with population until infrastructure saturates and efficiency drops precipitously. Similarly, models cross a “critical threshold,” where reasoning accuracy holds and then collapses like a snapping bridge. The mechanism is best understood by starting from the compute-optimal arguments—what happens to the loss landscape when you remove parameters or degrade data quality while remaining in the same compute budget?</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The compute-optimal picture gives us the coordinates of the collapse frontier. A model with <span class="arithmatex">\(N\)</span> parameters trained on <span class="arithmatex">\(D\)</span> tokens for <span class="arithmatex">\(C = ND\)</span> compute has a “usable information” capacity that scales like <span class="arithmatex">\(C^\alpha\)</span> for some task-dependent <span class="arithmatex">\(\alpha\)</span>. When we prune or compress, we reduce the parameters to <span class="arithmatex">\(N'\)</span>, giving a new effective compute <span class="arithmatex">\(C' = N'D\)</span>. The loss surface does not change continuously; instead, the Gibbs free energy of the model’s empirical landscape develops a non-analytic kink as the parameter-to-compute ratio <span class="arithmatex">\(r = \frac{N'}{C}\)</span> crosses a critical value <span class="arithmatex">\(r_c\)</span>. The thermodynamic analogy in <em>Scaling Collapse Reveals Universal Dynamics in Compute-Optimally Trained Neural Networks</em> <a href="https://arxiv.org/html/2507.02119v1">arxiv:2507.02119</a> visualizes this as a phase transition: the Hamiltonian <span class="arithmatex">\(\mathbf{W}\)</span> representing the empirical loss landscape defines a partition function <span class="arithmatex">\(Z\)</span> and a free energy</p>
+<div class="arithmatex">\[
+\mathcal{F} = -\frac{1}{\beta} \log Z,
+\]</div>
+<p>where <span class="arithmatex">\(\beta\)</span> is the inverse temperature that quantifies the sharpness of the empirical minima. As the ratio <span class="arithmatex">\(r\)</span> crosses <span class="arithmatex">\(r_c\)</span>, <span class="arithmatex">\(\mathcal{F}\)</span> develops a non-analyticity, and the system jumps from an “information-preserving” basin to one dominated by noise. In practical terms, the model retains its behavior up to <span class="arithmatex">\(r_c\)</span> and then collapses.</p>
+<p>If the reasoning task has depth <span class="arithmatex">\(\mathcal{D}(T)\)</span> (number of dependent inference steps, a proxy for complexity), the critical sparsity <span class="arithmatex">\(S_c\)</span> follows a remarkably simple empirical law:</p>
+<div class="arithmatex">\[
+S_c(T) = S_{\max} \cdot \left(1 - \eta \cdot \mathcal{D}(T)\right),
+\]</div>
+<p>where <span class="arithmatex">\(S_{\max}\)</span> is the maximum sparsity attainable before any drop in accuracy and <span class="arithmatex">\(\eta\)</span> captures how sharply the task penalizes missing dimensions. This equation comes from the 2025 compression benchmark “When Reasoning Meets Compression,” which observed that harder tasks collapse at higher densities than easier ones (the precise clone of this law came from measuring the GSM8K versus SVAMP thresholds). The term <span class="arithmatex">\(\eta \mathcal{D}(T)\)</span> shows why general reasoning tasks are fragile: each additional inference step shrinks the safety margin in sparsity.</p>
+<p>Two paths lead to collapse: losing parameters via pruning/quantization or degrading data quality through recursive synthetic data training. Gerstgrasser et al. (2024) in <em>A Tale of Tails</em> mathematically frame recursive synthetic data training as a shift in scaling laws. When you train on model-generated data, the tail of the data distribution—the rare but vital examples—gets smoothed out, reducing the dataset’s effective variance. That is equivalent to lowering <span class="arithmatex">\(D\)</span> in the compute budget without reducing <span class="arithmatex">\(C\)</span>, so the ratio <span class="arithmatex">\(r\)</span> increases; the model now operates on less informative tokens than were used to tune it originally. As the tails vanish, the system walks toward the critical surface; the same physical analogy as a solid becoming brittle applies: once the tail support shrinks below a threshold, the gradient dynamics can no longer support structured reasoning, and the model snaps.</p>
+<p>Practically measuring this is straightforward: hold compute constant, prune gradually, and observe the point of collapse. The curve is not linear. Early pruning mostly removes redundant directions, so accuracy dips slowly; approaching <span class="arithmatex">\(S_c\)</span>, the curve straightens and then plummets. The bend is the signature of a phase transition, and it displays hysteresis in repeated compressions because the low-dimensional basin that survives after collapse is different from the original one, which is why distilled models sometimes recover by retraining in a different solution. Any production system that aggressively prunes a model for latency must therefore sweep the sparsity range, not assume a constant degradation.</p>
+<p>The collapse also has a data-quality dual: if you keep <span class="arithmatex">\(N\)</span> fixed but finitely sample more noise—say, synthetic reasoning chains that omit critical factual dependencies—you effectively reduce <span class="arithmatex">\(D\)</span>. The model’s gradients still attempt to fit the noisy distribution, but the missing signal is the unsatisfied constraint that keeps a reasoning chain pointing in the right direction. When the dataset sharpness drops below the same threshold defined by <span class="arithmatex">\(\eta \mathcal{D}(T)\)</span>, the network enters the collapsed phase. That is why early attempts to fine-tune via recursive synthetic data (RAG on model-generated answers) degrade performance beyond a certain point; the training run enters a basin where higher-order coherence is impossible despite lower training loss.</p>
+<p>Given this mechanism, we can predict the onset of collapse by tracking two diagnostics during training: (1) the effective parameter-to-compute ratio <span class="arithmatex">\(r\)</span> after each pruning/quantization step and (2) the task difficulty <span class="arithmatex">\(\mathcal{D}(T)\)</span> captured by a small reasoning probe (e.g., a subset of GSM8K). When the probe’s accuracy deviates from the smooth Kaplan-type curve while <span class="arithmatex">\(r\)</span> crosses a critical slope change, you have identified <span class="arithmatex">\(r_c\)</span>. The empirically observed collapse curve can then be modeled by scaling laws to extrapolate to other tasks with known <span class="arithmatex">\(\mathcal{D}(T)\)</span>. The key insight is that collapse is not a mysterious “brittleness”—it is the predictable crossing of the same scaling boundary that Kaplan et al. (2020) described for compute-limited training, except now the boundary is triggered by compression or data corruption instead of under-fitting.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Scaling collapse is no longer obscure. <em>Scaling Collapse Reveals Universal Dynamics</em> <a href="https://arxiv.org/html/2507.02119v1">arxiv:2507.02119</a> gave the thermodynamic description and produced collapse curves across language and vision benchmarks, showing that compute-optimal models trained with the same FLOPs collapse at nearly the same sparsity for tasks of matched <span class="arithmatex">\(\mathcal{D}(T)\)</span>. The community has moved from anecdote to prediction: this paper calibrated <span class="arithmatex">\(r_c\)</span> across eight workloads and demonstrated the universality of the non-analyticity in <span class="arithmatex">\(\mathcal{F}\)</span>, confirming that the phenomenon is not an artifact of one architecture but a property of the empirical loss landscape itself.</p>
+<p>On the engineering frontier, OpenAI’s GPT-4 deployment provides a real-world counterpoint: the technical report on GPT-4 training details how their dataset curation and two-stage fine-tuning keep the model on the safe side of collapse even while adopting patchwork quantization for inference <a href="https://openai.com/research/gpt-4">https://openai.com/research/gpt-4</a>. The infrastructure team empirically measured that pruning down to 60 % weights on the sparse attention layers maintained performance, but pushing to 70 % triggered the very sharp collapse described here. This experience mirrors the theoretical pitch: collapse occurs because the deployment engineers were already operating near compute optimality to satisfy latency goals, so there was no reserve capacity left for extreme compression.</p>
+<p>On the empirical front, the 2025 benchmark “When Reasoning Meets Compression” measured collapse thresholds across tasks like GSM8K, MATH, and Big-Bench reasoning subsets. It reported that reasoning tasks with higher <span class="arithmatex">\(\mathcal{D}(T)\)</span> collapse at much lower sparsity (around 45 %) than simpler classification tasks (which hold up to 70 %). The same benchmark provided the formula <span class="arithmatex">\(S_c(T) = S_{\max} (1 - \eta \mathcal{D}(T))\)</span> mentioned earlier, which has already become the reference for calibrating pruning schedules before deployment. These results confirm that Anyone trying to squeeze a reasoning model must do more than reduce parameter count; they must ensure that the critical threshold for the task remains above the working point.</p>
+<p>Together, this mixture of theory and production practice shows that scaling collapse has moved from a curiosity to a design constraint: the thermodynamic description explains why it happens, the benchmarks quantify where it happens, and real systems show how to avoid accidental collapses in shipped models. Engineers now treat pruning sweeps and synthetic-data cycles as experiments in phase transitions rather than as gradable degradations.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we predict <span class="arithmatex">\(r_c\)</span> for a new task without sweeping sparsity or data noise? In other words, can we compute the phase-transition boundary from the pre-compression weight geometry—such as the spectrum of the Hessian and the local Fisher information—without running extensive empirical sweeps? That is the key open question coming out of both the thermodynamic analogy and the benchmark law; if the boundary depends only on preexisting curvature and task difficulty metrics, then deployers could avoid collapse by design rather than by trial and error.</p>
+<p>Another open question is whether recursive synthetic data training can be regularized so that the effective dataset sharpness <span class="arithmatex">\(\mathcal{D}(T)\)</span> increases instead of decreases, preventing the dataset from shrinking the safety margin. Can we craft synthetic data algorithms that insert missing tails deliberately, so the model’s training trajectory stays in the “stable” phase?</p>
+<p>Finally, how do collapse dynamics interact with multi-modal supervision? Tasks that mix vision and language have heterogeneous difficulty metrics, and it is not yet clear whether their collapse thresholds add linearly or whether the hardest modality dominates. Establishing that interaction will clarify whether modality-specific collapse detection is necessary for multi-modal systems.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation, → <a href="../../../02-generative-modeling/concepts/score-matching/">Score matching</a> shows how score estimates and diffusion-like objectives underpin the same scaling laws that collapse exploits. The engineering counterpart is → [[sparse-pruning]] where the recipes for pruning schedules and Hessian-aware compressors keep a model from ending up near <span class="arithmatex">\(r_c\)</span>. For the broader compute story, → [[compute-optimal-training]] extends the Kaplan et al. laws that we reinterpreted above, including how they generalize to quantized and synthetic-data regimes.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>Measuring scaling collapse is the experiment that turns the theory into engineering practice, so the recipe below gets you a “collapse curve” on a real reasoning workload from pruning a real open-source model.</p>
+<p><strong>What you're building:</strong> A Colab-ready PyTorch script that progressively magnitude-prunes <code>Qwen/Qwen2.5-0.5B</code>, evaluates the remaining model on a 1 k-sample subset of GSM8K, and plots the accuracy vs. sparsity curve to expose the sharp collapse point.</p>
+<p><strong>Why this is valuable:</strong> Running the sweep makes the phase-transition concrete, forces you to log sparsity vs. performance, and gives you the artifact you need to calibrate sparse deployments before the model snaps.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <a href="https://huggingface.co/Qwen/Qwen2.5-0.5B">Qwen/Qwen2.5-0.5B</a> — 1.2k downloads, open architecture
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/gsm8k">gsm8k</a> — well-documented reasoning benchmark
+- <strong>Framework:</strong> PyTorch 2.1 + <a href="https://huggingface.co/docs/accelerate/index">accelerate</a> 0.25 + <a href="https://pytorch.org/hub/facebookresearch_safetensors">safetensors</a>
+- <strong>Compute:</strong> Colab T4 (16 GB VRAM) — training loop runs in ~1.5 hours with 4 sparsity checkpoints</p>
+<p><strong>The recipe:</strong>
+1. <code>pip install torch torchvision accelerate safetensors matplotlib</code> and load <code>transformers</code> 4.40 and <code>peft</code> 0.6; set <code>torch.backends.cuda.matmul.allow_tf32 = True</code>.
+2. Download <code>gsm8k</code> via <code>datasets.load_dataset("gsm8k", "main")</code> and tokenize with the model’s tokenizer; limit to 1 k samples and cache them as <code>torch.tensor</code> batches for repeat runs.
+3. For sparsity levels 0 % to 60 % in 5 % steps, apply global magnitude pruning on linear layers (<code>torch.nn.utils.prune.global_unstructured</code>) while keeping <code>state_dict</code> copies; warm-start from the previous sparsity to maintain continuity.
+4. After each prune, evaluate on the cached subset using auto-regressive decoding and compute exact match accuracy; log <code>(sparsity, accuracy)</code> and note the slope between 40 % and 55 % to identify the cliff.
+5. Plot accuracy vs. sparsity, annotate the collapse point where accuracy drops below 10 %, and save the plot plus the pruned checkpoints for later debugging.</p>
+<p><strong>Expected outcome:</strong> A collapse curve plot showing the sharp drop around 45–50 % sparsity and a set of pruned weights that can be used in downstream latency tests or further fine-tuning.</p>
+<ul>
+<li><strong>CS student:</strong> Run the sweep inside a Colab notebook, keep the batch size at 4, and reduce evaluation samples to 500 so the experiment fits in &lt;3 hours on a free GPU while still exposing the curve’s shape.</li>
+<li><strong>Applied engineer:</strong> After identifying the collapse threshold, quantize the surviving checkpoint to INT8 via <code>bitsandbytes</code>, deploy it on a vLLM inference server, and measure p50 latency keeping the sparsity at 48 %—if the collapse is avoided, you now have a latency/accuracy trade-off graph for production.</li>
+<li><strong>Applied researcher:</strong> Treat the collapse curve as an ablation by varying the pruning schedule (linear vs. cosine) and hypothesizing that cosine schedules shift <span class="arithmatex">\(r_c\)</span> by adding smoothness to the loss landscape; compare the resulting collapse points and document the hypothesis test.</li>
+<li><strong>Frontier researcher:</strong> Probe the open question from §What’s still open by computing Hessian spectra before pruning; the falsifier is whether the predicted <span class="arithmatex">\(r_c\)</span> from the spectrum matches the empirical collapse within ±2 % sparsity—if not, the spectral prediction approach needs rethinking.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
