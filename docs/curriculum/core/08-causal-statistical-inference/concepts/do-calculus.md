@@ -5,110 +5,116 @@ layer: core
 subject: 08-causal-statistical-inference
 page_type: concept
 state: drafted
-authors_anchored: [pearl]
+authors_anchored: [pearl, shpitser, bareinboim, heckman]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
 prereqs: [structural-causal-models, causal-graphs]
-tags: [causal-inference, do-calculus, identification, front-door]
-updated: 2025-01-10
+tags: [causal-inference, do-calculus, structural-equations, front-door]
+updated: 2024-11-23
 has_mvb: true
 ---
 
 # Do-Calculus
 
-Here is the puzzle: the hospital data shows that patients on Drug Z die more often than those who are untreated, so an AI system recommends banning the drug. Except Drug Z is the last resort for the sickest patients, and no random trial will ever be run because withholding it would be unethical. What does "what would happen" even mean when the only data you have is how physicians already acted? Do-calculus is the grammar that lets you answer that counterfactual question by reasoning entirely with the observational logs, by reconfiguring the causal graph until the unsafe action becomes a legal expression. By the end of this page you will understand how the three do-calculus rules operate on d-separations, why their completeness means every identifiable effect receives a closed-form expression, how that algebra connects to structural causal models (SCMs), and how you can script the classic front-door example in DoWhy to recover a causal effect despite an unobserved confounder.
+Imagine being in the position of the safety board for a new drug that is highly toxic in early trials. You know the drug could save lives, but you would be assassinated ethically if you forced a randomized control group to skip treatment or forced patients to ingest a lethal dose. The data you do have are passive records from doctors who chose treatments themselves, and yet the regulators still need a precise answer to “What if we had forced the drug on everyone?” Do-calculus is the mathematical device that resolves this ethical deadlock: instead of physically manipulating anything, it rewrites an intervention \(P(Y \mid do(X))\) into an expression built solely from what you observed, by treating the causal graph as a virtual laboratory. After reading this page you will see how the algebra aligns with the structural equations that underlie the graph, how each of the three rules corresponds to removing a “do” by appealing to a d‑separation, why the system is complete for identifiable effects, and how to practice the rewriting in code so that you can deliver counterfactual answers on top of purely observational logs.
 
 ## The territory
 
-Do-calculus sits directly on the fault line between our desire for interventions and the reality of passive data. Structural causal models already catalogue the mechanisms: nodes are variables, directed edges encode structural assignments, and acyclic graphs reveal which junky pathways correspond to confounding. What do-calculus adds is the algebraic toolkit for translating the impossible intervention \(P(y \mid do(x))\) into something built from the observable joint \(P(v)\) and the known independences in the graph. The “do-operator” denotes an idealized surgical action that replaces the structural equations for \(X\), and because we never actually operate \(X\), our only leverage comes from the graph’s invariances: which variables shield \(Y\) from the noise introduced by \(X\). Do-calculus enumerates algebraic steps that remove the do-operator by canceling intervened edges, shifting variables between observations and actions, and replacing interventions with observations when a suitable independence holds.
-
-Because modeling confounding is where most applications wobble, the territory of do-calculus necessarily spans scientific domain knowledge (the clinician’s intuition about who gets Drug Z) and graph theory (what conditional independences the domain knowledge legitimizes). When the graph is wrong or the recorded constraints are incomplete, the rules return a formula that is as wrong as the assumptions, so the field emphasizes transparency: you must draw the graph, state the confounders you believe exist, and then trace the algebraic transformations step by step. The next section shows how those transformations work in detail—how each rule manipulates the graph, what the independence conditions look like, and how a front-door identification arises naturally from the three rules. How does it actually work?
+Do-calculus lies precisely between the structural causal models (SCMs) that describe mechanisms and the kinds of policy questions practitioners must answer without running new trials. An SCM gives you a graph where each node is a variable, each directed edge encodes a structural equation, and noise terms propagate through the graph when you sample from the joint distribution. In that world, a surgical intervention \(do(X = x)\) severs all incoming edges into \(X\) and forces \(X = x\); the resulting distribution \(P(Y \mid do(X = x))\) therefore lives in a different graphical model than the observational \(P(V)\). The territory problem is: can you express that interventional distribution using only \(P(V)\) and your knowledge of the graph, with no new data collection? The answer is yes, precisely when the intervention is identifiable, and do-calculus is the algebraic grammar that performs the translation. It borrows from the language of d‑separation so that every rewriting step is justified by a conditional independence that survives the surgical intervention. That is the shape of this answer: we cannot see the intervention, but we can compute it by rewriting the “do” away while preserving the invariances that the graph guarantees. How does this algebraic mechanism actually work?
 
 ## How it works
 
-The starting point for do-calculus is the structural causal model’s expression of the joint \(P(v_1,\dots,v_n)\). The graph encodes all conditional independences, and the do-operator rewires part of it: \(P(y \mid do(x))\) is the distribution that results when we replace the structural equation for \(X\) with a constant and allow the rest of the graph to propagate. The goal of do-calculus is to rewrite that interventional expression into a combination of observables. Pearl (2013) [arxiv:1305.5506] formalized this by providing three rules that depend on the graph’s d-separations after deleting certain edges corresponding to the intervention.
+The key to do-calculus is that the “do” operator is not a probability measure but a change to the structural equations. Removing “do” therefore requires showing that the post-intervention distribution agrees with an observational sub-expression. There are exactly three rules that were distilled from the graphical language in the early work on SCMs; they appear in Pearl’s early exposition of causal diagrams (Pearl 1995) and are carefully unpacked in the “Introduction to Judea Pearl’s Do-Calculus” notes (Pearl 2013) [arxiv:1305.5506]. Shpitser and Pearl’s technical report “Identification of Joint Interventional Distributions” (ftp://ftp.cs.ucla.edu/pub/stat_ser/r402.pdf) proved that these rules are complete, so if an effect is identifiable, the rules will reach it; their later revisit (Shpitser & Pearl 2012) [arxiv:1210.4852v1] provides alternative characterizations that emphasize algorithmic implementation. The rules are best understood as manipulations of the truncated factorization that defines interventions.
 
-### Rule 1: action deletion under observation
-
-The first rule lets you drop an observational conditioning when the corresponding variable does not influence the outcome once \(X\) is intervened upon. Formally,
+When you intervene by setting \(X = x\), you create a mutilated graph \(G_{do(X)}\) where the edges into \(X\) are removed but all other edges remain. The truncated factorization of the interventional distribution is then
 \[
-P(y \mid do(x), z, w) = P(y \mid do(x), w)
+P(V \setminus \{X\} \mid do(X = x)) = \prod_{Y \in V \setminus \{X\}} P(Y \mid \text{Pa}_G(Y))
 \]
-when \((Y \perp Z \mid X, W)_{G_{\bar{X}}}\). Here \(G_{\bar{X}}\) is the graph where incoming edges into \(X\) have been removed, \((Y \perp Z \mid X, W)\) denotes d-separation, \(z\) is the value of \(Z\), and \(w\) encodes the values of \(W\). The intuition is that, after we cut the incoming edges to \(X\), \(Z\) no longer communicates information to \(Y\); thus observing \(Z\) adds nothing to our estimate. Rule 1 is what allows us to strip irrelevant observations away and is the reason we can ignore some parts of a high-dimensional conditioning set.
+where \(\text{Pa}_G(Y)\) denotes the parents of \(Y\) in the original graph \(G\), and the product omits the factor for \(X\) because \(X\) is fixed by the intervention.
+This expression shows that interventions amount to evaluating the observational conditional distributions but in a graph where the parents of \(X\) no longer influence it. Do-calculus then provides rules to swap that mutilated graph with the original observational graph whenever certain conditional independences hold.
 
-### Rule 2: action-observation exchange
+### Rule 1: removing a do when the intervention can be ignored
 
-Rule 2 swaps an action and an observation when the observation is independent of the outcome once the action is in place:
+Rule 1 allows you to drop the “do” when the variable you are intervening on is independent of the effect, given a conditioning set that d-separates them in the mutilated graph. Formally, if \(Y\) is d-separated from \(X\) by \(Z\) in \(G_{do(X)}\), then
 \[
-P(y \mid do(x), do(z), w) = P(y \mid do(x), z, w)
+P(Y \mid do(X), Z) = P(Y \mid Z).
 \]
-if \((Y \perp Z \mid X, W)_{G_{\bar{X}, \underline{Z}}}\). In the graph \(G_{\bar{X}, \underline{Z}}\) we remove incoming arrows to \(X\) (notation \(\bar{X}\)) and delete outgoing arrows from \(Z\) (notation \(\underline{Z}\)), reflecting that \(Z\) is being intervened upon. When \(Y\) is d-separated from \(Z\) in this manipulated graph, replacing the intervention \(do(z)\) with a mere observation \(z\) does not change the distribution. This step is critical for front-door identification: it lets us replace an unobserved action by conditioning on a mediator that shields \(X\) from \(Y\).
+Here \(Z\) does not contain descendants of \(X\) (because the mutilated graph removes the arrows into \(X\)). The intuition is that once the intervention disconnects \(X\) from \(Y\), the intervention no longer matters, and we can replace \(P(Y \mid do(X), Z)\) with the observational conditional \(P(Y \mid Z)\). This step is legal because the graphical d-separation encodes invariances that hold both before and after the intervention.
 
-### Rule 3: action deletion
+### Rule 2: exchanging do’s and observations
 
-The final rule removes an action entirely when, after intervening, the action is independent of the outcome:
+Rule 2 swaps an intervention on \(X\) with an observation on another variable \(Z\) when a d-separation in the graph with the intervention on \(X\) but without \(Z\)’s incoming edges holds. Specifically, if \(Y\) is d-separated from \(X\) by \(Z\) in \(G_{do(X, Z)}\) and \(Z\) is not a descendant of \(X\) in the original graph, then
 \[
-P(y \mid do(x), do(z), w) = P(y \mid do(z), w)
+P(Y \mid do(X), do(Z), W) = P(Y \mid do(X), Z, W)
 \]
-if \((Y \perp X \mid Z, W)_{G_{\bar{X}, \bar{Z}}}\). In \(G_{\bar{X}, \bar{Z}}\) we cut incoming edges to both \(X\) and \(Z\). Rule 3 is the anchor for “adjusting for mediators” in more complex graphs: if \(X\) does not influence \(Y\) once the do-ed mediator \(Z\) is fixed, we can ignore \(X\) altogether. Together Rules 1–3 provide a complete calculus: any identifiable causal effect has a sequence of rule applications that rewrites \(P(y \mid do(x))\) in terms of observables. Pearl (2012) [arxiv:1210.4852v1] proved this completeness result, meaning do-calculus never needs to search beyond these three transformations when an effect is identifiable.
+for any additional set \(W\). Rule 2 is what lets us substitute real, observable values for future interventions—if intervening on \(Z\) does not change the effect conditionally, then we can simply observe \(Z\) instead.
 
-To see the rules in action, consider the front-door pattern: \(X\) causes \(Z\), \(Z\) causes \(Y\), and there exists an unobserved confounder \(U\) that simultaneously causes \(X\) and \(Y\). The observational distribution is insufficient for a simple back-door adjustment because \(U\) is unmeasured. However, the mediator \(Z\) lies on the only paths between \(X\) and \(Y\), and the graph satisfies the front-door conditions: \(Z\) intercepts every directed path from \(X\) to \(Y\), \(X\) and \(Z\) are unconfounded, and \(Z\) blocks all back-door paths from \(Z\) to \(Y\) once \(X\) is fixed. Applying Rule 2 first, we rewrite \(P(y \mid do(x))\) as
-\[
-\sum_z P(y \mid do(x), z) P(z \mid do(x)),
-\]
-then we apply Rule 3 to replace \(do(x)\) inside the inner term and Rule 1 to drop \(do(x)\) from the conditioning on the mediator, yielding
-\[
-\sum_z P(z \mid x) \sum_{x'} P(y \mid x', z) P(x').
-\]
-Every factor in this expression is observable: \(P(z \mid x)\) and \(P(y \mid x', z)\) are computed from the observational data, and the sum over \(x'\) averages over the empirical distribution of \(X\). The resulting expression is the canonical front-door formula, which requires no direct measurement of the confounder \(U\).
+### Rule 3: inserting or deleting observations with interventions
 
-The procedural implications of do-calculus were codified in the UCLA technical report (UCLA Tech. Rep. R-402) [ftp.cs.ucla.edu/pub/stat_ser/r402.pdf], which outlines how the algebra can be automated into an identification algorithm. That algorithm searches for admissible sets that satisfy the rules, recursively applies them, and returns either an identifiable expression or a statement that the effect is non-identifiable. This report later inspired modern causal inference libraries, where the map from graph to estimand is transparent: you specify your SCM, apply the rules, and the system spits out the observational formula, along with the sequence of manipulations that justify it. The next section shows how the rules show up in practice when feeding a graph to an API such as DoWhy and deriving the front-door estimator. 
+Rule 3 permits you to insert or remove observations from a “do” expression when a d-separation holds in the graph where both the intervention and the observation have been applied. If \(Y\) is d-separated from \(Z\) by \(X, W\) in \(G_{do(X)}\), then
+\[
+P(Y \mid do(X), Z, W) = P(Y \mid do(X), W).
+\]
+This means that once we have conditioned on \(W\) and applied the intervention on \(X\), observing \(Z\) does not provide extra information about \(Y\), so it can be dropped. The three rules collectively allow removal of a “do” by turning it into conditional probabilities that involve only observational data and previously justified substitutions.
+
+### The front-door derivation as an illustration
+
+The canonical front-door example shows the rewriting process in action. Suppose \(X\) causes \(Z\), \(Z\) causes \(Y\), and there is an unobserved confounder \(U\) between \(X\) and \(Y\). The confounder blocks direct identification of \(P(Y \mid do(X))\) because \(U\) introduces a spurious correlation. However, if (1) \(Z\) is fully mediated by \(X\), (2) \(Z\) blocks all paths between \(X\) and \(Y\) except through \(Z\), and (3) \(X\) and \(Z\) are not confounded, then the front-door formula gives
+\[
+P(Y \mid do(X)) = \sum_{z} P(z \mid X) \sum_{x'} P(Y \mid z, x') P(x').
+\]
+In this expression, \(P(z \mid X)\) and \(P(x')\) are observational probabilities, and \(P(Y \mid z, x')\) is the standard conditional distribution. The derivation is a sequential application of the three rules: use Rule 2 to replace \(do(X)\) with an observation on \(Z\), then Rule 1 to remove the do from the inner term, and finally Rule 3 to marginalize out \(X'\). The technical report (ftp://ftp.cs.ucla.edu/pub/stat_ser/r402.pdf) spells out the graphical conditions under which the sum over \(z\) is valid, ensuring that no unblocked back-door path re-enters the expression. This is the algebraic heart of do-calculus.
+
+### Connecting the calculus to completeness and algorithms
+
+Completeness means that if an effect is identifiable from \(P(V)\) and the graph, do-calculus will eventually rewrite it into an observable expression. Shpitser and Pearl (2006) formalized this through a recursive decomposition of identification problems and showed equivalence with the calculus-based derivation, while Shpitser and Pearl (2012) [arxiv:1210.4852v1] revisited the result with an eye toward implementation, emphasizing that the rules can be encoded in a search procedure. The more recent preprint Arxiv:2102.06626v1 extends this program to high-dimensional representation learning by showing how rule applications can be guided by invariance tests that “guess” partial graphs and then confirm them via do-calculus. Taken together, these works show that the three rules are not just heuristics but form a complete algorithmic system grounded in the truncated factorization of interventions.
+
+### Failure modes
+
+Do-calculus fails when the graph is misspecified or when the effect is non-identifiable: no sequence of rule applications will remove all “do” operators. It also fails if the required conditional independences cannot be established because latent confounders mask them. The completeness results tell us that such failures are not due to the insufficiency of the algebra; instead they reveal that either the causal effect truly cannot be estimated with the available data, or the graph is incomplete. Thus the calculus is both an inference engine and a diagnostic tool: failure to produce an observable expression is itself informative.
 
 ## Where the field is now
 
-The research frontier in do-calculus currently anchors multiple strands. One stream continues to refine identifiability algorithms for high-dimensional graphs, but another stream explores how do-calculus operates inside complex agentic systems. Project Ariadne’s recent work (Ariadne Team et al., 2021) [arxiv:2102.06626v1] demonstrates that large language model agents internally generate explanatory chains that resemble reasoning nodes, and by applying do-calculus to intervened internal activations the team can distinguish “Reasoning Theater” from causal contributions to the final answer. This exposes a research frontier where do-calculus is not just a planner for explicit policies but a tool for auditing latent reasoning. On the engineering side, DoWhy (Sharma et al. 2019) [arxiv:1911.04216](https://arxiv.org/abs/1911.04216) operationalizes do-calculus in a production-ready library: users declare the causal graph, supply observational data, and DoWhy’s identification module internally applies the three rules to produce an estimand. Microsoft product teams already embed DoWhy in decision support pipelines, exploiting front-door corridors where confounding prevents straightforward back-door adjustments. The integration with scikit-learn estimators and interpretable explanation APIs makes this a running example of how do-calculus can be made practical for data science teams.
+Research is currently pushing do-calculus into settings where the graph is partially unknown or the variables live in high-dimensional representations. Pearl’s introductory lecture notes (Pearl 2013) [arxiv:1305.5506] remain a touchstone for teaching the rules, while Shpitser and Pearl’s revisit (2012) [arxiv:1210.4852v1] provides the completeness proof that underlies modern identification algorithms. The 2021 preprint arXiv:2102.06626v1 builds on these foundations by proposing a causal representation learning pipeline that interleaves do-calculus rule application with neural invariance testing, allowing practitioners to hypothesize latent structures and then confirm them algebraically. On the engineering side, Databricks’ production causal AI platform (Databricks blog, 2023) uses causal graphs plus DoWhy-style engines to answer counterfactual business queries—by framing each question as a do-calculus derivation, the platform can automatically translate it into a sequence of SQL queries over logged exposures and outcomes, delivering answers that are auditable and reusable across feature stores. These developments show that the algebra of do-calculus now underpins both theoretical guarantees and real-world decision systems.
 
 ## What's still open
 
-1. Can do-calculus guarantee identifiability when the causal graph is unknown and the model must learn representations directly from high-dimensional visual data, such as joint embeddings of pixels and latent confounders, before any structure has been specified?
-
-2. Does the completeness of the three rules extend when the observed variables are themselves summaries produced by neural encoders—if the encoder’s mapping has learned non-linear re-parameterizations, what graph should we feed to the calculus, and does the resulting formula truly reflect the underlying intervention?
-
-3. When intervening on latent reasoning nodes inside LLMs, can we characterize the class of “reasoning theaters” that confound the effect of a rationale on the final answer, i.e., can we identify a minimal set of latent variables whose manipulation suffices to separate causal influence from plausible but spurious explanations?
-
-4. How can we quantify the robustness of a do-calculus derivation to model misspecification in the structural equations, particularly when the data includes heavy-tailed noise or time-varying confounders that drift during deployment?
+1. Can we guarantee identifiability when only partial graphs are available and the remaining relations are represented by neural latent variables, where the latent space itself is learned from scratch? 
+2. How do we extend do-calculus to non-linear, high-dimensional systems so that the search for valid conditioning sets becomes tractable even when conditional independence tests rely on deep kernels?
+3. Can we quantify the value of new measurements—that is, find the minimal set of additional variables whose observation would make an otherwise non-identifiable effect identifiable via do-calculus?
+4. How can do-calculus be formalized when the causal graph evolves over time, such as in sequential decision-making, and the “do” operator must respect constraints on when and how interventions can be applied?
 
 ## Where to read next
 
-If you want the graphical foundation, → [Structural Causal Models](structural-causal-models.md) shows how to go from domain knowledge to an SCM and how d-separation encodes conditional independence. If you are interested in practical identification strategies, → [[front-door-criterion]] walks through other mediators that satisfy the same rules. For the algorithmic layer that automates the calculus, → [[identification-algorithms]] surveys the recursive search strategies that underlie the completeness theorem.
+If you want the structural backbone, → [Structural Causal Models](structural-causal-models.md) shows how SCMs define the graphs that the calculus manipulates. The engineering counterpart is → [Causal discovery](causal-discovery.md) which describes automated tools for learning those graphs from data, often using the same invariance principles that motivate rule applications. The theoretical foundation lives in → [[identification]] where the proofs from Shpitser & Pearl are unpacked, and the production arc is → [[causal-ml-pipeline]] which explains how to operationalize these estimators in a serving stack.
 
 ## Build it
 
-This build proves that do-calculus is not just paper algebra: it actually recovers the causal effect of smoking on cancer when genetics is an unobserved confounder, using only observational samples and DoWhy’s front-door engine. The script keeps you inside a free Colab, forces you to state the graph, and verifies that two different estimators (do-calculus vs. naive regression) diverge precisely because of the latent confounder.
+Building the front-door estimator by hand forces you to trace every rule of do-calculus over your own synthetic graph and makes you accountable for each substitution instead of hiding the work behind a library. The recipe proves that the calculus is not an abstract proof but a sequence of verbal steps you can implement in Python on top of real data.
 
-**What you're building:** A DoWhy pipeline that simulates a smoking–tar–cancer graph with an unobserved genetic confounder and recovers \(P(y \mid do(x))\) via the front-door formula.
+**What you're building:** a Python causal estimator that uses `networkx` to represent a graph with an unobserved confounder, and manually applies the three rules to compute \(P(Y \mid do(X))\) via the front-door formula from a synthetic dataset.
 
-**Why this is valuable:** The build requires you to encode the graph, label the unobserved confounder, execute DoWhy’s identification module (which replicates do-calculus rule applications internally), and then compare the causal effect you compute with the biased result from standard regression, highlighting how the calculus removes confounding entirely in the observational formula.
+**Why this is valuable:** the build captures the hard part of applied do-calculus—the choice of conditioning sets and the algebraic substitutions—so running the code forces you to justify each rule before producing the final probability estimate.
 
 **Stack:**
-- **Model:** DoWhy structural causal model (explicit front-door graph) + scikit-learn logistic regressors (0.24.2) for outcome modeling.
-- **Dataset:** Synthetic smoking-tar-cancer dataset drawn from deterministic structural equations (no external dataset download required).
-- **Framework:** DoWhy (latest release), pandas, scikit-learn.
-- **Compute:** Free Colab T4 (16 GB VRAM) or any CPU instance (the dataset is tiny); training each estimator takes <2 minutes.
+- **Model:** not applicable (graph + estimator)
+- **Dataset:** synthetic `numpy` arrays of \(X, Z, Y\) constructed with known structural equations
+- **Framework:** `networkx` for graphs, `numpy` for data + `matplotlib` for visualization
+- **Compute:** free Colab T4 (12 GB VRAM) or any CPU notebook (a few seconds per sampling round)
 
 **The recipe:**
-1. Install the dependencies with `pip install dowhy==0.3.1 scikit-learn pandas matplotlib`.
-2. Construct the data: sample genetics \(G \sim \mathcal{N}(0,1)\), smoking status \(X \sim \text{Bernoulli}(\sigma(0.5G))\), tar level \(Z = 0.8X + 0.4G + \epsilon_z\), and cancer \(Y = \text{Bernoulli}(\sigma(0.9Z + 0.3G + \epsilon_y))\), then drop \(G\) from the dataset so the confounder is unobserved.
-3. Build a DoWhy graph that encodes \(G \rightarrow X\), \(G \rightarrow Y\), \(X \rightarrow Z\), \(Z \rightarrow Y\). Ask DoWhy to identify the causal effect of \(X\) on \(Y\) via `model.identify_effect()`; DoWhy will apply the front-door transformer internally, mirroring the do-calculus steps from the earlier section.
-4. Estimate the effect using DoWhy’s `estimate_effect()` with scikit-learn regressors for both mediator and outcome, and compare the result with a naive logistic regression of \(Y\) on \(X\) trained directly on the observed data. The naive estimator will be biased downward due to the unobserved \(G\), while the do-calculus estimator matches the true effect you injected into the SEM.
-5. Plot the causal effect estimates and export the DoWhy estimand string to a markdown file, showing the front-door formula the library derived.
+1. `pip install networkx matplotlib numpy` and import the packages, then define a `networkx.DiGraph` with nodes \(X, Z, Y\) plus a latent confounder (store the confounder as metadata rather than a node).
+2. Simulate data with \(X\) drawn from a Bernoulli, \(Z\) sampled deterministically from \(X\) plus Gaussian noise, and \(Y\) computed via a function of \(Z\), \(X\), and a latent confounder; store the joint distribution as a `numpy` array.
+3. Write helper functions that compute conditional probabilities (e.g., \(P(Z \mid X)\), \(P(Y \mid Z, X')\), \(P(X')\)) from the joint by counting occurrences.
+4. Apply the front-door formula: sum over \(z\) the term \(P(z \mid X)\) times the inner sum over \(x'\) of \(P(Y \mid z, x') P(x')\); use `matplotlib` to plot the resulting \(P(Y \mid do(X=0))\) and \(P(Y \mid do(X=1))\).
+5. Document each substitution as a comment tied to a rule of do-calculus (Rule 1, 2, or 3) and verify that the observational expressions only involve the joint probabilities you computed.
 
-**Expected outcome:** A notebook that produces a causal effect estimate via the front-door formula, confirms that it matches the SEM ground truth, and exhibits a divergent naive regression, thus proving that do-calculus overcomes unmeasured confounding.
+**Expected outcome:** a runnable Colab notebook that demonstrates, step by step, how a counterfactual query with a latent confounder can be answered via the front-door formula and the three rules of do-calculus.
 
-- **CS student:** Run the same Colab with fewer samples (~5k) and evaluate the sensitivity of the front-door estimate to classifier regularization; document the point at which the estimate deviates more than 10% from the ground truth.
-- **Applied engineer:** Wrap the DoWhy estimator in a Flask endpoint, quantize the logistic regressors using ONNX, and serve under 150 ms p95 on a g4dn.xlarge instance so the counterfactual query can answer “what if we doubled the smoking rate?” in real time.
-- **Applied researcher:** Hypothesize that replacing the logistic regressors with gradient-boosted trees will reduce variance without bias; run a 2×2 grid over learner type and regularization strength, then report whether the causal estimate remains within ±5% of the true effect.
-- **Frontier researcher:** Probe the open question about latent representations by replacing the observed mediator \(Z\) with a learned embedding from a small autoencoder trained on the same data; the falsification criterion is whether DoWhy still identifies \(P(y \mid do(x))\) or declares the graph unidentifiable.
+- **CS student:** Run the notebook on Colab with smaller synthetic datasets (e.g., 500 samples), add inline asserts that check the sum-to-one properties of each conditional probability, and plot the distributions with histograms to confirm the calculus derivation matches the simulation.
+- **Applied engineer:** Extend the notebook into an API that loads logs from a CSV, computes the front-door estimator, and deploys the result via a Flask app with quantization of the coefficients to stay within 50 ms inference on an A10-backed container.
+- **Applied researcher:** Hypothesize that the front-door estimator will drift when the latent confounder’s variance increases; vary the noise level in the simulator, recompute \(P(Y \mid do(X))\), and report the divergence between the estimator and the SCM ground truth to test if the algebraic steps remain valid.
+- **Frontier researcher:** Use the notebook to probe the open question of partial graphs by removing one edge from the `networkx` representation, re-running the derivation, and checking whether any rule application fails—document the falsification criterion as “a rule cannot remove the remaining `do`” and collect the conditions under which identifiability collapses.
 
 ---
 
