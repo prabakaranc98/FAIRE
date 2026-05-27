@@ -82,6 +82,21 @@ class WikiPageState(TypedDict, total=False):
     review_rubric: dict                 # per-dimension scores (structured + critic panel)
     revision_count: int                 # number of revision loops (max 2)
 
+    # ── Knockout selection (revision regression protection) ───────────────────
+    prev_draft: str                     # draft from prior review pass; restored if
+                                        # the revised draft scores worse than prev
+    prev_review_confidence: float       # confidence of prev_draft for knockout cmp
+    prev_review_issues: list            # issues of prev_draft
+
+    # ── Planning checklist (mandatory items the writer must include) ──────────
+    writing_checklist: dict             # {
+                                        #   "must_cite_papers": [titles+urls],
+                                        #   "must_use_hf_models": [model_ids],
+                                        #   "must_link_concepts": [slugs]
+                                        # } — built by build_writing_checklist_node
+                                        # before write_draft; reviewer downgrades
+                                        # any page that misses items.
+
     # ── Critic panel (multi-critic review, runs in parallel) ──────────────────
     critic_panel: dict                  # {critic_name: {score: float, issues: list, fixes: list}}
 

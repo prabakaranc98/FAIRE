@@ -405,6 +405,145 @@ def plan_and_scratch_node(state: WikiPageState) -> WikiPageState:
     return {**state, "writing_plan": writing_plan, "scratch_pad": scratch_pad}
 
 
+def _format_checklist_block(checklist: dict | None) -> str:
+    """Render the writing_checklist as a block the writer reads.
+
+    The reviewer enforces this list deterministically (regex), so we make the
+    requirements explicit in the prompt. Returns empty string if no checklist.
+    """
+    if not checklist:
+        return ""
+    parts = []
+    papers = checklist.get("must_cite_papers") or []
+    hf = checklist.get("must_use_hf_models") or []
+    concepts = checklist.get("must_link_concepts") or []
+    if papers:
+        parts.append("MUST cite these papers inline (Author et al. YEAR + arxiv URL):")
+        parts.extend(f"  • {p}" for p in papers)
+    if hf:
+        parts.append("\nMUST use these HuggingFace IDs in Build it (do NOT invent others):")
+        parts.extend(f"  • {m}" for m in hf)
+    if concepts:
+        parts.append("\nMUST link these related concepts inline in Where to read next:")
+        parts.extend(f"  • [[{c}]]" for c in concepts)
+    if not parts:
+        return ""
+    return (
+        "\n\n════════════════════════════════════════\n"
+        "MANDATORY CHECKLIST — the reviewer rejects any page that misses items\n"
+        "════════════════════════════════════════\n"
+        + "\n".join(parts)
+        + "\n"
+    )
+
+
+def build_writing_checklist_node(state: WikiPageState) -> WikiPageState:
+    """Promote grounded facts from research into a mandatory writer checklist.
+
+    Pure-Python derivation (no LLM call): pull the top-N citations from
+    research_results/sota_results, the top HF model IDs from hf_models, and
+    the prereq slugs from the persona. The writer treats these as required;
+    the reviewer downgrades any page that omits items.
+
+    This directly attacks two failure modes seen in production:
+      - HF model ID hallucination (must_use_hf_models is pre-verified)
+      - Citation vagueness (must_cite_papers is named author+url)
+    """
+    research = state.get("research_results", []) or []
+    sota = state.get("sota_results", []) or []
+    hf_models = state.get("hf_models", []) or []
+    prereqs = (state.get("persona", {}) or {}).get("prereqs", []) or []
+
+    def _cite_str(r: dict) -> str:
+        url = r.get("url", "")
+        title = (r.get("title", "Untitled") or "Untitled").strip()
+        return f"{title[:80]} ({url})"
+
+    # Citations: take arxiv/edu URLs from research + sota (top 4 by source quality)
+    must_cite = []
+    seen_urls = set()
+    for r in research + sota:
+        url = r.get("url", "")
+        if not url or url in seen_urls:
+            continue
+        if "arxiv.org" in url.lower() or ".edu" in url.lower():
+            must_cite.append(_cite_str(r))
+            seen_urls.add(url)
+            if len(must_cite) >= 4:
+                break
+
+    # HF models: take top 2 by downloads (only ones that actually exist)
+    must_use_hf = []
+    for m in sorted(hf_models, key=lambda x: x.get("downloads", 0), reverse=True):
+        mid = m.get("model_id", "")
+        if mid and m.get("downloads", 0) > 50:
+            must_use_hf.append(mid)
+            if len(must_use_hf) >= 2:
+                break
+
+    # Related concepts: prereqs + top 2 topic_slugs from research (if any)
+    must_link = list(prereqs)[:3]
+
+    checklist = {
+        "must_cite_papers": must_cite,
+        "must_use_hf_models": must_use_hf,
+        "must_link_concepts": must_link,
+    }
+    return {**state, "writing_checklist": checklist}
+
+
+def keep_best_draft_node(state: WikiPageState) -> WikiPageState:
+    """Knockout selection — if the revised draft scored worse than the prior,
+    restore the prior draft and its review state.
+
+    Pattern from PerFine (arxiv 2510.24469, 2025). Prevents the well-known
+    'revision makes it worse' regression where the writer's second pass
+    introduces new problems while fixing the flagged ones.
+
+    Tolerance: revised must be at least 0.02 confidence below prev to trigger
+    a restore (small wiggle room for review noise).
+    """
+    current_conf = state.get("review_confidence", 0.0) or 0.0
+    prev_conf = state.get("prev_review_confidence", 0.0) or 0.0
+    prev_draft = state.get("prev_draft", "") or ""
+
+    # First pass (no prev to compare) — just stash current as prev for next round
+    if not prev_draft:
+        return {
+            **state,
+            "prev_draft": state.get("draft", ""),
+            "prev_review_confidence": current_conf,
+            "prev_review_issues": list(state.get("review_issues", []) or []),
+        }
+
+    # Revised regressed vs prior — restore prior, log a note
+    if current_conf + 0.02 < prev_conf:
+        try:
+            from rich.console import Console
+            Console().print(
+                f"[yellow]↩ Knockout: revised draft {current_conf:.2f} < prev "
+                f"{prev_conf:.2f} — restoring prior draft.[/yellow]"
+            )
+        except ImportError:
+            pass
+        return {
+            **state,
+            "draft": prev_draft,
+            "review_confidence": prev_conf,
+            "review_issues": list(state.get("prev_review_issues", []) or []),
+            # 'approved' stays whatever the prev pass yielded; route_after_review
+            # reads review_confidence so the kept draft drives downstream routing
+        }
+
+    # Revised is as-good-or-better — stash it as the new prev for the next round
+    return {
+        **state,
+        "prev_draft": state.get("draft", ""),
+        "prev_review_confidence": current_conf,
+        "prev_review_issues": list(state.get("review_issues", []) or []),
+    }
+
+
 def write_draft_node(state: WikiPageState) -> WikiPageState:
     """Write the complete wiki page in a single LLM call.
 
@@ -448,9 +587,11 @@ def write_draft_node(state: WikiPageState) -> WikiPageState:
         if existing.strip() and "🚧" not in existing else ""
     )
 
+    checklist_block = _format_checklist_block(state.get("writing_checklist"))
+
     user = f"""Topic: **{topic}** | Track: {track} | Page type: {page_type}
 {depth_note}
-
+{checklist_block}
 ════════════════════════════════════
 WRITING PLAN
 ════════════════════════════════════
@@ -930,10 +1071,44 @@ PAGE TO REVIEW:
         prev_panel_min=prev_panel_min,
     )
 
+    # Deterministic checklist enforcement (no LLM call): downgrade for missed items.
+    # The writer was given a mandatory list of papers / HF models / concept links;
+    # we verify each appears in the draft. Penalty: -0.05 per miss, cap at -0.20.
+    checklist = state.get("writing_checklist") or {}
+    checklist_misses: list[str] = []
+    draft_lower = draft.lower()
+    for paper in (checklist.get("must_cite_papers") or []):
+        # Extract URL from the citation string; we only need the arxiv ID or domain.
+        import re as _re_local
+        m = _re_local.search(r"https?://[^\s)]+", paper)
+        url = m.group(0) if m else paper
+        # Match by URL or by the arxiv id portion (last path segment)
+        arxiv_id = url.rsplit("/", 1)[-1].lower()
+        if url.lower() not in draft_lower and arxiv_id not in draft_lower:
+            checklist_misses.append(f"Missing required citation: {paper[:120]}")
+    for hf_id in (checklist.get("must_use_hf_models") or []):
+        if hf_id and hf_id.lower() not in draft_lower:
+            checklist_misses.append(f"Missing required HuggingFace ID: {hf_id}")
+    for slug in (checklist.get("must_link_concepts") or []):
+        if slug and f"[[{slug}".lower() not in draft_lower and f"/{slug}".lower() not in draft_lower:
+            checklist_misses.append(f"Missing required concept link: [[{slug}]]")
+
+    if checklist_misses:
+        penalty = min(0.20, 0.05 * len(checklist_misses))
+        confidence = max(0.0, confidence - penalty)
+        all_issues = list(all_issues) + checklist_misses
+        per_dim["checklist_score"] = max(0.0, 1.0 - penalty * 2)
+        # If checklist misses pushed us under the approval bar, flip approved.
+        if penalty >= 0.10:
+            approved = False
+    else:
+        per_dim["checklist_score"] = 1.0
+
     summary = (
         f"PASS: {structured.passed}\nConfidence: {confidence:.2f} "
         f"(rubric={structured.confidence:.2f}, panel_min={min((cs.score for cs in panel.values()), default=1.0):.2f})\n"
         + " · ".join(f"{k}:{v:.2f}" for k, v in per_dim.items())
+        + (f"\n\nChecklist misses ({len(checklist_misses)}):\n" + "\n".join(f"  - {m}" for m in checklist_misses) if checklist_misses else "")
         + ("\n\nCritic panel detail:\n" + "\n".join(
             f"  [{name}] {cs.score:.2f} — {'; '.join(cs.issues[:3]) or 'no issues'}"
             for name, cs in panel.items()
@@ -975,22 +1150,28 @@ def revise_draft_node(state: WikiPageState) -> WikiPageState:
     feedback = state.get("review_feedback", "")
     issues = state.get("review_issues", [])
 
-    # Detect if the page was truncated (missing terminal sections)
-    missing_nav = "## What comes next" not in draft or "## Connected topics" not in draft
+    # Capture the pre-revision draft so keep_best_draft_node can knockout-compare
+    # after the next review pass. Only stash on the FIRST revision (when prev
+    # is empty) — subsequent revisions roll forward via keep_best_draft_node.
+    stash_prev = {}
+    if not state.get("prev_draft"):
+        stash_prev = {
+            "prev_draft": draft,
+            "prev_review_confidence": state.get("review_confidence", 0.0) or 0.0,
+            "prev_review_issues": list(issues or []),
+        }
+
+    # Detect if the page was truncated (missing v2 sections)
+    v2_required = ["## The territory", "## How it works", "## Where the field is now",
+                   "## What's still open", "## Where to read next"]
+    missing = [s for s in v2_required if s not in draft]
     truncation_note = ""
-    if missing_nav:
-        truncation_note = """
-⚠ TRUNCATION DETECTED — the draft is incomplete. The following sections are MISSING
-and must be written NOW (do not skip, do not summarize):
-
-  ## Code & implementations
-  ## What comes next
-  ## Connected topics
-  ## Further reading
-
-After fixing other reviewer issues, append these sections immediately.
-The last line of your output MUST be inside ## Further reading.
-"""
+    if missing:
+        truncation_note = (
+            "\n⚠ TRUNCATION DETECTED — these v2 sections are missing and must be written NOW:\n"
+            + "\n".join(f"  {s}" for s in missing)
+            + "\n"
+        )
 
     writing_plan = state.get("writing_plan", "")
     plan_note = (
@@ -998,7 +1179,10 @@ The last line of your output MUST be inside ## Further reading.
         if writing_plan else ""
     )
 
+    checklist_block = _format_checklist_block(state.get("writing_checklist"))
+
     prompt = f"""You are revising a Frontier Wiki page. The reviewer flagged specific issues. Fix all of them.
+{checklist_block}
 
 REVIEWER FEEDBACK (fix every issue listed):
 {feedback}
@@ -1012,13 +1196,19 @@ WORKING MEMORY (verified facts — use ONLY these citations when adding new cont
 CURRENT DRAFT TO REVISE:
 {draft}
 
-Return the COMPLETE revised page. Include ALL sections from frontmatter through
-## Further reading. Do not omit any section, even ones that don't need changes.
+Return the COMPLETE revised page. Include ALL v2 sections (hook → The territory →
+How it works → Where the field is now → What's still open → Where to read next →
+Build it). Do not omit any section, even ones that don't need changes.
 """
 
     response = writer.invoke([SystemMessage(content=system), HumanMessage(content=prompt)])
     count = state.get("revision_count", 0) + 1
-    return {**state, "draft": _coerce_text(response.content), "revision_count": count}
+    return {
+        **state,
+        **stash_prev,
+        "draft": _coerce_text(response.content),
+        "revision_count": count,
+    }
 
 
 def _sanitize_draft(text: str) -> str:

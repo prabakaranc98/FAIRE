@@ -14,8 +14,10 @@ from __future__ import annotations
 from langgraph.graph import END, START, StateGraph
 
 from .nodes import (
+    build_writing_checklist_node,
     commit_node,
     flag_human_review_node,
+    keep_best_draft_node,
     link_node,
     load_persona_node,
     log_run_node,
@@ -64,11 +66,13 @@ def build_wiki_graph() -> StateGraph:
     graph.add_node("read_stub", read_stub_node)
     graph.add_node("research", research_node)
     graph.add_node("plan_and_scratch", plan_and_scratch_node)
+    graph.add_node("build_writing_checklist", build_writing_checklist_node)
     graph.add_node("write_draft", write_draft_node)
     graph.add_node("write_arc_step", write_arc_step_node)
     graph.add_node("write_arc_index", write_arc_index_node)
     graph.add_node("link", link_node)
     graph.add_node("review", review_node)
+    graph.add_node("keep_best_draft", keep_best_draft_node)
     graph.add_node("revise_draft", revise_draft_node)
     graph.add_node("write_file", write_file_node)
     graph.add_node("commit", commit_node)
@@ -80,9 +84,10 @@ def build_wiki_graph() -> StateGraph:
     graph.add_edge("load_persona", "read_stub")
     graph.add_edge("read_stub", "research")
     graph.add_edge("research", "plan_and_scratch")
+    graph.add_edge("plan_and_scratch", "build_writing_checklist")
 
     graph.add_conditional_edges(
-        "plan_and_scratch",
+        "build_writing_checklist",
         _route_after_plan_scratch,
         {
             "write_arc_step": "write_arc_step",
@@ -95,9 +100,10 @@ def build_wiki_graph() -> StateGraph:
     graph.add_edge("write_arc_step", "link")
     graph.add_edge("write_arc_index", "link")
     graph.add_edge("link", "review")
+    graph.add_edge("review", "keep_best_draft")
 
     graph.add_conditional_edges(
-        "review",
+        "keep_best_draft",
         route_after_review,
         {
             "write_file": "write_file",
@@ -138,6 +144,7 @@ def build_mvb_graph() -> StateGraph:
     graph.add_node("merge_mvb", merge_mvb_node)
     graph.add_node("link", link_node)
     graph.add_node("review", review_node)
+    graph.add_node("keep_best_draft", keep_best_draft_node)
     graph.add_node("revise_draft", revise_draft_node)
     graph.add_node("write_file", write_file_node)
     graph.add_node("commit", commit_node)
@@ -151,9 +158,10 @@ def build_mvb_graph() -> StateGraph:
     graph.add_edge("mvb_recipe", "merge_mvb")
     graph.add_edge("merge_mvb", "link")
     graph.add_edge("link", "review")
+    graph.add_edge("review", "keep_best_draft")
 
     graph.add_conditional_edges(
-        "review",
+        "keep_best_draft",
         route_after_review,
         {
             "write_file": "write_file",
