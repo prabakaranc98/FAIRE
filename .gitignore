@@ -1,6 +1,14 @@
 # API keys and secrets — NEVER commit
+# Catches .env, .env.cloud-premium, .env.cloud-quality-oss, .env.cloud-backup, etc.
+# .example variants are explicitly excluded (templates without real keys).
 .env
+.env.*
+!.env.example
+!.env.*.example
 agents/.env
+agents/.env.*
+!agents/.env.example
+!agents/.env.*.example
 
 # Python
 __pycache__/
