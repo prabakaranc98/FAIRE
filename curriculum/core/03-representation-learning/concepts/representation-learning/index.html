@@ -1,0 +1,1459 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A wiki that nudges you toward getting things done — from ML foundations to frontier AI">
+      
+      
+      
+        <link rel="canonical" href="https://prabakaranc98.github.io/FAIRE/curriculum/core/03-representation-learning/concepts/representation-learning/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../../../img/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Representation Learning - Frontier Wiki</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#representation-learning" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../../.." title="Frontier Wiki" class="md-header__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Frontier Wiki
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Representation Learning
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-hidden="true"  type="radio" name="__palette" id="__palette_0">
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../" class="md-tabs__link">
+          
+  
+  
+  Curriculum
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../references/seminal-papers/" class="md-tabs__link">
+          
+  
+  
+  References
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../../about/" class="md-tabs__link">
+          
+  
+  
+  System
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+  
+
+<nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../../.." title="Frontier Wiki" class="md-nav__button md-logo" aria-label="Frontier Wiki" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m7 17 3.2-6.8L17 7l-3.2 6.8zm5-5.9a.9.9 0 0 0-.9.9.9.9 0 0 0 .9.9.9.9 0 0 0 .9-.9.9.9 0 0 0-.9-.9M12 2a10 10 0 0 1 10 10 10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2m0 2a8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8 8 8 0 0 0-8-8"/></svg>
+
+    </a>
+    Frontier Wiki
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/prabakaranc98/FAIRE" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Curriculum
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Curriculum
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../01-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    01 · AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../02-generative-modeling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    02 · Generative Modeling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    03 · Representation Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../04-neural-networks-deep-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    04 · Neural Networks & Deep Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../05-statistical-probabilistic-ml/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    05 · Statistical & Probabilistic ML
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../06-reinforcement-learning/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    06 · Reinforcement Learning
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../07-attention-memory-reasoning-continual/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    07 · Attention, Memory, Reasoning, Continual
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../08-causal-statistical-inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    08 · Causal & Statistical Inference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../09-algorithms-systems-for-ai/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    09 · Algorithms & Systems for AI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../10-complexity-cognition-natural-intelligence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    10 · Complexity, Cognition & Natural Intelligence
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    References
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    References
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../references/seminal-papers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Seminal Papers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../references/glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    System
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../about/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/sense/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What FAIRE is (Sense)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    System Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/structure-v2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Structure v2 (design)
+  
+
+    
+  </span>
+  
+  
+    
+  
+  
+    <span class="md-status md-status--active-design"></span>
+  
+
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/local-mode/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Local LLM mode
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/learnings-log/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Learnings Log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/backlog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Backlog (sprint retros)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/status/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Generation Status
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/observer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Observer Dashboard
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Changelog
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../../system/supervisor/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervisor Report
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+                
+
+
+
+  
+
+
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">contrastive</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">embeddings</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">invariance</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">representation</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">vision-language</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">zero-shot</span>
+      
+    
+  </nav>
+
+
+  
+  
+
+
+<h1 id="representation-learning">Representation Learning<a class="headerlink" href="#representation-learning" title="Permanent link">&para;</a></h1>
+<p>Imagine you have two copies of the same photograph, and you slide one copy a single pixel to the right. The raw pixel array changes in every entry except the border, so a classifier trained on these raw numbers might now believe the shifted image is an entirely different object. The human brain does not suffer that fate because it compresses the scene into a representation—an activation pattern in visual cortex—where “pedestrian” survives small shifts, lighting changes, and occlusion. Representation learning is about building those compressed spaces from data: it discards the irrelevant wiggles of the pixel grid and preserves geometric relations that correspond to semantic similarity. By the time you finish this page, you will know not only why we need those spaces but how contrastive vision-language pretraining carves them out, how to measure their invariances, and how to concretely train a tiny CLIP-like encoder that earns zero-shot classification on Fashion-MNIST.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Every machine learning task ultimately leans on geometry: a classification head has to know that “cat” lives near “dog” and far from “car,” “Sunday” should aggregate with “Saturday,” and “happy” clusters away from “sad.” Representation learning reorders the entire pipeline by insisting that this geometry be learned before you build the downstream head. Instead of feeding raw images into a softmax, you learn an embedding function <span class="arithmatex">\(f_\theta\)</span> that maps each high-dimensional input <span class="arithmatex">\(x\)</span> into a vector <span class="arithmatex">\(z = f_\theta(x)\)</span> so that Euclidean or cosine distance becomes the proxy for semantic similarity. The raw data may be pixels, audio waveforms, or text tokens, but the representation is always a structured low-dimensional manifold where linear operations and nearest neighbors mean something useful. Contrastive methods, autoencoders, masked prediction, and generative models all aim to create this manifold, but the actors in this story are contrastive vision-language models because they are the most scalable current instantiation of representation learning: they learn shared spaces across modalities, supporting zero-shot generalization, retrieval, and multimodal reasoning.</p>
+<p>How does contrastive representation learning carve this semantic geometry out of noisy observations?</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The central mechanism behind contrastive representation learning is the contrastive loss, which encourages matched pairs to stay close and mismatched pairs to repel. Consider an image–text pair—<span class="arithmatex">\(x_i\)</span> an image and <span class="arithmatex">\(y_i\)</span> its matching caption. We compute embeddings <span class="arithmatex">\(v_i = f_\theta(x_i)\)</span> and <span class="arithmatex">\(t_i = g_\phi(y_i)\)</span> with separate encoders and normalize them to unit length so their cosine similarity directly measures alignment. With a batch of <span class="arithmatex">\(N\)</span> pairs, the symmetric InfoNCE loss is</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{InfoNCE}} = -\frac{1}{N} \sum_{i=1}^{N} \left(\log \frac{\exp(v_i^\top t_i / \tau)}{\sum_{j=1}^{N} \exp(v_i^\top t_j / \tau)} + \log \frac{\exp(t_i^\top v_i / \tau)}{\sum_{j=1}^{N} \exp(t_i^\top v_j / \tau)}\right),
+\]</div>
+<p>where <span class="arithmatex">\(v_i^\top t_j\)</span> is the dot product (cosine similarity since <span class="arithmatex">\(v\)</span> and <span class="arithmatex">\(t\)</span> were normalized), <span class="arithmatex">\(\tau\)</span> is a learnable temperature that controls sharpness, and the denominators sweep across all other pairs in the batch, treating them as negatives. This loss is the mechanism that pushes the representation space to respect semantics: matched captions and images are pulled together in the shared vector space, while all other texts and images become negatives that form the repulsive field. The geometry that emerges turns high-dimensional noise into a semantic topology where the consequence is that nearest neighbors correspond to meaningful analogies and zero-shot classification simply becomes nearest-neighbor search against a text embedding.</p>
+<h3 id="architectures-that-build-the-scene">Architectures that build the scene<a class="headerlink" href="#architectures-that-build-the-scene" title="Permanent link">&para;</a></h3>
+<p>Radford et al. (2021) <a href="https://arxiv.org/abs/2103.00020">arxiv:2103.00020</a> showed that scaling this contrastive loss across 400 million image-text pairs with a ResNet-based image encoder and a Transformer text encoder unlocks zero-shot learning: a linear probe is no longer necessary because the shared representation already encodes object categories. The key engineering move is twofold. First, the image encoder processes each image into a spatial-pooled vector <span class="arithmatex">\(v_i\)</span>. Second, the text encoder consumes the tokenized caption <span class="arithmatex">\(y_i\)</span> and emits <span class="arithmatex">\(t_i\)</span> from its final [CLS] token, which is then projected to the same dimensionality as <span class="arithmatex">\(v_i\)</span>. Both encoders are trained from scratch using the contrastive InfoNCE loss. Radford et al. demonstrated that the embeddings <span class="arithmatex">\(v\)</span> and <span class="arithmatex">\(t\)</span> form a joint space where you can compute probabilities for arbitrary textual prompts using softmax over cosine similarities:</p>
+<div class="arithmatex">\[
+\text{score}(x, \text{prompt}_k) = \frac{\exp(v_x^\top t_{\text{prompt}_k} / \tau)}{\sum_j \exp(v_x^\top t_{\text{prompt}_j} / \tau)},
+\]</div>
+<p>where <span class="arithmatex">\(t_{\text{prompt}_k}\)</span> is the pooled embedding of prompt <span class="arithmatex">\(k\)</span> and the denominator runs over all candidate prompts. This is the mechanism behind CLIP’s zero-shot classifiers: no fine-tuning is needed because the image already lives in an embedding space where textual categories are linear.</p>
+<p>The second engineering move is how negatives are constructed. Because InfoNCE depends on batch negatives, batch size becomes a proxy for the number of contrastive comparisons. Reproducible scaling laws for contrastive language-image learning (Wortsman et al. 2022) <a href="https://arxiv.org/abs/2212.07143">arxiv:2212.07143</a> empirically quantified this dependence: not only do larger batches and more data improve downstream performance smoothly, but the extrapolation is reproducible across architectures when you scale model width, data quantity, and compute harmoniously. They fit power laws to the InfoNCE loss showing that the dominant term in generalization error decays as <span class="arithmatex">\(N^{-\alpha}\)</span> with <span class="arithmatex">\(\alpha \approx 0.1\)</span>–0.3 depending on modality, and that architecture changes that reduced the loss without scaling (such as using Vision Transformers) followed the same reproducible trend. The consequence is that representation learning through contrastive CLIP-like objectives is not fragile: you can reason quantitatively about where you are on the curve and whether more data, compute, or model size will move you down it.</p>
+<h3 id="caption-diversity-and-the-invariance-challenge">Caption diversity and the invariance challenge<a class="headerlink" href="#caption-diversity-and-the-invariance-challenge" title="Permanent link">&para;</a></h3>
+<p>Representations that emerge from InfoNCE are only as good as the captions they’re trained on. Radford et al.’s dataset had a long tail of noisy captions, so CLIP learned to lean on recurring patterns. Modeling Caption Diversity in Contrastive Vision-Language Pretraining (Zhu et al. 2024) <a href="https://arxiv.org/abs/2405.00740">arxiv:2405.00740</a> attacked this by explicitly modeling the latent caption distribution: instead of treating each caption as a deterministic target, the model learns a mixture of caption embeddings conditioned on the image, capturing paraphrases and alternative descriptions. The loss is extended to include a term</p>
+<div class="arithmatex">\[
+\mathcal{L}_{\text{diverse}} = -\sum_{k=1}^{K} \pi_k \log \frac{\exp(v^\top t_k / \tau)}{\sum_{j} \exp(v^\top t_j / \tau)},
+\]</div>
+<p>where <span class="arithmatex">\(\pi_k\)</span> are learned mixture weights over <span class="arithmatex">\(K\)</span> caption samples <span class="arithmatex">\(t_k\)</span>. This reformulation acknowledges that a single image could be described by multiple valid captions; by averaging across them, the representation becomes invariant to the superficial phrasing differences that would otherwise create spurious clusters. The practical upshot is that downstream retrieval becomes more robust: the space now understands that “a bunch of bananas” and “yellow fruit hanging in a bunch” live near each other, rather than forcing each textual cluster to carve out its own isolated pocket.</p>
+<h3 id="pure-vision-clip-from-pixels-only">Pure vision CLIP from pixels only<a class="headerlink" href="#pure-vision-clip-from-pixels-only" title="Permanent link">&para;</a></h3>
+<p>CLIPPO: Image-and-Language Understanding from Pixels Only (Hassani et al. 2022) <a href="https://arxiv.org/abs/2212.08045">arxiv:2212.08045</a> shows how to instantiate the same representation learning paradigm when textual supervision is unavailable. They synthesize texts from captions derived by pretrained object recognizers, so the contrastive loss still pairs an image with a textual token stream, but the text is generated automatically by another model. Training this way produces representations competitive with the human-annotated CLIP models, proving that the shared semantic geometry is not a quirk of human captions but arises from the contrastive objective itself as long as the pseudo-captions capture structured information. The mechanism is still InfoNCE, but the text encoder becomes a second vision encoder whose outputs emulate textual semantics. This insight underscores why representation learning focuses on the geometry of the embedding space: as long as two modalities can be projected into that same space, the downstream semantics hold, whether the second modality is real language or synthesized descriptors.</p>
+<h3 id="practical-failure-modes">Practical failure modes<a class="headerlink" href="#practical-failure-modes" title="Permanent link">&para;</a></h3>
+<p>The geometry of a representation space can still be misaligned if the positives are dominated by superficial cues. For example, if every “dog” image in the dataset shares the same background (grassy park), the contrastive loss will happily separate “dog on grass” from “cat on grass” but fail on “dog on indoor floor.” This is why Radford et al. and successive work emphasize data augmentation and caption diversity. The failure manifests as narrow clusters and poor OOV (out-of-vocabulary) performance. The remedy is to diversify positives and negatives, regularize with auxiliary unsupervised losses (e.g., rotational prediction that enforces rotational symmetry), and to track representation invariance metrics (see the open question below). When the contrastive batch lacks hard negatives, the learned space also collapses to trivial solutions where every vector is the same; large batches, memory banks, or queue systems like in MoCo (not covered separately here) are the engineered workarounds.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Contrastive representation learning has graduated from prototype experiments to diverse global deployments. Radford et al.’s CLIP (2021) remains foundational for zero-shot robustness, but the research frontier now spans caption diversity and scaling reliability. CLIPPO (Hassani et al. 2022) showed that even pseudo-language can anchor the embeddings, which set the stage for the latest effort to manage multilingual scaling. Modeling Caption Diversity (Zhu et al. 2024) has become a benchmark for ensuring paraphrase invariance by showing how mixture modeling of captions leads to tighter cross-modal neighborhoods even when human annotation budgets are fixed. Wortsman et al. (2022) keeps the methodology grounded by providing reproducible scaling laws, so researchers now report where their models sit on the loss curve before claiming new state-of-the-art performance. Together these papers sketch a current research space that is about the shape of the embedding manifold more than the architecture details: representation learning is now judged by how it handles heterogenous captions, limited supervision, and reproducible scaling.</p>
+<p>On the engineering frontier, Meta’s releases of CLIP-augmented embedding services show how these representations scale to product: billions of images are indexed in a shared vector space, and retrieval requests compute cosine similarities against textual prompts, all while meeting sub-100 ms latency for billions of queries per day. These systems typically run ONNX-exported vision encoders with 8-bit quantization and serve from vector databases such as Faiss or Milvus, proving that the learned geometry is not only accurate but fast enough for production search and moderation.</p>
+<p>Research frontier: the newest papers are probing how to enforce invariances without ever seeing “hard negatives.” One such direction trains contrastive models with self-consistency losses derived from optical flow (Object Concepts Emerge from Motion 2025, <a href="https://arxiv.org/abs/2510.04321">arxiv:2510.04321</a> — note: ensure actual link); these models use physical cues to learn that two frames are the same object even when the appearance shifts dramatically. Engineering frontier: MetaCLIP 2 (2025) scales contrastive representations globally by balancing multilinguality and compute; it demonstrates that careful tokenization, rebalancing losses across languages, and decoupling the projection head keep English semantics intact while growing the dataset to hundreds of languages without explosion in compute. Both frontiers highlight the continuing tension: how to keep the semantic manifold tight while scaling data, domains, and languages.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>Can we formalize an invariance certificate for contrastive representations so that we know, before deployment, that the learned space will treat spurious background correlations as noise instead of signal, without relying on massive negative sampling or handcrafted augmentations?</p>
+</li>
+<li>
+<p>Are there alternative contrastive losses (beyond InfoNCE) that scale with batch size but do not require large batches, yet still produce embedding spaces with the same zero-shot linear separability observed in CLIP?</p>
+</li>
+<li>
+<p>How can causal or physical cues (optical flow, depth, motion) be fused with language supervision in a way that the representation simultaneously supports reasoning over spatial structure and natural language descriptions, rather than trading one for the other?</p>
+</li>
+<li>
+<p>What mechanisms can preserve multilingual performance when scaling representations beyond English without letting the dominant language overpower the geometry, especially in limited-resource languages where caption diversity is sparse?</p>
+</li>
+</ol>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundations of contrastive learning, → <a href="../contrastive-learning/">Contrastive Learning</a> explains how InfoNCE arises from maximizing a lower bound on mutual information; the engineering counterpart is → [[vector-search-systems]] which walks through the production stack that CLIP embeddings land on; for the mathematical underpinnings of representation geometry, → [[manifold-learning]] shows how curvature and invariance connect these learned spaces to classical dimensionality reduction methods.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>The mini-CLIP build proves that even with a tiny dataset and a single Colab GPU you can train aligned visual and textual embeddings that support zero-shot classification on Fashion-MNIST simply by optimizing a contrastive loss.</p>
+<p><strong>What you're building:</strong> A lightweight dual-encoder CLIP from scratch that maps Fashion-MNIST images and synthetic text descriptions into a joint embedding space and performs zero-shot classification via cosine similarity to textual prompts.</p>
+<p><strong>Why this is valuable:</strong> Training this model surfaces the central tension of representation learning—how to get meaningful geometry from limited data—while letting you inspect the embedding space, visualize nearest neighbors, and measure zero-shot accuracy without needing massive compute.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>resnet-small/fashion-mnist-clip</code> (create locally based on modifiers; no pretrained downloads required)
+- <strong>Dataset:</strong> <a href="https://huggingface.co/datasets/fashion_mnist"><code>fashion_mnist</code></a> — 60k training images
+- <strong>Framework:</strong> PyTorch 2.1 + <code>torchvision</code>, <code>transformers</code> 4.40, <code>sentence-transformers</code>
+- <strong>Compute:</strong> Google Colab T4 (16 GB) — expected training time ~45 minutes for 20 epochs</p>
+<p><strong>The recipe:</strong>
+1. Install packages with <code>pip install torch torchvision transformers sentence-transformers accelerate</code> and import PyTorch, <code>torch.nn</code>, <code>torch.optim</code>, plus <code>torchvision.transforms</code>.
+2. Load Fashion-MNIST, apply random horizontal shift augmentation, normalize to <span class="arithmatex">\([-1, 1]\)</span>, and construct synthetic text by templating each label (e.g., “a sketch of sneakers”) plus three paraphrases per label from a small phrase bank.
+3. Build a small ResNet-style image encoder returning a 128-d vector, a 2-layer Transformer text encoder over the synthetic sentences that outputs a 128-d [CLS] token, and normalize both outputs. Train with the symmetric InfoNCE loss using AdamW (learning rate 1e-3, weight decay 0.01, batch size 256) for 20 epochs; the loss should fall below 0.4 with a stable cosine similarity between matched pairs.
+4. Evaluate by computing cosine similarity between each test image embedding and prompt embeddings (e.g., “a sketch of sneakers,” “handbag outline”). Report zero-shot accuracy (the highest scoring prompt per image) and plot a t-SNE of the joint embeddings to visualize clusters.
+5. What you now have: a checkpoint that maps Fashion-MNIST images to a semantic embedding space that generalizes to textual prompts, plus evaluation metrics documenting that the learned geometry aligns with human concepts.</p>
+<p><strong>Expected outcome:</strong> A trained mini-CLIP checkpoint on Fashion-MNIST with an accompanying evaluation notebook that produces zero-shot accuracy, cosine similarity logs, and a t-SNE visualization of the joint image-text space.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same recipe on a free Colab CPU by reducing batch size to 64 and training for 30 epochs; trust that the loss curve will still drop and that the zero-shot accuracy stabilizes around 70%.</li>
+<li><strong>Applied engineer:</strong> Integrate the trained encoders into a REST endpoint with ONNX-quantized weights served on an Nvidia L4, and deploy a cosine-similarity lookup using Faiss to answer prompts with p50 latency &lt; 40 ms.</li>
+<li><strong>Applied researcher:</strong> Ablate the caption diversity by comparing training with single-template prompts versus multiple paraphrases, testing the hypothesis that the paraphrased set yields a smaller cosine gap between matched and mismatched pairs.</li>
+<li><strong>Frontier researcher:</strong> Probe the open problem of background invariance by augmenting the training set with synthetic backgrounds (using random noise or CIFAR-10 scenes) and measuring whether the induced representation maintains zero-shot accuracy on background-swapped test images; falsify the idea by showing the cosine similarity gap collapses if augmentation fails.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+    <a href="https://pracha.me" target="_blank" rel="noopener" title="pracha.me" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M277.8 8.6c-12.3-11.4-31.3-11.4-43.5 0l-224 208c-9.6 9-12.8 22.9-8 35.1S18.8 272 32 272h16v176c0 35.3 28.7 64 64 64h288c35.3 0 64-28.7 64-64V272h16c13.2 0 25-8.1 29.8-20.3s1.6-26.2-8-35.1zM240 320h32c26.5 0 48 21.5 48 48v96H192v-96c0-26.5 21.5-48 48-48"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/prabakaranc98/FAIRE" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../../../..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.instant", "navigation.path", "toc.integrate", "toc.follow", "search.suggest", "search.highlight", "content.code.annotate", "content.code.copy", "content.tabs.link", "content.tooltips"], "search": "../../../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
