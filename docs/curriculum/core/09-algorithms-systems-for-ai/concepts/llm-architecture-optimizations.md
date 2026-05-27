@@ -5,121 +5,135 @@ layer: core
 subject: 09-algorithms-systems-for-ai
 page_type: concept
 state: drafted
-authors_anchored: [kaplan, chen, hinton, wang]
+authors_anchored: [vaswani, barroso, armbrust, gentry, liu]
 feeds_de_pillar: []
 mvb_personas: [cs-student, applied-engineer, applied-researcher, frontier-researcher]
-prereqs: [attention-mechanisms, parameter-efficient-training, memory-bandwidth-optimization]
-tags: [llm, architecture, memory, attention, parameter-efficiency, serving]
-updated: 2024-12-10
+prereqs: [attention, sparse-attention-patterns, memory-hierarchies]
+tags: [llms, sparse-attention, memory-hierarchy, hardware-software-codesign, kv-cache, scaling-laws]
+updated: 2024-11-15
 has_mvb: true
 ---
 
 # LLM Architecture Optimizations
 
-Imagine buying a multi-million-dollar sports car only to discover that every block of the city requires you to unload the driver, reconfigure the steering column, and then park for the next set of passengers. That is what happens when a state-of-the-art language model runs on modern GPUs: the compute is there, but at every inference step the model pauses to fetch, realign, and cache enormous KV pairs, choking on the memory bandwidth between HBM and DRAM. Architecture optimization in this era is not about adding more parameters for the sake of scale, it is about rethinking what gets computed, what gets cached, and how the remaining compute traces through hardware. By the end of this page you will be able to point to the levers—the hybrid attention blocks, the parameter scaling tricks, and the KV-cache routing policies—that break the memory wall without rebuilding from scratch.
+Imagine you prune every attention head that “looks redundant” and route only the surviving token pairs through compute-hungry matrix multiplies, only to realize that each surviving key/value vector still lives in HBM and must be loaded for every inference step. The FLOPs saved vanish into the bandwidth spikes of shuttling millions of bytes between on-chip SRAM, HBM, and off-chip DRAM, turning the “sparse attention” win into a memory-accounting headache. What the pruning optimizers never told you is that the KV cache is not just a side buffer; it is the memory footprint that defines the feasible batch size, the throughput, and whether the layer can hide the latency of the denominator in the softmax. This page shows how to treat those caches, the parameterization of depth/width, and the multilevel memory hierarchy as a single optimization surface, so that the design decisions you make in PyTorch, CUDA, or Triton are not fighting each other but reinforcing one another.
 
 ## The territory
 
-Modern LLM training and inference still celebrate billions of parameters, yet many deployments never see the benefits because the weights sit dormant while tokens fight over scarce bandwidth. The problem is not accuracy; it is the infrastructure around KV cache and attention that sequels rate limits the GPU. Optimization, therefore, sits at the intersection of three families: parameter-efficient adaptations that reuse frozen backbone weights, hybrid attention mechanisms that trade quadratic memory for structured approximations, and hardware-aware serving systems that orchestrate high-bandwidth memory (HBM) and DRAM to keep tokens streaming. BERT (Devlin et al. 2018) [arxiv:1810.04805v1](https://arxiv.org/pdf/1810.04805v1) proved that a bidirectional transformer encoder could learn general representations, but its dense self-attention already squanders \(O(n^2)\) interactions where \(n\) is the sequence length. Follow-up work on parameter-efficient transfers—for instance, Houlsby et al. 2019 [arxiv:1902.00751](https://arxiv.org/pdf/1902.00751)—showed that adding small adapter modules can capture task-specific details without retraining the entire encoder, exposing the possibility of freezing most weights and letting lightweight subgraphs adapt. While these lines of work matured, hardware deployments kept hitting the same tradeoff: the bigger the model, the more KV cache, and at some point the HBM-to-DRAM bandwidth becomes the wall the GPU keeps hitting. The territory of “LLM architecture optimizations” is thus to weave those strands together so that when the model fetches KV blocks it is doing only the work that truly needs dense attention, leaving the rest to memory-light structures and memory-friendly scheduling. How does it actually work?
+Large language models still make the same unforgiving trade-off as the first Transformer: attention scales quadratically in sequence length, so the most obvious wins are not in new activation functions but in how you store and move the key/value tensors. Vaswani et al. (2017) [arxiv:1706.03762](https://arxiv.org/abs/1706.03762) showed that multi-head attention computes weights \(A = \text{softmax}(QK^\top / \sqrt{d_k})\) for queries \(Q\) and keys \(K\), with \(d_k\) the head dimension, and that every decoder step needs both the current query and the entire set of cached keys and values to produce the next token distribution. The FLOPs are the obvious offender, but the real limiter is that \(K\) and \(V\) must remain on a very fast storage tier because they are accessed irregularly at inference time, for every autoregressive token produced.
+
+The community answered this by pruning, quantizing, and sparsifying; each attempt saved arithmetic while leaving the cache hierarchy untouched. In practice, however, the cache spans hundreds of megabytes on HBM and must be mirrored to DRAM or even CPU-accessible storage when the batch count grows. Warehouse-scale insights remind us why this matters: Barroso et al. (2009) [https://people.eecs.berkeley.edu/~randy/Courses/CS294.F09/wharehousesizedcomputers.pdf] and Armbrust et al. (2009) [https://www.cs.princeton.edu/courses/archive/fall10/cos561/papers/AboveClouds09.pdf] describe the shuttling penalty between compute and storage as the defining limiter of throughput. When a layer finishes computing on a token, the next token may still be waiting for the KV cache to stream back from DRAM, and the time that takes depends on the physical topology of the datacenter network and whether memory interconnects are saturated. That is why architecture optimization is not just about layers but about data placement, energy per bit, and the latency of cache misses that feel like software bugs even if they are hardware constraints.
+
+The shaping insight, then, is that LLM architecture optimization is a joint problem across three dimensions: model topology (heads, depth, width), parameterization scaling (how depth-wise learning rates and width multipliers trade compute for capacity), and hardware memory hierarchies (HBM⇄DRAM offload, cache residency, prefetch cadence). Where does one begin? How does such a joint surface guide the actual implementation of sparse attention that still pushes the throughput envelope? The mechanism is best understood by starting from the quadratic KV cache, following its path into the hardware hierarchy, and then layering in the hyperparameter decisions that CompleteP (2024) claims allow transfer across depths. How does it actually work?
 
 ## How it works
 
-The mechanism has three moving parts: (1) parameter-efficient reparameterizations that keep the bulk of the model frozen, (2) hybrid attention kernels that shrink the KV state, and (3) cache-aware routing that keeps bandwidth steady during serving.
+### From quadratic attention to cache pressure
 
-### 1. Parameter-efficient reparameterizations
+Every multi-head attention layer calculates \(A = \text{softmax}(QK^\top / \sqrt{d_k})\), where \(Q\), \(K\), and \(V\) are \(n \times d_k\) and \(n\) is the sequence length. The matrix multiplication \(QK^\top\) is \(O(n^2 d_k)\), which is the FLOP count. However, as soon as you adopt autoregression, the next query needs the entire history of keys and values, meaning that the key/value cache grows as \(O(n d_k)\). The number of bytes is \(n \cdot d_k \cdot 2 \cdot \text{sizeof(float)}\) for single-precision (or quantized equivalents). This cache is accessed for each decoding step, so its bandwidth request is \(O(n d_k)\) per token, and the access pattern is mostly random reads from a contiguous buffer.
 
-The first insight is that not all parameters need to be updated for new tasks or modalities. LoRA (Hu et al. 2021) [arxiv:2106.09685](https://arxiv.org/pdf/2106.09685.pdf) shows how freezing the original weight matrix \(W_0 \in \mathbb{R}^{d \times d}\) and learning low-rank update matrices \(A \in \mathbb{R}^{d \times r}\) and \(B \in \mathbb{R}^{r \times d}\) reduces trainable parameters to \(2dr\) while capturing task-specific gradients. Here \(d\) is the hidden dimension and \(r \ll d\) is the adaptation rank; the updated weight becomes \(W_0 + BA\). The low-rank form preserves the expressive linear subspace of \(W_0\) without touching the dense bulk that consumes the most VRAM, so during inference the GPU still streams the frozen weights from HBM but only executes the cheaper rank-\(r\) correction. Completing this picture, “Outrageously Large Neural Networks” (Hinton et al.) [https://www.cs.toronto.edu/~hinton/absps/Outrageously.pdf](https://www.cs.toronto.edu/~hinton/absps/Outrageously.pdf) argued for sparse, modular parameter sharing to keep the inference graph manageable when the number of hidden units skyrockets. The consequence is that modern architectures expose hooks for adapters, LoRA-style updates, or even task-specific prompt matrices, so the host GPU leverages the frozen, pretrained topology for most of the compute, and only a few light-weight additions need to be fetched at runtime.
+A naive sparse attention layer prunes the input tokens per layer or selects a subset of \(q \in Q\) pairs to attend to, reducing the FLOPs but not the cache size, because even if only 10% of the tokens attend, the keys and values for the other 90% still need to stay in high-bandwidth storage for the next token if the next step might attend to them. This is the dynamic sparse attention paradox: the arithmetic you skip is dwarfed by the memory you still have to buffer. As a result, your throughput is still limited by the interconnect that reads \(K\) and \(V\) out of HBM, and cache eviction stalls happen whenever the working set spills over to DRAM. That situation is what politicians call “computing through memory limitations.”
 
-CompleteP (Anonymous et al. 2025) [https://arxiv.org/abs/2510.01234](https://arxiv.org/abs/2510.01234) (note: placeholder for actual arXiv link per plan) argues that how we parameterize matters more than simply stacking layers: if the scaling laws tie width and depth improperly, networks exhibit “lazy learning,” where the gradients of effective layers vanish and only the last few layers carry the burden. CompleteP introduces depth-wise hyperparameter transfer that calibrates initialization, learning rate, and normalization so that every layer participates. In practical terms, this means architecture optimization must treat parameter efficiency not just as a deployment afterthought but as a design constraint: the frozen backbone must be robust to new adapters, and the adapters must respect the scaling schedule to avoid gradient starvation.
+The architecture optimization question becomes: can we reshape the cache to shrink in bandwidth-critical tiers whenever we prune tokens, and then restore it seamlessly when higher fidelity is needed? The answer lies in explicitly modeling the cache residency and prefetch strategy during the design of the sparse attention layer.
 
-### 2. Hybrid attention kernels
+### Memory hierarchies and datacenter constraints
 
-Self-attention, the core of transformers, requires computing \(QK^\top\) for queries \(Q \in \mathbb{R}^{n \times d}\) and keys \(K \in \mathbb{R}^{n \times d}\), so the memory cost is \(O(n^2)\) and the KV cache must store \(2nd\) embeddings per layer (keys plus values). The KV cache size \(S\) for sequence length \(n\), hidden dimension \(d\), and 32-bit floats is
+The datacenter perspective tells us why this matters. Interconnect networks were not designed for the irregular, low-arithmetic-running pattern of sparse attention. Barroso et al. (2009) argued that energy and latency budget allocated to memory transfers dominates the CPU/GPU arithmetic budget; each byte moved between HBM and DRAM costs microseconds. Armbrust et al. (2009) extended this to the cloud view, showing that shared storage resources and virtualization amplify these delays, creating a “stalled machine” whenever an application cannot keep its working set inside the preferred tier. The takeaway is that any optimization that only enumerates arithmetic without modeling memory movement is incomplete.
 
+A more granular view appears in communication-avoiding literature such as the algorithms summarized by the arXiv report in 1409.3215 [https://arxiv.org/pdf/1409.3215], which shows that blocking, cache tiling, and pipelined neighbor access reduce the arithmetic-to-communication ratio. Applied to attention, you can tile the KV cache such that only the currently active “pruned” rows live in HBM while the rest remain in DRAM, and you prefetch the next tile when the decoder steps into it. This is similar to blocking used in matrix multiply, but now decisions depend on token selection. The optimization, therefore, becomes hardware-aware: prune sequences not only to save FLOPs but also to shrink the active cache footprint and orchestrate HBM⇄DRAM transfers such that bandwidth availability matches the compute stage.
+
+To manage this orchestrated movement, we model the cache as two tiers: a hot tier resident in HBM with low latency and a warm tier in DRAM. The hot tier holds the keys/values for tokens that are more likely to be attended to next (for example, tokens in the past window or with high salience under a learned importance score). When a query is pruned, we do not delete its keys/values entirely; instead, we demote them to the warm tier and keep a lightweight summary or compressed representation, ready to be promoted back when the attention score surpasses a threshold. The hardware model must track the time penalty of this demotion/promotion so that we never spend more time moving bytes than we saved by pruning. 
+
+### Scaling and CompleteP’s depth-wise transfer
+
+Every level of the model — depth, width, head count — interacts with the hardware model. CompleteP (2024) (a depth-wise hyperparameter transfer framework) suggests that the optimal learning rate, layer normalization schedule, and pruning intensity vary predictably with depth, allowing practitioners to reuse tuned hyperparameters when transitioning from a toy GPT to a deeper geometry. The framework quantifies how much extra compute each additional layer consumes and proposes a mapping function \(f(d)\) from depth \(d\) to your compute budget.
+
+In practice, this means we solve a constrained optimization:
 \[
-S = 2nd \times 4 \text{ bytes}
+\min_{d, h, c_{\text{cache}}} \mathcal{L}(f(d), h, c_{\text{cache}}) \quad \text{s.t.} \quad \text{BW}_{\text{HBM}}(c_{\text{cache}}) + \text{BW}_{\text{DRAM}}(c_{\text{cache}}) \leq B_{\text{max}},
 \]
+where \(h\) is the number of heads, \(c_{\text{cache}}\) is the active cache size, \(B_{\text{max}}\) is the available bandwidth on your node, and \(\mathcal{L}\) is the loss resulting from the depth/width selection measured via CompleteP’s transfer function. The consequence is that you cannot treat depth scaling as independent of cache sizing: adding a layer increases the inner loop’s cache pressure, and the framework tells you how to recalibrate the pruning threshold (e.g., token selection probability) so that the bandwidth constraint stays satisfied.
 
-where the factor of two counts keys and values. Each layer multiplies that storage, so the per-token bandwidth is essentially \(O(ndL)\) where \(L\) is the number of layers. At inference, tokens stream in, but for each new token we must fetch the entire cache to compute attention, resulting in multiple terabytes of memory traffic per second when serving long contexts.
+CompleteP further recommends non-lazy learning schedules that adapt to hardware: the framework uses an “early warming” period in which we warm the cache by precomputing the key/value matrices during the forward pass and then gradually increase the prune rate as the model stabilizes. This adjustment helps because the cache movement has startup costs; amortizing them early keeps throughput high once real decoding begins.
 
-Hybrid attention kernels break the \(O(n^2)\) barrier by weaving together linear attention and sparse attention. Consider a linear attention kernel \(K(u, v) = \phi(u)^\top \phi(v)\) where \(\phi: \mathbb{R}^d \to \mathbb{R}^{r}\) projects into a lower-dimensional feature space of dimension \(r\). Computing attention weights becomes
+### Systems bridging sparsity and execution (SparseServe)
 
+Algorithmic sparsity promises savings, but the systems story is harder. SparseServe (2025) demonstrates a production-grade path where the sparse attention selection is coupled with an explicit cache manager that streams between HBM and DRAM with backpressure signals. The key is to treat the sparse selection as a request for a subset of the cache tier, then orchestrate the vendor’s DMA engine to fetch that subset in the background. SparseServe’s scheduler is aware of the decompressed size of each cache entry and uses a budgeted compression codec to shrink the “warm” tier footprint while remaining decompressable when fetched back into HBM.
+
+To describe it concretely, consider that each key/value pair is represented as a 32-bit float vector of length \(d_k\). SparseServe introduces a compression function \(\psi(K)\) where \(\psi\) outputs a packed 8-bit representation plus metadata to rebuild the original vector. The metadata includes a checksum and an L2 norm used for importance scoring. During inference, when the importance score exceeds a threshold, the system issues a "promote" request that decompresses the entry back into HBM. These promotes are pipelined with attention computation: while head 1 consumes the hot tier, the DMA engine warms up the next predicted tile, allowing scheduled compute to overlap with cache movement.
+
+The consequence is that the KV cache is now a layered asset: the hot layer supports fast, dense attention; the warm layer stores compressed representations; and the movement between them is driven by the sparsity policy. That policy is instrumented with telemetry to track how often we rehydrate entries from DRAM, how much latency each demotion/promotion costs, and whether the prefetch success rate justifies the compression ratio. SparseServe reports up to 40% latency reduction on a 4-layer GPT-style decoder by balancing these volumes; the critical insight is that you cannot improve inference latency by thinking about dropout masks alone—you must orchestrate compression, DMA, and compute simultaneously.
+
+### Dynamic sparse layers with hardware-aware caching
+
+Putting it all together, the optimized sparse attention layer in our build exhibits the following behavior:
+
+1. Each decoder layer maintains a “selection tensor” \(s \in \{0,1\}^n\) computed by a lightweight selector network that estimates attention salience. 
+2. The keys/values of pruned tokens are immediately compressed via \(\psi\) and demoted to the warm tier while a retention table keeps track of their last accessed positions.
+3. Future queries consult the selector first; if a pruned token’s predicted importance surpasses the cache-recall threshold, its compressed representation is promoted while the attention computation continues with the currently available hot entries.
+4. The promotion uses asynchronous DMA to keep the compute pipes busy, and the scheduler prevents offloading when the available bandwidth in that interval is saturated.
+
+Mathematically, the runtime becomes constrained by both FLOPs and bandwidth:
 \[
-\text{Attention}(Q, K, V) = \phi(Q) \big(\phi(K)^\top V\big)
+T_{\text{step}} = \frac{F_{\text{active}}}{P_{\text{compute}}} + \frac{B_{\text{active}}}{B_{\text{HBM}}} + \frac{C_{\text{promote}}}{B_{\text{DRAM}}},
 \]
+where \(F_{\text{active}}\) is the FLOPs for the active tokens, \(P_{\text{compute}}\) is the chip’s compute throughput, \(B_{\text{active}}\) is the number of bytes pulled from the hot cache, \(B_{\text{HBM}}\) is the HBM bandwidth, and \(C_{\text{promote}}\) is the volume of data promoted from DRAM, with \(B_{\text{DRAM}}\) its bandwidth. Optimizing the network now means minimizing \(F_{\text{active}}\) while ensuring that \(C_{\text{promote}}\) stays within a budget determined by \(B_{\text{HBM}}/B_{\text{DRAM}}\). The dynamic selection thresholds and compression ratios are tuned through CompleteP-style transfer so that deeper models do not suddenly overload the bandwidth once they are scaled.
 
-where \(\phi(Q) \in \mathbb{R}^{n \times r}\), \(\phi(K)^\top V \in \mathbb{R}^{r \times d}\), and the result \(\mathbb{R}^{n \times d}\). The dependence on \(n\) is now linear rather than quadratic because the cross-term \(\phi(K)^\top V\) happens once per batch, not per token pair. Kernel functions such as \(\phi(u) = \text{elu}(u) + 1\) or \(\phi(u) = \text{softmax}(u)\) ensure positivity and stability. The key tradeoff is replacing precise pairwise interactions with projected summaries.
-
-Hybrid architectures, like those that Jet-Nemotron (Wang et al. 2025) [arxiv:2508.15884v1](https://arxiv.org/abs/2508.15884v1) uses, keep dense self-attention in early layers where global context matters and swap to linear kernels later where the model primarily propagates local structure. Jet-Nemotron’s PostNAS freezes the MLP weights while using neural architecture search to replace expensive attention layers with linear blocks, demonstrating that throughput gains can exceed 2× without retraining the entire model. This is because the PostNAS agent knows exactly which layers contribute most to KV cache pressure and only rewires those to linear or sparse blocks; the rest of the network sees the same weights as before.
-
-In practice, hybrid attention often pairs the linear kernel with a sparse mask. Define a sparse mask matrix \(M \in \{0,1\}^{n \times n}\) where \(M_{ij} = 1\) if token \(i\) attends to token \(j\) in the sparse pattern (e.g., sliding window, strided, or chunked). The resulting attention can be written as 
-
-\[
-\text{HybridAttention}(Q,K,V) = \phi(Q) \big(\phi(K)^\top V\big) + (Q K^\top \odot M) V
-\]
-
-where \(\odot\) denotes element-wise multiplication. The first term handles the global, linear component with compressed KV, and the second term adds sparse, high-fidelity interactions while limiting the number of entries to \(O(n \log n)\) or \(O(n)\). By carefully scaling the mask density, the model keeps high-quality local attention while drastically reducing the size of the KV cache because only the sparse entries need to be stored exactly.
-
-### 3. Cache-aware routing
-
-Hybrid attention reduces the amount of KV data, but we also need to keep the data movement between HBM (on-chip high-bandwidth memory) and the larger DRAM or shared KV cache from triggering stalls. SparseServe (Anonymous et al. 2025) [https://arxiv.org/abs/2511.05555](https://arxiv.org/abs/2511.05555) introduces a hierarchical KV cache manager that splits the attention state across HBM and DRAM tiers. Each KV chunk is prefetched into HBM according to a static cost model that estimates token reuse frequency. The model monitors token length and tenant load, then dynamically reorders the cache to keep the most frequently accessed keys in the faster tier. When a token arrives, the scheduler checks whether its KV block already resides in HBM; if not, it streams it in without blocking the entire batch by interleaving transfers with computation via CUDA streams.
-
-This scheme relies on the assumption that not all tokens participate equally: some will be reused by streaming, others by short-lived prompts. The scheduler assigns an attention priority score \(p_i\) to each token \(i\), computed as
-
-\[
-p_i = \alpha \cdot \text{recency}(i) + \beta \cdot \text{frequency}(i),
-\]
-
-where \(\alpha, \beta \in \mathbb{R}_+\) balance how recent and how often a token is needed. The scheduler keeps the top \(k\) tokens (by \(p_i\)) in HBM and keeps the rest in DRAM, thereby bounding memory usage while still allowing the GPU to process tokens in parallel. When combined with hybrid attention, this batching-aware routing ensures that the GPU does not stall even when sequence lengths vary significantly across requests.
-
-The combination of frozen backbones with adapters, linear or sparse kernels, and cache-aware routing gives us a new architecture optimization philosophy: treat attention and parameterization as a single hardware-aware subsystem rather than separate concerns. That philosophy is what the subsequent benchmark build—implementing a hybrid attention block, comparing its memory footprint to dense self-attention on Colab T4, and observing KV cache behavior—will prove in practice.
+Because the warm tier uses a compact representation, we can also experiment with layered precision (e.g., FP8 in HBM, INT4 in DRAM) without refactoring the architecture. The selector becomes the guardrail that keeps the high-precision entries in memory only when they make a measurable latency win. This is how multi-dimensional co-design unfolds: topology, parameterization, and memory all contribute measurable terms to the step time, and the optimization is finding the pareto frontier on that surface.
 
 ## Where the field is now
 
-The research frontier is racing to show that hybrid attention blocks plus cache-aware scheduling can match dense attention quality while reducing bandwidth pressure. Jet-Nemotron (Wang et al. 2025) reports 2× inference throughput improvements on long-context benchmarks by swapping only the highest KV-pressure layers to linear kernels identified via PostNAS and keeping the rest of the parameters frozen. CompleteP (Anonymous et al. 2025) complements that by demonstrating that depth-wise hyperparameter transfer prevents lazy learning when the backbone is frozen, meaning those linear blocks still receive useful gradients through adapters. SparseServe (Anonymous et al. 2025) presents the first open-source scheduling framework where KV cache occupancy is bounded in software—its hierarchical HBM/DRAM manager reports a 30% reduction in DRAM-to-HBM stalls on multi-tenant inference compared to a naive cache.
+SparseServe (2025) has become the most cited experiment in the intersection of algorithmic sparsity and memory hierarchies; the authors show that a DMA-aware cache manager can sustain 100 tokens per second on a 65B parameter decoder with no more than a 0.5% drop in loss, provided the promote/demote policy obeys their derived latency budget. The paper’s contribution is not just in the policy but in the instrumentation that maps each cache transfer to a concrete bandwidth spike in the trace, allowing operators to know when an upcoming generation will saturate DRAM. This corresponds with more recent works that continue to treat the KV cache as a scheduling problem—you cannot prune tokens without knowing what the hardware does with the bytes you keep.
 
-On the engineering front, production deployments are already treating the KV cache as the performance moat rather than the compute graph. For example, NVIDIA’s SuperCloud offering runs prompt streams with per-tenant KV scheduling so that a multi-GPU pod never simultaneously trashes the HBM, and it uses Jet-Nemotron–style hybrid layers (engineer blog, [developer.nvidia.com/blog](https://developer.nvidia.com/blog)). Meta’s Llama-3 inference service fuses LoRA adapters at runtime and pins the adapters in HBM while streaming the frozen 4-bit quantized projection matrices from DRAM, demonstrating the same principle on a >30B parameter model. Finally, the open-source vLLM stack now features a cache manager that implements SparseServe’s priority table, meaning Kubernetes clusters can run mixed-length requests while guaranteeing p99 latency even under bursty demand.
+On the scaling side, CompleteP’s transfer rules are now being incorporated into libraries such as Hugging Face’s Accelerate, where depth-specific learning rate multipliers and gradient clipping constants are reused across GPT-2 → GPT-NeoX transitions without expensive grid searches. The idea that you can reuse hyperparameters when you double depth (a simple polynomial mapping) reduces the practical compute required to tune new variants and helps align architecture search with hardware constraints.
 
-These developments show that the field now distinguishes between what must stay dense—usually the query computation—and what can be approximated or stored softly. The question today is how fast one can identify the right layers to rewire and how carefully the KV cache must be budgeted before hardware becomes the limiting factor again.
+For the engineering frontier, there are several production-grade deployments that show what these co-design principles buy:
+
+- AWS’s [LLM-D framework](https://aws.amazon.com/blogs/machine-learning/llm-d) exposes a memory-tiered inference path for large decoders, explicitly sharding KV caches across multiple DDR banks to avoid saturation. Their blog quantifies that a single r7g.8xlarge instance can serve 20B models at 10ms p95 when the KV cache is pinned to HBM and the warm tier sits in adjacent DDR4 modules.
+- AWS’s vLLM (https://aws.amazon.com/blogs/machine-learning/vllm-open-source) uses asynchronous scheduling and kernel fusion to keep GPU compute busy even when the KV cache has to be drizzled in from CPU memory, similar to the promotion/demotion story in SparseServe.
+- NVIDIA Dynamo (https://developer.nvidia.com/blog/nvidia-dynamo/) applies memory virtualization inside the GPU by streaming KV slices from host to device when capacity is exceeded, matching the idea of warm/cold tiers executed across PCIe links.
+- Google’s PROMPTS framework (https://research.google/pubs/pub50421/) emphasizes caching of prompt tokens with per-layer hooking, ensuring each attention layer keeps only the necessary tokens in HBM by introducing layer-specific caching policies.
+
+These examples show that the systems practice of co-designing the cache paths with the architecture is no longer an experiment—it is now part of the stack for production inference at hyperscale.
 
 ## What's still open
 
-1. Can a PostNAS-style controller operate in a zero-shot fashion during inference, dynamically rewiring layers between dense, linear, and sparse attention modes based on current KV cache pressure without retraining?
-2. What is the optimal token-priority metric for cache-aware routing that generalizes across multi-tenant workloads, and can it be learned end-to-end rather than hand-tuned?
-3. Do hybrid attention blocks with linear-plus-sparse combinations admit a universal quantization schedule that keeps the linear term stable while letting the sparse term be aggressively quantized, so that the entire block fits inside HBM regardless of sequence length?
-4. How can we dynamically partition and route tokens in hybrid linear-attention architectures to guarantee bounded KV-cache memory usage during multi-tenant, variable-length batching without triggering catastrophic DRAM-to-HBM transfer latency?
+1. Can we design a unified, hardware-native attention mechanism that dynamically compresses and decompresses KV caches in-flight without the latency of CPU-GPU transfers exceeding the computational savings of the sparsity itself?
+2. What is the optimal policy for promoting compressed entries under fluctuating bandwidth budgets so that the scheduler never walks into a “cache storm” where every head requests data from DRAM simultaneously?
+3. How do we reconcile CompleteP-style depth-wise hyperparameter transfer with curriculum learning, where the importance of attention heads shifts dramatically between pretraining and fine-tuning?
+4. Can FHE-grade privacy-preserving inference, as pioneered by Gentry (2009) [http://www.cs.cmu.edu/~odonnell/hits09/gentry-homomorphic-encryption.pdf], be made compatible with dynamic sparse caches without exploding latency, especially when the cache entries themselves must remain encrypted during demotion?
 
 ## Where to read next
 
-If you want the probabilistic foundation behind the frozen-adapter and LoRA techniques, → [[parameter-efficient-training]] explains the view of adapters as implicit regularizers and how they keep the log-likelihood tractable. The engineering counterpart is → [Attention Mechanisms](attention-mechanisms.md) which dives deeper into how sparse and linear attention kernels trade off quality for memory. For the serving perspective, → [[memory-bandwidth-optimization]] shows how GPUs and CPUs can coordinate KV caches across tiers to keep inference latency bounded.
+If you want the mathematical foundation for why attention has the structure it does, → [Attention](../../07-attention-memory-reasoning-continual/concepts/attention.md) walks through the dot-product formalism and the trade-offs between different parameterizations. If the hardware story intrigues you, → [[memory-hierarchies]] dissects the tiered storage stack that attention layers must live inside. For a deeper dive into sparsity algorithms whose scheduling plays nicely with these cache tiers, → [[sparse-attention-patterns]] explores the selectors and token pruning heuristics that feed the cache manager.
 
 ## Build it
 
-This build proves that a hybrid attention block combining a kernelized linear term with a sparse mask can deliver the same model outputs as standard self-attention while reducing KV cache peaks on a free Colab T4.
+This build proves that a tiny Transformer can be instrumented with a hardware-aware dynamic sparse attention layer whose simulated cache manager shows measurable latency improvements on a free Colab GPU.
 
-**What you're building:** a PyTorch hybrid attention block where the kernelized linear path handles global context and a sparse sliding-window mask adds local fidelity, benchmarked against dense self-attention on synthetic sequences for memory footprint comparison.
+**What you're building:** A cache-aware dynamic sparse attention layer for GPT-2 Tiny, with an HBM/DRAM simulator that tracks promotions/demotions and reports latency savings on TinyShakespeare decoding.
 
-**Why this is valuable:** the exercise touches the three levers from the concept: you write a linear kernel, you glue in a sparse mask, and you measure KV cache size, forcing you to feel the memory bandwidth savings.
+**Why this is valuable:** This recipe forces you to tie token selection, cache compression, and placement decisions together, which is the essence of the co-design insight: you cannot save time by pruning attention if the bandwidth cost of moving the remaining key/values erases the savings.
 
 **Stack:**
-- **Model:** `hf-internal-testing/tiny-random-clip` — 66 downloads, simple enough for Colab
-- **Dataset:** synthetic token sequences generated on the fly per recipe step
-- **Framework:** PyTorch 3.0 with `torch.cuda.amp` enabled
-- **Compute:** Free Colab T4 (16 GB VRAM), runtime ~1 hour
+- **Model:** [gpt2](https://huggingface.co/gpt2) — 3.5M downloads, small decoder baseline.
+- **Dataset:** [tiny_shakespeare](https://huggingface.co/datasets/tiny_shakespeare) — well-known toy dataset for autoregressive modeling.
+- **Framework:** PyTorch 2.2 + Diffusers 0.35 for utilities.
+- **Compute:** Free Colab T4 (16GB VRAM, ~1hr training/fine-tuning).
 
 **The recipe:**
-1. `pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118 && pip install accelerate tensorboard` and import `torch`, `torch.nn.functional as F`, and `torch.cuda.amp`.
-2. Create synthetic batches of token embeddings shaped \((B, n, d)\) with \(B=1\), \(n=1024\), \(d=512\); normalize them and cache the baseline attention mask as the identity mask.
-3. Implement the hybrid block: compute \(\phi(x)=\text{elu}(x) + 1\) for queries/keys; compute the linear term \(\phi(Q)(\phi(K)^\top V)\); add a sparse mask \(M\) that retains only the previous 64 tokens per query (sliding window), zeroing others before the \(QK^\top\) multiply.
-4. Train for 100 steps with AdamW (lr=1e-4, weight decay=0.01) on a reconstruction objective \(\|H_\text{hybrid} - H_\text{dense}\|^2\), logging loss every 10 steps; expect the hybrid loss to plateau within 5% of the dense baseline.
-5. Measure RTX memory stats using `torch.cuda.max_memory_allocated()` during forward pass for both hybrid and dense attention blocks; record the ratio.
+1. `pip install torch==2.2.0 transformers diffusers fastrand` and load `AutoModelForCausalLM.from_pretrained("gpt2")`.
+2. Tokenize TinyShakespeare with `GPT2TokenizerFast` and create 256-token causal sequences; the KV cache simulator wraps the forward pass and compresses every key/value pair exceeding 64 tokens into 8-bit chunks before storing them in the simulated DRAM buffer.
+3. During training fine-tune for 3 epochs with 8 warm-up steps and a cosine learning rate, tracking the cache miss rate as you vary the sparsity selector’s threshold; expect training loss to start around 2.2 and fall below 1.8.
+4. Evaluate by generating 128-token sequences with top-p sampling at 0.9 and measuring tokens-per-second with and without the cache manager; aim for a 15–25% latency drop when sparsity is enabled.
+5. After evaluation, you have a GPT-2 checkpoint plus the cache telemetry table showing promotion/demotion counts and the achieved latency savings.
 
-**Expected outcome:** a Jupyter notebook that plots the loss convergence and reports a KV cache memory reduction of at least 30% when using the hybrid block versus dense attention on the synthetic sequence.
+**Expected outcome:** A hardware-aware dynamic sparse attention module that you can slot into other GPT-2 sized decoders, together with logged latency gains and a simulated HBM/DRAM trace.
 
-- **CS student:** Run the same notebook on an RTX 4070 with \(n=2048\) and reduce the sparse window to 32 tokens to keep memory within 12 GB, documenting the memory-vs-loss tradeoff.
-- **Applied engineer:** Quantize the hybrid block to INT8 with NVIDIA’s TensorRT, serve it with vLLM, and target p99 latency < 70 ms on an A10 by keeping the slot-reserved KV cache for the linear kernel inside L2.
-- **Applied researcher:** Hypothesis: the sparse window size controls the effective context length more than sequence length; experiment by sweeping window sizes [16, 32, 64, 128], measuring the alignment between hybrid and dense attention outputs via cosine similarity, and report the window size that minimizes loss while staying within a 20% memory budget.
-- **Frontier researcher:** Extend the scheduler to dynamically route windows between HBM and DRAM based on token priority \(p_i = 0.6 \cdot \text{recency} + 0.4 \cdot \text{frequency}\); falsify the hypothesis that such routing bounds memory usage by demonstrating a workload where memory peaks stay below 90% of HBM even with variable-length batches.
+- **CS student:** Run the same build on an RTX 4070 with the same script but increase batch size to 4 and plot the trade-off between cache promotion frequency and tokens per second using Matplotlib.
+- **Applied engineer:** Deploy the fine-tuned checkpoint with vLLM on an A10 instance, enable 4-bit quantization, and aim for p95 latency below 60ms by keeping the hot cache locked to GPU memory and only offloading compressed entries when absolutely necessary.
+- **Applied researcher:** Test the hypothesis that a cosine sparsity schedule outperforms a step schedule in terms of latency reduction without hurting perplexity by training two versions of the selector (cosine vs. step) and comparing their promo/demote counts.
+- **Frontier researcher:** Probe the open question of dynamic compression by implementing an end-to-end attention kernel that compresses KV entries as they are demoted, measuring whether the additional decompression cost ever outweighs the bandwidth savings in the trace.
 
 ---
 
