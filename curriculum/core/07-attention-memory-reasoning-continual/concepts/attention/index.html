@@ -1207,13 +1207,124 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">attention</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">context-modeling</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">memory</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">routing</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">transformers</span>
+      
+    
+  </nav>
+
 
   
   
 
 
 <h1 id="attention">Attention<a class="headerlink" href="#attention" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">07 · Attention Memory Reasoning Continual</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<p>Imagine asking a translator to read a 100-word sentence, memorize it perfectly, and then translate it from a single internal snapshot. Every nuance—cultural references, clause boundaries, rare named entities—must survive in that fixed memory. Before attention, every encoder-decoder stack in machine translation suffered that absurd constraint: the decoder only ever saw the encoder through a single bottleneck vector, so long sentences, legal contracts, or dialogues lost critical context. Attention is the responsive workaround that lets every decoder token query, route, and retrieve exactly the pieces of the source it needs at that moment. By the end of this page you will understand how attention turns static representations into dynamic queries over an entire sequence, why scaled dot-product and multi-head versions are the practical workhorses, and how to prove it to yourself by building a PyTorch version and cross-checking it against the framework primitives. </p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Before attention, sequence-to-sequence models ran exactly once through the source, cached a hidden state, and fed that to the target generator. The result was a single vector trying to carry the entire sentence, which means rare facts became noise by the time the decoder needed them. Attention reframes the problem as dynamic retrieval: each decoder “query” asks the encoder set whether any stored “key-value” pair matches what is needed right now. This makes the representation context-dependent instead of static.</p>
+<p>This dynamic routing protocol sits between two families: the probabilistic alignment approaches of the early 2010s and the later parallelizable architectures like Transformers. It inherits from alignment the idea that not all source tokens matter equally, and from modern matrix-heavy models the ability to execute those comparisons for a whole sequence simultaneously through batched linear algebra.</p>
+<p>Attention does not just pick a token once per time step; it broadcasts queries over every encoder position, computes match scores with the keys, and aggregates values with the resulting weights. That aggregation can happen inside one token-pair or across entire sequences simultaneously, which is why attention became the substrate for self-attention, memory access, and even retrieval-augmented generation. How does this routing protocol work in practice—what are the exact computations, the scaling tricks, and the gradient checks that make attention reliable at scale?</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>The mechanism begins with three projections for every input token: a query <span class="arithmatex">\(q\)</span>, a key <span class="arithmatex">\(k\)</span>, and a value <span class="arithmatex">\(v\)</span>. Each projection is a learned linear map of the token’s embedding or hidden state. The key idea is that the query interacts only with keys, not with values directly, so the attention weights reflect a similarity measure independent of the aggregated output.</p>
+<p>The canonical similarity is the scaled dot product. For a batch of sequences we organize queries into matrix <span class="arithmatex">\(Q \in \mathbb{R}^{B \times T_q \times d_k}\)</span>, keys into <span class="arithmatex">\(K \in \mathbb{R}^{B \times T_k \times d_k}\)</span>, and values into <span class="arithmatex">\(V \in \mathbb{R}^{B \times T_k \times d_v}\)</span>, where <span class="arithmatex">\(B\)</span> is batch size, <span class="arithmatex">\(T_q\)</span> and <span class="arithmatex">\(T_k\)</span> are the number of query and key positions, and <span class="arithmatex">\(d_k\)</span> and <span class="arithmatex">\(d_v\)</span> are the dimensionalities of keys and values. The attention logits are</p>
+<div class="arithmatex">\[
+\text{logits} = \frac{Q K^\top}{\sqrt{d_k}},
+\]</div>
+<p>where the denominator <span class="arithmatex">\(\sqrt{d_k}\)</span> prevents the dot products from growing too large as dimensionality increases and destabilizing the softmax. Feeding those logits into softmax row-wise over <span class="arithmatex">\(T_k\)</span> yields attention weights</p>
+<div class="arithmatex">\[
+A = \text{softmax}\left(\frac{Q K^\top}{\sqrt{d_k}}\right),
+\]</div>
+<p>where each row of <span class="arithmatex">\(A\)</span> sums to one and expresses how much each key should contribute to a given query. The output is then</p>
+<div class="arithmatex">\[
+\text{Attention}(Q, K, V) = A V,
+\]</div>
+<p>where every query receives a weighted-combination of values, and the weights can be interpreted as dynamic routing probabilities. This simple algebra is already enough to explain multiplicative attention (Luong et al. 2015 [arxiv:1508.04025]) and explains how matrix multiplies can replace per-token loops.</p>
+<p>Attention’s gradient flows cleanly: the derivative of the loss with respect to <span class="arithmatex">\(Q\)</span> depends on <span class="arithmatex">\(K\)</span>, <span class="arithmatex">\(V\)</span>, and the upstream gradient through <span class="arithmatex">\(A\)</span>, and there is a direct path from each target position to all source positions. This is in contrast to fixed bottlenecks and makes attention favorable for long-range dependencies.</p>
+<h3 id="multi-head-attention">Multi-head attention<a class="headerlink" href="#multi-head-attention" title="Permanent link">&para;</a></h3>
+<p>The raw scaled dot-product handles a single projection space at dimension <span class="arithmatex">\(d_k\)</span>, but different subspaces of the hidden state may encode different relational cues: syntactic roles, positional clues, lexical semantics. Multi-head attention splits each projection into <span class="arithmatex">\(h\)</span> separate heads. If the total model dimension is <span class="arithmatex">\(d_{\text{model}}\)</span>, each head runs with <span class="arithmatex">\(d_k = d_v = d_{\text{model}} / h\)</span>. We compute <span class="arithmatex">\(Q_h, K_h, V_h\)</span> by slicing the projected tensors, perform attention per head, and concatenate the <span class="arithmatex">\(h\)</span> outputs:</p>
+<div class="arithmatex">\[
+\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h) W^O,
+\]</div>
+<p>where each <span class="arithmatex">\(\text{head}_i = \text{Attention}(Q_i, K_i, V_i)\)</span> and <span class="arithmatex">\(W^O\)</span> is a learned output projection. Each head can focus on a different relational pattern because the keys and queries per head train independently. The combination keeps the overall parameter count manageable while allowing representational diversity.</p>
+<p>Multi-head attention turned out to be the critical ingredient of Vaswani et al. (2017) “Attention Is All You Need” [arxiv:1706.03762] (and the mirrored site archives at <a href="https://hasler.ece.gatech.edu/Courses/MachineLearning/FoundationalPapers/Google_Attention_NIPS-2017.pdf">hasler.ece.gatech.edu</a> and <a href="https://www.research.pitt.edu/sites/default/files/Attention%20is%20All%20You%20Need.pdf">research.pitt.edu</a>), where the Transformer replaced recurrence entirely with stacked multi-head self-attention and position-wise feed-forward layers. The paper also provides the foundation for residual connections, layer normalization, and the position encoding that lets attention handle ordered data.</p>
+<p>The original additive attention by Bahdanau et al. (2014) [arxiv:1409.0473] (which also appears in the 1507.01053 preprint “Untitled” [arxiv:1507.01053]) uses a learned two-layer network to combine decoder hidden state <span class="arithmatex">\(s_{t-1}\)</span> and encoder hidden states <span class="arithmatex">\(h_i\)</span> before measuring similarity. That additive formulation inspired the query-key-value separation: the decoder hidden state becomes the query, the encoder hidden states become keys and values, and the scoring network is the attention function. Luong et al. (2015) [arxiv:1508.04025] showed that a dot-product similarity can replace the learned score function, offering huge compute savings for long sequences by turning the alignment into two matrix multiplies rather than a neural network per pair.</p>
+<h3 id="position-and-masking">Position and masking<a class="headerlink" href="#position-and-masking" title="Permanent link">&para;</a></h3>
+<p>Because attention is permutation-invariant, the Transformer adds positional encodings to each token embedding. These encodings are either sinusoidal functions or learned vectors, added to the input before the projections to <span class="arithmatex">\(Q, K, V\)</span>. During decoder self-attention, causal masking sets logits to <span class="arithmatex">\(-\infty\)</span> for future positions, ensuring the model cannot peek ahead. In encoder-decoder attention, masking only blocks padded positions, preserving parallelism.</p>
+<h3 id="implementation-considerations">Implementation considerations<a class="headerlink" href="#implementation-considerations" title="Permanent link">&para;</a></h3>
+<p>Computing <span class="arithmatex">\(Q K^\top\)</span> naively costs <span class="arithmatex">\(O(T_q T_k d_k)\)</span> per layer, meaning dense attention scales quadratically with sequence length. Practical implementations use batched GEMMs (general matrix multiplies) and fused softmax operations. Frameworks like PyTorch provide <code>nn.MultiheadAttention</code>, which internally handles projection weight packing, dropout, and in-projection biases. To understand and debug the mechanism, it is valuable to implement the attention computation explicitly—the same calculations, but with explicit matrix multiplies so every intermediate tensor has a name.</p>
+<h3 id="failure-modes">Failure modes<a class="headerlink" href="#failure-modes" title="Permanent link">&para;</a></h3>
+<p>When sequences exceed the maximum length that fits in memory, the quadratic cost forces truncation or chunks. Truncation loses context, while chunked attention introduces windowing biases. Softmax attention also suffers from “attention dilution”: when many keys are equally similar, gradients spread thinly and the model can’t focus on the truly relevant tokens. In practice, attention weights often end up sharply peaked because of the scaling term <span class="arithmatex">\(\sqrt{d_k}\)</span>, but when <span class="arithmatex">\(d_k\)</span> is not properly tuned, softmax can become too flat or too sharp, causing vanishing gradients. Understanding these failure modes is why building attention from scratch is enlightening: every tensor you name is a handle to inspect.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>Attention remains the substrate for most large-scale sequence models. Research frontiers continue to push both the retrieval power and the efficiency of the mechanism.</p>
+<p>On the research frontier, Perceiver IO (Jaegle et al. 2021) and its successors show how attention can be interfaced with arbitrary input modalities by learning latent arrays that interact with the high-dimensional data through cross-attention; the latent array remains constant in size, so the model only pays <span class="arithmatex">\(O(L)\)</span> compute, where <span class="arithmatex">\(L\)</span> is the latent length rather than the input length. The most recent work from Kitaev et al. (2024) introduces routing-based attention (Minotaur), which partitions sequences into chunks using attention-induced clustering, leading to sub-quadratic complexity while keeping the retrieval deterministic—this direction directly engages the question of how to maintain exact non-reciprocal retrieval when the state update cost is constant.</p>
+<p>The engineering frontier includes systems such as FlashAttention (Dao et al. 2022) and its optimizations in production stacks. FlashAttention reorganizes the softmax into blocks that fit in the on-chip SRAM, eliminating extra copies and achieving both speed and memory efficiency on GPUs. Nvidia’s developer blog documents how FlashAttention enabled training GPT-3–sized models by reducing peak memory without altering the mathematical behavior of attention, which means the same training code works once the fused kernels replaced the standard PyTorch autodiff ops. Transformers deployed at Netflix, Meta, and OpenAI use these kernels to hit throughput targets without sacrificing model accuracy. Inference systems such as vLLM incorporate FlashAttention and quantization-aware operators to maintain low latency for long-context models.</p>
+<p>Finally, memory-efficient variants such as Linformer, Performer, and Nyströmformer offer approximate attention that trades some retrieval fidelity for lower computational cost. While these approximations are often good enough for standard benchmarks, they further highlight the engineering imperative: we still need a routing protocol that returns to the original softmax attention’s exactness but with constant-time state updates. That dual demand—precision and scale—defines the current territory.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can an attention variant be designed so that the state update at inference time—what each new token contributes to future queries—incurs only <span class="arithmatex">\(O(1)\)</span> work while preserving the exact non-reciprocal retrieval behavior of the classic <span class="arithmatex">\(O(N^2)\)</span> softmax? Constructing such an <span class="arithmatex">\(O(1)\)</span>-state attention would require a summary that is both compact and selective: it must route new information into a fixed-size structure without averaging out the contributions that future queries might later need.</p>
+<p>How can attention weights be regularized so that the model learns to distinguish multiple relevant keys even when they span many timesteps, without the softmax collapsing to a single head or diffusing into uniform probabilities? A directional regularization, perhaps derived from graph Laplacians over token positions, might enforce diversity without additional hyperparameters.</p>
+<p>Is there a way to embed causal reasoning directly into the query-key scaling such that the attention matrix becomes a sparse, directed graph with learnable edges that respect logical dependencies (e.g., antecedent–consequence pairs) while remaining differentiable and parallelizable?</p>
+<p>What evaluation methodology would rigorously test whether retrieval fidelity has degraded when moving from dense attention to approximate forms? Existing benchmarks measure perplexity on held-out sequences, but a test that isolates the exactness of attention retrieval—by constructing adversarial contexts where only a few keys should matter—would expose whether approximations are brushing past the core challenge.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic foundation that motivated attention, → <a href="../../../02-generative-modeling/concepts/score-matching/">Score matching</a> shows how the same gradients emerge from denoising models. The engineering counterpart is → [[flash-attention]] where fused kernels keep attention practical for billions of parameters. For the next paradigm that stretches beyond softmax, → <a href="../../../02-generative-modeling/concepts/flow-matching/">Flow matching</a> explains how continuous paths generalize diffusion and attention alike.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p>This build proves that the attention equations are not magic—they are nothing more than query-key-value products followed by a softmax and a sum, and the gradients align perfectly with PyTorch’s optimized versions. By implementing scaled dot-product and multi-head attention from scratch in PyTorch and validating them on a synthetic sequence-reversal dataset, you gain confidence that every matrix you build matches the official primitive and that the numerical gradients carry through exactly.</p>
+<p><strong>What you're building:</strong> A validated PyTorch replica of scaled dot-product and multi-head attention whose outputs and gradients match <code>nn.MultiheadAttention</code> when trained on synthetic sequence reversal.</p>
+<p><strong>Why this is valuable:</strong> This exercise forces you to name every tensor (raw queries, attention logits, softmax weights) and verify that gradients propagate, so you cannot hide behind framework abstractions.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> <code>Qdrant/all_miniLM_L6_v2_with_attentions</code> — 19.6M downloads, exposes attention maps
+- <strong>Dataset:</strong> <code>wikitext/wikitext-2-raw-v1</code> — compact sequence data for synthetic reversal samples
+- <strong>Framework:</strong> PyTorch 2.1 with <code>torch.nn.functional</code> and <code>torch.autograd</code>
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM) — expect 30–40 minutes per run</p>
+<p><strong>The recipe:</strong>
+1. Install PyTorch (<code>pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118</code>) and HuggingFace Transformers; load <code>Qdrant/all_miniLM_L6_v2_with_attentions</code> to inspect its attention projections.
+2. Create a synthetic dataset from <code>wikitext-2-raw-v1</code>: sample sequences of 32 tokens, reverse them as targets, and batch into size 8 with padding masks.
+3. Implement scaled dot-product attention: compute <span class="arithmatex">\(Q, K, V\)</span> with linear layers, calculate <span class="arithmatex">\(\text{logits} = Q K^\top / \sqrt{d_k}\)</span>, apply causal masking where needed, softmax, and then multiply by <span class="arithmatex">\(V\)</span>. Wrap it into multi-head attention by splitting <span class="arithmatex">\(Q, K, V\)</span> into <span class="arithmatex">\(h=8\)</span> heads and concatenating outputs.
+4. Train a tiny model that embeds tokens, passes them through your attention module, and computes cross-entropy loss against the reversed sequence. Record the loss, then run the same inputs through <code>torch.nn.MultiheadAttention</code> with identical projections and compare outputs and gradients using <code>torch.autograd.grad</code>—they should match within <span class="arithmatex">\(10^{-5}\)</span>.
+5. Evaluate by measuring sequence-reversal accuracy and asserting that your module’s attention weights align with the library version by computing <span class="arithmatex">\(L_2\)</span> distance between the weight tensors; they should be near zero due to the same arithmetic.</p>
+<p><strong>Expected outcome:</strong> A notebook that produces a checkpoint plus plots showing attention weights and gradient differences, confirming your implementation reproduces PyTorch’s primitive on the same data.</p>
+<ul>
+<li><strong>CS student:</strong> Run the same notebook on a Colab GPU, reduce sequence length to 16, and visualize one head’s attention heatmap to convince yourself it attends to the reversed token.</li>
+<li><strong>Applied engineer:</strong> Wrap your attention module in a simple API, export it to TorchScript, quantize it to INT8 using <code>torch.fx</code>, and deploy it via a HuggingFace <code>text-generation</code> pipeline that reports latency &lt;60 ms per batch on an A10.</li>
+<li><strong>Applied researcher:</strong> Ablate the scaling factor <span class="arithmatex">\(\sqrt{d_k}\)</span> by training two versions (with and without scaling) and report the convergence gap in loss/accuracy, verifying whether the scaling term is the main stabilizer.</li>
+<li><strong>Frontier researcher:</strong> Extend the build by implementing a constant-state attention buffer (e.g., a fixed-size reservoir) and test whether your validation accuracy drops by more than 2 points compared to the dense version, providing empirical data toward the open question about <span class="arithmatex">\(O(1)\)</span> state updates.</li>
+</ul>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
