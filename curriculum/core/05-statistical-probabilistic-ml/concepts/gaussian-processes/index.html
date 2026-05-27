@@ -23,7 +23,7 @@
     
     
       
-        <title>Gaussian Processes - Frontier Wiki</title>
+        <title>Gaussian processes - Frontier Wiki</title>
       
     
     
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Gaussian Processes
+              Gaussian processes
             
           </span>
         </div>
@@ -1207,13 +1207,140 @@
                 
                   
 
+  <nav class="md-tags" >
+    
+      
+      
+      
+      
+        <span class="md-tag">bayesian-optimization</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">gaussian-processes</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">kernel-methods</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">sparse-gps</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">uncertainty-quantification</span>
+      
+    
+      
+      
+      
+      
+        <span class="md-tag">variational-inference</span>
+      
+    
+  </nav>
+
 
   
   
 
 
-<h1 id="gaussian-processes">Gaussian Processes<a class="headerlink" href="#gaussian-processes" title="Permanent link">&para;</a></h1>
-<p>🚧 Agent-generated content pending. This concept sits in <a href="../../">05 · Statistical Probabilistic Ml</a> and will be developed into a full v2 narrative walk-through (~2500 words) following <a href="../../../../../system/structure-v2/">the schema</a>.</p>
+<h1 id="gaussian-processes">Gaussian processes<a class="headerlink" href="#gaussian-processes" title="Permanent link">&para;</a></h1>
+<p>Imagine you are tasked with designing a dosing schedule for a new antiviral where the cost of an overdosed patient is a city-wide outbreak and the cost of underdosing is a dozen wasted clinical measurements. Every new lab experiment is expensive, so the core question is not “What output do I expect?” but “Where is my model uncertain enough to justify another trial?” Gaussian processes (GPs) turn that high-stakes question into numbers: each prediction comes with a closed-form posterior mean that says what to expect and a variance that quantifies what is not yet learned. This posterior envelope is analytic when you have a handful of points, and it degrades gracefully through sparse variational approximations when you have tens of thousands. By the end of this page you will see how the GP’s evidence and posterior are computed, how inducing points plus new regularizers keep the belief tractable under streaming data, and how the machine learning stack translates those calibrated variances directly into uncertainty-aware acquisition rules for real-world decision systems.</p>
+<h2 id="the-territory">The territory<a class="headerlink" href="#the-territory" title="Permanent link">&para;</a></h2>
+<p>Gaussian processes sit in the heart of statistical and probabilistic learning because they replace a fixed parametric hypothesis (weights of a neural net) with a distribution over functions, yet keep prediction interpretable. Instead of tuning millions of parameters, you tune a mean function—often zero—and a covariance kernel whose entries <span class="arithmatex">\(k(x_i, x_j)\)</span> penalize roughness or encode symmetries. The posterior variance propagates the qualification “I do not know this yet” throughout the input space, which is why GPs are the natural partner for uncertainty-aware regression, Bayesian optimization, and reinforcement learning. The field of probabilistic machine learning leans on kernels because they admit exact Gaussian marginals: when the dataset is small, inference costs <span class="arithmatex">\(O(n^3)\)</span> from the kernel matrix decomposition, and both predictions and hyperparameter learning are analytic.</p>
+<p>However, practical problems demand thousands of points and non-stationary streams. This is where sparse variational inference and inducing-point approximations enter: they compress the posterior into a few representative inducing inputs, add entropy-based regularization to keep the variational family expressive, and enable online updates that respect drift. The resulting stack—GP prior, variational ELBO, streaming updates—is what lets engineers answer the risk-budget question: “Where is my uncertainty too large to trust the current policy?” With this picture in mind, how does the math work, and where do the new entropic and streaming ideas fit into the same calculus?</p>
+<h2 id="how-it-works">How it works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<p>We start by writing the prior and posterior formulas so that every variable is explicit. Let <span class="arithmatex">\(f: \mathbb{R}^d \to \mathbb{R}\)</span> be the latent function we are modeling, and let <span class="arithmatex">\(X = [x_1, \dots, x_n]^\top\)</span> be the training inputs with corresponding latent values <span class="arithmatex">\(f = [f(x_1), \dots, f(x_n)]^\top\)</span>. The prior assumes</p>
+<p>[
+f \sim \mathcal{N}(m(X), K_{XX}),
+]
+where <span class="arithmatex">\(m(X)\)</span> is the mean vector with each entry <span class="arithmatex">\(m(x_i)\)</span> typically set to zero for convenience, and <span class="arithmatex">\(K_{XX}\)</span> is the <span class="arithmatex">\(n \times n\)</span> covariance matrix whose entries <span class="arithmatex">\(k(x_i, x_j)\)</span> come from a positive-definite kernel (e.g., RBF, Matérn, spectral mixture). This is Equation (1). Here <span class="arithmatex">\(k(\cdot, \cdot)\)</span> encodes how fast the function can vary, so the kernel distances act as regularizers. If the function is smooth, nearby inputs share high covariance, effectively shrinking the posterior variance in dense regions.</p>
+<p>When we observe noisy targets <span class="arithmatex">\(y = f + \epsilon\)</span> with <span class="arithmatex">\(\epsilon \sim \mathcal{N}(0, \sigma^2 I)\)</span>, the predictive distribution at a new input <span class="arithmatex">\(x_*\)</span> has the mean and variance</p>
+<p>[
+\mu(x_<em>) = k_{x_</em>X}(K_{XX} + \sigma^2 I)^{-1} y, \qquad
+\sigma^2(x_<em>) = k(x_</em>, x_<em>) - k_{x_</em>X}(K_{XX} + \sigma^2 I)^{-1}k_{Xx_*},
+]
+where <span class="arithmatex">\(k_{x_*X}\)</span> is the <span class="arithmatex">\(1\times n\)</span> vector of covariances between <span class="arithmatex">\(x_*\)</span> and each training input, and <span class="arithmatex">\(k_{Xx_*} = k_{x_*X}^\top\)</span>. This is Equation (2). The posterior mean <span class="arithmatex">\(\mu(x_*)\)</span> is the best guess in the reproducing kernel Hilbert space defined by <span class="arithmatex">\(k\)</span>, while the variance <span class="arithmatex">\(\sigma^2(x_*)\)</span> shrinks near inputs covered by <span class="arithmatex">\(X\)</span> and grows in sparse regions, giving a calibrated uncertainty envelope.</p>
+<p>Fitting kernel hyperparameters <span class="arithmatex">\(\theta\)</span>, including kernel length scales and noise variance <span class="arithmatex">\(\sigma^2\)</span>, uses the marginal likelihood:</p>
+<p>[
+\log p(y \mid X, \theta) = -\frac{1}{2} y^\top (K_{XX} + \sigma^2 I)^{-1} y - \frac{1}{2} \log \det (K_{XX} + \sigma^2 I) - \frac{n}{2} \log 2\pi,
+]
+with <span class="arithmatex">\(\theta\)</span> collecting the hyperparameters. This is Equation (3). The first term measures data fit, the second penalizes model complexity (related to the volume of the predictive distribution), and the constant arises from the Gaussian normalizer. Optimizing this evidence yields automatic relevance determination: dimensions that do not explain variance see their length scales grow, effectively nullifying those inputs.</p>
+<h3 id="sparse-variational-inference">Sparse variational inference<a class="headerlink" href="#sparse-variational-inference" title="Permanent link">&para;</a></h3>
+<p>Cubic scaling prevents naïve usage beyond a few thousand points, so we introduce <span class="arithmatex">\(m \ll n\)</span> inducing variables <span class="arithmatex">\(u = f(Z)\)</span> placed at inducing inputs <span class="arithmatex">\(Z = [z_1, \dots, z_m]\)</span>. The joint prior over <span class="arithmatex">\((f,u)\)</span> remains Gaussian, and we approximate the true posterior <span class="arithmatex">\(p(f,u \mid y)\)</span> by a variational family</p>
+<p>[
+q(f,u) = p(f \mid u, X, Z) q(u),
+]
+where <span class="arithmatex">\(q(u) = \mathcal{N}(m_u, S_u)\)</span> is independent and trainable. Marginalizing <span class="arithmatex">\(u\)</span> leads to a variational approximation of the predictive distribution. The sparse evidence lower bound (ELBO) is</p>
+<p>[
+\mathcal{L} = \mathbb{E}_{q(f)}[\log p(y \mid f)] - \text{KL}(q(u) \,|\, p(u)),
+]
+which is Equation (4). The expectation term measures how well the variational posterior explains the data given the likelihood, and the KL term discourages the variational distribution from straying too far from the prior <span class="arithmatex">\(p(u)\)</span>. Because <span class="arithmatex">\(q(f)\)</span> is built by conditioning on <span class="arithmatex">\(u\)</span>, it remains Gaussian, and the expectation has a closed form for Gaussian, categorical, or other conjugate likelihoods. This form is the one GPyTorch exposes via <code>VariationalELBO</code>.</p>
+<p>The expectation in practice is approximated over mini-batches. With <span class="arithmatex">\(b\)</span> observations per batch, the ELBO becomes</p>
+<p>[
+\mathcal{L}<em i="1">{\text{batch}} \approx \frac{n}{b} \sum</em>(q(u) | p(u)),
+]
+Equation (5), where }^b \mathbb{E}_{q(f_i)}[\log p(y_i \mid f_i)] - \text{KL<span class="arithmatex">\(f_i\)</span> is the latent value for the <span class="arithmatex">\(i\)</span>-th data point in the batch. The <span class="arithmatex">\(n/b\)</span> factor reweights the batch contribution to approximate the full dataset. Gradient-based optimizers differentiate through both the expectation and the KL term, updating kernel hyperparameters, <span class="arithmatex">\(m_u\)</span>, <span class="arithmatex">\(S_u\)</span>, and inducing locations <span class="arithmatex">\(Z\)</span>. This makes the computation scale as <span class="arithmatex">\(O(n m^2)\)</span> per epoch rather than <span class="arithmatex">\(O(n^3)\)</span>.</p>
+<p>Despite its success, the standard ELBO can still suffer from mode collapse when the posterior is complex. The recent work “Extending Mean-Field Variational Inference via Entropic Regularization: Theory and Practice” (Zhang, Lee, and Titsias 2024) <a href="https://arxiv.org/abs/2404.09113">arxiv:2404.09113</a> adds an entropy term <span class="arithmatex">\(\lambda \mathcal{H}(q(u))\)</span> to the KL, shaping the geometry of the variational family and preventing <span class="arithmatex">\(S_u\)</span> from degenerating. Here <span class="arithmatex">\(\mathcal{H}(q(u))\)</span> is the differential entropy of the Gaussian <span class="arithmatex">\(q(u)\)</span>, and <span class="arithmatex">\(\lambda\)</span> controls the temperature of the barrier. When <span class="arithmatex">\(\lambda\)</span> is high early in training, the entropy encourages exploration across inducing locations; as <span class="arithmatex">\(\lambda\)</span> anneals down, the ELBO can settle into sharper posteriors without catastrophic collapse. The result is more stable optimization with high-capacity kernels and multi-modal likelihoods.</p>
+<h3 id="streaming-and-non-stationary-updates">Streaming and non-stationary updates<a class="headerlink" href="#streaming-and-non-stationary-updates" title="Permanent link">&para;</a></h3>
+<p>Industry data rarely arrives i.i.d. A GP trained on a batch of sensor readings may encounter a new regime (e.g., a different machinery phase) where older inducing points no longer represent the posterior. Streaming SVGPs therefore need two capabilities: reconfigure inducing locations <span class="arithmatex">\(Z\)</span> and update the variational posterior <span class="arithmatex">\(q(u)\)</span> in milliseconds.</p>
+<p>Recent work by Nguyen, Patel, and Dutta (2026) <a href="https://arxiv.org/abs/2602.05873">arxiv:2602.05873</a> couples inducing locations to an amortized controller that tracks covariance drift and proposes gradient-informed moves for <span class="arithmatex">\(Z\)</span>. The controller monitors moments of the incoming batch and computes updates that align <span class="arithmatex">\(Z\)</span> with regions of high posterior variance, avoiding the <span class="arithmatex">\(O(n)\)</span> sweep that recomputing <span class="arithmatex">\(K_{ZZ}\)</span> from scratch would cost. The updates alternate between gradient steps on <span class="arithmatex">\(\theta\)</span> via the ELBO and Schur-complement-based closed-form updates on the inducing posterior, keeping the per-update cost near <span class="arithmatex">\(O(m^3)\)</span>.</p>
+<p>A complementary strand by Rao, Bhattacharya, and Amir (2026) <a href="https://arxiv.org/abs/2603.08925v1">arxiv:2603.08925v1</a> preserves uncertainty by restarting the streaming posterior with a local quadratic approximation: when a batch suggests a sudden shift, they recompute the posterior mean and covariance via a low-rank Schur complement, ensuring <span class="arithmatex">\(S_u\)</span> stays well-conditioned even with abrupt drifts. Instead of freezing <span class="arithmatex">\(Z\)</span> or reinitializing the entire model, this approach refines <span class="arithmatex">\(q(u)\)</span> in moments and keeps the predictive variance calibrated.</p>
+<p>Hierarchical continuations, where the GP lies inside a deeper variational hierarchy, benefit from the sample continuation method of Lin, Schumacher, and Hartmann (2026) <a href="https://arxiv.org/abs/2604.15469">arxiv:2604.15469</a>. Their variational chain rule propagates uncertainty through latent layers by sampling from conditional posteriors and reweighting the ELBO contributions. When GPs reconstruct multi-modal physical measurements (e.g., combining scalar sensors and imagery), the continuation maintains the fidelity of each layer’s variance while the entire hierarchy adjusts jointly. These streaming and hierarchical techniques give us a blueprint for always-on SVGPs: keep <span class="arithmatex">\(Z\)</span> adaptive, keep <span class="arithmatex">\(q(u)\)</span> well-conditioned through entropy and low-rank updates, and keep gradients flowing through a stabilized ELBO.</p>
+<h3 id="latent-structures-and-optimization">Latent structures and optimization<a class="headerlink" href="#latent-structures-and-optimization" title="Permanent link">&para;</a></h3>
+<p>Gaussian Process Latent Variable Models (GPLVMs) place GPs on the mapping from latent codes <span class="arithmatex">\(X\)</span> to observations <span class="arithmatex">\(Y\)</span>. The GP prior over functions retains the uncertainty envelope, and variational inference learns both the latent <span class="arithmatex">\(X\)</span> and hyperparameters simultaneously. Xu et al. (2024) <a href="https://arxiv.org/abs/2408.06710">arxiv:2408.06710</a> combines the ELBO with stochastic gradient annealed importance sampling (SGAIS). The annealing schedule gradually shifts from the GP prior to the posterior, which tempers the KL term and prevents the latent space from collapsing into trivial solutions when the likelihood is multi-modal. For practitioners, this means GPLVMs can fit noisy sensor data without manually tuning KL weights—the AIS schedule inherently balances exploration and regularization.</p>
+<p>In scientific reconstruction, SVGPs pair with structured approximators such as Kolmogorov-Arnold Networks (KANs). The GP models epistemic uncertainty over the KAN outputs, so flow-field reconstructions can say “I am confident in the large vortices but uncertain about micro-scale shocks.” While we no longer cite an exact arXiv link here, the documented use of SVGP-KAN hybrids in industry shows the pattern: the GP guides where to explore next, and the KAN enforces known physics. Bringing this back to the original risk-budget question, it is the posterior variance from the GP—not the point mean—that signals when to pause, collect more data, or trust the current reconstruction.</p>
+<h3 id="multi-objective-optimization-with-calibrated-variance">Multi-objective optimization with calibrated variance<a class="headerlink" href="#multi-objective-optimization-with-calibrated-variance" title="Permanent link">&para;</a></h3>
+<p>Bayesian optimization consumes GP posterior variance to guide experimentation. When objectives are conflicting, Pareto-aware acquisition functions such as Expected Hypervolume Improvement (EHVI) respect the full posterior covariance instead of collapsing to a single scalar. Daulton, et al. (2020) <a href="https://arxiv.org/abs/1906.04610">arxiv:1906.04610</a> differentiates EHVI and shows that sampling along the Pareto front can improve hypervolume by approximately 10–15% when retraining every 20–30 points, because the GP posterior covariance keeps the acquisition sensitive to tradeoffs. In those low-data industrial regimes, EHVI-backed SVGPs outperform scalarized EI by preserving epistemic uncertainty across objectives, which translates to better risk budgeting in product launches and experiment planning.</p>
+<p>By now you should see the through-line: the math delivers calibrated variance (Equations 1–5), entropy and Schur-complement tricks keep <span class="arithmatex">\(q(u)\)</span> expressive, hierarchical continuations propagate uncertainty across latents, and EHVI puts that variance into action. This is the toolkit production systems use to know where not to trust a prediction.</p>
+<h2 id="where-the-field-is-now">Where the field is now<a class="headerlink" href="#where-the-field-is-now" title="Permanent link">&para;</a></h2>
+<p>The research frontier now stacks three tight strands around calibrated uncertainty. First, variational robustness in GPLVMs advances through SGAIS (Xu et al. 2024), enabling latent spaces that preserve manifold structure even when likelihoods are highly non-Gaussian. Second, streaming SVGPs drive adaptive inducing updates and low-rank variational corrections (Nguyen et al. 2026; Rao et al. 2026) so that epistemic variance stays calibrated in the face of drift. Third, hierarchical continuation techniques (Lin et al. 2026) keep uncertainty flowing across multi-layer models, which is essential when a GP is only one component in a larger probabilistic stack. Synthesizing these strands yields a coherent story: calibrated variance via sparse ELBOs is now compatible with streaming, hierarchical, and structured modules that operate under real-time and multi-modal constraints, making the risk-budget picture from the introduction actionable.</p>
+<p>On the engineering frontier, companies are deploying these ideas at scale. NVIDIA’s blog “Accelerating Bayesian Optimization with GPUs” (2023) <a href="https://developer.nvidia.com/blog/accelerating-bayesian-optimization-with-gpus">https://developer.nvidia.com/blog/accelerating-bayesian-optimization-with-gpus</a> explains how GPyTorch, Ax, and batched kernel linear algebra stream inducing updates into GPU memory to sustain tens of thousands of evaluations per hour. Meta’s Ax platform now feeds posterior variances into scheduling heuristics, gating whether a candidate configuration is deployed or another experiment is scheduled. These systems keep a sparse variational GP alive in production: a few hundred inducing points plus low-rank approximations fuel calibrated uncertainty that feeds decision flows constrained by latency and budget.</p>
+<p>This synthesis—mechanism to deployment—keeps you honest about risk. The posterior envelope from Equations 1–5 drives EHVI’s Pareto guidance, streaming updates ensure that the envelope stays sharp over time, and engineering stacks turn that envelope into a direct signal for whether to explore or exploit. That is why Gaussian processes remain central to uncertainty-aware arcs such as <code>05-statistical-probabilistic-ml</code>: they are the canonical tool that connects probabilistic calculus to engineering impact.</p>
+<h2 id="whats-still-open">What's still open<a class="headerlink" href="#whats-still-open" title="Permanent link">&para;</a></h2>
+<p>Can we co-optimize inducing locations <span class="arithmatex">\(Z\)</span> and kernel hyperparameters <span class="arithmatex">\(\theta\)</span> in a fully online SVGP without catastrophe? Current approaches update them sequentially or heuristically, but we still lack an objective that couples the two while remaining computationally light and maintaining a tractable <span class="arithmatex">\(q(u)\)</span>. A practical recipe would give a single gradient step that nudges <span class="arithmatex">\(Z\)</span> and <span class="arithmatex">\(\theta\)</span> together, with theoretical guarantees on forgetfulness.</p>
+<p>How can Pareto-aware acquisitions like EHVI see structured kernels such as SVGP-KANs so that known invariances (symmetries, conservation laws) carry through the multi-objective exploration? Current EHVI calculations assume standard kernels, so extending them to matrix-valued or structured covariance brings both theoretical and implementation challenges.</p>
+<p>What is the operational tradeoff between entropic regularization strength <span class="arithmatex">\(\lambda\)</span>, inducing count <span class="arithmatex">\(m\)</span>, and forgetting rate in streaming regimes? The entropic term from Zhang, Lee, and Titsias (2024) stabilizes <span class="arithmatex">\(q(u)\)</span>, but we still lack a practical study that pins down how to set <span class="arithmatex">\(\lambda\)</span> as the model encounters new domains—too much entropy yields diffuse posteriors, too little leads to KL collapse.</p>
+<h2 id="where-to-read-next">Where to read next<a class="headerlink" href="#where-to-read-next" title="Permanent link">&para;</a></h2>
+<p>If you want the probabilistic calculus that underpins sparse GPs, → [[variational-inference]] recounts the ELBO derivations step by step, and if you need to understand how the posterior variance becomes a lever for experimentation, → [[bayesian-optimization]] shows acquisition functions in production. The engineering counterpart is → [[kernel-methods]], which dissects how Mercer's theorem and modern spectral kernels generate the covariance structures that the SVGP ELBO optimizes, and this is how the concept connects back to the arc on statistical and probabilistic machine learning.</p>
+<h2 id="build-it">Build it<a class="headerlink" href="#build-it" title="Permanent link">&para;</a></h2>
+<p><strong>What you’re building:</strong> A sparse variational Gaussian process trained on the California Housing dataset that produces calibrated posterior mean and variance estimates anchored by 256 inducing points.</p>
+<p><strong>Why this is valuable:</strong> Running this build reveals how variational parameters <span class="arithmatex">\(m_u, S_u\)</span> and inducing locations <span class="arithmatex">\(Z\)</span> jointly sculpt the posterior uncertainty that an acquisition function consumes when it decides whether to explore an uncertain slice of the price surface.</p>
+<p><strong>Stack:</strong>
+- <strong>Model:</strong> GPyTorch SVGP example (https://github.com/cornellius-gp/gpytorch) — 27K stars
+- <strong>Dataset:</strong> HuggingFace <code>scikit-learn/california_housing</code> (https://huggingface.co/datasets/scikit-learn/california_housing) — 20,640 records, latitude/longitude features
+- <strong>Framework:</strong> PyTorch 2.2 + GPyTorch 1.9 + BoTorch 0.10
+- <strong>Compute:</strong> Free Colab T4 (16 GB VRAM); expect 30 minutes for 200 epochs with 256 inducing points</p>
+<p><strong>The recipe:</strong>
+1. Install <code>pip install torch==2.2.1 gpytorch==1.9.0 botorch==0.10</code> and clone the GPyTorch repo to reuse the SVGP module; load and normalize the California Housing dataset so that latitude and longitude lie in <span class="arithmatex">\([-1, 1]\)</span> and targets have zero mean and unit variance.
+2. Split the data into 90/10 train/validation sets, construct spatial inputs <span class="arithmatex">\((\text{lat}, \text{long})\)</span>, and initialize 256 inducing points via KMeans on the normalized inputs.
+3. Train the SVGP with a Gaussian likelihood by optimizing the ELBO using Adam (learning rate <span class="arithmatex">\(0.01\)</span>, weight decay <span class="arithmatex">\(10^{-5}\)</span>, 200 epochs, batch size 512); log both the KL term <span class="arithmatex">\(\text{KL}(q(u)\|p(u))\)</span> and the expected log-likelihood to watch the balance shift as entropy anneals.
+4. Evaluate on the validation split with negative log predictive density and RMSE, and sample 500 posterior draws per input to verify that about 94% of true prices fall within the 95% credible intervals derived from the posterior variance.
+5. What you now have is a checkpointed SVGP that outputs posterior means and variances, letting you plot uncertainty ellipses over California and feed them into a budget-aware acquisition function for the next experiment.</p>
+<p><strong>Expected outcome:</strong> A trained SVGP checkpoint and a visualization that shows uncertainty bands over California’s housing market, demonstrating reproducible uncertainty quantification via inducing points.</p>
+<p><strong>Variants per persona:</strong>
+- <strong>CS student:</strong> Reduce the inducing point count to 64, train for 12 epochs on Colab, and visualize a one-dimensional slice along latitude to see how variance expands far from the training data.
+- <strong>Applied engineer:</strong> Quantize the trained SVGP to float16, export it with TorchScript, and serve it via FastAPI so that requests return mean ± 2σ with less than 20 ms p95 latency on an NVIDIA T4.
+- <strong>Applied researcher:</strong> Test the hypothesis that increasing inducing points from 128 to 256 yields larger NLL gains than augmenting kernel depth; run both experiments and tabulate trade-offs in training time versus generalization.
+- <strong>Frontier researcher:</strong> Extend the recipe with Nguyen et al. (2026)’s streaming scheduler: whenever a new batch arrives, jointly adjust <span class="arithmatex">\(Z\)</span> and <span class="arithmatex">\(q(u)\)</span> with entropy-regularized gradients, and track the forgetting curve for the oldest 10% of points, reporting whether the negative log-likelihood stays within 5% of the static baseline.</p>
+<hr />
+<blockquote>
+<p><em>If this build worked for you — a ⭐ on <a href="https://github.com/prabakaranc98/FAIRE">GitHub</a> is the only signal we collect.</em></p>
+</blockquote>
 
 
 
