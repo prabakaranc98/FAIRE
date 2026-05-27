@@ -101,10 +101,10 @@ def runtime_status(arc: dict) -> str:
 
 
 STATUS_BADGE = {
-    "live": "🟢 live",
-    "ready": "🟡 ready to spin",
-    "needs-seeds": "🟠 needs seeds",
-    "in-progress": "🔵 queued",
+    "live": "🟢 live — read now",
+    "ready": "🟡 designed · next to be written",
+    "needs-seeds": "🟠 designed · waiting on missing concept pages",
+    "in-progress": "🔵 queued — writer is on it",
 }
 
 
@@ -163,9 +163,9 @@ def main() -> int:
         "",
         "> An arc is a **diagonal** learning path: from a tool you already touch, through a broader frame, to a synthesised capability, landing at the intersection of two active research areas. Each arc names a **specific frontier destination** you build toward. The MVB at each step is the recipe; the arc is the journey.",
         "",
-        f"**{n_live} live · {n_ready} ready to spin · {n_seeds} need concept seeds · {n_total} total**",
+        f"**{n_live} live · {n_ready} designed and next-up · {n_seeds} waiting on missing concept pages · {n_total} total**",
         "",
-        "See the [arc roadmap](../system/arc-roadmap.md) for the full design rationale and frontier evidence behind each one. The autonomous loop spins the `ready` ones; the `needs-seeds` ones unlock as the retro auto-seeds the missing concepts.",
+        "*Status meanings:* 🟢 **live** = readable on the site now. 🟡 **designed · next** = the arc is designed in the [roadmap](../system/arc-roadmap.md) and all 5 concept pages it needs exist; the autonomous loop will write it next time it runs. 🟠 **waiting on missing concept pages** = the arc is designed but one or more of its concept pages need to be written first; those concept pages get auto-seeded by the retrospective, then the arc unlocks.",
         "",
         "---",
         "",

@@ -451,6 +451,20 @@ def full_cycle_job(dry_run: bool = False) -> dict:
         except Exception:
             pass  # cosmetic; never block the cycle
 
+    # Step 4.7: Refresh the arc catalog so newly-landed arc-index pages
+    # flip from yellow ("designed · next") to green ("live") on the
+    # public catalog at /curriculum/arcs/. Auto-rebuilt from
+    # docs/system/arc-roadmap.md cross-referenced against on-disk presence.
+    if not dry_run:
+        try:
+            import subprocess as _sp
+            from pathlib import Path as _P
+            repo_root = _P(__file__).resolve().parent.parent.parent.parent
+            _sp.run(["python3", "scripts/build_arc_catalog.py"],
+                    cwd=repo_root, capture_output=True, text=True, timeout=30)
+        except Exception:
+            pass  # cosmetic; never block the cycle
+
     # Step 5: Retrospective — backlog agent closes the loop. Aggregates patterns
     # from this cycle's runs, runs an LLM scrum-style retrospective, auto-applies
     # safe proposals (stub seeds), writes everything to docs/system/backlog.md
